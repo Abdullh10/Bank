@@ -54,7 +54,7 @@ export function seed({ log = console.log } = {}) {
       }
     }
 
-    const qdir = path.join(root, 'data', 'questions');
+    const qdir = process.env.QUESTIONS_DIR || path.join(root, 'data', 'questions');
     for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(f => f.endsWith('.json')).sort() : []) {
       const set = JSON.parse(fs.readFileSync(path.join(qdir, f), 'utf8'));
       const obj = db.prepare('SELECT id FROM objectives WHERE code = ?').get(set.objective);
