@@ -7,6 +7,10 @@ import path from 'node:path';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'chem21-'));
 process.env.DB_PATH = path.join(dir, 'test.db');
+// الاختبارات تعمل على أسئلة الهدف النموذجي فقط حتى تكون نتائجها ثابتة مهما زاد البنك.
+fs.mkdirSync(path.join(dir, 'questions'));
+fs.copyFileSync(new URL('../data/questions/C1-L1-O14.json', import.meta.url), path.join(dir, 'questions', 'C1-L1-O14.json'));
+process.env.QUESTIONS_DIR = path.join(dir, 'questions');
 
 const { createApp } = await import('../server/index.js');
 const { seed } = await import('../server/seed.js');
