@@ -177,7 +177,7 @@ async function pageHome() {
           ${progress('أهداف اكتملت أسئلتها المعتمدة', s.coverage.approved_complete, o.n, 'ok')}
           ${progress('محتوى مكمّل للمذكرة معتمد', s.supplements.approved, s.supplements.n, 'ok')}
         </div>
-        <p class="small muted" style="margin-top:.6rem">المرحلة الحالية: <strong>النموذج الأولي</strong>؛ أسئلة هدف واحد فقط للتحقق من الجودة قبل التعميم.</p>
+        <p class="small muted" style="margin-top:.6rem">اكتمل بنك الأسئلة لجميع الأهداف. اعتُمدت الأسئلة بقرار مالك المشروع دون مراجعة تفصيلية لكل سؤال، والتفاصيل في سجل كل سؤال.</p>
       </div>
     </div>
     <div class="section-title"><h2>الفصول</h2><a href="#/chapters">عرض الكل</a></div>

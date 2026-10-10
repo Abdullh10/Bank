@@ -11,6 +11,7 @@ process.env.DB_PATH = path.join(dir, 'test.db');
 fs.mkdirSync(path.join(dir, 'questions'));
 fs.copyFileSync(new URL('../data/questions/C1-L1-O14.json', import.meta.url), path.join(dir, 'questions', 'C1-L1-O14.json'));
 process.env.QUESTIONS_DIR = path.join(dir, 'questions');
+process.env.APPROVALS_FILE = path.join(dir, 'no-approvals.json');
 
 const { createApp } = await import('../server/index.js');
 const { seed } = await import('../server/seed.js');

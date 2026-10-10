@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 import { getDb, tx, J } from './db.js';
 import { autoCheck } from './validate.js';
 
@@ -55,6 +56,9 @@ export function seed({ log = console.log } = {}) {
     }
 
     const qdir = process.env.QUESTIONS_DIR || path.join(root, 'data', 'questions');
+    // قرارات الاعتماد الموثقة: تُطبق فقط إذا طابقت بصمة الملف بصمته وقت الاعتماد.
+    const approvalsFile = process.env.APPROVALS_FILE || path.join(root, 'data', 'approvals.json');
+    const approvals = fs.existsSync(approvalsFile) ? JSON.parse(fs.readFileSync(approvalsFile, 'utf8')) : null;
     for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(f => f.endsWith('.json')).sort() : []) {
       const set = JSON.parse(fs.readFileSync(path.join(qdir, f), 'utf8'));
       const obj = db.prepare('SELECT id FROM objectives WHERE code = ?').get(set.objective);
@@ -74,6 +78,17 @@ export function seed({ log = console.log } = {}) {
           stats.questions++;
         });
       }
+      const fileHash = crypto.createHash('sha256').update(fs.readFileSync(path.join(qdir, f))).digest('hex');
+      if (approvals && approvals.files?.[set.objective] === fileHash) {
+        const dec = approvals.decision;
+        const pending = db.prepare(`SELECT id FROM questions WHERE objective_id = ? AND status = 'generated' AND origin = 'ai_generated'`).all(obj.id);
+        for (const q of pending) {
+          db.prepare(`UPDATE questions SET status = 'approved', reviewer_notes = ?, reviewed_at = ? WHERE id = ?`).run(dec.note, dec.date, q.id);
+          db.prepare(`INSERT INTO revisions (entity, entity_id, action, before_json, after_json, note) VALUES ('question', ?, 'status', ?, ?, ?)`)
+            .run(q.id, J.str({ status: 'generated' }), J.str({ status: 'approved' }), `${dec.by}: ${dec.note}`);
+          stats.approved = (stats.approved || 0) + 1;
+        }
+      }
       // التحقق الآلي لكل أسئلة الهدف بعد إدراجها
       const sib = db.prepare('SELECT id, stem FROM questions WHERE objective_id = ? AND excluded = 0').all(obj.id);
       for (const q of db.prepare('SELECT * FROM questions WHERE objective_id = ?').all(obj.id)) {
@@ -82,7 +97,7 @@ export function seed({ log = console.log } = {}) {
       }
     }
   });
-  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا`);
+  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا، واعتُمد ${stats.approved || 0} سؤالًا بقرار موثق`);
   return stats;
 }
 
