@@ -1535,11 +1535,17 @@
          40
         ]
        }
-      },
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "التراكيب الجزيئية",
+     "objectives": [
       {
        "text": "ان يرسم الطالب تركيب لويس للامونيا NH3/ PH3الفوسفين",
        "src_page": 5,
-       "id": "C4-L2-O08",
+       "id": "C4-L3-O01",
        "status": "pending_review",
        "memo_coverage": {
         "status": "P",
@@ -1549,94 +1555,11 @@
          48
         ],
         "note": "تركيب لويس لـ NH3 موجود؛ أما PH3 فيرد فقط في سؤال اختيار عن شكله (ص48)."
-       }
+       },
+       "original_id": "C4-L2-O08"
       },
       {
        "text": "ان يعرف الطالب الرنين",
-       "src_page": 5,
-       "id": "C4-L2-O09",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         42
-        ]
-       }
-      },
-      {
-       "text": "أن يوضح الطالب أشكال الرنين من خلال الرسم لعدة جزيئات",
-       "src_page": 5,
-       "id": "C4-L2-O10",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         42
-        ]
-       }
-      },
-      {
-       "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأقل من ثمان الكترونات حول الذرة.",
-       "src_page": 5,
-       "id": "C4-L2-O11",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         42
-        ]
-       }
-      },
-      {
-       "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأكثر من ثمان الكترونات حول الذرة",
-       "src_page": 5,
-       "id": "C4-L2-O12",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         42
-        ]
-       }
-      },
-      {
-       "text": "ان يعرف الطالب الرابطه التساهمية التناسقية",
-       "src_page": 5,
-       "id": "C4-L2-O13",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         42
-        ]
-       }
-      }
-     ]
-    },
-    {
-     "number": 3,
-     "title": "أشكال الجزيئات",
-     "objectives": [
-      {
-       "text": "ان يعرف الطالب نموذج VSEPR",
-       "src_page": 5,
-       "id": "C4-L3-O01",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         43
-        ]
-       }
-      },
-      {
-       "text": "ان يوضح الطالب الشكل الهندسي لجزئ BeCl2 ومقدار الزاوية",
        "src_page": 5,
        "id": "C4-L3-O02",
        "status": "pending_review",
@@ -1644,14 +1567,106 @@
         "status": "C",
         "label": "مغطى",
         "memo_pdf_pages": [
+         42
+        ]
+       },
+       "original_id": "C4-L2-O09"
+      },
+      {
+       "text": "أن يوضح الطالب أشكال الرنين من خلال الرسم لعدة جزيئات",
+       "src_page": 5,
+       "id": "C4-L3-O03",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       },
+       "original_id": "C4-L2-O10"
+      },
+      {
+       "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأقل من ثمان الكترونات حول الذرة.",
+       "src_page": 5,
+       "id": "C4-L3-O04",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       },
+       "original_id": "C4-L2-O11"
+      },
+      {
+       "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأكثر من ثمان الكترونات حول الذرة",
+       "src_page": 5,
+       "id": "C4-L3-O05",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       },
+       "original_id": "C4-L2-O12"
+      },
+      {
+       "text": "ان يعرف الطالب الرابطه التساهمية التناسقية",
+       "src_page": 5,
+       "id": "C4-L3-O06",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       },
+       "original_id": "C4-L2-O13"
+      }
+     ],
+     "source_note": "درس أُنشئ بقرار المستخدم (2026-10-10) وفق المذكرة ص41–42؛ أهدافه منقولة بنصوصها من درس «تسمية الجزيئات» في ملف الأهداف."
+    },
+    {
+     "number": 4,
+     "title": "أشكال الجزيئات",
+     "objectives": [
+      {
+       "text": "ان يعرف الطالب نموذج VSEPR",
+       "src_page": 5,
+       "id": "C4-L4-O01",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
          43
         ]
-       }
+       },
+       "original_id": "C4-L3-O01"
+      },
+      {
+       "text": "ان يوضح الطالب الشكل الهندسي لجزئ BeCl2 ومقدار الزاوية",
+       "src_page": 5,
+       "id": "C4-L4-O02",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       },
+       "original_id": "C4-L3-O02"
       },
       {
        "text": "ان يوضح الطالب الشكل الهندسي لجزئ PH3 ومقدار الزاوية",
        "src_page": 5,
-       "id": "C4-L3-O03",
+       "id": "C4-L4-O03",
        "status": "pending_review",
        "memo_coverage": {
         "status": "P",
@@ -1660,93 +1675,11 @@
          43
         ],
         "note": "الهدف يطلب جزيء PH3، والمذكرة تعرض NH3 (107.3°). الزاوية الفعلية في PH3 قرابة 93.5°، فتحتاج تحققًا قبل بناء أي سؤال."
-       }
+       },
+       "original_id": "C4-L3-O03"
       },
       {
        "text": "ان يوضح الطالب الشكل الهندسي لجزئ H2Oومقدار الزاوية",
-       "src_page": 5,
-       "id": "C4-L3-O04",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         43
-        ]
-       }
-      },
-      {
-       "text": "ان يعرف الطالب التهجين",
-       "src_page": 5,
-       "id": "C4-L3-O05",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         43
-        ]
-       }
-      },
-      {
-       "text": "ان يحدد الطالب نوع التهجين في المركب CH4/ AlCl3",
-       "src_page": 5,
-       "id": "C4-L3-O06",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         43
-        ]
-       }
-      }
-     ]
-    },
-    {
-     "number": 4,
-     "title": "الكهروسالبية والقطبية",
-     "objectives": [
-      {
-       "text": "ان يعرف الطالب الميل الالكتروني",
-       "src_page": 5,
-       "id": "C4-L4-O01",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "N",
-        "label": "غير موجود",
-        "memo_pdf_pages": [],
-        "note": "مصطلح «الميل الإلكتروني» غير موجود في المذكرة."
-       }
-      },
-      {
-       "text": "ان يحدد الطالب انواع الروابط مستخدما فرق الكهروسالبية",
-       "src_page": 5,
-       "id": "C4-L4-O02",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         45
-        ]
-       }
-      },
-      {
-       "text": "ان يعلل الطالب سبب انجذاب الجزيئات القطبية للمجال الكهربائي",
-       "src_page": 5,
-       "id": "C4-L4-O03",
-       "status": "pending_review",
-       "memo_coverage": {
-        "status": "C",
-        "label": "مغطى",
-        "memo_pdf_pages": [
-         45
-        ]
-       }
-      },
-      {
-       "text": "ان يوضح الطالب مدى قابلية الذوبان المركبات القطبية في المذيبات القطبية",
        "src_page": 5,
        "id": "C4-L4-O04",
        "status": "pending_review",
@@ -1754,12 +1687,13 @@
         "status": "C",
         "label": "مغطى",
         "memo_pdf_pages": [
-         46
+         43
         ]
-       }
+       },
+       "original_id": "C4-L3-O04"
       },
       {
-       "text": "ان يبين الطالب مدى قابلية الذوبان للمركبات الغير قطبية في المذيبات الغير قطبية",
+       "text": "ان يعرف الطالب التهجين",
        "src_page": 5,
        "id": "C4-L4-O05",
        "status": "pending_review",
@@ -1767,12 +1701,13 @@
         "status": "C",
         "label": "مغطى",
         "memo_pdf_pages": [
-         46
+         43
         ]
-       }
+       },
+       "original_id": "C4-L3-O05"
       },
       {
-       "text": "ان يعرف الطالب قوى فاند رفال",
+       "text": "ان يحدد الطالب نوع التهجين في المركب CH4/ AlCl3",
        "src_page": 5,
        "id": "C4-L4-O06",
        "status": "pending_review",
@@ -1780,14 +1715,104 @@
         "status": "C",
         "label": "مغطى",
         "memo_pdf_pages": [
+         43
+        ]
+       },
+       "original_id": "C4-L3-O06"
+      }
+     ]
+    },
+    {
+     "number": 5,
+     "title": "الكهروسالبية والقطبية",
+     "objectives": [
+      {
+       "text": "ان يعرف الطالب الميل الالكتروني",
+       "src_page": 5,
+       "id": "C4-L5-O01",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "مصطلح «الميل الإلكتروني» غير موجود في المذكرة."
+       },
+       "original_id": "C4-L4-O01"
+      },
+      {
+       "text": "ان يحدد الطالب انواع الروابط مستخدما فرق الكهروسالبية",
+       "src_page": 5,
+       "id": "C4-L5-O02",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         45
+        ]
+       },
+       "original_id": "C4-L4-O02"
+      },
+      {
+       "text": "ان يعلل الطالب سبب انجذاب الجزيئات القطبية للمجال الكهربائي",
+       "src_page": 5,
+       "id": "C4-L5-O03",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         45
+        ]
+       },
+       "original_id": "C4-L4-O03"
+      },
+      {
+       "text": "ان يوضح الطالب مدى قابلية الذوبان المركبات القطبية في المذيبات القطبية",
+       "src_page": 5,
+       "id": "C4-L5-O04",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         46
+        ]
+       },
+       "original_id": "C4-L4-O04"
+      },
+      {
+       "text": "ان يبين الطالب مدى قابلية الذوبان للمركبات الغير قطبية في المذيبات الغير قطبية",
+       "src_page": 5,
+       "id": "C4-L5-O05",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         46
+        ]
+       },
+       "original_id": "C4-L4-O05"
+      },
+      {
+       "text": "ان يعرف الطالب قوى فاند رفال",
+       "src_page": 5,
+       "id": "C4-L5-O06",
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O06"
       },
       {
        "text": "ان يعرف الطالب قوى التشتت",
        "src_page": 5,
-       "id": "C4-L4-O07",
+       "id": "C4-L5-O07",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1795,12 +1820,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O07"
       },
       {
        "text": "ان يعرف الطالب قوى ثنائية القطب",
        "src_page": 5,
-       "id": "C4-L4-O08",
+       "id": "C4-L5-O08",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1808,12 +1834,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O08"
       },
       {
        "text": "ان يعرف الطالب الرابطه الهيدروجينية",
        "src_page": 5,
-       "id": "C4-L4-O09",
+       "id": "C4-L5-O09",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1821,12 +1848,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O09"
       },
       {
        "text": "ان يستنتج الطالب سبب انصهار السكر بالتسخين المعتدل بينما الملح لاينصهر",
        "src_page": 5,
-       "id": "C4-L4-O10",
+       "id": "C4-L5-O10",
        "status": "pending_review",
        "memo_coverage": {
         "status": "P",
@@ -1835,12 +1863,13 @@
          30,
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O10"
       },
       {
        "text": "ان يعلل الطالب سبب وجود بعض المركبات الجزيئية التساهمية في الحالة الغازية",
        "src_page": 5,
-       "id": "C4-L4-O11",
+       "id": "C4-L5-O11",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1848,12 +1877,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O11"
       },
       {
        "text": "ان يعلل الطالب سبب ليونة بعض المركبات الجزيئية التساهمية بالرغم من انها صلبة",
        "src_page": 5,
-       "id": "C4-L4-O12",
+       "id": "C4-L5-O12",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1861,12 +1891,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O12"
       },
       {
        "text": "ان يعطى الطالب امثلة على المواد التساهمية الشبكية",
        "src_page": 5,
-       "id": "C4-L4-O13",
+       "id": "C4-L5-O13",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1874,12 +1905,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O13"
       },
       {
        "text": "ان يعدد الطالب مميزات المواد التساهمية الشبكية",
        "src_page": 5,
-       "id": "C4-L4-O14",
+       "id": "C4-L5-O14",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1887,12 +1919,13 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O14"
       },
       {
        "text": "ان يعلل الطالب ارتفاع درجه انصهار الالماس",
        "src_page": 5,
-       "id": "C4-L4-O15",
+       "id": "C4-L5-O15",
        "status": "pending_review",
        "memo_coverage": {
         "status": "C",
@@ -1900,7 +1933,8 @@
         "memo_pdf_pages": [
          47
         ]
-       }
+       },
+       "original_id": "C4-L4-O15"
       }
      ]
     }
@@ -3678,6 +3712,31 @@
    "date": "2026-10-10",
    "by": "user",
    "text": "المذكرة المرفقة بديلة للكتاب المدرسي، وهي أساس المعلومات العلمية."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "تُكمَّل الفراغات (الأهداف الجزئية) بمساعدة وكيل كيميائي تربوي، مع وسمها مكمَّلة وتخضع للمراجعة."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "الأهداف غير الموجودة في المذكرة تُبنى لها أسئلة وفق نص الهدف."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "إنشاء درس «التراكيب الجزيئية» في الفصل الرابع (أصبح L3، وأُعيد ترقيم «أشكال الجزيئات» L4 و«الكهروسالبية والقطبية» L5؛ الرموز السابقة محفوظة في original_id)."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "أهداف PH3 تشمل NH3 وPH3 معًا. ملاحظة علمية: زاوية NH3 = 107.3° (المذكرة)، وPH3 هرمي ثلاثي بزاوية أصغر (~93.5°)؛ أسئلة الزاوية تُبنى على NH3."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "لا توجد صفحات ناقصة في المذكرة؛ قفزات الترقيم أخطاء ترقيم."
   }
  ]
 }
