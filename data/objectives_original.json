@@ -14,7 +14,8 @@
   "pages": 9,
   "official_textbook_verified": false,
   "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-10-10)",
-  "content_basis": "كتاب الطالب الرسمي — لم يُستلم بعد"
+  "content_basis": "مذكرة «كيمياء 2-1 ثاني ثانوي، الفصل الدراسي الأول 1447هـ» (85 صفحة، مسح ضوئي)، بديلًا عن كتاب الطالب بقرار المستخدم",
+  "memo_file": "مذكرة كيمياء 2-1 (أوراق عمل).pdf"
  },
  "chapters": [
   {
@@ -29,103 +30,225 @@
        "text": "أن يعرف الطالب الاشعاع الكهرومغناطيسي",
        "src_page": 1,
        "id": "C1-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب خصائص الموجات",
        "src_page": 1,
        "id": "C1-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المقصود بالطول الموجي.",
        "src_page": 1,
        "id": "C1-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المقصود بالتردد.",
        "src_page": 1,
        "id": "C1-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المقصود بسعة الموجة.",
        "src_page": 1,
        "id": "C1-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب وحدة قياس التردد .",
        "src_page": 1,
        "id": "C1-L1-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب بالرسم طول الموجة و سعة الموجة",
        "src_page": 1,
        "id": "C1-L1-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب العلاقة بين التردد و طول الموجة.",
        "src_page": 1,
        "id": "C1-L1-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2
+        ]
+       }
       },
       {
        "text": "ان يحسب الطالب الطول الموجي و التردد لموجة كهرمغناطيسية.",
        "src_page": 1,
        "id": "C1-L1-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2,
+         3
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب المقصود بالكم",
        "src_page": 1,
        "id": "C1-L1-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         4
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب المقصود بالطيف الكهرومغناطيسي",
        "src_page": 1,
        "id": "C1-L1-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         3
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب طبيعة الضوء",
        "src_page": 1,
        "id": "C1-L1-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         2,
+         4
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب العلاقة بين طاقة الاشعاع الكهرمغناطيسي و تردده",
        "src_page": 1,
        "id": "C1-L1-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         3,
+         4
+        ]
+       }
       },
       {
        "text": "أن يحسب الطالب طاقة الفوتون",
        "src_page": 1,
        "id": "C1-L1-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         4
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الفوتون",
        "src_page": 1,
        "id": "C1-L1-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         4,
+         14
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب المقصود بطيف الانبعاث للذرات",
        "src_page": 1,
        "id": "C1-L1-O16",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         5
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب تغير لون الاجسام الساخنة تبعاً لدرجة حرارتها",
        "src_page": 1,
        "id": "C1-L1-O17",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "لا يوجد في المذكرة تفسير لتغير لون الأجسام الساخنة بتغير درجة حرارتها."
+       }
       }
      ]
     },
@@ -137,67 +260,146 @@
        "text": "أن يوضح الطالب مفهوم حالة الأستقرار للذرة .",
        "src_page": 1,
        "id": "C1-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         6
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب مفهوم حالة الأثارة للذرة .",
        "src_page": 1,
        "id": "C1-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         6
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب عيوب نموذج بور",
        "src_page": 1,
        "id": "C1-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         6
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب خطوط الطيف لذرة الهيدروجين في سلاسل ليمان وبالمر وباشن .",
        "src_page": 1,
        "id": "C1-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         7
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب فكرة العالم دي برولي",
        "src_page": 1,
        "id": "C1-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         8
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب مبدا هايزنبرك للشك",
        "src_page": 1,
        "id": "C1-L2-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         8,
+         15
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب المقصود بالمستوى.",
        "src_page": 1,
        "id": "C1-L2-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         8
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين نموذج بور و النموذج الميكانيكي الكمي للذرة .",
        "src_page": 1,
        "id": "C1-L2-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         6,
+         8
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب مستويات الطاقة الثانوية.",
        "src_page": 1,
        "id": "C1-L2-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         9
+        ]
+       }
       },
       {
        "text": "أن يصف الطالب أشكال المستويات ( s - p )",
        "src_page": 1,
        "id": "C1-L2-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         9
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب عدد الألكترونات الأقصى في المستويات s,p,d,f",
        "src_page": 1,
        "id": "C1-L2-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         9
+        ]
+       }
       }
      ]
     },
@@ -209,55 +411,123 @@
        "text": "أن يوضح الطالب المقصود بالتوزيع الالكتروني.",
        "src_page": 1,
        "id": "C1-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         10,
+         11
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب مبدأ أوفباو.",
        "src_page": 1,
        "id": "C1-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         10,
+         15
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب مبدأ باولي.",
        "src_page": 1,
        "id": "C1-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         10,
+         15
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب قاعدة هوند.",
        "src_page": 1,
        "id": "C1-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         10,
+         14
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب التوزيع الالكتروني للعنصر بطريقة الترميز.",
        "src_page": 1,
        "id": "C1-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         11
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب التوزيع الالكتروني للعنصر بطريقة الغاز النبيل.",
        "src_page": 1,
        "id": "C1-L3-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         11
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب التوزيع الالكتروني للعنصر بطريقة رسم المربعات.",
        "src_page": 1,
        "id": "C1-L3-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         12
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الكترونات التكافؤ.",
        "src_page": 1,
        "id": "C1-L3-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         13,
+         19
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب التمثيل النقطي ( لويس ) للعناصر",
        "src_page": 1,
        "id": "C1-L3-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         13
+        ]
+       }
       }
      ],
      "source_note": "يلي هذه الأهداف في الملف (آخر ص1 وكامل ص2) 34 صفًا مطابقة حرفيًا لأهداف الفصل الثاني كاملة، مدرجة خطأً تحت هذا الدرس. لم تُحذف؛ وُثقت في duplicate_rows."
@@ -276,67 +546,144 @@
        "text": "ان يذكر الطالب المساهمات كلا من لافوازية ونيولاندز و مندليف و موزلي في تطور الجدول الدوري الحديث.",
        "src_page": 3,
        "id": "C2-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الدورة والمجموعه.",
        "src_page": 3,
        "id": "C2-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يحدد الطالب عناصر المجموعات الممثلة ( الرئيسية ).",
        "src_page": 3,
        "id": "C2-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يحدد الطالب عناصر المجموعات الانتقالية في الجدول الدوري .",
        "src_page": 3,
        "id": "C2-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يحدد الطالب الفلزات و اللافلزات واشباه الفلزات والعناصر الانتقالية على الجدول الدوري.",
        "src_page": 3,
        "id": "C2-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         17
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب اسم المجموعه الاولى.",
        "src_page": 3,
        "id": "C2-L1-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب اسم المجموعه الثانية .",
        "src_page": 3,
        "id": "C2-L1-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب اسم المجموعه السابعة عشر .",
        "src_page": 3,
        "id": "C2-L1-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب اسم المجموعه الثامنة عشر.",
        "src_page": 3,
        "id": "C2-L1-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب أستخدام واحد لعنصر ( الصوديوم / الليثيوم/ الفلور/ الماغنيسيوم/ الكالسيوم/ السيليكون )",
        "src_page": 3,
        "id": "C2-L1-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         17
+        ]
+       }
       },
       {
        "text": "ان يعدد الطالب اقسام الفلزات الانتقالية الداخلية.",
        "src_page": 3,
        "id": "C2-L1-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16
+        ]
+       }
       }
      ]
     },
@@ -348,25 +695,54 @@
        "text": "ان يستنتج الطالب الكترونات التكافؤ ورقم الدورة ورقم المجموعه من خلال التوزيع الالكتروني.",
        "src_page": 3,
        "id": "C2-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         19
+        ]
+       }
       },
       {
        "text": "ان يعدد الطالب فئات الجدول الدوري.",
        "src_page": 3,
        "id": "C2-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         16,
+         18
+        ]
+       }
       },
       {
        "text": "ان يحدد الطالب المجموعات التي تنتمي اليها فئات الجدول الدوري.",
        "src_page": 3,
        "id": "C2-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         18
+        ]
+       }
       },
       {
        "text": "ان يستنتج الطالب فئة العنصر وموقعه من خلال التوزيع الالكتروني.",
        "src_page": 3,
        "id": "C2-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         18
+        ]
+       }
       }
      ]
     },
@@ -378,115 +754,253 @@
        "text": "أن يعرّف الطالب الحجم الذري.",
        "src_page": 3,
        "id": "C2-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         21
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب نصف قطر الذرة للفلزات.",
        "src_page": 3,
        "id": "C2-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         21
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب نقص الحجم الذري لعناصر الدورة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         21
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين أحجام الذرات لعناصر الدورة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         21
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سبب إزدياد الحجم الذري لعناصر المجموعة الواحدة من الاعلى للأسفل .",
        "src_page": 3,
        "id": "C2-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         21,
+         26
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين أحجام الذرات لعناصر المجموعة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         21
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب الأيون.",
        "src_page": 3,
        "id": "C2-L3-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         22,
+         27
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سبب صغر حجم الذرة عندما تفقد إلكترونات.",
        "src_page": 3,
        "id": "C2-L3-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         22
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سبب كبر حجم الذرة عندما تكتسب إلكترونات.",
        "src_page": 3,
        "id": "C2-L3-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         22
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب طاقة التأين.",
        "src_page": 3,
        "id": "C2-L3-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         23,
+         26
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب ازدياد طاقة التأين لعناصر الدورة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         23
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب طاقة التأين لعناصر الدورة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         23
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب طاقة التأين لعناصر المجموعه الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         23
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب نقص طاقة التأين لعناصر المجموعة الواحدة.",
        "src_page": 3,
        "id": "C2-L3-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         23
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب نص القاعدة الثمانية.",
        "src_page": 3,
        "id": "C2-L3-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         23,
+         26
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب الكهرسالبية.",
        "src_page": 3,
        "id": "C2-L3-O16",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         45,
+         26
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين الكهروسالبية لعناصر الجدول الدوري",
        "src_page": 3,
        "id": "C2-L3-O17",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         24,
+         45
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب ميل بعض العناصر إلى فقد الإلكترونات.",
        "src_page": 3,
        "id": "C2-L3-O18",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         27
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب عدم تعيين قيم الكهرسالبية للغازات النبيلة",
        "src_page": 3,
        "id": "C2-L3-O19",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "لا يوجد في المذكرة ذكر لعدم تعيين قيم الكهروسالبية للغازات النبيلة."
+       }
       }
      ]
     }
@@ -504,31 +1018,66 @@
        "text": "أن يعرف الطالب الرابطة الكيميائية",
        "src_page": 4,
        "id": "C3-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         28
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الكاتيون",
        "src_page": 4,
        "id": "C3-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         27
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الانيون",
        "src_page": 4,
        "id": "C3-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         27
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب ميل بعض العناصر إلى إكتساب الإلكترونات",
        "src_page": 4,
        "id": "C3-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         27
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب النشاط الكيميائي لذرات الفلزات",
        "src_page": 4,
        "id": "C3-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         27
+        ]
+       }
       }
      ]
     },
@@ -540,43 +1089,93 @@
        "text": "أن يعرف الطالب الرابطة الايونية",
        "src_page": 4,
        "id": "C3-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         29
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب طريقة تكوين الرابطة الأيونية في المركبات الأيونية",
        "src_page": 4,
        "id": "C3-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         29
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب الخواص الفيزيائية للمركبات الأيونية",
        "src_page": 4,
        "id": "C3-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         30
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب طاقة الشبكة البلورية",
        "src_page": 4,
        "id": "C3-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         30
+        ]
+       }
       },
       {
        "text": "أن يعرّف الطالب الإلكتروليت",
        "src_page": 4,
        "id": "C3-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         30
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب العلاقة بين قوة الرابطة الأيونية, والخواص الفيزيائية للمركبات الأيونية، وطاقة الشبكة البلورية",
        "src_page": 4,
        "id": "C3-L2-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         30,
+         31
+        ]
+       }
       },
       {
        "text": "أن يبرر الطالب خواص المركبات الأيونية",
        "src_page": 4,
        "id": "C3-L2-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         30
+        ]
+       }
       }
      ]
     },
@@ -588,31 +1187,69 @@
        "text": "أن يعرّف الطالب عدد التأكسد",
        "src_page": 4,
        "id": "C3-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         32
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب صيغ المركبات الأيونية ثنائية الذرات",
        "src_page": 4,
        "id": "C3-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         32,
+         33
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب صيغ المركبات الأيونية عديدة الذرات",
        "src_page": 4,
        "id": "C3-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         32,
+         33
+        ]
+       }
       },
       {
        "text": "أن يتعرف الطالب على الايون احادي الذرة",
        "src_page": 4,
        "id": "C3-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         32
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب طريقة التسمية على صيغ المركبات الأيونية والأيونات العديدة الذرات",
        "src_page": 4,
        "id": "C3-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         32,
+         33
+        ]
+       }
       }
      ]
     },
@@ -624,31 +1261,66 @@
        "text": "أن يعرّف الطالب الرابطة الفلزية",
        "src_page": 4,
        "id": "C3-L4-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         34,
+         35
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب خواص الفيزيائية للفلزات",
        "src_page": 4,
        "id": "C3-L4-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         34
+        ]
+       }
       },
       {
        "text": "أن يعلل الطالب الفلزات موصلات جيدة للحرارة والكهرباء",
        "src_page": 4,
        "id": "C3-L4-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "المذكرة تذكر أن الفلزات موصلة، لكن تعليل ذلك (الإلكترونات الحرة) غير مكتوب (ص34 وص69 فراغ)."
+       }
       },
       {
        "text": "أن يعرّف الطالب السبيكة",
        "src_page": 4,
        "id": "C3-L4-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         34
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب استخدامات بعض السبائك",
        "src_page": 4,
        "id": "C3-L4-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         34
+        ]
+       }
       }
      ]
     }
@@ -666,49 +1338,106 @@
        "text": "ان يعرف الطالب الرابطه التساهمية",
        "src_page": 5,
        "id": "C4-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         36
+        ]
+       }
       },
       {
        "text": "ان يوضح الطالب كيف يتكون الجزئ في الرابطه التساهمية",
        "src_page": 5,
        "id": "C4-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         36
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الرابطة التساهمية الاحادية.",
        "src_page": 5,
        "id": "C4-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         36
+        ]
+       }
       },
       {
        "text": "ان يعطى الطالب امثلة على الرابطه التساهمة الاحاديه",
        "src_page": 5,
        "id": "C4-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         36
+        ]
+       }
       },
       {
        "text": "ان يمثل الطالب تركيب لويس",
        "src_page": 5,
        "id": "C4-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         41
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الرابطه سيجما",
        "src_page": 5,
        "id": "C4-L1-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         36,
+         48
+        ]
+       }
       },
       {
        "text": "ان يقارن الطالب بين رابطه سيجما ورابطه باي",
        "src_page": 5,
        "id": "C4-L1-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         36
+        ]
+       }
       },
       {
        "text": "ان يستنتج الطالب العلاقة بين طول الرابطه التساهمية وقوه الرابطة وطاقة تفككها",
        "src_page": 5,
        "id": "C4-L1-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         37
+        ]
+       }
       }
      ]
     },
@@ -720,79 +1449,172 @@
        "text": "ان يسمى الطالب بعض المركبات الجزيئية الثنائية الذرات",
        "src_page": 5,
        "id": "C4-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         38
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب الاسماء الشائعه ل ثالث هيدريد النيتروجين ورابع هيدريد ثنائي النيتروجين و أكسيد ثنائي الهيدروجين",
        "src_page": 5,
        "id": "C4-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         38
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الاحماض الثنائية",
        "src_page": 5,
        "id": "C4-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         39
+        ]
+       }
       },
       {
        "text": "ان يسمى الطالب الاحماض الثنائية HCL/ HF/HI/H2S",
        "src_page": 5,
        "id": "C4-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         39
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الاحماض الاكسجينية",
        "src_page": 5,
        "id": "C4-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         39
+        ]
+       }
       },
       {
        "text": "أن يسمي الطالب الاحماض الاكسجينية",
        "src_page": 5,
        "id": "C4-L2-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         39
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب الصيغ الكيميائية من أسماء المركبات",
        "src_page": 5,
        "id": "C4-L2-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         40
+        ]
+       }
       },
       {
        "text": "ان يرسم الطالب تركيب لويس للامونيا NH3/ PH3الفوسفين",
        "src_page": 5,
        "id": "C4-L2-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         41,
+         48
+        ],
+        "note": "تركيب لويس لـ NH3 موجود؛ أما PH3 فيرد فقط في سؤال اختيار عن شكله (ص48)."
+       }
       },
       {
        "text": "ان يعرف الطالب الرنين",
        "src_page": 5,
        "id": "C4-L2-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب أشكال الرنين من خلال الرسم لعدة جزيئات",
        "src_page": 5,
        "id": "C4-L2-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       }
       },
       {
        "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأقل من ثمان الكترونات حول الذرة.",
        "src_page": 5,
        "id": "C4-L2-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       }
       },
       {
        "text": "ان يمثل الطالب تركيب لويس لحالة استقرار المركبات بأكثر من ثمان الكترونات حول الذرة",
        "src_page": 5,
        "id": "C4-L2-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الرابطه التساهمية التناسقية",
        "src_page": 5,
        "id": "C4-L2-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         42
+        ]
+       }
       }
      ]
     },
@@ -804,37 +1626,80 @@
        "text": "ان يعرف الطالب نموذج VSEPR",
        "src_page": 5,
        "id": "C4-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       }
       },
       {
        "text": "ان يوضح الطالب الشكل الهندسي لجزئ BeCl2 ومقدار الزاوية",
        "src_page": 5,
        "id": "C4-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       }
       },
       {
        "text": "ان يوضح الطالب الشكل الهندسي لجزئ PH3 ومقدار الزاوية",
        "src_page": 5,
        "id": "C4-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         43
+        ],
+        "note": "الهدف يطلب جزيء PH3، والمذكرة تعرض NH3 (107.3°). الزاوية الفعلية في PH3 قرابة 93.5°، فتحتاج تحققًا قبل بناء أي سؤال."
+       }
       },
       {
        "text": "ان يوضح الطالب الشكل الهندسي لجزئ H2Oومقدار الزاوية",
        "src_page": 5,
        "id": "C4-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب التهجين",
        "src_page": 5,
        "id": "C4-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       }
       },
       {
        "text": "ان يحدد الطالب نوع التهجين في المركب CH4/ AlCl3",
        "src_page": 5,
        "id": "C4-L3-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         43
+        ]
+       }
       }
      ]
     },
@@ -846,91 +1711,196 @@
        "text": "ان يعرف الطالب الميل الالكتروني",
        "src_page": 5,
        "id": "C4-L4-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "مصطلح «الميل الإلكتروني» غير موجود في المذكرة."
+       }
       },
       {
        "text": "ان يحدد الطالب انواع الروابط مستخدما فرق الكهروسالبية",
        "src_page": 5,
        "id": "C4-L4-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         45
+        ]
+       }
       },
       {
        "text": "ان يعلل الطالب سبب انجذاب الجزيئات القطبية للمجال الكهربائي",
        "src_page": 5,
        "id": "C4-L4-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         45
+        ]
+       }
       },
       {
        "text": "ان يوضح الطالب مدى قابلية الذوبان المركبات القطبية في المذيبات القطبية",
        "src_page": 5,
        "id": "C4-L4-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         46
+        ]
+       }
       },
       {
        "text": "ان يبين الطالب مدى قابلية الذوبان للمركبات الغير قطبية في المذيبات الغير قطبية",
        "src_page": 5,
        "id": "C4-L4-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         46
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب قوى فاند رفال",
        "src_page": 5,
        "id": "C4-L4-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب قوى التشتت",
        "src_page": 5,
        "id": "C4-L4-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب قوى ثنائية القطب",
        "src_page": 5,
        "id": "C4-L4-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الرابطه الهيدروجينية",
        "src_page": 5,
        "id": "C4-L4-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يستنتج الطالب سبب انصهار السكر بالتسخين المعتدل بينما الملح لاينصهر",
        "src_page": 5,
        "id": "C4-L4-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         30,
+         47
+        ]
+       }
       },
       {
        "text": "ان يعلل الطالب سبب وجود بعض المركبات الجزيئية التساهمية في الحالة الغازية",
        "src_page": 5,
        "id": "C4-L4-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعلل الطالب سبب ليونة بعض المركبات الجزيئية التساهمية بالرغم من انها صلبة",
        "src_page": 5,
        "id": "C4-L4-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعطى الطالب امثلة على المواد التساهمية الشبكية",
        "src_page": 5,
        "id": "C4-L4-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعدد الطالب مميزات المواد التساهمية الشبكية",
        "src_page": 5,
        "id": "C4-L4-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       },
       {
        "text": "ان يعلل الطالب ارتفاع درجه انصهار الالماس",
        "src_page": 5,
        "id": "C4-L4-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         47
+        ]
+       }
       }
      ]
     }
@@ -948,31 +1918,66 @@
        "text": "أن يعرف الطالب التركيب النسبي المئوي",
        "src_page": 6,
        "id": "C5-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         49
+        ]
+       }
       },
       {
        "text": "أن يحل الطالب مسائل على التركيب النسبي المئوي",
        "src_page": 6,
        "id": "C5-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         49
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين الصيغة الأولية والجزيئية",
        "src_page": 6,
        "id": "C5-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         50
+        ]
+       }
       },
       {
        "text": "أن يحل الطالب مسائل إيجاد الصيغة الأولية للمركب",
        "src_page": 6,
        "id": "C5-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         50
+        ]
+       }
       },
       {
        "text": "أن يحل الطالب مسائل على إيجاد الصيغة الجزيئية",
        "src_page": 6,
        "id": "C5-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         51
+        ]
+       }
       }
      ]
     },
@@ -984,31 +1989,67 @@
        "text": "أن يعرف الطالب الملح المائي",
        "src_page": 6,
        "id": "C5-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         52
+        ]
+       }
       },
       {
        "text": "أن يحل الطالب مسائل لإيجاد الصيغة الكيميائية لملح مائي",
        "src_page": 6,
        "id": "C5-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         52,
+         53
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب استخدامات بعض الأملاح المائية",
        "src_page": 6,
        "id": "C5-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         52
+        ]
+       }
       },
       {
        "text": "أن يسمي الطالب بعض الملح المائي",
        "src_page": 6,
        "id": "C5-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         52
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب طريقة الحصول على الملح اللامائي من الملح المائي",
        "src_page": 6,
        "id": "C5-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         52
+        ]
+       }
       }
      ]
     },
@@ -1020,31 +2061,66 @@
        "text": "ان يصف الطالب العلاقات الكمية بين المواد المتفاعلة و المواد الناتجة في التفاعلات الكيميائية من خلال معادلة كيميائية موزونة.",
        "src_page": 6,
        "id": "C5-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         54
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المقصود بالحسابات الكيميائية.",
        "src_page": 6,
        "id": "C5-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         54
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المقصود بقانون حفظ الكتلة .",
        "src_page": 6,
        "id": "C5-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         54
+        ]
+       }
       },
       {
        "text": "أن يحقق الطالب قانون حفظ الكتلة من خلال المعادلة الكيميائية الموزونة.",
        "src_page": 6,
        "id": "C5-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         54
+        ]
+       }
       },
       {
        "text": "أن يكتب الطالب النسب المولية في المعادلة الكيميائية الموزونة.",
        "src_page": 6,
        "id": "C5-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         55
+        ]
+       }
       }
      ]
     },
@@ -1056,13 +2132,27 @@
        "text": "أن يحسب الطالب عدد مولات مادة ما بدلالة عدد مولات مادة معلومة من خلال المعادلة الكيميائية الموزونة.",
        "src_page": 6,
        "id": "C5-L4-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         56
+        ]
+       }
       },
       {
        "text": "أن يحسب الطالب الكتلة بالجرام لمادة ما بدلالة عدد مولات مادة معلومة من خلال المعادلة الكيميائية الموزونة.",
        "src_page": 6,
        "id": "C5-L4-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         57
+        ]
+       }
       }
      ]
     },
@@ -1074,25 +2164,53 @@
        "text": "ان يعرف الطالب المادة المحددة للتفاعل.",
        "src_page": 6,
        "id": "C5-L5-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         58
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب المادة الفائضة للتفاعل.",
        "src_page": 6,
        "id": "C5-L5-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         58
+        ]
+       }
       },
       {
        "text": "ان يفسر الطالب متى يتوقف التفاعل الكيميائي.",
        "src_page": 6,
        "id": "C5-L5-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         58
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب المادة المحددة والمادة الفائضة في التفاعل الكيميائي.",
        "src_page": 6,
        "id": "C5-L5-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         58
+        ]
+       }
       }
      ]
     },
@@ -1104,13 +2222,27 @@
        "text": "أن يعرّف الطالب المردود النظري ونسبة المردود المئوي.",
        "src_page": 6,
        "id": "C5-L6-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         59
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب نسبة المردود المئوي للتفاعل الكيميائي .",
        "src_page": 6,
        "id": "C5-L6-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         59
+        ]
+       }
       }
      ]
     }
@@ -1128,110 +2260,240 @@
        "text": "أن يعرف الطالب التصادم المرن.",
        "src_page": 7,
        "id": "C6-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60,
+         74
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سلوك الغازات.",
        "src_page": 7,
        "id": "C6-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب العوامل التي تعتمد عليها الطاقة الحركية لجسيمات الغاز.",
        "src_page": 7,
        "id": "C6-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الانتشار.",
        "src_page": 7,
        "id": "C6-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التدفق.",
        "src_page": 7,
        "id": "C6-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60,
+         74
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب نص قانون جراهام.",
        "src_page": 7,
        "id": "C6-L1-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         61
+        ]
+       }
       },
       {
        "text": "أن يحسب الطالب معدل الإنتشار بين غازين",
        "src_page": 7,
        "id": "C6-L1-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         61
+        ]
+       }
       },
       {
        "text": "ان يفسر الطالب انخفاض كثافة الغازات.",
        "src_page": 7,
        "id": "C6-L1-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب قابلية الغازات للتمدد.",
        "src_page": 7,
        "id": "C6-L1-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب قابلية الغازات للانضغاط.",
        "src_page": 7,
        "id": "C6-L1-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         60
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الضغط.",
        "src_page": 7,
        "id": "C6-L1-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         62,
+         74
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب العلاقة بين الضغط والجاذبية.",
        "src_page": 7,
        "id": "C6-L1-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "العلاقة بين الضغط والجاذبية غير موجودة؛ يوجد فقط سؤال فارغ عن نقص الضغط في المرتفعات (ص62)."
+       }
       },
       {
        "text": "أن يعرف الطالب الضغط الجوي",
        "src_page": 7,
        "id": "C6-L1-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         62
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب أجهزة قياس الضغط الجوي مع ذكر استخداماتها.",
        "src_page": 7,
        "id": "C6-L1-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         62,
+         74
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب وحدات قياس الضغط.",
        "src_page": 7,
        "id": "C6-L1-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         62
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب قانون دالتون للضغوط الجزئية.",
        "src_page": 7,
        "id": "C6-L1-O16",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         63
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب قانون دالتون للضغوط الجزئية والكلية.",
        "src_page": 7,
        "id": "C6-L1-O17",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         63
+        ]
+       }
       },
       {
        "text": "أن يحسب الطالب معدل الإنتشار بين غازين",
        "src_page": 7,
        "id": "C6-L1-O18",
        "status": "pending_review",
-       "duplicate_of": "C6-L1-O07"
+       "duplicate_of": "C6-L1-O07",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         61
+        ],
+        "note": "مكرر للهدف C6-L1-O07."
+       }
       }
      ]
     },
@@ -1243,61 +2505,134 @@
        "text": "أن يقارن الطالب بين أنواع القوى بين الجزيئات.",
        "src_page": 7,
        "id": "C6-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64,
+         65
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سبب وجود الفلور في الحالة الغازية بينما اليود صلب عند درجة حرارة الغرفة.",
        "src_page": 7,
        "id": "C6-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         64
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب سبب تكون قوى التشتت.",
        "src_page": 7,
        "id": "C6-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب امثلة لقوى التشتت",
        "src_page": 7,
        "id": "C6-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب قوى ثنائية القطب",
        "src_page": 7,
        "id": "C6-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب امثلة لقوى ثنائية القطب",
        "src_page": 7,
        "id": "C6-L2-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64,
+         65
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب الروابط الهيدروجينية",
        "src_page": 7,
        "id": "C6-L2-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب امثلة للروابط الهيدروجينية",
        "src_page": 7,
        "id": "C6-L2-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         64,
+         65
+        ]
+       }
       },
       {
        "text": "ان يفسر الطالب تواجد الماء في حالة سائلة والنشادر في حالة غازية رغم تكوينهما لروابط هيدروجينية",
        "src_page": 7,
        "id": "C6-L2-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         65
+        ]
+       }
       },
       {
        "text": "ان يعلل الطالب ان الاوكتان سائل بينما الميثان غاز",
        "src_page": 7,
        "id": "C6-L2-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         65
+        ]
+       }
       }
      ]
     },
@@ -1309,217 +2644,472 @@
        "text": "أن يقارن الطالب بين المادة الصلبة والسائلة في ترتيب الجسيمات.",
        "src_page": 7,
        "id": "C6-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66,
+         68
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب خصائص المواد السائلة.",
        "src_page": 7,
        "id": "C6-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب العامل المؤثر على الطاقة الحركية لجسيمات السوائل.",
        "src_page": 7,
        "id": "C6-L3-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب كثافة السوائل أعلى من الغازات.",
        "src_page": 7,
        "id": "C6-L3-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب عدم قابلية السوائل للانضغاط.",
        "src_page": 7,
        "id": "C6-L3-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب تصنيف الغازات والسوائل على أنها موائع.",
        "src_page": 7,
        "id": "C6-L3-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب السوائل أقل ميوعة من الغازات.",
        "src_page": 7,
        "id": "C6-L3-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب اللزوجة.",
        "src_page": 7,
        "id": "C6-L3-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66,
+         74
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب العوامل المؤثرة في اللزوجة",
        "src_page": 7,
        "id": "C6-L3-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         66
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التوتر السطحي.",
        "src_page": 7,
        "id": "C6-L3-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "ان يذكر الطالب مثال على العوامل الخافضة للتوتر السطحي.",
        "src_page": 7,
        "id": "C6-L3-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب الماء هو الاعلى توتر سطحي بين معظم السوائل.",
        "src_page": 7,
        "id": "C6-L3-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب قطرات الماء لها شكل كروي.",
        "src_page": 8,
        "id": "C6-L3-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب استخدام الصابون لإزالة الاوساخ في الماء.",
        "src_page": 8,
        "id": "C6-L3-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب أن الماء يتقعر بينما يتحدب الزئبق في الانبوب الزجاجي.",
        "src_page": 8,
        "id": "C6-L3-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "N",
+        "label": "غير موجود",
+        "memo_pdf_pages": [],
+        "note": "تقعر سطح الماء وتحدب الزئبق في الأنبوب الزجاجي غير مذكورين في المذكرة."
+       }
       },
       {
        "text": "أن يعرف الطالب التماسك.",
        "src_page": 8,
        "id": "C6-L3-O16",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التلاصق.",
        "src_page": 8,
        "id": "C6-L3-O17",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب ارتفاع الماء في الانابيب الاسطوانية.",
        "src_page": 8,
        "id": "C6-L3-O18",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67,
+         74
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الخاصية الشعرية.",
        "src_page": 8,
        "id": "C6-L3-O19",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         67,
+         74
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب خصائص المواد الصلبة.",
        "src_page": 8,
        "id": "C6-L3-O20",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب العامل المؤثر على الطاقة الحركية لجسيمات المواد الصلبة.",
        "src_page": 8,
        "id": "C6-L3-O21",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب كثافة بعض المواد الصلبة أعلى من المواد السائلة.",
        "src_page": 8,
        "id": "C6-L3-O22",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب عدم قابلية المواد الصلبة للانضغاط.",
        "src_page": 8,
        "id": "C6-L3-O23",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب عدم تصنيف المواد الصلبة ضمن الموائع.",
        "src_page": 8,
        "id": "C6-L3-O24",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب مكعبات البنزين الصلبة تغرق في البنزين السائل.",
        "src_page": 8,
        "id": "C6-L3-O25",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب الثلج الصلب يطفو على سطح الماء السائل.",
        "src_page": 8,
        "id": "C6-L3-O26",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         68
+        ]
+       }
       },
       {
        "text": "أن يعدد الطالب أنواع المواد الصلبة حسب التبلور.",
        "src_page": 8,
        "id": "C6-L3-O27",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المواد المتبلورة.",
        "src_page": 8,
        "id": "C6-L3-O28",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب أمثلة على المواد الصلبة المتبلورة",
        "src_page": 8,
        "id": "C6-L3-O29",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب المواد غير المتبلورة.",
        "src_page": 8,
        "id": "C6-L3-O30",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب أمثلة على المواد الصلبة غير المتبلورة",
        "src_page": 8,
        "id": "C6-L3-O31",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب وحدة البناء.",
        "src_page": 8,
        "id": "C6-L3-O32",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يصنف الطالب المواد الصلبة البلورية.",
        "src_page": 8,
        "id": "C6-L3-O33",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التآصل.",
        "src_page": 8,
        "id": "C6-L3-O34",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب المواد الصلبة الجزيئية رديئة التوصيل للحرارة والكهرباء.",
        "src_page": 8,
        "id": "C6-L3-O35",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب المواد الصلبة الفلزية موصلة جيدة للحرارة و الكهرباء.",
        "src_page": 8,
        "id": "C6-L3-O36",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         69
+        ]
+       }
       }
      ],
      "source_note": "في ص8 تقع آخر 15 هدفًا (من «كثافة بعض المواد الصلبة» حتى «الصلبة الفلزية») في خلية درس فارغة العنوان؛ أُلحقت بهذا الدرس بوصفها امتدادًا له، وتحتاج تحققًا."
@@ -1532,103 +3122,223 @@
        "text": "أن يفسر الطالب كيف يؤدي إضافة الطاقة أو انتزاعها إلى تغير الحالة الفيزيائية للمادة.",
        "src_page": 8,
        "id": "C6-L4-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الانصهار.",
        "src_page": 8,
        "id": "C6-L4-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التبخر.",
        "src_page": 8,
        "id": "C6-L4-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التسامي.",
        "src_page": 8,
        "id": "C6-L4-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب التجمد.",
        "src_page": 8,
        "id": "C6-L4-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب التكثف.",
        "src_page": 8,
        "id": "C6-L4-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "ان يوضح الطالب الترسيب.",
        "src_page": 8,
        "id": "C6-L4-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "ان يعرف الطالب التبخر السطحي.",
        "src_page": 8,
        "id": "C6-L4-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الضغط البخاري",
        "src_page": 8,
        "id": "C6-L4-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب درجة الغليان.",
        "src_page": 8,
        "id": "C6-L4-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب درجة الانصهار.",
        "src_page": 8,
        "id": "C6-L4-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب درجة التجمد.",
        "src_page": 8,
        "id": "C6-L4-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         70
+        ]
+       }
       },
       {
        "text": "أن يحدد الطالب المتغيرات التي تتحكم في حالة المادة.",
        "src_page": 8,
        "id": "C6-L4-O13",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         71
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب مخطط الحالة الفيزيائية.",
        "src_page": 8,
        "id": "C6-L4-O14",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         71
+        ]
+       }
       },
       {
        "text": "أن يوضح الطالب فائدة مخطط الحالة الفيزيائية.",
        "src_page": 8,
        "id": "C6-L4-O15",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         71
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب النقطة الحرجة.",
        "src_page": 8,
        "id": "C6-L4-O16",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         71,
+         74
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب النقطة الثلاثية.",
        "src_page": 8,
        "id": "C6-L4-O17",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         71
+        ]
+       }
       }
      ]
     }
@@ -1646,73 +3356,162 @@
        "text": "أن يذكر الطالب نص قوانين بويل و شارل و جاي لوساك و القانون العام للغازات.",
        "src_page": 9,
        "id": "C7-L1-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         75,
+         76,
+         77,
+         78,
+         85
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب قانون بويل.",
        "src_page": 9,
        "id": "C7-L1-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         75
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب قانون شارل.",
        "src_page": 9,
        "id": "C7-L1-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         76
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب قانون جاي لوساك.",
        "src_page": 9,
        "id": "C7-L1-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         77
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب القانون العام للغازات.",
        "src_page": 9,
        "id": "C7-L1-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         78
+        ]
+       }
       },
       {
        "text": "أن يذكر الطالب نص مبدأ أفوجادرو.",
        "src_page": 9,
        "id": "C7-L1-O06",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         79,
+         85
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الحجم المولاري.",
        "src_page": 9,
        "id": "C7-L1-O07",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         79
+        ]
+       }
       },
       {
        "text": "أن يحسب الطالب الحجم المولاري لبعض الغازات.",
        "src_page": 9,
        "id": "C7-L1-O08",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         79
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب قانون الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L1-O09",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "P",
+        "label": "جزئي",
+        "memo_pdf_pages": [
+         80
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب قانون الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L1-O10",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         80
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب على العلاقة بين الكتلة المولية وقانون الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L1-O11",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         81
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب على العلاقة بين الكثافة وقانون الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L1-O12",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         81
+        ]
+       }
       }
      ]
     },
@@ -1724,31 +3523,66 @@
        "text": "أن يعدد الطالب مميزات الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L2-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         82
+        ]
+       }
       },
       {
        "text": "أن يقارن الطالب بين الغاز الحقيقي والغاز المثالي.",
        "src_page": 9,
        "id": "C7-L2-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         82
+        ]
+       }
       },
       {
        "text": "أن يعرف الطالب الغاز الحقيقي.",
        "src_page": 9,
        "id": "C7-L2-O03",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         82
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب عدم سلوك الغازات القطبية سلوك الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L2-O04",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         82
+        ]
+       }
       },
       {
        "text": "أن يفسر الطالب عدم سلوك الغازات كبيرة الحجم سلوك الغاز المثالي.",
        "src_page": 9,
        "id": "C7-L2-O05",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         82
+        ]
+       }
       }
      ]
     },
@@ -1760,13 +3594,27 @@
        "text": "أن يطبق الطالب مبدأ أفوجادرو في حسابات الغازات في المعادلة الكيميائية الموزونة.",
        "src_page": 9,
        "id": "C7-L3-O01",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         83
+        ]
+       }
       },
       {
        "text": "أن يطبق الطالب حسابات الغازات ( الحجم - الكتلة ).",
        "src_page": 9,
        "id": "C7-L3-O02",
-       "status": "pending_review"
+       "status": "pending_review",
+       "memo_coverage": {
+        "status": "C",
+        "label": "مغطى",
+        "memo_pdf_pages": [
+         84
+        ]
+       }
       }
      ]
     }
@@ -1825,6 +3673,11 @@
    "date": "2026-10-10",
    "by": "claude (تطبيق للقرار)",
    "text": "اعتماد الفصول السبعة والدروس السبعة والعشرين بالعناوين والترتيب الواردين في الملف؛ إبقاء أهداف لويس والرنين في درس «تسمية الجزيئات» وأهداف الغاز المثالي في «قوانين الغازات» كما في الملف؛ إلحاق خلية ص8 غير المعنونة بدرس «المواد السائلة والمواد الصلبة»؛ إبقاء الهدف المكرر C6-L1-O18 مع وسمه مكررًا لـ C6-L1-O07."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "user",
+   "text": "المذكرة المرفقة بديلة للكتاب المدرسي، وهي أساس المعلومات العلمية."
   }
  ]
 }
