@@ -8,15 +8,80 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
 
-async function api(path, { method = 'GET', body } = {}) {
-  const res = await fetch('/api' + path, {
+async function api(path, opts = {}) {
+  if (state.static) return staticApi(path, opts);
+  const { method = 'GET', body } = opts;
+  const res = await fetch('api' + path, {
     method, credentials: 'same-origin',
     headers: body ? { 'Content-Type': 'application/json' } : {},
     body: body ? JSON.stringify(body) : undefined,
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error || 'تعذر تنفيذ الطلب'), { errors: data.errors, status: res.status });
+  const data = await res.json().catch(() => null);
+  // لا يوجد خادم (مثل GitHub Pages): ننتقل إلى نسخة العرض الثابتة.
+  if (data === null && path === '/me') { state.static = true; return staticApi(path, opts); }
+  if (!res.ok || data === null) throw Object.assign(new Error(data?.error || 'تعذر تنفيذ الطلب'), { errors: data?.errors, status: res.status });
   return data;
+}
+
+// ---------- نسخة العرض الثابتة (للقراءة فقط) ----------
+const staticCache = new Map();
+const staticQuestions = new Map();
+async function staticFile(name) {
+  if (!staticCache.has(name)) {
+    staticCache.set(name, fetch('static/' + name).then(r => {
+      if (!r.ok) throw new Error('البيانات غير متاحة في نسخة العرض');
+      return r.json();
+    }));
+  }
+  const data = await staticCache.get(name);
+  if (Array.isArray(data.questions)) for (const q of data.questions) staticQuestions.set(q.id, q);
+  return data;
+}
+function staticTokens(s) {
+  return new Set(String(s ?? '').replace(/[\u064B-\u0652]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(w => w.length > 1));
+}
+function staticSimilarity(a, b) {
+  const A = staticTokens(a), B = staticTokens(b);
+  let i = 0; for (const w of A) if (B.has(w)) i++;
+  return A.size && B.size ? i / (A.size + B.size - i) : 0;
+}
+async function staticApi(path, { method = 'GET', body } = {}) {
+  const [p, query = ''] = path.split('?');
+  const f = Object.fromEntries(new URLSearchParams(query));
+  if (p === '/me') return { user: null };
+  if (p === '/stats') return staticFile('stats.json');
+  if (p === '/chapters') return staticFile('chapters.json');
+  let m;
+  if ((m = p.match(/^\/chapters\/(\d+)$/))) return staticFile(`chapter-${m[1]}.json`);
+  if ((m = p.match(/^\/objectives\/([^/]+)$/)) && method === 'GET') {
+    const d = await staticFile(`objectives/${decodeURIComponent(m[1])}.json`);
+    return { ...d, questions: d.questions.filter(q => !q.excluded) };
+  }
+  if ((m = p.match(/^\/questions\/(\d+)\/check$/))) {
+    const q = staticQuestions.get(Number(m[1]));
+    if (!q) throw new Error('السؤال غير موجود');
+    const c = Number(body?.choice);
+    return { correct: c === q.correctIndex, correctIndex: q.correctIndex, explanation: q.explanation, distractorNote: q.distractorNotes?.[c] || null };
+  }
+  if (p === '/bank') {
+    const all = (await staticFile('bank.json')).questions;
+    const rows = all.filter(q => !q.excluded
+      && (!f.chapter || q.chapter.number === Number(f.chapter)) && (!f.lesson || q.lesson.number === Number(f.lesson))
+      && (!f.type || q.type === f.type) && (!f.level || q.thinkingLevel === f.level)
+      && (!f.difficulty || q.difficulty === f.difficulty) && (!f.status || q.status === f.status)
+      && (!f.q || q.stem.includes(f.q) || q.options.some(o => o.includes(f.q))));
+    if (f.similar === '1') {
+      const similar = [];
+      for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
+        const sc = staticSimilarity(rows[i].stem, rows[j].stem);
+        if (sc >= 0.5) similar.push({ a: rows[i].id, b: rows[j].id, score: Math.round(sc * 100) });
+      }
+      return { questions: rows, similar };
+    }
+    return { questions: rows };
+  }
+  if (p === '/revisions') return [];
+  throw new Error('هذا الإجراء غير متاح في نسخة العرض؛ التعديل والاعتماد يتطلبان تشغيل المنصة على الخادم.');
 }
 
 function toast(msg, error = false) {
@@ -65,6 +130,8 @@ function renderUserbox() {
     box.innerHTML = `<span class="muted">${esc(state.user.displayName)} · ${roles[state.user.role]}</span>
       <button type="button" id="logout">خروج</button>`;
     box.querySelector('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); state.user = null; renderUserbox(); route(); };
+  } else if (state.static) {
+    box.innerHTML = `<span class="badge warn" title="البيانات منسوخة من قاعدة البيانات وقت النشر">نسخة عرض للقراءة فقط</span>`;
   } else {
     box.innerHTML = `<a class="btn" href="#/login">تسجيل الدخول</a>`;
   }
@@ -76,6 +143,7 @@ async function pageHome() {
   const o = s.objectives, q = s.questions;
   const chapters = await api('/chapters');
   $app.innerHTML = `
+    ${state.static ? `<p class="notice">هذه <strong>نسخة عرض للقراءة فقط</strong> منشورة على GitHub Pages (البيانات بتاريخ ${esc((s.generatedAt || '').slice(0, 10))}). تظهر فيها الإجابات لغرض مراجعة النموذج الأولي؛ <strong>لا تشاركها مع الطلاب</strong>. الاعتماد والتعديل وحفظ البيانات تتطلب تشغيل المنصة على خادم.</p>` : ''}
     <div class="hero">
       <div>
         <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
@@ -533,7 +601,7 @@ async function pageBank() {
     ${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(bankFilter[k] || '') === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
   $app.innerHTML = `<div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ بنك الأسئلة</div>
     <div class="hero no-print"><div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div>
-      <div class="actions">${isReviewer() ? `<a class="btn" href="/api/export/questions.csv">تصدير الأسئلة CSV</a><a class="btn" href="/api/export/objectives.csv">تصدير الأهداف CSV</a>` : ''}</div></div>
+      <div class="actions">${isReviewer() ? `<a class="btn" href="api/export/questions.csv">تصدير الأسئلة CSV</a><a class="btn" href="api/export/objectives.csv">تصدير الأهداف CSV</a>` : ''}</div></div>
     <section class="card no-print">
       <div class="filters">
         ${f('chapter', 'الفصل', chapters.map(c => [c.number, `${c.number}. ${c.title}`]))}
@@ -642,6 +710,7 @@ async function pageReports() {
 
 // ---------- تسجيل الدخول ----------
 function pageLogin() {
+  if (state.static) { $app.innerHTML = '<div class="notice">تسجيل الدخول غير متاح في نسخة العرض؛ يلزم تشغيل المنصة على خادم.</div>'; return; }
   $app.innerHTML = `<div class="card" style="max-width:420px;margin:2rem auto">
     <h1>تسجيل الدخول</h1><p class="muted small">حسابات المراجعين والمعلمين ينشئها المشرف من الخادم.</p>
     <form id="login-form">

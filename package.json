@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server/index.js",
     "seed": "node --disable-warning=ExperimentalWarning server/seed.js",
+    "build-static": "node --disable-warning=ExperimentalWarning scripts/build-static.js",
     "create-user": "node --disable-warning=ExperimentalWarning scripts/create-user.js",
     "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
   },

@@ -28,6 +28,8 @@ export function createApp() {
     next();
   });
   app.use('/api', api);
+  // ملفات نسخة العرض الثابتة (تتضمن الإجابات) لا تُقدَّم من الخادم؛ الخادم يحمي الإجابات بالصلاحيات.
+  app.use('/static', (_req, res) => res.status(404).end());
   app.use(express.static(path.join(root, 'public'), { index: 'index.html' }));
   app.get(/^\/(?!api\/).*/, (_req, res) => res.sendFile(path.join(root, 'public', 'index.html')));
   return app;

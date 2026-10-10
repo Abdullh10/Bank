@@ -169,3 +169,8 @@ test('كلمة مرور خاطئة ترفض، والخروج ينهي الجلس
   await call('/logout', { method: 'POST', as: 'view' });
   assert.equal((await call('/me', { as: 'view' })).body.user, null);
 });
+
+test('الخادم لا يقدّم ملفات نسخة العرض الثابتة (التي تتضمن الإجابات)', async () => {
+  const r = await fetch(base.replace('/api', '') + '/static/bank.json');
+  assert.equal(r.status, 404);
+});
