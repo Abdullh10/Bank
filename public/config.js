@@ -9,3 +9,7 @@ export const SUPABASE = {
   // الحسابات تُنشأ في Supabase بهذا البريد الشكلي (مع Auto Confirm)، ولا تُرسل إليه أي رسائل.
   loginDomain: 'chem21.local',
 };
+
+// الرابط الرسمي للمنصة: يُطبع على بطاقات دخول الطلاب وفي ملفات Excel.
+export const SITE_URL = 'https://itqanchem.com';
+

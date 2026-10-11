@@ -785,3 +785,8 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .as-listhead select, .as-listhead input { width: auto; min-width: 8rem; }
 .as-table td { vertical-align: middle; }
 .st-opt.ok[disabled], .st-opt.bad[disabled] { color: var(--ink); opacity: 1; }
+.as-bulk { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin: .3rem 0 .6rem; padding: .55rem .8rem; background: var(--surface-2); border-radius: 12px; }
+.as-bulk #as-del-many { margin-inline-start: auto; }
+.as-chk { width: 2.4rem; text-align: center; }
+.as-chk input { width: 1.1rem; height: 1.1rem; margin: 0; }
+.as-table tr.picked td { background: var(--bad-soft); }

@@ -104,6 +104,7 @@ export function icon(name, size = 24, tone = TONE[name] || 'navy', cls = '') {
 
 // أيقونات خطية صغيرة بلون النص (للأزرار والحقول)
 const LINES = {
+  trash: '<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   user: '<circle cx="12" cy="8.5" r="3.8"/><path d="M4.8 20c.6-3.9 3.6-6.4 7.2-6.4s6.6 2.5 7.2 6.4"/>',
   lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8.3 10.5V8a3.7 3.7 0 0 1 7.4 0v2.5"/>',
   key: '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.4 12.6 19.5 3.5M16 7l2.5 2.5M13.8 9.2l2 2"/>',

@@ -1,5 +1,6 @@
 // صفحات الطاقم للطلاب: لوحة تقدم الطلاب (للمعلمين والمراجعين والمشرف) وإدارة حسابات الطلاب (للمشرف فقط).
 import { icon, line } from './icons.js';
+import { SITE_URL } from './config.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
@@ -144,8 +145,14 @@ export async function pageAdminStudents(ctx) {
         <input id="af-q" placeholder="بحث بالاسم" value="${esc(adminFilter.q)}" style="max-width:11rem">
         <button type="button" id="as-export">${line('download', 17)}تصدير Excel</button>
       </div></div>
-      ${list.length ? `<div class="table-wrap"><table class="list as-table"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th><th>التدريب</th><th></th></tr></thead><tbody>
+      ${list.length ? `<div class="as-bulk" id="as-bulk">
+        <label class="st-radio"><input type="checkbox" id="as-all"> تحديد الكل المعروض (${list.length})</label>
+        <span id="as-count" class="muted small">لم يُحدد أحد</span>
+        <button type="button" id="as-del-many" class="danger" disabled>${line('trash', 16)}حذف المحدد</button>
+      </div>
+      <div class="table-wrap"><table class="list as-table"><thead><tr><th class="as-chk"></th><th>الاسم</th><th>اسم المستخدم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th><th>التدريب</th><th></th></tr></thead><tbody>
         ${list.map(s => `<tr data-id="${s.id}" data-user="${esc(s.username)}">
+          <td class="as-chk"><input type="checkbox" class="as-pick" aria-label="تحديد ${esc(s.name)}"></td>
           <td><input class="as-name" value="${esc(s.name)}" aria-label="الاسم"></td>
           <td><input class="as-user ltr" value="${esc(s.username)}" aria-label="اسم المستخدم" style="max-width:9rem"></td>
           <td><input class="as-grade" value="${esc(s.grade || '')}" aria-label="الصف" style="max-width:8rem"></td>
@@ -179,8 +186,8 @@ export async function pageAdminStudents(ctx) {
         ${results.map(r => r.ok ? `<tr><td>${esc(r.name)}</td><td>${esc(r.grade)}</td><td>${esc(r.section)}</td><td class="ltr"><b>${esc(r.username)}</b></td><td class="ltr"><b>${esc(r.password)}</b></td></tr>`
           : `<tr><td>${esc(r.name)}</td><td colspan="4" class="bad">${esc(r.error)}</td></tr>`).join('')}</tbody></table></div>
         <div class="actions"><button type="button" id="as-cred-xlsx" class="primary">تحميل كلمات المرور Excel</button><button type="button" id="as-print">طباعة بطاقات الدخول</button><button type="button" id="as-refresh">تحديث القائمة</button></div>`;
-      document.getElementById('as-cred-xlsx').onclick = () => downloadXlsx('حسابات-الطلاب', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم', 'كلمة المرور'],
-        ok.map(r => [r.name, r.grade, r.section, r.username, r.password]));
+      document.getElementById('as-cred-xlsx').onclick = () => downloadXlsx('حسابات-الطلاب', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم', 'كلمة المرور', 'رابط المنصة'],
+        ok.map(r => [r.name, r.grade, r.section, r.username, r.password, SITE_URL]));
       document.getElementById('as-print').onclick = () => printCards(ok, esc);
       document.getElementById('as-refresh').onclick = () => pageAdminStudents(ctx).catch(fail);
       document.getElementById('as-lines').value = '';
@@ -203,6 +210,36 @@ export async function pageAdminStudents(ctx) {
   document.getElementById('af-grade').onchange = e => { adminFilter.grade = e.target.value; adminFilter.section = ''; refilter(); };
   document.getElementById('af-sec').onchange = e => { adminFilter.section = e.target.value; refilter(); };
   document.getElementById('af-q').onchange = e => { adminFilter.q = e.target.value.trim(); refilter(); };
+
+  // تحديد دفعة وحذفها مرة واحدة (التحديد يشمل القائمة المعروضة بعد التصفية فقط)
+  const picks = [...$app.querySelectorAll('.as-pick')];
+  const allBox = document.getElementById('as-all');
+  const syncBulk = () => {
+    const n = picks.filter(c => c.checked).length;
+    const delBtn = document.getElementById('as-del-many');
+    if (!delBtn) return;
+    delBtn.disabled = !n;
+    delBtn.lastChild.textContent = n ? `حذف المحدد (${n})` : 'حذف المحدد';
+    document.getElementById('as-count').textContent = n ? `حُدد ${n} من ${picks.length}` : 'لم يُحدد أحد';
+    allBox.checked = n === picks.length && n > 0; allBox.indeterminate = n > 0 && n < picks.length;
+    picks.forEach(c => c.closest('tr').classList.toggle('picked', c.checked));
+  };
+  picks.forEach(c => c.onchange = syncBulk);
+  if (allBox) {
+    allBox.onchange = () => { picks.forEach(c => { c.checked = allBox.checked; }); syncBulk(); };
+    document.getElementById('as-del-many').onclick = async e => {
+      const ids = picks.filter(c => c.checked).map(c => c.closest('tr').dataset.id);
+      if (!ids.length) return;
+      if (!confirm(`حذف ${ids.length} حسابًا نهائيًا مع سجل تدريبهم؟ لا يمكن التراجع.`)) return;
+      if (ids.length >= 10 && prompt(`للتأكيد اكتب العدد: ${ids.length}`) !== String(ids.length)) return toast('أُلغي الحذف', true);
+      e.currentTarget.disabled = true;
+      try {
+        const r = await api('/admin/students/delete-many', { method: 'POST', body: { userIds: ids } });
+        toast(`حُذف ${r.deleted} حسابًا` + (r.failed?.length ? `، وتعذر ${r.failed.length}` : ''), !!r.failed?.length);
+        refilter();
+      } catch (err) { fail(err); e.currentTarget.disabled = false; }
+    };
+  }
 
   $app.querySelectorAll('tr[data-id]').forEach(tr => {
     const id = tr.dataset.id;
@@ -237,7 +274,7 @@ export async function pageAdminStudents(ctx) {
 function printCards(rows, esc) {
   const w = window.open('', '_blank');
   if (!w) return;
-  const url = location.href.split('#')[0];
+  const url = SITE_URL;
   w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>بطاقات دخول الطلاب</title>
     <style>body{font-family:system-ui,sans-serif;margin:12mm}.g{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
     .c{border:1px dashed #555;border-radius:8px;padding:5mm;break-inside:avoid}.c h3{margin:0 0 2mm}.l{direction:ltr;text-align:right;font-family:monospace;font-size:14pt}

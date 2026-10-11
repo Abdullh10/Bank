@@ -44,7 +44,7 @@ await pool.query(`update public.profiles set role='reviewer', display_name='عب
 await pool.query(`update public.profiles set role='viewer' where email='view@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
-await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local'`);
+await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local' or email like 'bulk_@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
 async function asRole(uid, sql, params) {
@@ -229,7 +229,7 @@ ok('admin: 3 accounts created, duplicate rejected', cards.filter(t => /\|st\d+\|
 const st = cards.find(t => t.includes('st2test')).split('|');
 const [dlc] = await Promise.all([p.waitForEvent('download'), p.click('#as-cred-xlsx')]);
 const credWb = XL.readFile(await dlc.path()); const credRows = XL.utils.sheet_to_json(credWb.Sheets[credWb.SheetNames[0]], { header: 1 });
-ok('admin: credentials Excel downloaded', credRows.length === 4 && credRows[0].includes('كلمة المرور'), JSON.stringify(credRows[1]));
+ok('admin: credentials Excel downloaded with site link', credRows.length === 4 && credRows[0].includes('كلمة المرور') && credRows[1].includes('https://itqanchem.com'), JSON.stringify(credRows[1]));
 await p.click('#as-refresh'); await p.waitForSelector('tr[data-id]');
 ok('admin: list shows grade', (await p.locator('.as-table').innerText()).length > 0 && (await p.inputValue('tr[data-user="st2test"] .as-grade')) === 'ثاني ثانوي');
 await p.screenshot({ path: `${OUT}/admin-students.png`, fullPage: true });
@@ -248,6 +248,19 @@ await p.selectOption('#af-grade', ''); await p.waitForTimeout(500);
 const [dle] = await Promise.all([p.waitForEvent('download'), p.click('#as-export')]);
 ok('admin: export list to Excel', XL.utils.sheet_to_json(XL.readFile(await dle.path()).Sheets['الطلاب'], { header: 1 })[0].includes('الصف'));
 p.removeAllListeners('dialog');
+// حذف دفعة كاملة
+await p.fill('#as-lines', 'دفعة أولى، دفعة اختبار، 9، bulk1\nدفعة ثانية، دفعة اختبار، 9، bulk2\nدفعة ثالثة، دفعة اختبار، 9، bulk3');
+await p.click('#as-read-lines'); await p.click('#as-create'); await p.waitForSelector('#as-cards');
+await p.click('#as-refresh'); await p.waitForSelector('#af-grade');
+await p.selectOption('#af-grade', 'دفعة اختبار'); await p.waitForSelector('#as-all');
+ok('bulk: filtered batch of 3', (await p.locator('tr[data-id]').count()) === 3);
+await p.check('#as-all');
+ok('bulk: select all shows count', (await p.locator('#as-del-many').innerText()).includes('(3)'));
+p.on('dialog', d => d.accept());
+await p.click('#as-del-many'); await p.waitForTimeout(1500);
+ok('bulk: batch deleted in one go', (await pool.query("select count(*)::int n from auth.users where email like 'bulk_@chem21.local'")).rows[0].n === 0);
+p.removeAllListeners('dialog');
+await p.selectOption('#af-grade', ''); await p.waitForTimeout(400);
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // دخول الطالب: تأكيد البيانات مرة واحدة
 await p.fill('#l-user', 'st2test'); await p.fill('#l-pass', st[3] || 'x'); await p.click('button[type=submit]');

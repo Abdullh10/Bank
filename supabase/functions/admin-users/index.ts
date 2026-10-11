@@ -58,6 +58,20 @@ export async function handle(body, jwt, deps) {
     return { status: 200, body: { results } };
   }
 
+  // حذف دفعة: قائمة معرّفات، ويُتحقق من كل حساب أنه حساب طالب قبل حذفه
+  if (body?.action === 'deleteMany') {
+    const ids = Array.isArray(body.userIds) ? [...new Set(body.userIds)] : [];
+    if (!ids.length) return { status: 400, body: { error: 'لم يُحدد أي حساب' } };
+    if (ids.length > 300) return { status: 400, body: { error: 'الحد الأقصى 300 حساب في المرة الواحدة' } };
+    let deleted = 0; const failed = [];
+    for (const id of ids) {
+      if (!(await deps.isStudent(jwt, id))) { failed.push({ id, error: 'ليس حساب طالب' }); continue; }
+      const r = await deps.deleteUser(id);
+      if (r?.error) failed.push({ id, error: r.error }); else deleted++;
+    }
+    return { status: 200, body: { deleted, failed } };
+  }
+
   // الإجراءات التالية لحسابات الطلاب فقط
   if (['reset', 'rename', 'delete'].includes(body?.action) && !(await deps.isStudent(jwt, body.userId)))
     return { status: 400, body: { error: 'هذا الإجراء متاح لحسابات الطلاب فقط' } };

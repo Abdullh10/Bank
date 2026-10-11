@@ -192,5 +192,6 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/admin/students/reset') return adminUsers({ action: 'reset', userId: body.userId, password: body.password || '' });
   if (p === '/admin/students/rename') return adminUsers({ action: 'rename', userId: body.userId, username: body.username });
   if (p === '/admin/students/delete') return adminUsers({ action: 'delete', userId: body.userId });
+  if (p === '/admin/students/delete-many') return adminUsers({ action: 'deleteMany', userIds: body.userIds });
   throw new Error('مسار غير معروف: ' + p);
 }
