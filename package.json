@@ -4,13 +4,16 @@
   "private": true,
   "description": "منصة تحليل الأهداف وبنك أسئلة كيمياء 2-1",
   "type": "module",
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server/index.js",
     "seed": "node --disable-warning=ExperimentalWarning server/seed.js",
     "build-static": "node --disable-warning=ExperimentalWarning scripts/build-static.js",
     "create-user": "node --disable-warning=ExperimentalWarning scripts/create-user.js",
-    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js",
+    "build-supabase-seed": "node --disable-warning=ExperimentalWarning scripts/build-supabase-seed.js"
   },
   "dependencies": {
     "express": "4.21.2"

@@ -1,5 +1,6 @@
 // واجهة المنصة: تطبيق صفحة واحدة بوحدات ES دون أدوات بناء.
 import { pageExam } from './exam.js';
+import { SUPABASE } from './config.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set() };
@@ -9,7 +10,30 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
 
+// أوضاع التشغيل: خادم محلي (api/) ← Supabase (إن ضُبط config.js) ← نسخة العرض الثابتة.
+let supa = null;
+async function useSupabase() {
+  if (!SUPABASE?.url || !SUPABASE?.key) return false;
+  try {
+    supa = await import('./supa.js');
+    await supa.initSupabase(SUPABASE);
+    state.supabase = true;
+    return true;
+  } catch (e) { console.warn('تعذر الاتصال بـ Supabase', e); supa = null; return false; }
+}
+
+// القراءة التي تصل بعد انتقال المستخدم إلى صفحة أخرى تُهمل حتى لا تكتب الصفحة القديمة فوق الجديدة.
+let routeSeq = 0;
+const STALE = Object.assign(new Error('stale'), { stale: true });
 async function api(path, opts = {}) {
+  const seq = routeSeq;
+  const data = await apiRaw(path, opts);
+  if ((!opts.method || opts.method === 'GET') && seq !== routeSeq) throw STALE;
+  return data;
+}
+
+async function apiRaw(path, opts = {}) {
+  if (state.supabase) return supa.supaApi(path, opts);
   if (state.static) return staticApi(path, opts);
   const { method = 'GET', body } = opts;
   const res = await fetch('api' + path, {
@@ -19,7 +43,12 @@ async function api(path, opts = {}) {
   });
   const data = await res.json().catch(() => null);
   // لا يوجد خادم (مثل GitHub Pages): ننتقل إلى نسخة العرض الثابتة.
-  if (data === null && path === '/me') { state.static = true; return staticApi(path, opts); }
+  if (data === null && path === '/me') {
+    if (await useSupabase()) {
+      try { return await supa.supaApi(path, opts); } catch (e) { console.warn(e); state.supabase = false; }
+    }
+    state.static = true; return staticApi(path, opts);
+  }
   if (!res.ok || data === null) throw Object.assign(new Error(data?.error || 'تعذر تنفيذ الطلب'), { errors: data?.errors, status: res.status });
   return data;
 }
@@ -93,7 +122,7 @@ function toast(msg, error = false) {
   document.body.append(t);
   setTimeout(() => t.remove(), error ? 6000 : 3000);
 }
-const fail = e => toast(e.errors?.length ? e.errors.join('، ') : e.message, true);
+const fail = e => e?.stale || toast(e.errors?.length ? e.errors.join('، ') : e.message, true);
 
 const isReviewer = () => ['reviewer', 'admin'].includes(state.user?.role);
 
@@ -127,7 +156,7 @@ const list = (arr, tag = 'ul') => (arr?.length ? `<${tag}>${arr.map(x => `<li>${
 function renderUserbox() {
   const box = document.getElementById('userbox');
   if (state.user) {
-    const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)' };
+    const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', pending: 'بانتظار التفعيل' };
     box.innerHTML = `<span class="muted">${esc(state.user.displayName)} · ${roles[state.user.role]}</span>
       <button type="button" id="logout">خروج</button>`;
     box.querySelector('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); state.user = null; renderUserbox(); route(); };
@@ -602,7 +631,9 @@ async function pageBank() {
     ${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(bankFilter[k] || '') === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
   $app.innerHTML = `<div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ بنك الأسئلة</div>
     <div class="hero no-print"><div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div>
-      <div class="actions">${isReviewer() ? `<a class="btn" href="api/export/questions.csv">تصدير الأسئلة CSV</a><a class="btn" href="api/export/objectives.csv">تصدير الأهداف CSV</a>` : ''}</div></div>
+      <div class="actions">${isReviewer() ? (state.supabase
+        ? `<button class="btn" data-export="questions">تصدير الأسئلة CSV</button><button class="btn" data-export="objectives">تصدير الأهداف CSV</button>`
+        : `<a class="btn" href="api/export/questions.csv">تصدير الأسئلة CSV</a><a class="btn" href="api/export/objectives.csv">تصدير الأهداف CSV</a>`) : ''}</div></div>
     <section class="card no-print">
       <div class="filters">
         ${f('chapter', 'الفصل', chapters.map(c => [c.number, `${c.number}. ${c.title}`]))}
@@ -631,6 +662,10 @@ async function pageBank() {
   document.getElementById('f-apply').onclick = () => { bankFilter.q = document.getElementById('f-q').value.trim(); pageBank().catch(fail); };
   document.getElementById('f-q').onkeydown = e => { if (e.key === 'Enter') document.getElementById('f-apply').click(); };
   document.getElementById('f-clear').onclick = () => { for (const k in bankFilter) delete bankFilter[k]; pageBank().catch(fail); };
+  $app.querySelectorAll('[data-export]').forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try { await supa.exportCsv(b.dataset.export); } catch (e) { fail(e); } finally { b.disabled = false; }
+  });
   document.getElementById('sel-all').onclick = () => { res.questions.forEach(q => state.selection.add(q.id)); pageBank().catch(fail); };
   document.getElementById('sel-none').onclick = () => { state.selection.clear(); pageBank().catch(fail); };
   $app.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => {
@@ -713,9 +748,9 @@ async function pageReports() {
 function pageLogin() {
   if (state.static) { $app.innerHTML = '<div class="notice">تسجيل الدخول غير متاح في نسخة العرض؛ يلزم تشغيل المنصة على خادم.</div>'; return; }
   $app.innerHTML = `<div class="card" style="max-width:420px;margin:2rem auto">
-    <h1>تسجيل الدخول</h1><p class="muted small">حسابات المراجعين والمعلمين ينشئها المشرف من الخادم.</p>
+    <h1>تسجيل الدخول</h1><p class="muted small">حسابات المراجعين والمعلمين ينشئها المشرف${state.supabase ? '' : ' من الخادم'}.</p>
     <form id="login-form">
-      <div class="field"><label for="l-user">اسم المستخدم</label><input id="l-user" autocomplete="username" required></div>
+      <div class="field"><label for="l-user">${state.supabase ? 'البريد الإلكتروني' : 'اسم المستخدم'}</label><input id="l-user" ${state.supabase ? 'type="email" dir="ltr" autocomplete="email"' : 'autocomplete="username"'} required></div>
       <div class="field"><label for="l-pass">كلمة المرور</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
       <button class="primary" type="submit">دخول</button>
     </form></div>`;
@@ -730,6 +765,7 @@ function pageLogin() {
 
 // ---------- الموجّه ----------
 async function route() {
+  const seq = ++routeSeq;
   const hash = location.hash.replace(/^#/, '') || '/';
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
@@ -746,6 +782,7 @@ async function route() {
     else if (page === 'login') pageLogin();
     else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
   } catch (e) {
+    if (e?.stale || seq !== routeSeq) return;
     $app.innerHTML = `<div class="notice bad">${esc(e.message)}</div>`;
   }
   window.scrollTo(0, 0);
