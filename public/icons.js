@@ -106,6 +106,9 @@ export function icon(name, size = 24, tone = TONE[name] || 'navy', cls = '') {
 const LINES = {
   user: '<circle cx="12" cy="8.5" r="3.8"/><path d="M4.8 20c.6-3.9 3.6-6.4 7.2-6.4s6.6 2.5 7.2 6.4"/>',
   lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8.3 10.5V8a3.7 3.7 0 0 1 7.4 0v2.5"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.4 12.6 19.5 3.5M16 7l2.5 2.5M13.8 9.2l2 2"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.6A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.6 6.7C4 8.4 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   logout: '<path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14"/><path d="M10 8 6 12l4 4M6 12h9.5"/>',
   print: '<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7.5" rx="2"/><path d="M7 14h10v6H7z"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',

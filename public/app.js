@@ -735,21 +735,25 @@ function pageLogin() {
     ${state.offline ? '<p class="notice bad">تعذر الاتصال بقاعدة البيانات؛ تحقق من الإنترنت ثم أعد تحميل الصفحة.</p>' : ''}
     <form id="login-form" novalidate>
       <div class="field"><label for="l-user">اسم المستخدم</label>
-        <div class="in-ic">${line('user', 19)}<input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="أدخل اسم المستخدم" required></div></div>
+        <div class="in-ic">${line('key', 19)}<input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="أدخل اسم المستخدم" required></div></div>
       <div class="field"><label for="l-pass">كلمة المرور</label>
         <div class="pass-wrap in-ic">${line('lock', 19)}<input id="l-pass" type="password" dir="ltr" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
-        <button type="button" class="pass-toggle" id="l-show" aria-pressed="false">إظهار</button></div></div>
+        <button type="button" class="pass-toggle" id="l-show" aria-pressed="false" aria-label="إظهار كلمة المرور" title="إظهار كلمة المرور">${line('eye', 20)}</button></div></div>
       <button class="primary" type="submit" id="l-submit">دخول</button>
     </form>
     <p class="login-foot">الدخول للحسابات المصرّح لها فقط. للحصول على حساب أو استعادة كلمة المرور تواصل مع المشرف.</p>
   </div></div>`;
   const user = document.getElementById('l-user'), pass = document.getElementById('l-pass'), btn = document.getElementById('l-submit');
   user.focus();
-  document.getElementById('l-show').onclick = e => {
+  const eyeBtn = document.getElementById('l-show');
+  eyeBtn.onclick = () => {
     const show = pass.type === 'password';
     pass.type = show ? 'text' : 'password';
-    e.target.textContent = show ? 'إخفاء' : 'إظهار';
-    e.target.setAttribute('aria-pressed', String(show));
+    const label = show ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور';
+    eyeBtn.innerHTML = line(show ? 'eyeOff' : 'eye', 20);
+    eyeBtn.setAttribute('aria-pressed', String(show));
+    eyeBtn.setAttribute('aria-label', label); eyeBtn.title = label;
+    pass.focus();
   };
   document.getElementById('login-form').onsubmit = async e => {
     e.preventDefault();
