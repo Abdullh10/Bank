@@ -1,12 +1,19 @@
-// اختبار القوائم المنسدلة في كليشة منشئ الاختبارات (نسخة العرض على المنفذ 8765 تحت /Bank/): node test/exam-header-e2e.mjs <مجلد الإخراج>
+// اختبار منشئ الاختبارات بالمتصفح على الخادم المحلي (المنفذ 3123، بيانات كاملة npm run seed، ومستخدم reviewer1): node test/exam-header-e2e.mjs <مجلد الإخراج>
 import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
+const BASE = process.env.BASE || 'http://localhost:3123';
+// المنصة مغلقة: كل اختبار يبدأ بتسجيل الدخول (خادم محلي بمستخدم reviewer1 / Test-Pass-12345).
+async function login(pg) {
+  await pg.goto(BASE + '/#/'); await pg.waitForSelector('#l-user');
+  await pg.fill('#l-user', process.env.E2E_USER || 'reviewer1'); await pg.fill('#l-pass', process.env.E2E_PASS || 'Test-Pass-12345');
+  await pg.click('button[type=submit]'); await pg.waitForSelector('#logout');
+}
 const b = await chromium.launch(); const res = []; const errs = [];
 const ok = (n, v) => res.push((v ? 'PASS ' : 'FAIL ') + n);
 for (const vp of [{ width: 1280, height: 1100 }, { width: 390, height: 844 }]) {
   const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message));
-  await p.goto('http://localhost:8765/Bank/public/#/exam'); await p.waitForSelector('#x-build');
+  await login(p); await p.goto(BASE + '/#/exam'); await p.waitForSelector('#x-build');
   await p.selectOption('[data-hsel="title"]', 'اختبار منتصف الفصل الدراسي');
   await p.selectOption('[data-hsel="duration"]', 'ساعة ونصف');
   await p.selectOption('[data-hsel="grade"]', '__other');

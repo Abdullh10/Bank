@@ -313,21 +313,26 @@ label.chk input { width: auto; }
 .other-input { margin-top: .35rem; }
 
 /* ---------- صفحة الدخول ---------- */
-.login-wrap { min-height: calc(100vh - 220px); display: grid; place-items: center; padding: 1.5rem 0; }
-.login-card { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(60, 40, 10, .08); padding: 1.6rem 1.5rem 1.4rem; text-align: center; }
-.login-logo { width: min(260px, 80%); height: auto; margin: 0 auto .4rem; display: block; }
-.login-card h1 { font-size: 1.25rem; margin: .2rem 0 .2rem; }
-.login-card .muted { margin: 0 0 1.1rem; }
+/* قبل الدخول تُخفى الترويسة والقائمة: لا يظهر إلا نموذج الدخول */
+body.locked .topbar { display: none; }
+body.locked { background: radial-gradient(1200px 600px at 50% -10%, var(--brand-soft), var(--bg) 70%); }
+body.locked main { padding-top: 0; }
+.login-wrap { min-height: calc(100vh - 90px); display: grid; place-items: center; padding: 2rem 0 1rem; }
+.login-card { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(60, 40, 10, .05), 0 12px 32px rgba(60, 40, 10, .08); padding: 1.75rem 1.5rem 1.4rem; text-align: center; }
+.login-logo { width: 150px; height: auto; margin: 0 auto 1rem; display: block; }
+.login-card h1 { font-size: 1.15rem; margin: 0 0 1.1rem; color: var(--brand-2); }
 .login-card form { text-align: start; }
-.login-card .field { margin-bottom: .9rem; }
-.login-card input { width: 100%; font-size: 1rem; padding: .7rem .8rem; }
+.login-card .field { margin-bottom: .85rem; }
+.login-card label { font-size: .88rem; color: var(--ink-2); }
+.login-card input { width: 100%; font-size: 1rem; padding: .65rem .8rem; border-radius: 10px; }
 .pass-wrap { position: relative; }
 .pass-wrap input { padding-left: 4.2rem; }
 .pass-toggle { position: absolute; left: .35rem; top: 50%; transform: translateY(-50%); border: 0; background: transparent;
   color: var(--brand); font-size: .85rem; padding: .3rem .45rem; cursor: pointer; }
-.login-card button.primary { width: 100%; padding: .75rem; font-size: 1.05rem; margin-top: .3rem; }
-.login-foot { margin-top: 1rem; font-size: .8rem; color: var(--ink-2); }
+.login-card button.primary { width: 100%; padding: .7rem; font-size: 1rem; margin-top: .35rem; border-radius: 10px; }
+.login-card .notice { text-align: start; }
+.login-foot { margin: 1rem 0 0; font-size: .78rem; line-height: 1.7; color: var(--ink-2); }
 /* الشعار بألوان داكنة؛ في الوضع الليلي يوضع على خلفية فاتحة ليبقى مقروءًا */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { background: #fbf8f2; border-radius: 14px; padding: .6rem; } }
 :root[data-theme="dark"] .login-logo { background: #fbf8f2; border-radius: 14px; padding: .6rem; }

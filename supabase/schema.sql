@@ -170,6 +170,7 @@ create table if not exists public.revisions (
 create index if not exists idx_rev_entity on public.revisions(entity, entity_id);
 
 -- ---------- أمان مستوى الصفوف ----------
+-- (الوصول للمحتوى كله مقصور على الحسابات المفعّلة: viewer و reviewer و admin)
 alter table public.profiles enable row level security;
 alter table public.courses enable row level security;
 alter table public.chapters enable row level security;
@@ -184,18 +185,18 @@ drop policy if exists profiles_self on public.profiles;
 create policy profiles_self on public.profiles for select to authenticated using (user_id = auth.uid() or public.is_reviewer());
 
 drop policy if exists courses_read on public.courses;
-create policy courses_read on public.courses for select to anon, authenticated using (true);
+create policy courses_read on public.courses for select to authenticated using (public.is_member());
 drop policy if exists chapters_read on public.chapters;
-create policy chapters_read on public.chapters for select to anon, authenticated using (true);
+create policy chapters_read on public.chapters for select to authenticated using (public.is_member());
 drop policy if exists lessons_read on public.lessons;
-create policy lessons_read on public.lessons for select to anon, authenticated using (true);
+create policy lessons_read on public.lessons for select to authenticated using (public.is_member());
 drop policy if exists objectives_read on public.objectives;
-create policy objectives_read on public.objectives for select to anon, authenticated using (true);
+create policy objectives_read on public.objectives for select to authenticated using (public.is_member());
 drop policy if exists supplements_read on public.supplements;
-create policy supplements_read on public.supplements for select to anon, authenticated using (true);
+create policy supplements_read on public.supplements for select to authenticated using (public.is_member());
 -- الأسئلة المستبعدة لا يراها إلا المراجع
 drop policy if exists questions_read on public.questions;
-create policy questions_read on public.questions for select to anon, authenticated using (not excluded or public.is_reviewer());
+create policy questions_read on public.questions for select to authenticated using (public.is_member() and (not excluded or public.is_reviewer()));
 -- الإجابات للمستخدمين المسجلين فقط (المعلمون والمراجعون)
 drop policy if exists answers_read on public.question_answers;
 create policy answers_read on public.question_answers for select to authenticated using (public.is_member());
@@ -205,7 +206,8 @@ create policy revisions_read on public.revisions for select to authenticated usi
 -- لا توجد سياسات insert/update/delete: الكتابة المباشرة ممنوعة، وتتم عبر الدوال أدناه فقط.
 revoke all on all tables in schema public from anon, authenticated;
 grant usage on schema public to anon, authenticated;
-grant select on public.courses, public.chapters, public.lessons, public.objectives, public.supplements, public.questions to anon, authenticated;
+-- المنصة مغلقة: لا يقرأ البيانات إلا حساب مفعّل؛ الزائر (anon) لا يملك أي صلاحية قراءة.
+grant select on public.courses, public.chapters, public.lessons, public.objectives, public.supplements, public.questions to authenticated;
 grant select on public.question_answers, public.revisions, public.profiles to authenticated;
 
 -- ---------- دوال مساعدة ----------
@@ -223,11 +225,19 @@ begin
   if not public.is_reviewer() then raise exception 'لا تملك صلاحية تنفيذ هذا الإجراء' using errcode = '42501'; end if;
 end $$;
 
+create or replace function public._require_member() returns void
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
+  if not public.is_member() then raise exception 'حسابك بانتظار التفعيل من المشرف' using errcode = '42501'; end if;
+end $$;
+
 -- ---------- التدريب الفوري: تصحيح إجابة دون كشف بقية الإجابات ----------
 create or replace function public.check_answer(p_question bigint, p_choice int) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare r record;
 begin
+  perform public._require_member();
   if p_choice is null or p_choice < 0 or p_choice > 2 then raise exception 'اختيار غير صالح'; end if;
   select q.id, a.correct_index, a.explanation, a.distractor_notes into r
     from public.questions q join public.question_answers a on a.question_id = q.id
@@ -430,7 +440,7 @@ begin
 end $$;
 
 -- ---------- المؤشرات (تُحسب من البيانات الفعلية) ----------
-create or replace function public.get_stats() returns jsonb
+create or replace function public._stats_data() returns jsonb
 language sql stable security definer set search_path = public as $$
   with o as (select * from public.objectives),
   q as (select * from public.questions where not excluded),
@@ -461,7 +471,7 @@ language sql stable security definer set search_path = public as $$
   )
 $$;
 
-grant execute on function public.check_answer(bigint, int), public.get_stats() to anon, authenticated;
+
 grant execute on function public.my_role(), public.is_reviewer(), public.is_member(),
   public.review_objective(text, text, text, text), public.patch_objective(text, jsonb),
   public.review_supplement(text, text, text, text), public.update_question(bigint, jsonb, jsonb),
@@ -499,7 +509,7 @@ language sql stable as $$
   else '{}'::jsonb end
 $$;
 
-create or replace function public.get_chapters() returns jsonb
+create or replace function public._chapters_data() returns jsonb
 language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_agg(to_jsonb(c) || jsonb_build_object(
     'lessons', (select count(*) from lessons l where l.chapter_id = c.id),
@@ -515,6 +525,7 @@ create or replace function public.get_chapter(p_number int) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare c public.chapters;
 begin
+  perform public._require_member();
   select * into c from chapters where number = p_number;
   if not found then raise exception 'الفصل غير موجود' using errcode = 'P0002'; end if;
   return to_jsonb(c) || jsonb_build_object('lessons', (select coalesce(jsonb_agg(to_jsonb(l) || jsonb_build_object('objectives',
@@ -528,6 +539,7 @@ create or replace function public.get_objective(p_code text) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare o public.objectives; l public.lessons; c public.chapters; s public.supplements; v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
 begin
+  perform public._require_member();
   select * into o from objectives where code = p_code;
   if not found then raise exception 'الهدف غير موجود' using errcode = 'P0002'; end if;
   select * into l from lessons where id = o.lesson_id;
@@ -550,6 +562,7 @@ create or replace function public.get_bank(f jsonb default '{}') returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
 begin
+  perform public._require_member();
   return (select coalesce(jsonb_agg(public._q_public(q, a, v_ans) || jsonb_build_object('objectiveCode', o.code,
       'objectiveText', coalesce(o.approved_text, o.original_text),
       'lesson', jsonb_build_object('number', l.number, 'title', l.title),
@@ -591,7 +604,7 @@ language sql stable security definer set search_path = public as $$
     (select jsonb_build_object('id', user_id, 'username', split_part(email, '@', 1), 'displayName', display_name, 'role', role) from profiles where user_id = auth.uid()) end
 $$;
 
-grant execute on function public.get_chapters(), public.get_chapter(int), public.get_objective(text), public.get_bank(jsonb), public.get_me() to anon, authenticated;
+grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.get_question(bigint), public.get_revisions(int, bigint) to authenticated;
 
 -- حفظ نتيجة التحقق الآلي فقط (بعد الإنشاء أو النسخ)؛ لا يغير محتوى السؤال ولا حالته.
@@ -603,3 +616,30 @@ begin
   update public.question_answers set auto_check = p_auto_check where question_id = p_id;
 end $$;
 grant execute on function public.set_auto_check(bigint, jsonb) to authenticated;
+
+-- =====================================================================
+-- إغلاق المنصة: المحتوى للحسابات المفعّلة فقط.
+-- =====================================================================
+create or replace function public.get_stats() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+begin
+  perform public._require_member();
+  return public._stats_data();
+end $$;
+
+create or replace function public.get_chapters() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+begin
+  perform public._require_member();
+  return public._chapters_data();
+end $$;
+
+-- سحب أي صلاحية سابقة من الزائر (Supabase يمنح anon تنفيذ الدوال الجديدة افتراضيًا).
+revoke select on all tables in schema public from anon;
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.check_answer(bigint, int), public.get_stats(), public.get_chapters(), public.get_chapter(int),
+  public.get_objective(text), public.get_bank(jsonb) to authenticated;
+-- الدوال الداخلية لا تُستدعى من الواجهة
+revoke execute on function public._stats_data(), public._chapters_data(), public._require_member(), public._require_reviewer(),
+  public._log(text, bigint, text, jsonb, jsonb, text), public._question_json(bigint), public.handle_new_user() from authenticated;

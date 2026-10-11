@@ -10,7 +10,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
 
-// أوضاع التشغيل: خادم محلي (api/) ← Supabase (إن ضُبط config.js) ← نسخة العرض الثابتة.
+// أوضاع التشغيل: خادم محلي (api/) ← Supabase (إن ضُبط config.js). لا توجد نسخة عامة: المحتوى للحسابات المفعّلة فقط.
 let supa = null;
 async function useSupabase() {
   if (!SUPABASE?.url || !SUPABASE?.key) return false;
@@ -34,7 +34,7 @@ async function api(path, opts = {}) {
 
 async function apiRaw(path, opts = {}) {
   if (state.supabase) return supa.supaApi(path, opts);
-  if (state.static) return staticApi(path, opts);
+  if (state.offline) throw new Error('تعذر الاتصال بقاعدة البيانات؛ تحقق من الإنترنت ثم أعد تحميل الصفحة.');
   const { method = 'GET', body } = opts;
   const res = await fetch('api' + path, {
     method, credentials: 'same-origin',
@@ -47,71 +47,10 @@ async function apiRaw(path, opts = {}) {
     if (await useSupabase()) {
       try { return await supa.supaApi(path, opts); } catch (e) { console.warn(e); state.supabase = false; }
     }
-    state.static = true; return staticApi(path, opts);
+    state.offline = true; return { user: null };
   }
   if (!res.ok || data === null) throw Object.assign(new Error(data?.error || 'تعذر تنفيذ الطلب'), { errors: data?.errors, status: res.status });
   return data;
-}
-
-// ---------- نسخة العرض الثابتة (للقراءة فقط) ----------
-const staticCache = new Map();
-const staticQuestions = new Map();
-async function staticFile(name) {
-  if (!staticCache.has(name)) {
-    staticCache.set(name, fetch('static/' + name).then(r => {
-      if (!r.ok) throw new Error('البيانات غير متاحة في نسخة العرض');
-      return r.json();
-    }));
-  }
-  const data = await staticCache.get(name);
-  if (Array.isArray(data.questions)) for (const q of data.questions) staticQuestions.set(q.id, q);
-  return data;
-}
-function staticTokens(s) {
-  return new Set(String(s ?? '').replace(/[\u064B-\u0652]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(w => w.length > 1));
-}
-function staticSimilarity(a, b) {
-  const A = staticTokens(a), B = staticTokens(b);
-  let i = 0; for (const w of A) if (B.has(w)) i++;
-  return A.size && B.size ? i / (A.size + B.size - i) : 0;
-}
-async function staticApi(path, { method = 'GET', body } = {}) {
-  const [p, query = ''] = path.split('?');
-  const f = Object.fromEntries(new URLSearchParams(query));
-  if (p === '/me') return { user: null };
-  if (p === '/stats') return staticFile('stats.json');
-  if (p === '/chapters') return staticFile('chapters.json');
-  let m;
-  if ((m = p.match(/^\/chapters\/(\d+)$/))) return staticFile(`chapter-${m[1]}.json`);
-  if ((m = p.match(/^\/objectives\/([^/]+)$/)) && method === 'GET') {
-    const d = await staticFile(`objectives/${decodeURIComponent(m[1])}.json`);
-    return { ...d, questions: d.questions.filter(q => !q.excluded) };
-  }
-  if ((m = p.match(/^\/questions\/(\d+)\/check$/))) {
-    const q = staticQuestions.get(Number(m[1]));
-    if (!q) throw new Error('السؤال غير موجود');
-    const c = Number(body?.choice);
-    return { correct: c === q.correctIndex, correctIndex: q.correctIndex, explanation: q.explanation, distractorNote: q.distractorNotes?.[c] || null };
-  }
-  if (p === '/bank') {
-    const all = (await staticFile('bank.json')).questions;
-    const rows = all.filter(q => !q.excluded
-      && (!f.chapter || q.chapter.number === Number(f.chapter)) && (!f.lesson || q.lesson.number === Number(f.lesson))
-      && (!f.type || q.type === f.type) && (!f.level || q.thinkingLevel === f.level)
-      && (!f.difficulty || q.difficulty === f.difficulty) && (!f.status || q.status === f.status)
-      && (!f.q || q.stem.includes(f.q) || q.options.some(o => o.includes(f.q))));
-    if (f.similar === '1') {
-      const similar = [];
-      for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
-        const sc = staticSimilarity(rows[i].stem, rows[j].stem);
-        if (sc >= 0.5) similar.push({ a: rows[i].id, b: rows[j].id, score: Math.round(sc * 100) });
-      }
-      return { questions: rows, similar };
-    }
-    return { questions: rows };
-  }
-  if (p === '/revisions') return [];
-  throw new Error('هذا الإجراء غير متاح في نسخة العرض؛ التعديل والاعتماد يتطلبان تشغيل المنصة على الخادم.');
 }
 
 function toast(msg, error = false) {
@@ -159,9 +98,7 @@ function renderUserbox() {
     const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', pending: 'بانتظار التفعيل' };
     box.innerHTML = `<span class="muted">${esc(state.user.displayName)} · ${roles[state.user.role]}</span>
       <button type="button" id="logout">خروج</button>`;
-    box.querySelector('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); state.user = null; renderUserbox(); route(); };
-  } else if (state.static) {
-    box.innerHTML = `<span class="badge warn" title="البيانات منسوخة من قاعدة البيانات وقت النشر">نسخة عرض للقراءة فقط</span>`;
+    box.querySelector('#logout').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); location.hash = '#/'; route(); };
   } else {
     box.innerHTML = `<a class="btn" href="#/login">تسجيل الدخول</a>`;
   }
@@ -173,7 +110,6 @@ async function pageHome() {
   const o = s.objectives, q = s.questions;
   const chapters = await api('/chapters');
   $app.innerHTML = `
-    ${state.static ? `<p class="notice">هذه <strong>نسخة عرض للقراءة فقط</strong> منشورة على GitHub Pages (البيانات بتاريخ ${esc((s.generatedAt || '').slice(0, 10))}). تظهر فيها الإجابات لغرض مراجعة النموذج الأولي؛ <strong>لا تشاركها مع الطلاب</strong>. الاعتماد والتعديل وحفظ البيانات تتطلب تشغيل المنصة على خادم.</p>` : ''}
     <div class="hero">
       <div>
         <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
@@ -745,16 +681,13 @@ async function pageReports() {
 }
 
 // ---------- تسجيل الدخول ----------
+const LOGO = '<img class="login-logo" src="assets/itqan-logo.png" alt="إتقان — بنك أسئلة الكيمياء" width="520" height="513">';
+
 function pageLogin() {
-  const logo = '<img class="login-logo" src="assets/itqan-logo.png" alt="إتقان — بنك أسئلة الكيمياء" width="520" height="513">';
-  if (state.static) {
-    $app.innerHTML = `<div class="login-wrap"><div class="login-card">${logo}<p class="notice">تسجيل الدخول غير متاح في نسخة العرض؛ يلزم الاتصال بقاعدة البيانات.</p></div></div>`;
-    return;
-  }
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
-    ${logo}
+    ${LOGO}
     <h1>تسجيل الدخول</h1>
-    <p class="muted small">للمعلمين والمراجعين. الحسابات ينشئها المشرف.</p>
+    ${state.offline ? '<p class="notice bad">تعذر الاتصال بقاعدة البيانات؛ تحقق من الإنترنت ثم أعد تحميل الصفحة.</p>' : ''}
     <form id="login-form" novalidate>
       <div class="field"><label for="l-user">اسم المستخدم</label>
         <input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
@@ -763,7 +696,7 @@ function pageLogin() {
         <button type="button" class="pass-toggle" id="l-show" aria-pressed="false">إظهار</button></div></div>
       <button class="primary" type="submit" id="l-submit">دخول</button>
     </form>
-    <p class="login-foot">نسيت كلمة المرور؟ تواصل مع المشرف لإعادة تعيينها.</p>
+    <p class="login-foot">الدخول للحسابات المصرّح لها فقط. للحصول على حساب أو استعادة كلمة المرور تواصل مع المشرف.</p>
   </div></div>`;
   const user = document.getElementById('l-user'), pass = document.getElementById('l-pass'), btn = document.getElementById('l-submit');
   user.focus();
@@ -779,9 +712,22 @@ function pageLogin() {
     btn.disabled = true; btn.textContent = 'جارٍ الدخول…';
     try {
       const r = await api('/login', { method: 'POST', body: { username: user.value, password: pass.value } });
-      state.user = r.user; renderUserbox(); toast('مرحبًا ' + r.user.displayName); location.hash = '#/';
+      state.user = r.user; renderUserbox();
+      if (r.user.role !== 'pending') toast('مرحبًا ' + r.user.displayName);
+      location.hash = '#/'; route();
     } catch (err) { fail(err); btn.disabled = false; btn.textContent = 'دخول'; }
   };
+}
+
+// حساب أُنشئ ولم يحدد المشرف دوره بعد: لا يرى أي محتوى.
+function pagePending() {
+  $app.innerHTML = `<div class="login-wrap"><div class="login-card">
+    ${LOGO}
+    <h1>حسابك بانتظار التفعيل</h1>
+    <p class="muted">مرحبًا ${esc(state.user.displayName)}. سيظهر لك المحتوى بعد أن يحدد المشرف صلاحيتك.</p>
+    <button type="button" class="primary" id="p-out">تسجيل الخروج</button>
+  </div></div>`;
+  document.getElementById('p-out').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); route(); };
 }
 
 // ---------- الموجّه ----------
@@ -792,6 +738,10 @@ async function route() {
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
     a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))));
   document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
+  // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
+  const locked = !state.user || state.user.role === 'pending';
+  document.body.classList.toggle('locked', locked);
+  if (locked) { if (state.user) pagePending(); else pageLogin(); window.scrollTo(0, 0); return; }
   try {
     if (!page) await pageHome();
     else if (page === 'chapters') await pageChapters();
@@ -800,7 +750,7 @@ async function route() {
     else if (page === 'bank') await pageBank();
     else if (page === 'reports') await pageReports();
     else if (page === 'exam') await pageExam({ api, esc, fail, toast, $app });
-    else if (page === 'login') pageLogin();
+    else if (page === 'login') location.hash = '#/';
     else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
   } catch (e) {
     if (e?.stale || seq !== routeSeq) return;

@@ -4,6 +4,12 @@ import { execSync } from 'node:child_process';
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
 const OUT = process.argv[2], BASE = 'http://localhost:3123';
+async function login(pg) {
+  await pg.goto(BASE + '/#/'); await pg.waitForSelector('#l-user');
+  check('login page first, header hidden', !(await pg.locator('.topbar').isVisible()));
+  await pg.fill('#l-user', 'reviewer1'); await pg.fill('#l-pass', 'Test-Pass-12345'); await pg.click('button[type=submit]');
+  await pg.waitForSelector('#logout');
+}
 const browser = await chromium.launch();
 const errors = [];
 const results = [];
@@ -19,6 +25,7 @@ const noHScroll = p => p.evaluate(() => document.documentElement.scrollWidth <= 
 
 for (const [name, vp] of [['desktop', { width: 1366, height: 900 }], ['ipad', { width: 820, height: 1180 }], ['mobile', { width: 390, height: 844 }]]) {
   const p = await page(vp);
+  await login(p);
   await p.goto(BASE + '/#/'); await p.waitForSelector('.kpi .value');
   check(`${name}: RTL`, await p.evaluate(() => getComputedStyle(document.body).direction === 'rtl'));
   check(`${name}: no horizontal scroll (home)`, await noHScroll(p));
@@ -32,12 +39,12 @@ for (const [name, vp] of [['desktop', { width: 1366, height: 900 }], ['ipad', { 
   await p.context().close();
 }
 
-// تدفق الزائر: الاختبار والتدريب الفوري
+// الاختبار والتدريب الفوري (بعد الدخول)
 const p = await page({ width: 1280, height: 900 });
+await login(p);
 await p.goto(BASE + '/#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 check('anon: answers hidden in test mode', (await p.locator('.answer:visible').count()) === 0);
 check('anon: 7 mcq + 3 essay cards', (await p.locator('#mcq-list .q').count()) === 7 && (await p.locator('#essay-section .q').count()) === 3);
-check('anon: review mode button hidden', (await p.locator('[data-mode="review"]').count()) === 0);
 await p.locator('[data-choose]').nth(0).click(); await p.waitForTimeout(200);
 await p.locator('#finish-test').click(); await p.waitForTimeout(500);
 check('anon: test finished shows feedback', (await p.locator('.notice.ok, .notice.bad').count()) >= 1);
@@ -46,10 +53,6 @@ await p.locator('#q-2 [data-choose]').nth(1).click(); await p.waitForTimeout(400
 check('anon: practice feedback wrong answer', (await p.locator('#q-2 .notice.bad').count()) === 1);
 await p.screenshot({ path: `${OUT}/practice.png`, fullPage: false });
 // تسجيل الدخول والمراجعة
-await p.goto(BASE + '/#/login');
-await p.fill('#l-user', 'reviewer1'); await p.fill('#l-pass', 'Test-Pass-12345'); await p.click('button[type=submit]');
-await p.waitForSelector('#logout');
-check('login works', true);
 await p.goto(BASE + '/#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
 check('review: answers visible', (await p.locator('#mcq-list .answer:visible').count()) === 7);

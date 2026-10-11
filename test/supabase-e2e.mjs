@@ -103,46 +103,49 @@ const BASE = 'http://localhost:8766/Bank/public/';
 const Q2 = sel => p.locator('#mcq-list .q').nth(1).locator(sel);
 
 try {
-// الزائر
-await p.goto(BASE + '#/'); await p.waitForSelector('.kpi .value');
-ok('anon: no read-only banner in Supabase mode', !(await p.locator('text=نسخة عرض للقراءة فقط').count()));
-ok('anon: stats show 2580 questions', (await p.locator('main').innerText()).includes('2580') || (await p.locator('main').innerText()).includes('2,580'));
+// الزائر: لا يرى إلا صفحة الدخول، وقاعدة البيانات ترفض طلباته مباشرة
+await p.goto(BASE + '#/'); await p.waitForSelector('#l-user');
+ok('anon: login page first, header hidden', !(await p.locator('.topbar').isVisible()) && !(await p.locator('.kpi').count()));
+ok('login form: username + password + logo', (await p.locator('label[for="l-user"]').innerText()).includes('اسم المستخدم') && await p.locator('.login-logo').evaluate(i => i.complete && i.naturalWidth > 0));
+ok('footer: copyright', (await p.locator('.footer').innerText()).includes('برمجة وتطوير الأستاذ عبدالله حمدي'));
+await p.screenshot({ path: `${OUT}/supa-login.png` });
+await p.goto(BASE + '#/bank'); await p.waitForSelector('#l-user');
+ok('anon: deep link still shows login only', !(await p.locator('.q').count()));
+const direct = await p.evaluate(async () => Promise.all(['get_bank', 'get_stats', 'get_chapters'].map(fn =>
+  fetch('http://localhost:8766/mock/rpc/' + fn, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(r => r.json()))));
+ok('anon: database refuses direct reads', direct.every(r => r.error && !r.data), JSON.stringify(direct.map(r => r.error?.code)));
+
+// حساب جديد لم يفعّله المشرف: رسالة انتظار فقط
+await p.fill('#l-user', 'new@x.com'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
+ok('pending: awaiting activation page', await p.locator('h1', { hasText: 'بانتظار التفعيل' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForTimeout(800);
+ok('pending: no content', !(await p.locator('.q').count()) && !(await p.locator('.topbar').isVisible()));
+await p.click('#p-out'); await p.waitForSelector('#l-user');
+
+// المعلم: يرى المحتوى والإجابات ولا يرى أدوات المراجعة
+await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
+await p.waitForSelector('.kpi .value');
+ok('viewer: header visible after login', await p.locator('.topbar').isVisible());
+ok('viewer: stats show 2580 questions', /2580|2,580/.test(await p.locator('main').innerText()));
 await p.screenshot({ path: `${OUT}/supa-home.png` });
 await p.goto(BASE + '#/chapter/4'); await p.waitForSelector('.obj-list');
-ok('anon: chapter 4 has 5 lessons', (await p.locator('section.lesson').count()) === 5);
+ok('viewer: chapter 4 has 5 lessons', (await p.locator('section.lesson').count()) === 5);
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
-ok('anon: 7 mcq + 3 essay', (await p.locator('#mcq-list .q').count()) === 7 && (await p.locator('#essay-section .q').count()) === 3);
-ok('anon: answers hidden', (await p.locator('.answer:visible').count()) === 0);
+ok('viewer: 7 mcq + 3 essay', (await p.locator('#mcq-list .q').count()) === 7 && (await p.locator('#essay-section .q').count()) === 3);
 await p.locator('[data-mode="practice"]').click(); await p.waitForTimeout(300);
 await Q2('[data-choose]').nth(0).click();
-ok('anon: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
-await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, .bank-q, table, .empty', { timeout: 15000 });
-ok('anon: no export buttons', (await p.locator('[data-export]').count()) === 0);
-await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
-await p.click('#x-build'); await p.waitForSelector('.paper');
-ok('anon: exam builder builds from Supabase bank', (await p.locator('.set-student .paper').count()) >= 1);
-
-// تسجيل دخول المعلم: يرى الإجابات ولا يرى أدوات المراجعة
-await p.goto(BASE + '#/login'); await p.waitForSelector('#l-user');
-ok('login form: username + password + logo', (await p.locator('label[for="l-user"]').innerText()).includes('اسم المستخدم') && await p.locator('.login-logo').evaluate(i => i.complete && i.naturalWidth > 0));
-await p.screenshot({ path: `${OUT}/supa-login.png` });
-await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
-await p.waitForSelector('#logout');
-await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+ok('viewer: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('viewer: sees answers but no review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools').count()) === 0);
-await p.click('#logout'); await p.waitForTimeout(500);
-// حساب جديد لم يفعّله المشرف: لا يرى الإجابات
-await p.goto(BASE + '#/login'); await p.waitForSelector('#l-user');
-await p.fill('#l-user', 'new@x.com'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
-await p.waitForSelector('#logout');
-ok('pending account shown as awaiting activation', (await p.locator('#userbox').innerText()).includes('بانتظار التفعيل'));
-await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
-ok('pending account: no answers', (await p.locator('[data-mode="review"]').count()) === 0);
-await p.click('#logout'); await p.waitForTimeout(500);
+await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, table, .empty', { timeout: 15000 });
+ok('viewer: no export buttons', (await p.locator('[data-export]').count()) === 0);
+await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
+await p.click('#x-build'); await p.waitForSelector('.paper');
+ok('viewer: exam builder builds from Supabase bank', (await p.locator('.set-student .paper').count()) >= 1);
+await p.click('#logout'); await p.waitForSelector('#l-user');
+ok('logout returns to login', !(await p.locator('.topbar').isVisible()));
 
 // المراجع
-await p.goto(BASE + '#/login'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'nobody@x.com'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
 ok('wrong login rejected', await p.locator('.toast.error').waitFor({ timeout: 3000 }).then(() => true, () => false));
 await p.fill('#l-user', 'rev@x.com'); await p.click('button[type=submit]');

@@ -1,12 +1,19 @@
-// اختبار منشئ الاختبارات بالمتصفح على نسخة العرض: خادم ملفات ثابتة على المنفذ 8765 يقدّم المستودع تحت /Bank/، ثم: node test/exam-e2e.mjs <مجلد الإخراج>
+// اختبار منشئ الاختبارات بالمتصفح على الخادم المحلي (المنفذ 3123، بيانات كاملة npm run seed، ومستخدم reviewer1): node test/exam-e2e.mjs <مجلد الإخراج>
 import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
+const BASE = process.env.BASE || 'http://localhost:3123';
+// المنصة مغلقة: كل اختبار يبدأ بتسجيل الدخول (خادم محلي بمستخدم reviewer1 / Test-Pass-12345).
+async function login(pg) {
+  await pg.goto(BASE + '/#/'); await pg.waitForSelector('#l-user');
+  await pg.fill('#l-user', process.env.E2E_USER || 'reviewer1'); await pg.fill('#l-pass', process.env.E2E_PASS || 'Test-Pass-12345');
+  await pg.click('button[type=submit]'); await pg.waitForSelector('#logout');
+}
 const OUT = process.argv[2]; const b = await chromium.launch(); const errs = []; const res = [];
 const ok = (n, v) => res.push((v ? 'PASS ' : 'FAIL ') + n);
 const p = await b.newPage({ viewport: { width: 1280, height: 1000 } });
 p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts/.test(m.text())) errs.push(m.text()); });
-await p.goto('http://localhost:8765/Bank/public/#/exam'); await p.waitForSelector('#x-build', { timeout: 15000 });
+await login(p); await p.goto(BASE + '/#/exam'); await p.waitForSelector('#x-build', { timeout: 15000 });
 // الفصلان 1 و2 فقط، 15 اختيار و3 مقالي، نموذجان
 for (const c of [3, 4, 5, 6, 7]) await p.uncheck(`[data-ch="${c}"]`);
 await p.fill('#x-mcq', '15'); await p.fill('#x-essay', '3'); await p.selectOption('#x-models', '2'); await p.fill('#x-seed', '1234');
@@ -47,7 +54,7 @@ const after = await p.locator('.set-student .paper:first-child .paper-mcq > li')
 ok('swap replaces question', first !== after);
 // جوال
 const m = await b.newPage({ viewport: { width: 390, height: 844 } });
-await m.goto('http://localhost:8765/Bank/public/#/exam'); await m.waitForSelector('#x-build');
+await login(m); await m.goto(BASE + '/#/exam'); await m.waitForSelector('#x-build');
 await m.click('#x-build'); await m.waitForSelector('.paper');
 ok('mobile no h-scroll', await m.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
 await m.screenshot({ path: `${OUT}/exam-mobile.png` });
