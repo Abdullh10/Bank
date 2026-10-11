@@ -6,7 +6,10 @@ const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set() };
 
 // ---------- أدوات ----------
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// المصطلح المعتمد للمصدر: «الكتاب المدرسي». البيانات المخزنة تقول «المذكرة»، ويُستبدل المصطلح عند العرض فقط
+// حتى لا تتغير ملفات الأسئلة (تغييرها يلغي قرار الاعتماد المرتبط ببصمة كل ملف).
+const term = s => String(s ?? '').replace(/للمذكرة/g, 'للكتاب المدرسي').replace(/المذكرة/g, 'الكتاب المدرسي').replace(/مذكرة/g, 'الكتاب المدرسي');
+const esc = s => term(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
 
@@ -114,7 +117,7 @@ async function pageHome() {
       <div>
         <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
         <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
-        <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: ${esc(s.course?.content_source)}</p>
+        <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي (مسارات)، الفصل الدراسي الأول 1447هـ</p>
       </div>
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">تصفح الفصول</a>
@@ -141,7 +144,7 @@ async function pageHome() {
         <div class="levels">
           ${progress('أهداف بلغت العدد المطلوب من الأسئلة (7 + 3)', s.coverage.complete, o.n)}
           ${progress('أهداف اكتملت أسئلتها المعتمدة', s.coverage.approved_complete, o.n, 'ok')}
-          ${progress('محتوى مكمّل للمذكرة معتمد', s.supplements.approved, s.supplements.n, 'ok')}
+          ${progress('محتوى مكمّل للكتاب المدرسي معتمد', s.supplements.approved, s.supplements.n, 'ok')}
         </div>
         <p class="small muted" style="margin-top:.6rem">اكتمل بنك الأسئلة لجميع الأهداف. اعتُمدت الأسئلة بقرار مالك المشروع دون مراجعة تفصيلية لكل سؤال، والتفاصيل في سجل كل سؤال.</p>
       </div>
@@ -187,7 +190,7 @@ async function pageChapter(n) {
             <span class="obj-badges">${objBadge(o.reviewStatus)}
               ${o.mcq + o.essay ? badge(`${o.mcq}/${o.requiredMcq} اختيار · ${o.essay}/${o.requiredEssay} مقالي`,
                 o.mcq >= o.requiredMcq && o.essay >= o.requiredEssay ? 'brand' : 'warn') : badge('لا أسئلة بعد')}
-              ${o.memoCoverage ? badge('المذكرة: ' + o.memoCoverage, COVERAGE_KIND[o.memoCoverage]) : ''}</span>
+              ${o.memoCoverage ? badge('الكتاب المدرسي: ' + o.memoCoverage, COVERAGE_KIND[o.memoCoverage]) : ''}</span>
           </li>`).join('')}
         </ul>
       </section>`).join('')}`;
@@ -211,7 +214,7 @@ async function pageObjective(code) {
       <div><span class="obj-code">${esc(o.code)}${o.originalCode ? ` (سابقًا ${esc(o.originalCode)})` : ''}</span>
         <h1>${esc(o.approvedText || o.proposedText || o.originalText)}</h1>
         <div class="meta-row">${objBadge(o.reviewStatus)}${o.thinkingLevel ? badge('مستوى التفكير: ' + o.thinkingLevel, 'brand') : ''}
-          ${o.memoCoverage ? badge('تغطية المذكرة: ' + o.memoCoverage, COVERAGE_KIND[o.memoCoverage]) : ''}</div></div>
+          ${o.memoCoverage ? badge('تغطية الكتاب المدرسي: ' + o.memoCoverage, COVERAGE_KIND[o.memoCoverage]) : ''}</div></div>
       <div class="actions no-print">
         ${idx > 0 ? `<a class="btn" href="#/objective/${data.lessonNav[idx - 1]}">→ الهدف السابق</a>` : ''}
         ${idx < data.lessonNav.length - 1 ? `<a class="btn" href="#/objective/${data.lessonNav[idx + 1]}">الهدف التالي ←</a>` : ''}
@@ -234,7 +237,7 @@ async function pageObjective(code) {
         <dt>مستوى التفكير</dt><dd>${esc(o.thinkingLevel || '—')}</dd>
         <dt>نوع المعرفة</dt><dd>${esc(o.knowledgeType || '—')}</dd>
         <dt>المفاهيم المرتبطة</dt><dd>${o.concepts.map(c => badge(c)).join(' ') || '—'}</dd>
-        <dt>المرجع في المذكرة</dt><dd>${o.memoPages.length ? 'صفحات PDF: ' + o.memoPages.join('، ') : '—'}${o.memoNote ? `<div class="small muted">${esc(o.memoNote)}</div>` : ''}</dd>
+        <dt>المرجع في الكتاب المدرسي</dt><dd>${o.memoPages.length ? 'الصفحات: ' + o.memoPages.join('، ') : '—'}${o.memoNote ? `<div class="small muted">${esc(o.memoNote)}</div>` : ''}</dd>
         ${o.duplicateOf ? `<dt>تكرار</dt><dd>${badge('مكرر للهدف ' + o.duplicateOf, 'warn')}</dd>` : ''}
       </dl>
       ${isReviewer() ? reviewPanel(o) : `<p class="small muted" style="margin-top:.6rem">اعتماد الهدف متاح للمراجعين بعد تسجيل الدخول.</p>`}
@@ -301,8 +304,8 @@ function supplementCard(s) {
   return `<section class="card no-print">
     <div class="section-title" style="margin-top:0"><h2>المحتوى العلمي المكمّل</h2>
       <span class="meta-row">${objBadge(s.reviewStatus)}${badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn')}</span></div>
-    <p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن المذكرة تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص المذكرة</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>
-    ${s.memoBasis ? `<p><strong>ما تقدمه المذكرة:</strong> ${esc(s.memoBasis)}</p>` : ''}
+    <p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>
+    ${s.memoBasis ? `<p><strong>ما تقدمه الكتاب المدرسي:</strong> ${esc(s.memoBasis)}</p>` : ''}
     <p id="sup-text">${esc(s.supplement)}</p>
     ${s.keyPoints.length ? `<h3>نقاط أساسية</h3>${list(s.keyPoints)}` : ''}
     ${s.misconceptions.length ? `<h3>تصورات خاطئة شائعة</h3>${list(s.misconceptions)}` : ''}
