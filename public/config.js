@@ -5,4 +5,7 @@
 export const SUPABASE = {
   url: 'https://znisbyqyygdholobhohu.supabase.co',
   key: 'sb_publishable_nynp0rDSZ91lCG4xhndULg_EDANOER5',
+  // الدخول بالمعرّف (ID): يكتب المستخدم «abdullah» فيُرسل إلى Supabase كبريد شكلي abdullah@chem21.local.
+  // الحسابات تُنشأ في Supabase بهذا البريد الشكلي (مع Auto Confirm)، ولا تُرسل إليه أي رسائل.
+  loginDomain: 'chem21.local',
 };

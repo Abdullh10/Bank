@@ -18,9 +18,9 @@ const OUT = process.argv[2] || '.';
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 
 // مستخدمان تجريبيان: مراجع ومعلم (بلا كلمات مرور: المحاكي لا يختبر Supabase Auth نفسه بل الأدوار والسياسات).
-await pool.query(`insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111','rev@x.com'),('22222222-2222-2222-2222-222222222222','view@x.com') on conflict do nothing`);
+await pool.query(`insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111','rev@x.com'),('22222222-2222-2222-2222-222222222222','view@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='reviewer', display_name='عبدالله حمدي' where email='rev@x.com'`);
-await pool.query(`update public.profiles set role='viewer' where email='view@x.com'`);
+await pool.query(`update public.profiles set role='viewer' where email='view@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
 async function asRole(uid, sql, params) {
@@ -124,8 +124,8 @@ ok('anon: exam builder builds from Supabase bank', (await p.locator('.set-studen
 
 // تسجيل دخول المعلم: يرى الإجابات ولا يرى أدوات المراجعة
 await p.goto(BASE + '#/login'); await p.waitForSelector('#l-user');
-ok('login form asks for email', (await p.locator('label[for="l-user"]').innerText()).includes('البريد'));
-await p.fill('#l-user', 'view@x.com'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
+ok('login form asks for ID', (await p.locator('label[for="l-user"]').innerText()).includes('المعرّف'));
+await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
 await p.waitForSelector('#logout');
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);

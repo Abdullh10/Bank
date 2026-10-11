@@ -588,7 +588,7 @@ end $$;
 create or replace function public.get_me() returns jsonb
 language sql stable security definer set search_path = public as $$
   select case when auth.uid() is null then null else
-    (select jsonb_build_object('id', user_id, 'username', email, 'displayName', display_name, 'role', role) from profiles where user_id = auth.uid()) end
+    (select jsonb_build_object('id', user_id, 'username', split_part(email, '@', 1), 'displayName', display_name, 'role', role) from profiles where user_id = auth.uid()) end
 $$;
 
 grant execute on function public.get_chapters(), public.get_chapter(int), public.get_objective(text), public.get_bank(jsonb), public.get_me() to anon, authenticated;

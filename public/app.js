@@ -750,7 +750,7 @@ function pageLogin() {
   $app.innerHTML = `<div class="card" style="max-width:420px;margin:2rem auto">
     <h1>تسجيل الدخول</h1><p class="muted small">حسابات المراجعين والمعلمين ينشئها المشرف${state.supabase ? '' : ' من الخادم'}.</p>
     <form id="login-form">
-      <div class="field"><label for="l-user">${state.supabase ? 'البريد الإلكتروني' : 'اسم المستخدم'}</label><input id="l-user" ${state.supabase ? 'type="email" dir="ltr" autocomplete="email"' : 'autocomplete="username"'} required></div>
+      <div class="field"><label for="l-user">${state.supabase ? 'المعرّف (ID)' : 'اسم المستخدم'}</label><input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
       <div class="field"><label for="l-pass">كلمة المرور</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
       <button class="primary" type="submit">دخول</button>
     </form></div>`;

@@ -5,9 +5,11 @@ import { cleanQuestion, cleanObjectiveEdit, autoCheck, similarity, ValidationErr
 
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 let client;
+let loginDomain = '';
 
 export async function initSupabase(cfg) {
   const { createClient } = await import(SDK);
+  loginDomain = cfg.loginDomain || '';
   client = createClient(cfg.url, cfg.key, { auth: { persistSession: true, autoRefreshToken: true } });
   return client;
 }
@@ -82,8 +84,11 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
 
   if (p === '/me') return { user: await rpc('get_me') };
   if (p === '/login') {
-    const { error } = await client.auth.signInWithPassword({ email: String(body.username || '').trim(), password: body.password || '' });
-    if (error) throw Object.assign(new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة'), { status: 401 });
+    // المعرّف بلا @ يُكمَّل بالنطاق الشكلي؛ ويبقى الدخول بالبريد الكامل ممكنًا.
+    const id = String(body.username || '').trim().toLowerCase();
+    const email = id.includes('@') || !loginDomain ? id : `${id}@${loginDomain}`;
+    const { error } = await client.auth.signInWithPassword({ email, password: body.password || '' });
+    if (error) throw Object.assign(new Error('المعرّف أو كلمة المرور غير صحيحة'), { status: 401 });
     const user = await rpc('get_me');
     if (!user) throw new Error('الحساب غير مرتبط بملف مستخدم؛ تواصل مع المشرف');
     return { user };

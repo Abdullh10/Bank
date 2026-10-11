@@ -41,20 +41,23 @@
 - **الأثر:** لا يستطيع أحد إنشاء حساب بنفسه.
 - **لو بقي التسجيل مفتوحًا:** أي حساب جديد يكون «بانتظار التفعيل» ولا يرى الإجابات حتى تحدد دوره.
 
-## الخطوة 4: إنشاء الحسابات
+## الخطوة 4: إنشاء الحسابات (الدخول بالمعرّف)
+يدخل المستخدم بمعرّف قصير مثل `abdullah`، لا ببريد. Supabase يشترط بريدًا لكل حساب، فيُنشأ الحساب ببريد شكلي هو المعرّف متبوعًا بـ `@chem21.local`. يكمل الموقع هذا النطاق تلقائيًا عند الدخول، ولا تُرسل إليه أي رسائل.
+
 1. افتح **Authentication**، ثم **Users**، ثم **Add user**، ثم **Create new user**.
-2. أدخل البريد وكلمة مرور قوية، وفعّل **Auto Confirm User**.
-3. أنشئ حسابك (المشرف)، وحساب المراجع عبدالله حمدي، وحسابات المعلمين عند الحاجة.
-4. حدد الأدوار من **SQL Editor**، مع استبدال البريد ببريد كل حساب:
+2. في خانة Email اكتب المعرّف مع النطاق، مثل `abdullah@chem21.local`، ثم كلمة مرور قوية، وفعّل **Auto Confirm User**.
+3. حدد الأدوار من **SQL Editor**:
 
 ```sql
-update public.profiles set role = 'admin',    display_name = 'مالك المشروع' where email = 'owner@example.com';
-update public.profiles set role = 'reviewer', display_name = 'عبدالله حمدي' where email = 'reviewer@example.com';
--- معلم يرى الإجابات دون صلاحية تعديل:
-update public.profiles set role = 'viewer',   display_name = 'اسم المعلم'  where email = 'teacher@example.com';
--- عرض كل الحسابات وأدوارها:
+update public.profiles set role = 'admin',    display_name = 'مالك المشروع' where email = 'owner@chem21.local';
+update public.profiles set role = 'reviewer', display_name = 'عبدالله حمدي' where email = 'abdullah@chem21.local';
 select email, display_name, role from public.profiles order by created_at;
 ```
+
+ملاحظات:
+- **المعرّف:** حروف إنجليزية صغيرة وأرقام فقط، بلا مسافات.
+- **الدخول بالبريد الكامل:** ما زال ممكنًا لأي حساب أُنشئ ببريد حقيقي.
+- **نسيان كلمة المرور:** يغيّرها المشرف من **Authentication** ← **Users** ← الحساب ← **Reset password**، أو بحذف الحساب وإنشائه من جديد، لأنه لا يوجد بريد حقيقي تُرسل إليه رسالة الاستعادة.
 
 **الأدوار:**
 
@@ -66,7 +69,7 @@ select email, display_name, role from public.profiles order by created_at;
 | `pending` | لا يرى الإجابات |
 
 ## الخطوة 5: الاستخدام
-- افتح رابط الموقع على GitHub Pages، ثم «تسجيل الدخول» بالبريد وكلمة المرور.
+- افتح رابط الموقع على GitHub Pages، ثم «تسجيل الدخول» بالمعرّف وكلمة المرور.
 - منشئ الاختبارات يعمل كما هو، ويقرأ البنك من قاعدة البيانات مباشرة.
 - تصدير CSV يتم في المتصفح من صفحة بنك الأسئلة، للمراجع والمشرف فقط.
 
