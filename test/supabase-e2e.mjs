@@ -5,6 +5,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -15,12 +16,30 @@ const { chromium } = require('playwright');
 const pg = createRequire(process.env.PG_MODULE + '/')('pg');
 const pool = new pg.Pool({ connectionString: process.env.PGURL });
 const OUT = process.argv[2] || '.';
+// دالة الحافة admin-users تُختبر بمنطقها الحقيقي مع بدائل محلية لعمليات Supabase Auth.
+const fnTmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fn-')), 'admin-users.mjs');
+fs.copyFileSync(path.join(root, 'supabase/functions/admin-users/index.ts'), fnTmp);
+const adminUsers = await import(fnTmp);
+const fnDeps = {
+  callerId: async jwt => jwt || null,
+  roleOf: async id => (await pool.query('select role from public.profiles where user_id = $1', [id])).rows[0]?.role || null,
+  createUser: async ({ email }) => {
+    if ((await pool.query('select 1 from auth.users where email = $1', [email])).rowCount) return { error: 'User already registered' };
+    try { return { id: (await pool.query('insert into auth.users (email) values ($1) returning id', [email])).rows[0].id }; }
+    catch (e) { return { error: (await pool.query('select 1 from auth.users where email = $1', [email])).rowCount ? 'User already registered' : e.message }; }
+  },
+  setProfile: async (id, f) => { await pool.query('update public.profiles set role=$2, display_name=$3, section=$4, profile_confirmed=$5 where user_id=$1', [id, f.role, f.display_name, f.section, f.profile_confirmed]); },
+  setPassword: async () => ({}),
+};
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 
 // مستخدمان تجريبيان: مراجع ومعلم (بلا كلمات مرور: المحاكي لا يختبر Supabase Auth نفسه بل الأدوار والسياسات).
 await pool.query(`insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111','rev@x.com'),('22222222-2222-2222-2222-222222222222','view@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='reviewer', display_name='عبدالله حمدي' where email='rev@x.com'`);
 await pool.query(`update public.profiles set role='viewer' where email='view@chem21.local'`);
+await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
+await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
+await pool.query(`delete from auth.users where email in ('st2test@chem21.local') or email like 'st_____@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
 async function asRole(uid, sql, params) {
@@ -49,6 +68,8 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/mock/login') {
       const r = await pool.query('select id from auth.users where email = $1', [b.email]);
       out = r.rows[0] ? { uid: r.rows[0].id } : { error: { message: 'Invalid login credentials' } };
+    } else if (url.pathname.startsWith('/mock/functions/')) {
+      out = await adminUsers.handle(b, uid, fnDeps);
     } else if (url.pathname === '/mock/q') {
       out = await asRole(uid, `select jsonb_build_object('objective_id', q.objective_id, 'objectives', jsonb_build_object('code', o.code)) r
         from public.questions q join public.objectives o on o.id = q.objective_id where q.id = $1`, [b.v]);
@@ -87,6 +108,8 @@ export function createClient() {
       signOut: async () => { token = null; localStorage.removeItem('mocktok'); return {}; },
     },
     from: t => ({ select: () => ({ eq: (c, v) => ({ single: () => post('/q', { t, c, v }) }) }) }),
+    functions: { invoke: async (name, { body }) => { const r = await post('/functions/' + name, body);
+      return r.status >= 400 ? { data: null, error: { message: 'FunctionsHttpError', context: { json: async () => r.body } } } : { data: r.body, error: null }; } },
   };
 }`;
 
@@ -180,6 +203,61 @@ const csv = fs.readFileSync(await dl.path(), 'utf8');
 ok('export questions CSV (client-side, BOM, 2581 lines)', csv.charCodeAt(0) === 0xfeff && csv.trim().split('\r\n').length === 2581, `lines=${csv.trim().split('\r\n').length}`);
 const [dl2] = await Promise.all([p.waitForEvent('download'), p.click('[data-export="objectives"]')]);
 ok('export objectives CSV', fs.readFileSync(await dl2.path(), 'utf8').trim().split('\r\n').length === 259);
+
+// ---------- حساب الطالب ----------
+await p.click('#logout'); await p.waitForSelector('#l-user');
+await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
+ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
+await p.goto(BASE + '#/students'); await p.waitForSelector('#as-lines');
+await p.fill('#as-lines', 'طالب أول تجريبي، 2/1\nطالب ثان تجريبي، 2/2، st2test\nمكرر، 2/2، st2test');
+await p.click('#as-create'); await p.waitForSelector('#as-cards');
+const cards = await p.$$eval('#as-cards tbody tr', trs => trs.map(tr => [...tr.cells].map(td => td.textContent.trim()).join('|')));
+ok('admin: 2 accounts created, duplicate rejected', cards.filter(t => /st\d|st2test/.test(t)).length === 2 && cards.some(t => t.includes('مستخدم من قبل')), JSON.stringify(cards));
+const st = cards.find(t => t.includes('st2test')).split('|');
+await p.goto(BASE + '#/'); await p.waitForSelector('.kpi .value');
+await p.goto(BASE + '#/students'); await p.waitForSelector('tr[data-id]');
+ok('admin: students listed', (await p.locator('tr[data-id]').count()) >= 2);
+await p.click('#logout'); await p.waitForSelector('#l-user');
+// دخول الطالب: تأكيد البيانات مرة واحدة
+await p.fill('#l-user', 'st2test'); await p.fill('#l-pass', st[3] || 'x'); await p.click('button[type=submit]');
+await p.waitForSelector('#c-form');
+ok('student: confirm page prefilled', (await p.inputValue('#c-name')) === 'طالب ثان تجريبي' && (await p.inputValue('#c-sec')) === '2/2');
+await p.click('#c-form button[type=submit]'); await p.waitForSelector('#s-start');
+ok('student: nav shows only practice + history', await p.locator('[data-nav="history"]').isVisible() && !(await p.locator('[data-nav="bank"]').isVisible()) && !(await p.locator('[data-nav="exam"]').isVisible()));
+await p.goto(BASE + '#/bank'); await p.waitForSelector('#s-start');
+ok('student: teacher pages redirect to practice', !(await p.locator('#bank-list, .kpi').count()));
+const blocked = await p.evaluate(async () => (await fetch('http://localhost:8766/mock/rpc/get_bank', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
+ok('student: database refuses teacher reads', !!blocked.error);
+await p.screenshot({ path: `${OUT}/student-setup.png`, fullPage: true });
+await p.locator('details.st-ch').first().locator('summary').click();
+await p.locator('[data-lesson]').first().check();
+await p.selectOption('#s-count', '5'); await p.check('#s-timed');
+await p.click('#s-start'); await p.waitForSelector('.st-opt');
+ok('student: session started with timer', (await p.locator('.st-top').innerText()).includes('سؤال 1 من 5') && await p.locator('#st-timer').isVisible());
+ok('student: no answer marked before answering', (await p.locator('.st-opt.ok, .st-opt.bad').count()) === 0);
+for (let i = 0; i < 5; i++) {
+  await p.locator('.st-opt').first().click(); await p.waitForSelector('.st-fb');
+  if (i === 0) { ok('student: immediate feedback with explanation', (await p.locator('.st-fb').innerText()).includes('التفسير')); await p.screenshot({ path: `${OUT}/student-feedback.png` }); }
+  await p.click('#st-next');
+}
+await p.waitForSelector('.st-result');
+const res = await p.locator('.st-score').innerText();
+ok('student: result shown', /من 5/.test(res), res);
+await p.screenshot({ path: `${OUT}/student-result.png`, fullPage: true });
+if (await p.locator('#st-retry').count()) {
+  await p.click('#st-retry'); await p.waitForSelector('.st-opt');
+  ok('student: retry mistakes session', (await p.locator('.st-top').innerText()).includes('إعادة الأخطاء'));
+  await p.click('#st-end'); p.once('dialog', d => d.accept());
+}
+await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
+await p.waitForTimeout(500);
+ok('student: history lists sessions', (await p.locator('main').innerText()).includes('آخر الجلسات') && (await p.locator('main tbody tr').count()) >= 1);
+await p.click('#logout'); await p.waitForSelector('#l-user');
+// المعلم يرى التقدم
+await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
+await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
+ok('teacher: progress lists student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي'));
+ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
 
 } catch (e) { results.push('FAIL exception: ' + e.message.split('\n')[0]); await p.screenshot({ path: `${OUT}/supa-fail.png` }); }
 console.log(results.join('\n'));

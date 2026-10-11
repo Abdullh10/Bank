@@ -20,11 +20,15 @@
         <span>إتقان <em>بنك أسئلة الكيمياء</em><small>كيمياء 2-1 · الصف الثاني الثانوي · الفصل الدراسي الأول</small></span>
       </a>
       <nav class="nav" aria-label="القائمة الرئيسية">
-        <a href="#/" data-nav="home">الرئيسية</a>
-        <a href="#/chapters" data-nav="chapters">الفصول</a>
-        <a href="#/bank" data-nav="bank">بنك الأسئلة</a>
-        <a href="#/exam" data-nav="exam">منشئ الاختبارات</a>
-        <a href="#/reports" data-nav="reports">التقارير</a>
+        <a href="#/" data-nav="home" data-roles="staff">الرئيسية</a>
+        <a href="#/chapters" data-nav="chapters" data-roles="staff">الفصول</a>
+        <a href="#/bank" data-nav="bank" data-roles="staff">بنك الأسئلة</a>
+        <a href="#/exam" data-nav="exam" data-roles="staff">منشئ الاختبارات</a>
+        <a href="#/reports" data-nav="reports" data-roles="staff">التقارير</a>
+        <a href="#/progress" data-nav="progress" data-roles="staff">تقدم الطلاب</a>
+        <a href="#/students" data-nav="students" data-roles="admin">حسابات الطلاب</a>
+        <a href="#/" data-nav="home" data-roles="student">تدرّب</a>
+        <a href="#/history" data-nav="history" data-roles="student">سجلي</a>
       </nav>
       <div class="userbox" id="userbox"></div>
     </div>

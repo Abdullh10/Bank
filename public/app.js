@@ -1,6 +1,8 @@
 // واجهة المنصة: تطبيق صفحة واحدة بوحدات ES دون أدوات بناء.
 import { pageExam } from './exam.js';
 import { SUPABASE } from './config.js';
+import { pageStudentHome, pageStudentHistory, pageStudentConfirm, resetStudentSession } from './student.js';
+import { pageTeacherProgress, pageAdminStudents } from './staff.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set() };
@@ -109,10 +111,10 @@ const list = (arr, tag = 'ul') => (arr?.length ? `<${tag}>${arr.map(x => `<li>${
 function renderUserbox() {
   const box = document.getElementById('userbox');
   if (state.user) {
-    const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', pending: 'بانتظار التفعيل' };
+    const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', student: 'طالب', pending: 'بانتظار التفعيل' };
     box.innerHTML = `<span class="muted">${esc(state.user.displayName)} · ${roles[state.user.role]}</span>
       <button type="button" id="logout">خروج</button>`;
-    box.querySelector('#logout').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); location.hash = '#/'; route(); };
+    box.querySelector('#logout').onclick = async () => { resetStudentSession(); await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); location.hash = '#/'; route(); };
   } else {
     box.innerHTML = `<a class="btn" href="#/login">تسجيل الدخول</a>`;
   }
@@ -756,6 +758,22 @@ async function route() {
   const locked = !state.user || state.user.role === 'pending';
   document.body.classList.toggle('locked', locked);
   if (locked) { if (state.user) pagePending(); else pageLogin(); window.scrollTo(0, 0); return; }
+  // القائمة حسب الدور: الطالب يرى «تدرّب» و«سجلي» فقط، و«حسابات الطلاب» للمشرف.
+  const role = state.user.role, isStudent = role === 'student';
+  document.querySelectorAll('[data-roles]').forEach(a => {
+    const r = a.dataset.roles;
+    a.hidden = !(r === 'student' ? isStudent : r === 'admin' ? role === 'admin' : !isStudent);
+  });
+  const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
+  if (isStudent) {
+    try {
+      if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
+      else if (page === 'history') await pageStudentHistory(ctx);
+      else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
+    } catch (e) { if (!e?.stale && seq === routeSeq) $app.innerHTML = `<div class="notice bad">${esc(e.message)}</div>`; }
+    window.scrollTo(0, 0);
+    return;
+  }
   try {
     if (!page) await pageHome();
     else if (page === 'chapters') await pageChapters();
@@ -764,6 +782,8 @@ async function route() {
     else if (page === 'bank') await pageBank();
     else if (page === 'reports') await pageReports();
     else if (page === 'exam') await pageExam({ api, esc, fail, toast, $app });
+    else if (page === 'progress') await pageTeacherProgress(ctx);
+    else if (page === 'students' && role === 'admin') await pageAdminStudents(ctx);
     else if (page === 'login') location.hash = '#/';
     else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
   } catch (e) {

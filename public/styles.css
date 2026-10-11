@@ -336,3 +336,43 @@ body.locked main { padding-top: 0; }
 /* الشعار بألوان داكنة؛ في الوضع الليلي يوضع على خلفية فاتحة ليبقى مقروءًا */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { background: #fbf8f2; border-radius: 14px; padding: .6rem; } }
 :root[data-theme="dark"] .login-logo { background: #fbf8f2; border-radius: 14px; padding: .6rem; }
+
+[hidden] { display: none !important; }
+/* ---------- واجهة الطالب ---------- */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; margin-top: 1rem; }
+@media screen and (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.st-ch { border-bottom: 1px solid var(--line); padding: .5rem 0; }
+.st-ch summary { cursor: pointer; padding: .25rem 0; }
+.st-lesson { display: grid; grid-template-columns: auto 1fr 70px 2.6rem; align-items: center; gap: .5rem; padding: .35rem .2rem; cursor: pointer; }
+.st-mastery { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.st-mastery span { display: block; height: 100%; background: var(--ok); }
+.st-radio { display: flex; gap: .45rem; align-items: baseline; padding: .25rem 0; cursor: pointer; }
+fieldset.field { border: 0; padding: 0; margin: 0 0 .8rem; }
+fieldset.field legend { font-weight: 600; margin-bottom: .3rem; }
+.st-start { width: 100%; margin-top: .8rem; padding: .7rem; font-size: 1.05rem; }
+.st-run { max-width: 760px; margin: 0 auto; }
+.st-top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.st-timer { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.st-timer.over { color: var(--warn); }
+.st-q { margin-top: .8rem; }
+.st-stem { font-size: 1.15rem; line-height: 1.9; margin: .4rem 0 1rem; }
+.st-opts { display: grid; gap: .55rem; }
+.st-opt { padding: .75rem .9rem; font-size: 1.02rem; cursor: pointer; }
+.st-opt:not([disabled]):hover { border-color: var(--brand); background: var(--brand-soft); }
+.st-opt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.st-opt.bad { border-color: var(--bad); background: var(--bad-soft); }
+.st-opt.dim { opacity: .65; }
+.st-opt.chosen { border-color: var(--brand); }
+.st-fb { margin-top: 1rem; }
+.st-fb p { margin: .45rem 0 0; }
+.linklike { border: 0; background: none; color: var(--brand); padding: .3rem 0; cursor: pointer; text-decoration: underline; }
+.st-nav { justify-content: space-between; margin-top: 1rem; }
+.st-result { text-align: center; }
+.st-score { font-size: 1.4rem; margin: .4rem 0; }
+.st-score b { font-size: 2.4rem; color: var(--brand); }
+.st-radio input, .st-lesson input { width: auto; flex: none; margin: 0; }
+.st-radio { align-items: center; }
+.st-opt[disabled] { color: var(--ink); opacity: 1; cursor: default; }
+.st-opt.dim[disabled] { opacity: .6; }
+.st-opt.ok .letter { color: var(--ok); }
+.st-opt.bad .letter { color: var(--bad); }

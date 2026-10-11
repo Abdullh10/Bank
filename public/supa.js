@@ -77,6 +77,17 @@ export async function exportCsv(kind) {
   }
 }
 
+// إنشاء الحسابات وإعادة تعيين كلمات المرور عبر دالة الحافة admin-users (تعمل داخل Supabase بمفتاح الخدمة).
+async function adminUsers(body) {
+  const { data, error } = await client.functions.invoke('admin-users', { body });
+  if (!error) return data;
+  let msg = error.message || '';
+  try { const j = await error.context?.json?.(); if (j?.error) msg = j.error; } catch { /* ليس JSON */ }
+  if (!msg || /Failed to send|not found|404|FunctionsFetchError|FunctionsRelayError/i.test(msg))
+    msg = 'دالة إنشاء الحسابات (admin-users) غير منشورة في Supabase بعد؛ راجع خطوات النشر في docs/supabase-setup.md';
+  throw new Error(msg);
+}
+
 export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   const [p, query = ''] = path.split('?');
   const f = Object.fromEntries([...new URLSearchParams(query)].filter(([, v]) => v !== ''));
@@ -163,5 +174,21 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     return { questions };
   }
   if (p === '/revisions') return rpc('get_revisions', { p_limit: Number(f.limit) || 100 });
+  // ---------- الطالب ----------
+  if (p === '/student/catalog') return rpc('student_catalog');
+  if (p === '/student/confirm') { await rpc('student_confirm_profile', { p_name: body.name, p_section: body.section }); return { ok: true }; }
+  if (p === '/student/start') return rpc('student_start', { p: body });
+  if (p === '/student/answer') return rpc('student_answer', { p_session: body.session, p_question: body.question, p_choice: body.choice });
+  if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
+  if (p === '/student/history') return rpc('student_history');
+  // ---------- المعلم والمشرف ----------
+  if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null });
+  if (p === '/admin/students') return rpc('admin_list_students');
+  if (p === '/admin/students/update') {
+    await rpc('admin_update_student', { p_id: body.id, p_name: body.name, p_section: body.section, p_role: body.role });
+    return { ok: true };
+  }
+  if (p === '/admin/students/create') return adminUsers({ action: 'create', students: body.students });
+  if (p === '/admin/students/reset') return adminUsers({ action: 'reset', userId: body.userId });
   throw new Error('مسار غير معروف: ' + p);
 }
