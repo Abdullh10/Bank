@@ -127,6 +127,7 @@ await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('bu
 await p.waitForSelector('.kpi .value');
 ok('viewer: header visible after login', await p.locator('.topbar').isVisible());
 ok('term: textbook, not memo (home)', !/مذكر/.test(await p.locator('main').innerText()));
+ok('home: term 1448', (await p.locator('main').innerText()).includes('الفصل الدراسي الأول 1448هـ'));
 ok('viewer: stats show 2580 questions', /2580|2,580/.test(await p.locator('main').innerText()));
 await p.screenshot({ path: `${OUT}/supa-home.png` });
 await p.goto(BASE + '#/chapter/4'); await p.waitForSelector('.obj-list');
@@ -139,6 +140,7 @@ await Q2('[data-choose]').nth(0).click();
 ok('viewer: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('viewer: sees answers but no review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools').count()) === 0);
+{ const t = await p.locator('main').innerText(); ok('refs: no page numbers or worksheet labels', !/ص\s*\d|ورقة/.test(t) && t.includes('المرجع: الكتاب المدرسي —'), (t.match(/المرجع:[^\n]*/) || [''])[0]); }
 await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, table, .empty', { timeout: 15000 });
 ok('viewer: no export buttons', (await p.locator('[data-export]').count()) === 0);
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });

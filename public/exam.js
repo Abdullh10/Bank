@@ -15,7 +15,7 @@ function todayHijri() {
     const y = get('year'), m = get('month'), d = get('day');
     if (y > 1400 && m >= 1 && m <= 12) return { y, m, d };
   } catch { /* المتصفح لا يدعم التقويم الهجري */ }
-  return { y: 1447, m: 4, d: 1 };
+  return { y: 1448, m: 4, d: 1 };
 }
 const HIJRI_NOW = todayHijri();
 const yearsAround = () => Array.from({ length: 5 }, (_, i) => `${HIJRI_NOW.y - 1 + i}هـ`);
@@ -46,7 +46,7 @@ const DEFAULT_HEADER = {
   subject: 'الكيمياء 2-1',
   grade: 'الثاني الثانوي – مسارات',
   duration: 'ساعتان ونصف',
-  date: '..../..../1447هـ',
+  date: '..../..../1448هـ',
   dateDay: '',
   dateMonth: '',
   dateYear: `${HIJRI_NOW.y}هـ`,

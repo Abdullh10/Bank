@@ -9,6 +9,17 @@ const state = { user: null, selection: new Set() };
 // المصطلح المعتمد للمصدر: «الكتاب المدرسي». البيانات المخزنة تقول «المذكرة»، ويُستبدل المصطلح عند العرض فقط
 // حتى لا تتغير ملفات الأسئلة (تغييرها يلغي قرار الاعتماد المرتبط ببصمة كل ملف).
 const term = s => String(s ?? '').replace(/للمذكرة/g, 'للكتاب المدرسي').replace(/المذكرة/g, 'الكتاب المدرسي').replace(/مذكرة/g, 'الكتاب المدرسي');
+// مراجع المصدر تُعرض دون أرقام صفحات ولا «ورقة عمل»: الأرقام المخزنة لصفحات المذكرة ولا تطابق صفحات الكتاب المدرسي.
+const cleanRef = s => {
+  const t = term(s);
+  if (/^محتوى مكمّل/.test(t)) return 'محتوى مكمّل (غير موجود في الكتاب المدرسي)';
+  return t
+    .replace(/(الصفحات|صفحات|ص)\s*\.?\s*\d+(\s*(?:[–\-،,]|و)\s*(?:ص\s*)?\d+)*/g, '')
+    .replace(/(تابع\s+)?ورقة(\s+عمل)?\s*\d*\s*:?\s*/g, '')
+    .replace(/\(\s*\)/g, '').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
+    .replace(/\s*—\s*/g, ' — ').replace(/(\s—\s*)+$/g, '').replace(/^\s*—\s*/, '')
+    .replace(/(\s—\s){2,}/g, ' — ').replace(/\s+([؛،.)])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+};
 const esc = s => term(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
@@ -117,7 +128,7 @@ async function pageHome() {
       <div>
         <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
         <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
-        <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي (مسارات)، الفصل الدراسي الأول 1447هـ</p>
+        <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي (مسارات)، الفصل الدراسي الأول 1448هـ</p>
       </div>
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">تصفح الفصول</a>
@@ -237,7 +248,7 @@ async function pageObjective(code) {
         <dt>مستوى التفكير</dt><dd>${esc(o.thinkingLevel || '—')}</dd>
         <dt>نوع المعرفة</dt><dd>${esc(o.knowledgeType || '—')}</dd>
         <dt>المفاهيم المرتبطة</dt><dd>${o.concepts.map(c => badge(c)).join(' ') || '—'}</dd>
-        <dt>المرجع في الكتاب المدرسي</dt><dd>${o.memoPages.length ? 'الصفحات: ' + o.memoPages.join('، ') : '—'}${o.memoNote ? `<div class="small muted">${esc(o.memoNote)}</div>` : ''}</dd>
+        <dt>المرجع في الكتاب المدرسي</dt><dd>${o.memoNote ? esc(cleanRef(o.memoNote)) : '—'}</dd>
         ${o.duplicateOf ? `<dt>تكرار</dt><dd>${badge('مكرر للهدف ' + o.duplicateOf, 'warn')}</dd>` : ''}
       </dl>
       ${isReviewer() ? reviewPanel(o) : `<p class="small muted" style="margin-top:.6rem">اعتماد الهدف متاح للمراجعين بعد تسجيل الدخول.</p>`}
@@ -305,11 +316,11 @@ function supplementCard(s) {
     <div class="section-title" style="margin-top:0"><h2>المحتوى العلمي المكمّل</h2>
       <span class="meta-row">${objBadge(s.reviewStatus)}${badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn')}</span></div>
     <p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>
-    ${s.memoBasis ? `<p><strong>ما تقدمه الكتاب المدرسي:</strong> ${esc(s.memoBasis)}</p>` : ''}
-    <p id="sup-text">${esc(s.supplement)}</p>
+    ${s.memoBasis ? `<p><strong>ما يقدمه الكتاب المدرسي:</strong> ${esc(cleanRef(s.memoBasis))}</p>` : ''}
+    <p id="sup-text">${esc(cleanRef(s.supplement))}</p>
     ${s.keyPoints.length ? `<h3>نقاط أساسية</h3>${list(s.keyPoints)}` : ''}
     ${s.misconceptions.length ? `<h3>تصورات خاطئة شائعة</h3>${list(s.misconceptions)}` : ''}
-    ${s.scientificNotes ? `<p class="small muted"><strong>ملاحظات علمية:</strong> ${esc(s.scientificNotes)}</p>` : ''}
+    ${s.scientificNotes ? `<p class="small muted"><strong>ملاحظات علمية:</strong> ${esc(cleanRef(s.scientificNotes))}</p>` : ''}
     ${isReviewer() ? `<div class="actions">
       <button type="button" class="ok" data-sup="approve">اعتماد المحتوى</button>
       <button type="button" data-sup="edit">تعديل</button>
@@ -339,7 +350,7 @@ function mcqCard(q, answers) {
       <h4>الإجابة الصحيحة: ${LETTERS[q.correctIndex]}) ${esc(q.options[q.correctIndex])}</h4>
       <div>${esc(q.explanation)}</div>
       ${q.distractorNotes?.some(Boolean) ? `<h4>سبب خطأ البدائل الأخرى</h4><ul>${q.distractorNotes.map((n, i) => n ? `<li>${LETTERS[i]}) ${esc(n)}</li>` : '').join('')}</ul>` : ''}
-      ${q.sourceRef ? `<div class="small muted">المرجع: ${esc(q.sourceRef)}</div>` : ''}
+      ${q.sourceRef ? `<div class="small muted">المرجع: ${esc(cleanRef(q.sourceRef))}</div>` : ''}
     </div>` : '';
   const feedback = chosen?.checked && mode === 'practice' ? `<div class="notice ${chosen.correct ? 'ok' : 'bad'}" style="margin-top:.5rem">
       ${chosen.correct ? 'إجابة صحيحة.' : `إجابة غير صحيحة؛ الصحيحة (${LETTERS[chosen.correctIndex]}).`} ${esc(chosen.explanation)}
@@ -363,7 +374,7 @@ function essayCard(q, answers) {
       ${q.rubric?.length ? `<h4>سلم التصحيح</h4><div class="table-wrap"><table class="data-table"><tbody>
         ${q.rubric.map(r => `<tr><th>${esc(r.level)}</th><td>${esc(r.description)}</td></tr>`).join('')}</tbody></table></div>` : ''}
       ${q.commonErrors?.length ? `<h4>أخطاء علمية شائعة ينبغي الانتباه إليها</h4>${list(q.commonErrors)}` : ''}
-      ${q.sourceRef ? `<div class="small muted">المرجع: ${esc(q.sourceRef)}</div>` : ''}
+      ${q.sourceRef ? `<div class="small muted">المرجع: ${esc(cleanRef(q.sourceRef))}</div>` : ''}
     </div></details>` : '';
   return `<article class="q ${q.excluded ? 'excluded' : ''}" id="q-${q.id}">
     <div class="q-head"><span class="q-num">سؤال مقالي ${q.number}</span>${answers ? qMeta(q) : ''}</div>
