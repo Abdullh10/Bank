@@ -20,15 +20,15 @@ const OUT = process.argv[2] || '.';
 const fnTmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fn-')), 'admin-users.mjs');
 fs.copyFileSync(path.join(root, 'supabase/functions/admin-users/index.ts'), fnTmp);
 const adminUsers = await import(fnTmp);
+// بدائل محلية: ما يمر بتوكن المستدعي يُنفذ بدوره الحقيقي (asRole) كما في Supabase.
 const fnDeps = {
-  callerId: async jwt => jwt || null,
-  roleOf: async id => (await pool.query('select role from public.profiles where user_id = $1', [id])).rows[0]?.role || null,
+  callerRole: async jwt => { const r = await asRole(jwt, 'select to_jsonb(public.get_me()) r'); return r.error ? { error: r.error.message } : { role: r.data?.role || null }; },
+  initStudent: async (jwt, id, { name, section }) => { const r = await asRole(jwt, 'select to_jsonb(public.admin_init_student($1, $2, $3)) r', [id, name, section || null]); return r.error ? { error: r.error.message } : {}; },
+  isStudent: async (jwt, id) => (await asRole(jwt, 'select to_jsonb(public.admin_is_student($1)) r', [id])).data === true,
   createUser: async ({ email }) => {
     if ((await pool.query('select 1 from auth.users where email = $1', [email])).rowCount) return { error: 'User already registered' };
-    try { return { id: (await pool.query('insert into auth.users (email) values ($1) returning id', [email])).rows[0].id }; }
-    catch (e) { return { error: (await pool.query('select 1 from auth.users where email = $1', [email])).rowCount ? 'User already registered' : e.message }; }
+    return { id: (await pool.query('insert into auth.users (email) values ($1) returning id', [email])).rows[0].id };
   },
-  setProfile: async (id, f) => { await pool.query('update public.profiles set role=$2, display_name=$3, section=$4, profile_confirmed=$5 where user_id=$1', [id, f.role, f.display_name, f.section, f.profile_confirmed]); },
   setPassword: async () => ({}),
 };
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';

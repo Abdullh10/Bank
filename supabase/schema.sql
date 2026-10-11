@@ -891,3 +891,21 @@ grant execute on function public.is_student(), public.student_confirm_profile(te
   public.student_answer(bigint, bigint, int), public.student_finish(bigint), public.student_history(),
   public.teacher_progress(text), public.admin_list_students(), public.admin_update_student(uuid, text, text, text) to authenticated;
 revoke execute on function public._require_student(), public._student_q(public.questions), public._session_summary(bigint) from authenticated;
+
+-- تستدعيها دالة الحافة admin-users بتوكن المشرف نفسه (لا بمفتاح الخدمة) بعد إنشاء حساب الطالب.
+create or replace function public.admin_init_student(p_id uuid, p_name text, p_section text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
+  if not exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student')) then raise exception 'الحساب ليس حساب طالب جديد'; end if;
+  update profiles set role = 'student', display_name = coalesce(nullif(trim(p_name), ''), display_name),
+    section = nullif(trim(p_section), ''), profile_confirmed = false where user_id = p_id;
+end $$;
+create or replace function public.admin_is_student(p_id uuid) returns boolean
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
+  return exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student'));
+end $$;
+revoke execute on function public.admin_init_student(uuid, text, text), public.admin_is_student(uuid) from anon, public;
+grant execute on function public.admin_init_student(uuid, text, text), public.admin_is_student(uuid) to authenticated;

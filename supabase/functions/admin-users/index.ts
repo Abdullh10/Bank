@@ -18,11 +18,15 @@ export function randomUsername() {
 export const cleanUsername = u => String(u || '').trim().toLowerCase();
 export const validUsername = u => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(u);
 
-// المنطق مستقل عن Supabase ليُختبر: deps = { callerId(jwt), roleOf(id), createUser({email,password,name}), setProfile(id, fields), setPassword(id, password) }
+// المنطق مستقل عن Supabase ليُختبر. التحقق من الدور وتحديث ملف الطالب يتمان بتوكن المشرف نفسه (عبر دوال قاعدة البيانات)،
+// ومفتاح الخدمة لا يُستخدم إلا لإنشاء الحساب وتغيير كلمة المرور في Supabase Auth.
+// deps = { callerRole(jwt) → {role}|{error}, initStudent(jwt, id, {name, section}) → {}|{error}, isStudent(jwt, id) → bool,
+//          createUser({email,password,name}) → {id}|{error}, setPassword(id, password) → {}|{error} }
 export async function handle(body, jwt, deps) {
-  const caller = jwt ? await deps.callerId(jwt) : null;
-  if (!caller) return { status: 401, body: { error: 'يلزم تسجيل الدخول' } };
-  if ((await deps.roleOf(caller)) !== 'admin') return { status: 403, body: { error: 'للمشرف فقط' } };
+  if (!jwt) return { status: 401, body: { error: 'يلزم تسجيل الدخول' } };
+  const who = await deps.callerRole(jwt);
+  if (who.error) return { status: 401, body: { error: 'تعذر التحقق من الحساب: ' + who.error } };
+  if (who.role !== 'admin') return { status: 403, body: { error: `للمشرف فقط (دور الحساب الحالي: ${who.role || 'غير معروف'})` } };
 
   if (body?.action === 'create') {
     const list = Array.isArray(body.students) ? body.students : [];
@@ -45,15 +49,15 @@ export async function handle(body, jwt, deps) {
         else lastErr = /already|exists|registered/i.test(r.error || '') ? 'اسم المستخدم مستخدم من قبل' : (r.error || 'تعذر إنشاء الحساب');
       }
       if (!created) { results.push({ name, ok: false, error: lastErr }); continue; }
-      await deps.setProfile(created.id, { role: 'student', display_name: name, section: section || null, profile_confirmed: false });
+      const init = await deps.initStudent(jwt, created.id, { name, section });
+      if (init?.error) { results.push({ name, ok: false, error: 'أُنشئ الحساب ولم يُضبط ملفه: ' + init.error }); continue; }
       results.push({ name, section, username: created.username, password, ok: true });
     }
     return { status: 200, body: { results } };
   }
 
   if (body?.action === 'reset') {
-    const role = await deps.roleOf(body.userId);
-    if (!['student', 'pending'].includes(role)) return { status: 400, body: { error: 'إعادة التعيين متاحة لحسابات الطلاب فقط' } };
+    if (!(await deps.isStudent(jwt, body.userId))) return { status: 400, body: { error: 'إعادة التعيين متاحة لحسابات الطلاب فقط' } };
     const password = randomPassword();
     const r = await deps.setPassword(body.userId, password);
     if (r?.error) return { status: 400, body: { error: r.error } };
@@ -70,26 +74,39 @@ const CORS = {
 
 if (typeof Deno !== 'undefined') {
   const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4');
-  const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
-  const deps = {
-    callerId: async jwt => (await admin.auth.getUser(jwt)).data?.user?.id || null,
-    roleOf: async id => (await admin.from('profiles').select('role').eq('user_id', id).maybeSingle()).data?.role || null,
+  const URL_ = Deno.env.get('SUPABASE_URL');
+  const admin = createClient(URL_, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
+  // عميل بصلاحيات المستدعي نفسه: كل ما يمر به يخضع لسياسات قاعدة البيانات كما في الموقع.
+  // المفتاح العام: نفس مفتاح الموقع المرسل مع الطلب (apikey)، وإلا مفتاح anon من بيئة Supabase.
+  const makeDeps = apikey => {
+  const asCaller = jwt => createClient(URL_, apikey || Deno.env.get('SUPABASE_ANON_KEY'), {
+    auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${jwt}` } } });
+  return {
+    callerRole: async jwt => {
+      const { data, error } = await asCaller(jwt).rpc('get_me');
+      return error ? { error: error.message } : { role: data?.role || null };
+    },
+    initStudent: async (jwt, id, { name, section }) => {
+      const { error } = await asCaller(jwt).rpc('admin_init_student', { p_id: id, p_name: name, p_section: section || null });
+      return error ? { error: error.message } : {};
+    },
+    isStudent: async (jwt, id) => (await asCaller(jwt).rpc('admin_is_student', { p_id: id })).data === true,
     createUser: async ({ email, password, name }) => {
       const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { display_name: name } });
       return error ? { error: error.message } : { id: data.user.id };
     },
-    setProfile: async (id, fields) => { await admin.from('profiles').update(fields).eq('user_id', id); },
     setPassword: async (id, password) => {
       const { error } = await admin.auth.admin.updateUserById(id, { password });
       return error ? { error: error.message } : {};
     },
+  };
   };
   Deno.serve(async req => {
     if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
     const jwt = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
     let body = null;
     try { body = await req.json(); } catch { /* جسم غير صالح */ }
-    const out = await handle(body, jwt, deps);
+    const out = await handle(body, jwt, makeDeps(req.headers.get('apikey')));
     return new Response(JSON.stringify(out.body), { status: out.status, headers: { ...CORS, 'Content-Type': 'application/json' } });
   });
 }
