@@ -303,3 +303,7 @@ label.chk input { width: auto; }
   .paper-head, .paper-info th, .paper-score th, .answer-grid th, .paper-instr, .paper-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 .answer-grid tr > th:first-child { width: 24mm; }
+
+.date-row { display: flex; flex-wrap: wrap; gap: .4rem; }
+.date-row select { width: auto; flex: 1 1 140px; }
+.other-input { margin-top: .35rem; }

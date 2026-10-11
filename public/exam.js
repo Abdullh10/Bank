@@ -5,6 +5,36 @@ const MODEL_NAMES = ['أ', 'ب', 'ج', 'د'];
 const LETTERS = ['أ', 'ب', 'ج'];
 const ORDINALS = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس'];
 const STORE_KEY = 'chem21.exam.header.v1';
+const HIJRI_MONTHS = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+
+// التاريخ الهجري الحالي (تقويم أم القرى) من المتصفح، مع قيمة احتياطية.
+function todayHijri() {
+  try {
+    const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(new Date());
+    const get = t => Number(parts.find(p => p.type === t)?.value);
+    const y = get('year'), m = get('month'), d = get('day');
+    if (y > 1400 && m >= 1 && m <= 12) return { y, m, d };
+  } catch { /* المتصفح لا يدعم التقويم الهجري */ }
+  return { y: 1447, m: 4, d: 1 };
+}
+const HIJRI_NOW = todayHijri();
+const yearsAround = () => Array.from({ length: 5 }, (_, i) => `${HIJRI_NOW.y - 1 + i}هـ`);
+const CHOICES = {
+  title: ['اختبار الفصل الدراسي الأول', 'اختبار الفصل الدراسي الثاني', 'اختبار الفصل الدراسي الثالث', 'اختبار منتصف الفصل الدراسي', 'اختبار الدور الثاني', 'اختبار قصير', 'اختبار تجريبي', 'ورقة عمل'],
+  year: yearsAround(),
+  subject: ['الكيمياء 2-1', 'الكيمياء 1', 'الكيمياء 2', 'الكيمياء 3', 'الكيمياء 4'],
+  grade: ['الثاني الثانوي – مسارات', 'الأول الثانوي – مسارات', 'الثالث الثانوي – مسارات', 'السنة المشتركة'],
+  duration: ['ساعتان ونصف', 'ساعتان', 'ساعة ونصف', 'ساعة واحدة', 'ثلاث ساعات', '45 دقيقة', '30 دقيقة', '20 دقيقة'],
+  country: ['المملكة العربية السعودية'],
+  org: ['الهيئة الملكية بالجبيل', 'الهيئة الملكية بينبع', 'وزارة التعليم'],
+  dept: ['إدارة التعليم العام', 'إدارة التعليم'],
+};
+// يبني نص التاريخ من الاختيارات؛ ترك اليوم أو الشهر فارغًا يُطبع نقاطًا ليكتبه المعلم يدويًا.
+function dateText(h) {
+  const d = h.dateDay ? String(h.dateDay) : '....', m = h.dateMonth ? String(h.dateMonth) : '....';
+  if (h.dateFormat === 'name' && h.dateDay && h.dateMonth) return `${h.dateDay} ${HIJRI_MONTHS[h.dateMonth - 1]} ${h.dateYear}`;
+  return `${d}/${m}/${h.dateYear}`;
+}
 
 const DEFAULT_HEADER = {
   country: 'المملكة العربية السعودية',
@@ -12,11 +42,15 @@ const DEFAULT_HEADER = {
   dept: 'إدارة التعليم العام',
   school: 'مدرسة العلا الثانوية',
   title: 'اختبار الفصل الدراسي الأول',
-  year: '1447هـ',
+  year: `${HIJRI_NOW.y}هـ`,
   subject: 'الكيمياء 2-1',
   grade: 'الثاني الثانوي – مسارات',
   duration: 'ساعتان ونصف',
   date: '..../..../1447هـ',
+  dateDay: '',
+  dateMonth: '',
+  dateYear: `${HIJRI_NOW.y}هـ`,
+  dateFormat: 'num',
   teacher: '',
   instructions: 'اقرأ الأسئلة بعناية، وأجب عنها جميعًا بالقلم الأزرق. لا يُسمح باستخدام المصحح السائل. يُسمح باستخدام الآلة الحاسبة غير المبرمجة.',
 };
@@ -91,6 +125,22 @@ export async function pageExam(ctx) {
     && (!o.approvedOnly || q.status === 'approved'));
   const avail = { mcq: poolFor('mcq').length, essay: poolFor('essay').length };
   const field = (k, label, wide) => `<div ${wide ? 'style="grid-column:1/-1"' : ''}><label for="h-${k}">${label}</label><input id="h-${k}" data-h="${k}" value="${esc(h[k])}"></div>`;
+  // قائمة منسدلة؛ اختيار «أخرى» يُظهر حقلًا لكتابة قيمة غير موجودة في القائمة.
+  const sel = (k, label) => {
+    const opts = CHOICES[k] || [];
+    const other = h[k] && !opts.includes(h[k]);
+    return `<div><label for="h-${k}">${label}</label>
+      <select id="h-${k}" data-hsel="${k}">${opts.map(v => `<option ${v === h[k] ? 'selected' : ''}>${esc(v)}</option>`).join('')}<option value="__other" ${other ? 'selected' : ''}>أخرى (اكتب)…</option></select>
+      <input class="other-input" data-hother="${k}" value="${other ? esc(h[k]) : ''}" placeholder="اكتب ${label}" ${other ? '' : 'hidden'}></div>`;
+  };
+  const dateField = () => `<div style="grid-column:1/-1"><label>التاريخ (هجري)</label>
+    <div class="date-row">
+      <select data-hd="dateDay" aria-label="اليوم"><option value="">اليوم: يُكتب يدويًا</option>${Array.from({ length: 30 }, (_, i) => `<option ${String(i + 1) === String(h.dateDay) ? 'selected' : ''}>${i + 1}</option>`).join('')}</select>
+      <select data-hd="dateMonth" aria-label="الشهر"><option value="">الشهر: يُكتب يدويًا</option>${HIJRI_MONTHS.map((n, i) => `<option value="${i + 1}" ${String(i + 1) === String(h.dateMonth) ? 'selected' : ''}>${i + 1} – ${n}</option>`).join('')}</select>
+      <select data-hd="dateYear" aria-label="السنة">${yearsAround().map(y => `<option ${y === h.dateYear ? 'selected' : ''}>${y}</option>`).join('')}</select>
+      <select data-hd="dateFormat" aria-label="صيغة التاريخ"><option value="num" ${h.dateFormat !== 'name' ? 'selected' : ''}>بالأرقام</option><option value="name" ${h.dateFormat === 'name' ? 'selected' : ''}>باسم الشهر</option></select>
+      <button type="button" id="h-today">تاريخ اليوم</button>
+    </div><div class="small muted" id="h-date-preview">سيُطبع: ${esc(dateText(h))}</div></div>`;
   const chk = (name, val, on, label) => `<label class="chk"><input type="checkbox" data-${name}="${esc(val)}" ${on ? 'checked' : ''}> ${esc(label)}</label>`;
 
   $app.innerHTML = `
@@ -124,9 +174,11 @@ export async function pageExam(ctx) {
         ${chk('opt', 'approvedOnly', o.approvedOnly, 'الأسئلة المعتمدة فقط')}
         <h2 style="margin-top:1rem">بيانات الكليشة</h2>
         <div class="form-grid">
-          ${field('country', 'الدولة')}${field('org', 'الجهة')}${field('dept', 'الإدارة')}${field('school', 'المدرسة')}
-          ${field('title', 'عنوان الاختبار')}${field('year', 'العام الدراسي')}${field('subject', 'المادة')}${field('grade', 'الصف')}
-          ${field('duration', 'الزمن')}${field('date', 'التاريخ')}${field('teacher', 'معلم المادة')}${field('instructions', 'التعليمات', true)}
+          ${sel('country', 'الدولة')}${sel('org', 'الجهة')}${sel('dept', 'الإدارة')}${field('school', 'المدرسة')}
+          ${sel('title', 'عنوان الاختبار')}${sel('year', 'العام الدراسي')}${sel('subject', 'المادة')}${sel('grade', 'الصف')}
+          ${sel('duration', 'الزمن')}${field('teacher', 'معلم المادة')}
+          ${dateField()}
+          ${field('instructions', 'التعليمات', true)}
         </div>
       </section>
     </div>
@@ -149,6 +201,12 @@ export async function pageExam(ctx) {
     o.essayMark = Math.max(0, Number($app.querySelector('#x-emark').value) || 0);
     o.seed = Number($app.querySelector('#x-seed').value) || 1;
     for (const i of $app.querySelectorAll('[data-h]')) h[i.dataset.h] = i.value.trim();
+    for (const i of $app.querySelectorAll('[data-hsel]')) {
+      const k = i.dataset.hsel;
+      h[k] = i.value === '__other' ? $app.querySelector(`[data-hother="${k}"]`).value.trim() : i.value;
+    }
+    for (const i of $app.querySelectorAll('[data-hd]')) h[i.dataset.hd] = i.value;
+    h.date = dateText(h);
     saveHeader(h);
   };
 
@@ -305,6 +363,23 @@ export async function pageExam(ctx) {
     toast('تم استبدال السؤال في جميع النماذج');
   };
 
+  for (const i of $app.querySelectorAll('[data-hsel]')) i.onchange = () => {
+    const box = $app.querySelector(`[data-hother="${i.dataset.hsel}"]`);
+    box.hidden = i.value !== '__other';
+    if (!box.hidden) box.focus();
+  };
+  const previewDate = () => {
+    const t = {};
+    for (const i of $app.querySelectorAll('[data-hd]')) t[i.dataset.hd] = i.value;
+    $app.querySelector('#h-date-preview').textContent = 'سيُطبع: ' + dateText(t);
+  };
+  for (const i of $app.querySelectorAll('[data-hd]')) i.onchange = previewDate;
+  $app.querySelector('#h-today').onclick = () => {
+    $app.querySelector('[data-hd="dateDay"]').value = String(HIJRI_NOW.d);
+    $app.querySelector('[data-hd="dateMonth"]').value = String(HIJRI_NOW.m);
+    $app.querySelector('[data-hd="dateYear"]').value = `${HIJRI_NOW.y}هـ`;
+    previewDate();
+  };
   $app.querySelector('#x-build').onclick = () => { try { build(); } catch (e) { fail(e); } };
   $app.querySelector('#x-reroll').onclick = () => { $app.querySelector('#x-seed').value = Math.floor(Math.random() * 1e6); build(); };
   if (state.exam) render();
