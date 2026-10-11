@@ -30,7 +30,7 @@ const TABLES = [
   { name: 'lessons', cols: ['id', 'chapter_id', 'number', 'title', 'summary', 'source_note'] },
   { name: 'objectives', cols: ['id', 'lesson_id', 'code', 'original_code', 'number', 'original_text', 'proposed_text', 'split_into', 'approved_text',
       'revision_reason', 'revision_type', 'ai_review_status', 'thinking_level', 'knowledge_type', 'concepts', 'source_page', 'memo_pages',
-      'memo_coverage', 'memo_note', 'duplicate_of', 'review_status', 'required_mcq', 'required_essay'],
+      'memo_coverage', 'memo_note', 'duplicate_of', 'review_status', 'reviewed_at', 'required_mcq', 'required_essay'],
     json: ['split_into', 'concepts', 'memo_pages'] },
   { name: 'supplements', cols: ['objective_id', 'memo_basis', 'supplement', 'key_points', 'misconceptions', 'scientific_notes', 'confidence', 'origin', 'review_status'],
     json: ['key_points', 'misconceptions'] },
@@ -76,6 +76,12 @@ select 'question', q.id, 'status', '{"status":"generated"}'::jsonb, '{"status":"
 from public.questions q
 where q.status = 'approved' and q.origin = 'ai_generated'
   and not exists (select 1 from public.revisions r where r.entity = 'question' and r.entity_id = q.id and r.action = 'status');
+${approvals.objectives ? `insert into public.revisions (entity, entity_id, action, before_json, after_json, note, user_name, at)
+select 'objective', o.id, 'approve', '{"reviewStatus":"pending","approvedText":null}'::jsonb, jsonb_build_object('reviewStatus', 'approved', 'approvedText', o.approved_text),
+  ${lit(`${approvals.objectives.by}: ${approvals.objectives.note}`)}, ${lit(approvals.objectives.by)}, ${lit(approvals.objectives.date)}::timestamptz
+from public.objectives o
+where o.review_status = 'approved'
+  and not exists (select 1 from public.revisions r where r.entity = 'objective' and r.entity_id = o.id and r.action = 'approve');` : ''}
 select setval(pg_get_serial_sequence('public.questions', 'id'), (select max(id) from public.questions));
 `);
 

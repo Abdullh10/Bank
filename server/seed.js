@@ -96,8 +96,19 @@ export function seed({ log = console.log } = {}) {
         db.prepare('UPDATE questions SET auto_check = ? WHERE id = ?').run(J.str(ac), q.id);
       }
     }
+    // قرار اعتماد الأهداف الموثق (إن وُجد): يطبق على الأهداف التي ما زالت بانتظار المراجعة فقط، فلا يمس قرارات المراجعين.
+    const od = approvals?.objectives;
+    if (od?.status === 'approved') {
+      for (const o of db.prepare(`SELECT * FROM objectives WHERE review_status = 'pending'`).all()) {
+        const text = [o.proposed_text || o.original_text, ...J.parse(o.split_into, [])].join('؛ ');
+        db.prepare(`UPDATE objectives SET review_status = 'approved', approved_text = ?, reviewed_at = ? WHERE id = ?`).run(text, od.date, o.id);
+        db.prepare(`INSERT INTO revisions (entity, entity_id, action, before_json, after_json, note) VALUES ('objective', ?, 'approve', ?, ?, ?)`)
+          .run(o.id, J.str({ reviewStatus: 'pending', approvedText: null }), J.str({ reviewStatus: 'approved', approvedText: text }), `${od.by}: ${od.note}`);
+        stats.objectivesApproved = (stats.objectivesApproved || 0) + 1;
+      }
+    }
   });
-  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا، واعتُمد ${stats.approved || 0} سؤالًا بقرار موثق`);
+  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا، واعتُمد ${stats.approved || 0} سؤالًا و${stats.objectivesApproved || 0} هدفًا بقرار موثق`);
   return stats;
 }
 
