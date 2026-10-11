@@ -16,6 +16,7 @@ create table if not exists public.profiles (
 );
 
 alter table public.profiles add column if not exists section text;
+alter table public.profiles add column if not exists grade text;
 alter table public.profiles add column if not exists profile_confirmed boolean not null default false;
 alter table public.profiles alter column role set default 'pending';
 alter table public.profiles drop constraint if exists profiles_role_check;
@@ -604,7 +605,7 @@ create or replace function public.get_me() returns jsonb
 language sql stable security definer set search_path = public as $$
   select case when auth.uid() is null then null else
     (select jsonb_build_object('id', user_id, 'username', split_part(email, '@', 1), 'displayName', display_name, 'role', role,
-       'section', section, 'profileConfirmed', profile_confirmed) from profiles where user_id = auth.uid()) end
+       'section', section, 'grade', grade, 'profileConfirmed', profile_confirmed) from profiles where user_id = auth.uid()) end
 $$;
 
 grant execute on function public.get_me() to anon, authenticated;
@@ -849,7 +850,7 @@ begin
   perform public._require_member();
   return jsonb_build_object(
     'sections', (select coalesce(jsonb_agg(distinct section), '[]') from profiles where role = 'student' and section is not null),
-    'students', (select coalesce(jsonb_agg(jsonb_build_object('name', pr.display_name, 'username', split_part(u.email, '@', 1), 'section', pr.section,
+    'students', (select coalesce(jsonb_agg(jsonb_build_object('name', pr.display_name, 'username', split_part(u.email, '@', 1), 'section', pr.section, 'grade', pr.grade,
         'sessions', (select count(*) from practice_sessions s where s.user_id = pr.user_id),
         'answered', (select count(*) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
         'correct', (select count(*) filter (where a.correct) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
@@ -872,34 +873,42 @@ language plpgsql stable security definer set search_path = public as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   return (select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
-      'section', pr.section, 'role', pr.role, 'confirmed', pr.profile_confirmed, 'createdAt', pr.created_at) order by pr.section nulls last, pr.display_name), '[]')
+      'grade', pr.grade, 'section', pr.section, 'role', pr.role, 'confirmed', pr.profile_confirmed, 'createdAt', pr.created_at,
+      'sessions', (select count(*) from practice_sessions s where s.user_id = pr.user_id),
+      'answered', (select count(*) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
+      'correct', (select count(*) filter (where a.correct) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
+      'lastActive', (select max(created_at) from practice_sessions s where s.user_id = pr.user_id))
+      order by pr.grade nulls last, pr.section nulls last, pr.display_name), '[]')
     from profiles pr join auth.users u on u.id = pr.user_id where pr.role in ('student', 'pending'));
 end $$;
 
-create or replace function public.admin_update_student(p_id uuid, p_name text, p_section text, p_role text) returns void
+drop function if exists public.admin_update_student(uuid, text, text, text);
+create or replace function public.admin_update_student(p_id uuid, p_name text, p_section text, p_role text, p_grade text default null) returns void
 language plpgsql security definer set search_path = public as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   if p_role not in ('student', 'pending') then raise exception 'الدور غير صالح'; end if;
   if not exists (select 1 from profiles where user_id = p_id and role in ('student', 'pending')) then raise exception 'الحساب ليس حساب طالب'; end if;
-  update profiles set display_name = coalesce(nullif(trim(p_name), ''), display_name), section = nullif(trim(p_section), ''), role = p_role where user_id = p_id;
+  update profiles set display_name = coalesce(nullif(trim(p_name), ''), display_name), section = nullif(trim(p_section), ''),
+    grade = nullif(trim(p_grade), ''), role = p_role where user_id = p_id;
 end $$;
 
 revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.is_student(), public.student_confirm_profile(text, text), public.student_catalog(), public.student_start(jsonb),
   public.student_answer(bigint, bigint, int), public.student_finish(bigint), public.student_history(),
-  public.teacher_progress(text), public.admin_list_students(), public.admin_update_student(uuid, text, text, text) to authenticated;
+  public.teacher_progress(text), public.admin_list_students(), public.admin_update_student(uuid, text, text, text, text) to authenticated;
 revoke execute on function public._require_student(), public._student_q(public.questions), public._session_summary(bigint) from authenticated;
 
 -- تستدعيها دالة الحافة admin-users بتوكن المشرف نفسه (لا بمفتاح الخدمة) بعد إنشاء حساب الطالب.
-create or replace function public.admin_init_student(p_id uuid, p_name text, p_section text) returns void
+drop function if exists public.admin_init_student(uuid, text, text);
+create or replace function public.admin_init_student(p_id uuid, p_name text, p_section text, p_grade text default null) returns void
 language plpgsql security definer set search_path = public as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   if not exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student')) then raise exception 'الحساب ليس حساب طالب جديد'; end if;
   update profiles set role = 'student', display_name = coalesce(nullif(trim(p_name), ''), display_name),
-    section = nullif(trim(p_section), ''), profile_confirmed = false where user_id = p_id;
+    section = nullif(trim(p_section), ''), grade = nullif(trim(p_grade), ''), profile_confirmed = false where user_id = p_id;
 end $$;
 create or replace function public.admin_is_student(p_id uuid) returns boolean
 language plpgsql stable security definer set search_path = public as $$
@@ -907,5 +916,5 @@ begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   return exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student'));
 end $$;
-revoke execute on function public.admin_init_student(uuid, text, text), public.admin_is_student(uuid) from anon, public;
-grant execute on function public.admin_init_student(uuid, text, text), public.admin_is_student(uuid) to authenticated;
+revoke execute on function public.admin_init_student(uuid, text, text, text), public.admin_is_student(uuid) from anon, public;
+grant execute on function public.admin_init_student(uuid, text, text, text), public.admin_is_student(uuid) to authenticated;

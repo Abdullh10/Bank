@@ -31,6 +31,7 @@ export function pageStudentConfirm(ctx) {
     <p class="muted small">تأكد من اسمك وشعبتك. تُثبَّت مرة واحدة، ويعدّلها المشرف فقط.</p>
     <form id="c-form" novalidate>
       <div class="field"><label for="c-name">الاسم</label><input id="c-name" value="${esc(state.user.displayName)}" required></div>
+      ${state.user.grade ? `<div class="field"><label>الصف</label><div class="st-readonly">${esc(state.user.grade)}</div></div>` : ''}
       <div class="field"><label for="c-sec">الشعبة</label><input id="c-sec" value="${esc(state.user.section || '')}" placeholder="مثال: 2/1" required></div>
       <button class="primary" type="submit">تأكيد والبدء</button>
     </form>

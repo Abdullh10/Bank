@@ -20,8 +20,9 @@ export const validUsername = u => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(u);
 
 // المنطق مستقل عن Supabase ليُختبر. التحقق من الدور وتحديث ملف الطالب يتمان بتوكن المشرف نفسه (عبر دوال قاعدة البيانات)،
 // ومفتاح الخدمة لا يُستخدم إلا لإنشاء الحساب وتغيير كلمة المرور في Supabase Auth.
-// deps = { callerRole(jwt) → {role}|{error}, initStudent(jwt, id, {name, section}) → {}|{error}, isStudent(jwt, id) → bool,
-//          createUser({email,password,name}) → {id}|{error}, setPassword(id, password) → {}|{error} }
+// deps = { callerRole(jwt) → {role}|{error}, initStudent(jwt, id, {name, section, grade}) → {}|{error}, isStudent(jwt, id) → bool,
+//          createUser({email,password,name}) → {id}|{error}, setPassword(id, password) → {}|{error},
+//          setEmail(id, email) → {}|{error}, deleteUser(id) → {}|{error} }
 export async function handle(body, jwt, deps) {
   if (!jwt) return { status: 401, body: { error: 'يلزم تسجيل الدخول' } };
   const who = await deps.callerRole(jwt);
@@ -36,6 +37,7 @@ export async function handle(body, jwt, deps) {
     for (const s of list) {
       const name = String(s.name || '').trim();
       const section = String(s.section || '').trim();
+      const grade = String(s.grade || '').trim();
       let username = cleanUsername(s.username);
       const password = String(s.password || '') || randomPassword();
       if (name.length < 3) { results.push({ name, ok: false, error: 'الاسم قصير' }); continue; }
@@ -49,16 +51,35 @@ export async function handle(body, jwt, deps) {
         else lastErr = /already|exists|registered/i.test(r.error || '') ? 'اسم المستخدم مستخدم من قبل' : (r.error || 'تعذر إنشاء الحساب');
       }
       if (!created) { results.push({ name, ok: false, error: lastErr }); continue; }
-      const init = await deps.initStudent(jwt, created.id, { name, section });
+      const init = await deps.initStudent(jwt, created.id, { name, section, grade });
       if (init?.error) { results.push({ name, ok: false, error: 'أُنشئ الحساب ولم يُضبط ملفه: ' + init.error }); continue; }
-      results.push({ name, section, username: created.username, password, ok: true });
+      results.push({ name, grade, section, username: created.username, password, ok: true });
     }
     return { status: 200, body: { results } };
   }
 
+  // الإجراءات التالية لحسابات الطلاب فقط
+  if (['reset', 'rename', 'delete'].includes(body?.action) && !(await deps.isStudent(jwt, body.userId)))
+    return { status: 400, body: { error: 'هذا الإجراء متاح لحسابات الطلاب فقط' } };
+
+  if (body?.action === 'rename') {
+    const username = cleanUsername(body.username);
+    if (!validUsername(username)) return { status: 400, body: { error: 'اسم المستخدم: حروف إنجليزية صغيرة وأرقام (3 إلى 30) ويبدأ بحرف أو رقم' } };
+    const r = await deps.setEmail(body.userId, `${username}@${LOGIN_DOMAIN}`);
+    if (r?.error) return { status: 400, body: { error: /already|exists|registered/i.test(r.error) ? 'اسم المستخدم مستخدم من قبل' : r.error } };
+    return { status: 200, body: { username } };
+  }
+
+  if (body?.action === 'delete') {
+    const r = await deps.deleteUser(body.userId);
+    if (r?.error) return { status: 400, body: { error: r.error } };
+    return { status: 200, body: { ok: true } };
+  }
+
   if (body?.action === 'reset') {
-    if (!(await deps.isStudent(jwt, body.userId))) return { status: 400, body: { error: 'إعادة التعيين متاحة لحسابات الطلاب فقط' } };
-    const password = randomPassword();
+    // كلمة مرور يحددها المشرف، أو تُولَّد تلقائيًا إن تُركت فارغة
+    const password = String(body.password || '') || randomPassword();
+    if (password.length < 8) return { status: 400, body: { error: 'كلمة المرور 8 أحرف على الأقل' } };
     const r = await deps.setPassword(body.userId, password);
     if (r?.error) return { status: 400, body: { error: r.error } };
     return { status: 200, body: { password } };
@@ -86,8 +107,8 @@ if (typeof Deno !== 'undefined') {
       const { data, error } = await asCaller(jwt).rpc('get_me');
       return error ? { error: error.message } : { role: data?.role || null };
     },
-    initStudent: async (jwt, id, { name, section }) => {
-      const { error } = await asCaller(jwt).rpc('admin_init_student', { p_id: id, p_name: name, p_section: section || null });
+    initStudent: async (jwt, id, { name, section, grade }) => {
+      const { error } = await asCaller(jwt).rpc('admin_init_student', { p_id: id, p_name: name, p_section: section || null, p_grade: grade || null });
       return error ? { error: error.message } : {};
     },
     isStudent: async (jwt, id) => (await asCaller(jwt).rpc('admin_is_student', { p_id: id })).data === true,
@@ -97,6 +118,14 @@ if (typeof Deno !== 'undefined') {
     },
     setPassword: async (id, password) => {
       const { error } = await admin.auth.admin.updateUserById(id, { password });
+      return error ? { error: error.message } : {};
+    },
+    setEmail: async (id, email) => {
+      const { error } = await admin.auth.admin.updateUserById(id, { email, email_confirm: true });
+      return error ? { error: error.message } : {};
+    },
+    deleteUser: async id => {
+      const { error } = await admin.auth.admin.deleteUser(id);
       return error ? { error: error.message } : {};
     },
   };

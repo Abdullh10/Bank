@@ -185,10 +185,12 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null });
   if (p === '/admin/students') return rpc('admin_list_students');
   if (p === '/admin/students/update') {
-    await rpc('admin_update_student', { p_id: body.id, p_name: body.name, p_section: body.section, p_role: body.role });
+    await rpc('admin_update_student', { p_id: body.id, p_name: body.name, p_section: body.section, p_role: body.role, p_grade: body.grade ?? null });
     return { ok: true };
   }
   if (p === '/admin/students/create') return adminUsers({ action: 'create', students: body.students });
-  if (p === '/admin/students/reset') return adminUsers({ action: 'reset', userId: body.userId });
+  if (p === '/admin/students/reset') return adminUsers({ action: 'reset', userId: body.userId, password: body.password || '' });
+  if (p === '/admin/students/rename') return adminUsers({ action: 'rename', userId: body.userId, username: body.username });
+  if (p === '/admin/students/delete') return adminUsers({ action: 'delete', userId: body.userId });
   throw new Error('مسار غير معروف: ' + p);
 }

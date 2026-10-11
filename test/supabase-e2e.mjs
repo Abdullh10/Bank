@@ -22,8 +22,13 @@ fs.copyFileSync(path.join(root, 'supabase/functions/admin-users/index.ts'), fnTm
 const adminUsers = await import(fnTmp);
 // بدائل محلية: ما يمر بتوكن المستدعي يُنفذ بدوره الحقيقي (asRole) كما في Supabase.
 const fnDeps = {
+  setEmail: async (id, email) => {
+    if ((await pool.query('select 1 from auth.users where email = $1', [email])).rowCount) return { error: 'User already registered' };
+    await pool.query('update auth.users set email = $2 where id = $1', [id, email]); return {};
+  },
+  deleteUser: async id => { await pool.query('delete from auth.users where id = $1', [id]); return {}; },
   callerRole: async jwt => { const r = await asRole(jwt, 'select to_jsonb(public.get_me()) r'); return r.error ? { error: r.error.message } : { role: r.data?.role || null }; },
-  initStudent: async (jwt, id, { name, section }) => { const r = await asRole(jwt, 'select to_jsonb(public.admin_init_student($1, $2, $3)) r', [id, name, section || null]); return r.error ? { error: r.error.message } : {}; },
+  initStudent: async (jwt, id, { name, section, grade }) => { const r = await asRole(jwt, 'select to_jsonb(public.admin_init_student($1, $2, $3, $4)) r', [id, name, section || null, grade || null]); return r.error ? { error: r.error.message } : {}; },
   isStudent: async (jwt, id) => (await asRole(jwt, 'select to_jsonb(public.admin_is_student($1)) r', [id])).data === true,
   createUser: async ({ email }) => {
     if ((await pool.query('select 1 from auth.users where email = $1', [email])).rowCount) return { error: 'User already registered' };
@@ -39,7 +44,7 @@ await pool.query(`update public.profiles set role='reviewer', display_name='عب
 await pool.query(`update public.profiles set role='viewer' where email='view@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
-await pool.query(`delete from auth.users where email in ('st2test@chem21.local') or email like 'st_____@chem21.local'`);
+await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
 async function asRole(uid, sql, params) {
@@ -117,6 +122,7 @@ const browser = await chromium.launch();
 const results = [], errors = [];
 const ok = (n, v, extra = '') => results.push(`${v ? 'PASS' : 'FAIL'} ${n} ${extra}`);
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', acceptDownloads: true });
+await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
 await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
 const p = await ctx.newPage();
@@ -208,20 +214,45 @@ ok('export objectives CSV', fs.readFileSync(await dl2.path(), 'utf8').trim().spl
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
-await p.goto(BASE + '#/students'); await p.waitForSelector('#as-lines');
-await p.fill('#as-lines', 'طالب أول تجريبي، 2/1\nطالب ثان تجريبي، 2/2، st2test\nمكرر، 2/2، st2test');
+await p.goto(BASE + '#/students'); await p.waitForSelector('#as-file');
+// ملف Excel حقيقي بعناوين عربية
+const XL = createRequire(process.env.XLSX_MODULE + '/')('xlsx');
+const wb = XL.utils.book_new();
+XL.utils.book_append_sheet(wb, XL.utils.aoa_to_sheet([['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم'],
+  ['طالب أول تجريبي', 'ثاني ثانوي', '1', ''], ['طالب ثان تجريبي', 'ثاني ثانوي', '2', 'st2test'], ['مكرر', 'ثاني ثانوي', '2', 'st2test'], ['طالب حذف', 'ثالث ثانوي', '1', 'deltest']]), 'S');
+const xlFile = path.join(os.tmpdir(), 'students-test.xlsx'); XL.writeFile(wb, xlFile);
+await p.setInputFiles('#as-file', xlFile); await p.waitForSelector('#as-create');
+ok('admin: excel preview parsed 4 rows with grade/section', (await p.locator('#as-preview tbody tr').count()) === 4 && (await p.locator('#as-preview').innerText()).includes('ثاني ثانوي'));
 await p.click('#as-create'); await p.waitForSelector('#as-cards');
 const cards = await p.$$eval('#as-cards tbody tr', trs => trs.map(tr => [...tr.cells].map(td => td.textContent.trim()).join('|')));
-ok('admin: 2 accounts created, duplicate rejected', cards.filter(t => /st\d|st2test/.test(t)).length === 2 && cards.some(t => t.includes('مستخدم من قبل')), JSON.stringify(cards));
+ok('admin: 3 accounts created, duplicate rejected', cards.filter(t => /\|st\d+\||st2test|deltest/.test(t)).length === 3 && cards.some(t => t.includes('مستخدم من قبل')), JSON.stringify(cards));
 const st = cards.find(t => t.includes('st2test')).split('|');
-await p.goto(BASE + '#/'); await p.waitForSelector('.kpi .value');
-await p.goto(BASE + '#/students'); await p.waitForSelector('tr[data-id]');
-ok('admin: students listed', (await p.locator('tr[data-id]').count()) >= 2);
+const [dlc] = await Promise.all([p.waitForEvent('download'), p.click('#as-cred-xlsx')]);
+const credWb = XL.readFile(await dlc.path()); const credRows = XL.utils.sheet_to_json(credWb.Sheets[credWb.SheetNames[0]], { header: 1 });
+ok('admin: credentials Excel downloaded', credRows.length === 4 && credRows[0].includes('كلمة المرور'), JSON.stringify(credRows[1]));
+await p.click('#as-refresh'); await p.waitForSelector('tr[data-id]');
+ok('admin: list shows grade', (await p.locator('.as-table').innerText()).length > 0 && (await p.inputValue('tr[data-user="st2test"] .as-grade')) === 'ثاني ثانوي');
+await p.screenshot({ path: `${OUT}/admin-students.png`, fullPage: true });
+await p.selectOption('#af-grade', 'ثالث ثانوي'); await p.waitForTimeout(600);
+ok('admin: filter by grade', (await p.locator('tr[data-id]').count()) === 1);
+// تعديل اسم المستخدم وكلمة المرور ثم الحذف
+await p.fill('tr[data-user="deltest"] .as-user', 'deltest2'); await p.click('tr[data-user="deltest"] .as-save'); await p.waitForTimeout(800);
+ok('admin: username renamed', (await pool.query("select 1 from auth.users where email='deltest2@chem21.local'")).rowCount === 1);
+const answers = ['Strong-Pass-99', null];
+p.on('dialog', async d => { if (d.type() === 'prompt') { const a = answers.shift(); a === null ? await d.dismiss() : await d.accept(a); } else await d.accept(); });
+await p.click('tr[data-user="deltest2"] .as-reset'); await p.waitForTimeout(800);
+ok('admin: custom password accepted', answers.length === 0);
+await p.click('tr[data-user="deltest2"] .as-del'); await p.waitForTimeout(1000);
+ok('admin: account deleted', (await pool.query("select 1 from auth.users where email='deltest2@chem21.local'")).rowCount === 0 && !(await p.locator('tr[data-user="deltest2"]').count()));
+await p.selectOption('#af-grade', ''); await p.waitForTimeout(500);
+const [dle] = await Promise.all([p.waitForEvent('download'), p.click('#as-export')]);
+ok('admin: export list to Excel', XL.utils.sheet_to_json(XL.readFile(await dle.path()).Sheets['الطلاب'], { header: 1 })[0].includes('الصف'));
+p.removeAllListeners('dialog');
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // دخول الطالب: تأكيد البيانات مرة واحدة
 await p.fill('#l-user', 'st2test'); await p.fill('#l-pass', st[3] || 'x'); await p.click('button[type=submit]');
 await p.waitForSelector('#c-form');
-ok('student: confirm page prefilled', (await p.inputValue('#c-name')) === 'طالب ثان تجريبي' && (await p.inputValue('#c-sec')) === '2/2');
+ok('student: confirm page prefilled', (await p.inputValue('#c-name')) === 'طالب ثان تجريبي' && (await p.inputValue('#c-sec')) === '2' && (await p.locator('#c-form').innerText()).includes('ثاني ثانوي'));
 await p.click('#c-form button[type=submit]'); await p.waitForSelector('#s-start');
 ok('student: nav shows only practice + history', await p.locator('[data-nav="history"]').isVisible() && !(await p.locator('[data-nav="bank"]').isVisible()) && !(await p.locator('[data-nav="exam"]').isVisible()));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#s-start');

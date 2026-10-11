@@ -376,3 +376,18 @@ fieldset.field legend { font-weight: 600; margin-bottom: .3rem; }
 .st-opt.dim[disabled] { opacity: .6; }
 .st-opt.ok .letter { color: var(--ok); }
 .st-opt.bad .letter { color: var(--bad); }
+/* ---------- إدارة الطلاب ---------- */
+.as-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.2rem; }
+@media screen and (max-width: 860px) { .as-add { grid-template-columns: minmax(0, 1fr); } }
+.as-add h3 { margin: .2rem 0 .3rem; font-size: 1rem; }
+.as-prev { max-height: 320px; overflow: auto; }
+.as-listhead { display: flex; justify-content: space-between; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.as-table input, .as-table select { padding: .35rem .5rem; }
+.as-acts { flex-wrap: nowrap; }
+button.danger { color: var(--bad); border-color: var(--bad-soft); }
+button.danger:hover { background: var(--bad-soft); }
+.st-readonly { padding: .6rem .8rem; background: var(--surface-2); border-radius: 10px; }
+.as-listhead .actions { flex-wrap: wrap; justify-content: flex-end; }
+.as-listhead select, .as-listhead input { width: auto; min-width: 8rem; }
+.as-acts button { white-space: nowrap; }
+.as-table td { vertical-align: middle; }
