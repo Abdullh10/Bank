@@ -102,3 +102,5 @@ select email, display_name, role from public.profiles order by created_at;
   - **المطلوب:** نفّذ [`supabase/approve-objectives.sql`](../supabase/approve-objectives.sql) مرة واحدة. التنفيذ آمن للتكرار، ويعتمد فقط الأهداف التي ما زالت «بانتظار المراجعة».
   - **الصياغة المعتمدة:** هي الصياغة المقترحة. والأهداف السبعة المقترح فصلها تُضم فيها الصياغتان بفاصلة منقوطة.
   - **التوثيق:** القرار موثق في `data/approvals.json`، ومسجل في سجل التعديلات باسم «مالك المشروع».
+- **2026-10-11، اعتماد جميع نصوص المحتوى المكمّل (111) بقرار مالك المشروع:**
+  - **المطلوب:** نفّذ [`supabase/approve-supplements.sql`](../supabase/approve-supplements.sql) مرة واحدة. التنفيذ آمن للتكرار.

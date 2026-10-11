@@ -82,6 +82,12 @@ select 'objective', o.id, 'approve', '{"reviewStatus":"pending","approvedText":n
 from public.objectives o
 where o.review_status = 'approved'
   and not exists (select 1 from public.revisions r where r.entity = 'objective' and r.entity_id = o.id and r.action = 'approve');` : ''}
+${approvals.supplements ? `insert into public.revisions (entity, entity_id, action, before_json, after_json, note, user_name, at)
+select 'supplement', s.objective_id, 'approve', '{"reviewStatus":"pending"}'::jsonb, '{"reviewStatus":"approved"}'::jsonb,
+  ${lit(`${approvals.supplements.by}: ${approvals.supplements.note}`)}, ${lit(approvals.supplements.by)}, ${lit(approvals.supplements.date)}::timestamptz
+from public.supplements s
+where s.review_status = 'approved'
+  and not exists (select 1 from public.revisions r where r.entity = 'supplement' and r.entity_id = s.objective_id and r.action = 'approve');` : ''}
 select setval(pg_get_serial_sequence('public.questions', 'id'), (select max(id) from public.questions));
 `);
 

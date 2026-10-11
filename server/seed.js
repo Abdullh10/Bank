@@ -107,8 +107,17 @@ export function seed({ log = console.log } = {}) {
         stats.objectivesApproved = (stats.objectivesApproved || 0) + 1;
       }
     }
+    const sd = approvals?.supplements;
+    if (sd?.status === 'approved') {
+      for (const sp of db.prepare(`SELECT * FROM supplements WHERE review_status = 'pending'`).all()) {
+        db.prepare(`UPDATE supplements SET review_status = 'approved' WHERE objective_id = ?`).run(sp.objective_id);
+        db.prepare(`INSERT INTO revisions (entity, entity_id, action, before_json, after_json, note) VALUES ('supplement', ?, 'approve', ?, ?, ?)`)
+          .run(sp.objective_id, J.str({ reviewStatus: 'pending' }), J.str({ reviewStatus: 'approved' }), `${sd.by}: ${sd.note}`);
+        stats.supplementsApproved = (stats.supplementsApproved || 0) + 1;
+      }
+    }
   });
-  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا، واعتُمد ${stats.approved || 0} سؤالًا و${stats.objectivesApproved || 0} هدفًا بقرار موثق`);
+  log(`أُضيف: ${stats.objectives} هدفًا، ${stats.supplements} محتوى مكمّلًا، ${stats.questions} سؤالًا، واعتُمد ${stats.approved || 0} سؤالًا و${stats.objectivesApproved || 0} هدفًا و${stats.supplementsApproved || 0} محتوى مكمّلًا بقرار موثق`);
   return stats;
 }
 
