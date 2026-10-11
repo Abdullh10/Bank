@@ -2,7 +2,10 @@
 // التصميم مبني على توصيات الوكيل التربوي: جلسات قصيرة (10 أسئلة افتراضيًا)، مستويات بثلاث مجموعات، تدرّج من السهل،
 // تغذية راجعة فورية تبدأ بسبب خطأ البديل المختار، ومؤقت اختياري لا يقفل الجلسة، ثم «أعد الأخطاء» بأسئلة من الهدف نفسه.
 
+import { icon, line, CHAPTER_ICONS } from './icons.js';
+
 const LETTERS = ['أ', 'ب', 'ج'];
+const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const GROUPS = { basic: 'أساسي (تذكر وفهم)', apply: 'تطبيق', higher: 'تفكير عليا' };
 const LEVEL_CHOICES = [['graded', 'متدرّج (مستحسن)'], ['basic', GROUPS.basic], ['apply', GROUPS.apply], ['higher', GROUPS.higher]];
 const PREFS_KEY = 'itqan.student.prefs.v1';
@@ -27,7 +30,7 @@ export function pageStudentConfirm(ctx) {
   const { state, esc, $app, api, fail, toast } = ctx;
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
     <img class="login-logo" src="assets/itqan-logo.png" alt="إتقان" width="520" height="513">
-    <h1>مرحبًا بك في إتقان</h1>
+    <h1>${icon('spark', 28)}<span>مرحبًا بك في إتقان</span></h1>
     <p class="muted small">تأكد من اسمك وشعبتك. تُثبَّت مرة واحدة، ويعدّلها المشرف فقط.</p>
     <form id="c-form" novalidate>
       <div class="field"><label for="c-name">الاسم</label><input id="c-name" value="${esc(state.user.displayName)}" required></div>
@@ -55,12 +58,14 @@ export async function pageStudentHome(ctx) {
   const prefs = { count: 10, levels: 'graded', timed: false, lessons: [], ...loadPrefs() };
   const chosen = new Set(prefs.lessons);
   $app.innerHTML = `
-    <section class="hero"><div><h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
-      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></section>
+    <section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
+      <span class="eyebrow">${icon('spark', 18)} تدريب ذاتي لا يدخل في الدرجات</span>
+      <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
+      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
     <div class="grid2 st-setup">
-      <section class="card"><h2>الدروس</h2>
+      <section class="card">${ttl('lessons', 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
-          <summary><b>الفصل ${c.number}:</b> ${esc(c.title)}</summary>
+          <summary>${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span><b>الفصل ${c.number}:</b> ${esc(c.title)}</span></summary>
           ${c.lessons.map(l => {
             const n = l.basic + l.apply + l.higher;
             return `<label class="st-lesson"><input type="checkbox" data-lesson="${l.id}" ${chosen.has(l.id) ? 'checked' : ''} ${n ? '' : 'disabled'}>
@@ -70,7 +75,7 @@ export async function pageStudentHome(ctx) {
           }).join('')}
         </details>`).join('')}
       </section>
-      <section class="card"><h2>إعداد الجلسة</h2>
+      <section class="card">${ttl('sliders', 'إعداد الجلسة')}
         <div class="field"><label for="s-count">عدد الأسئلة</label>
           <select id="s-count">${[5, 10, 15, 20].map(n => `<option ${n === prefs.count ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
         <fieldset class="field"><legend>المستوى</legend>
@@ -114,13 +119,13 @@ function renderQuestion(ctx) {
   const last = session.idx === session.questions.length - 1;
   $app.innerHTML = `<div class="st-run">
     <div class="st-top">
-      <span>${session.retry ? 'إعادة الأخطاء · ' : ''}سؤال ${session.idx + 1} من ${session.questions.length}</span>
+      <span>${icon(session.retry ? 'history' : 'practice', 28)}${session.retry ? 'إعادة الأخطاء · ' : ''}سؤال ${session.idx + 1} من ${session.questions.length}</span>
       ${session.timeLimit ? '<span class="st-timer" id="st-timer" aria-live="off"></span>' : ''}
       <button type="button" id="st-end">إنهاء الجلسة</button>
     </div>
     <div class="bar"><span style="width:${pct(answeredCount, session.questions.length)}%"></span></div>
     <article class="card st-q">
-      <div class="small muted">${esc(q.lesson)} · ${GROUPS[q.group]}</div>
+      <div class="st-meta">${esc(q.lesson)} · ${GROUPS[q.group]}</div>
       <p class="st-stem">${esc(q.stem)}</p>
       ${q.stimulus ? `<div class="table-wrap"><table class="data-table"><thead><tr>${q.stimulus.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
         <tbody>${q.stimulus.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}
@@ -129,14 +134,14 @@ function renderQuestion(ctx) {
           let cls = '';
           if (res) cls = orig === res.correctIndex ? 'ok' : orig === res.choice ? 'bad' : 'dim';
           return `<button type="button" class="opt st-opt ${cls}" data-orig="${orig}" ${res ? 'disabled' : ''} role="radio" aria-checked="${res && orig === res.choice}">
-            <span class="letter">${LETTERS[pos]}</span><span>${esc(q.options[orig])}</span></button>`;
+            <span class="letter">${LETTERS[pos]}</span><span>${esc(q.options[orig])}</span>${cls === 'ok' ? `<span class="st-mark">${line('check', 16)}</span>` : cls === 'bad' ? `<span class="st-mark">${line('cross', 16)}</span>` : ''}</button>`;
         }).join('')}
       </div>
       ${res ? feedback(res, q, order, esc) : ''}
     </article>
     <div class="actions st-nav">
-      ${session.idx > 0 ? '<button type="button" id="st-prev">السابق</button>' : ''}
-      ${res ? `<button type="button" class="primary" id="st-next">${last ? 'عرض النتيجة' : 'التالي'}</button>` : ''}
+      ${session.idx > 0 ? `<button type="button" id="st-prev">${line('prev', 17)}السابق</button>` : ''}
+      ${res ? `<button type="button" class="primary" id="st-next">${last ? 'عرض النتيجة' : 'التالي'}${line('next', 17)}</button>` : ''}
     </div>
   </div>`;
   if (session.timeLimit) tickTimer();
@@ -169,7 +174,7 @@ function feedback(res, q, order, esc) {
   const pos = o => LETTERS[order.indexOf(o)];
   const otherWrong = [0, 1, 2].filter(o => o !== res.correctIndex && o !== res.choice && notes[o]);
   return `<div class="notice ${res.correct ? 'ok' : 'bad'} st-fb" role="status">
-    <strong>${res.correct ? 'إجابة صحيحة ✓' : `إجابة غير صحيحة. الصحيح: (${pos(res.correctIndex)})`}</strong>
+    <strong>${icon(res.correct ? 'check' : 'cross', 30)}<span>${res.correct ? 'إجابة صحيحة ✓' : `إجابة غير صحيحة. الصحيح: (${pos(res.correctIndex)})`}</span></strong>
     ${!res.correct && notes[res.choice] ? `<p><b>لماذا (${pos(res.choice)}) خطأ؟</b> ${esc(notes[res.choice])}</p>` : ''}
     ${res.explanation ? `<p><b>التفسير:</b> ${esc(res.explanation)}</p>` : ''}
     ${otherWrong.length ? `<button type="button" class="linklike" id="st-others">اعرض سبب خطأ البدائل الأخرى</button>
@@ -205,6 +210,7 @@ function renderSummary(ctx) {
   const usedSec = Math.round((Date.now() - session.startedAt) / 1000);
   $app.innerHTML = `<div class="st-run">
     <section class="card st-result">
+      ${icon('trophy', 76)}
       <h1>نتيجة الجلسة</h1>
       <div class="st-score"><b>${s.score}</b> من ${s.total} <span class="muted">(${pct(s.score, s.total)}%)</span></div>
       <p>${encouragement(s.score, s.total)}</p>
@@ -212,13 +218,13 @@ function renderSummary(ctx) {
       ${s.answered < s.total ? `<p class="small muted">أجبت عن ${s.answered} من ${s.total}.</p>` : ''}
     </section>
     <div class="grid2">
-      <section class="card"><h2>حسب الدرس</h2>${table(s.byLesson.map(r => [r.lesson, r.correct, r.n]), esc)}</section>
-      <section class="card"><h2>حسب المستوى</h2>${table(s.byGroup.map(r => [GROUPS[r.group], r.correct, r.n]), esc)}</section>
+      <section class="card">${ttl('lessons', 'حسب الدرس')}${table(s.byLesson.map(r => [r.lesson, r.correct, r.n]), esc)}</section>
+      <section class="card">${ttl('reports', 'حسب المستوى')}${table(s.byGroup.map(r => [GROUPS[r.group], r.correct, r.n]), esc)}</section>
     </div>
     <div class="actions st-nav">
-      ${s.wrong ? '<button type="button" class="primary" id="st-retry">أعد الأخطاء</button>' : ''}
-      <button type="button" id="st-new">جلسة جديدة</button>
-      <a class="btn" href="#/history">سجلي</a>
+      ${s.wrong ? `<button type="button" class="primary" id="st-retry">${icon('history', 22, 'navy')}أعد الأخطاء</button>` : ''}
+      <button type="button" id="st-new">${line('plus', 17)}جلسة جديدة</button>
+      <a class="btn" href="#/history">${line('clock', 17)}سجلي</a>
     </div>
   </div>`;
   const retry = document.getElementById('st-retry');
@@ -238,13 +244,13 @@ export async function pageStudentHistory(ctx) {
   const [hist, catalog] = await Promise.all([api('/student/history'), api('/student/catalog')]);
   const lessons = catalog.flatMap(c => c.lessons.filter(l => l.answered).map(l => ({ ...l, chapter: c.number })));
   $app.innerHTML = `
-    <section class="hero"><div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك بياناتك.</p></div></section>
+    <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك بياناتك.</p></div></div></section>
     <div class="grid2">
-      <section class="card"><h2>تقدّمك في الدروس</h2>
+      <section class="card">${ttl('progress', 'تقدّمك في الدروس')}
         ${lessons.length ? table(lessons.map(l => [`${l.chapter}. ${l.title}`, l.correct, l.answered]), esc) : '<div class="empty">لم تبدأ التدريب بعد.</div>'}
         ${lessons.some(l => pct(l.correct, l.answered) < 70) ? '<p class="small muted">الدروس التي تقل عن 70% تستحق جلسة أخرى.</p>' : ''}
       </section>
-      <section class="card"><h2>آخر الجلسات</h2>
+      <section class="card">${ttl('history', 'آخر الجلسات')}
         ${hist.length ? `<table class="list"><thead><tr><th>التاريخ</th><th>النتيجة</th><th></th></tr></thead><tbody>
           ${hist.map(h => `<tr><td class="ltr">${esc(new Date(h.createdAt).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }))}</td>
             <td>${h.score}/${h.total} (${pct(h.score, h.total)}%)</td>

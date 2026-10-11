@@ -3,9 +3,31 @@ import { pageExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { pageStudentHome, pageStudentHistory, pageStudentConfirm, resetStudentSession } from './student.js';
 import { pageTeacherProgress, pageAdminStudents } from './staff.js';
+import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set() };
+
+// ---------- لمسات العرض ----------
+hydrateIcons(document);
+// سياسة أمان المحتوى في الخادم المحلي تمنع سمة style المضمّنة؛ تُطبَّق قيمها عبر CSSOM (مسموح) حتى تظهر أشرطة التقدم بنسبها الصحيحة.
+// والحالات الفارغة تُزيَّن بأيقونة. لا يتغير أي سلوك.
+function decorate(root) {
+  if (!root.querySelectorAll) return;
+  const styled = root.matches?.('[style]') ? [root, ...root.querySelectorAll('[style]')] : root.querySelectorAll('[style]');
+  for (const el of styled) { const css = el.getAttribute('style'); if (css && el.style.cssText !== css && !el.style.cssText) el.style.cssText = css; }
+  const empties = root.matches?.('.empty') ? [root] : root.querySelectorAll('.empty');
+  for (const el of empties) if (!el.querySelector(':scope > .ic')) el.insertAdjacentHTML('afterbegin', icon('empty', 44));
+}
+new MutationObserver(list => { for (const m of list) m.addedNodes.forEach(n => n.nodeType === 1 && decorate(n)); })
+  .observe(document.body, { childList: true, subtree: true });
+// ارتفاع الترويسة الثابتة: يستعمله شريط أزرار التصدير في منشئ الاختبارات ليلتصق تحتها
+const $top = document.querySelector('.topbar');
+const syncTop = () => document.documentElement.style.setProperty('--tb-h',
+  $top && getComputedStyle($top).position === 'sticky' && $top.offsetHeight ? $top.offsetHeight + 'px' : '0px');
+if (window.ResizeObserver && $top) new ResizeObserver(syncTop).observe($top);
+window.addEventListener('resize', syncTop);
+const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 
 // ---------- أدوات ----------
 // المصطلح المعتمد للمصدر: «الكتاب المدرسي». البيانات المخزنة تقول «المذكرة»، ويُستبدل المصطلح عند العرض فقط
@@ -112,8 +134,9 @@ function renderUserbox() {
   const box = document.getElementById('userbox');
   if (state.user) {
     const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', student: 'طالب', pending: 'بانتظار التفعيل' };
-    box.innerHTML = `<span class="muted">${esc(state.user.displayName)} · ${roles[state.user.role]}</span>
-      <button type="button" id="logout">خروج</button>`;
+    box.innerHTML = `<span class="avatar" aria-hidden="true">${esc((state.user.displayName || '؟').trim().charAt(0))}</span>
+      <span class="who"><b>${esc(state.user.displayName)}</b><span>${roles[state.user.role]}</span></span>
+      <button type="button" id="logout" title="تسجيل الخروج">${line('logout', 17)}<span>خروج</span></button>`;
     box.querySelector('#logout').onclick = async () => { resetStudentSession(); await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); location.hash = '#/'; route(); };
   } else {
     box.innerHTML = `<a class="btn" href="#/login">تسجيل الدخول</a>`;
@@ -126,24 +149,28 @@ async function pageHome() {
   const o = s.objectives, q = s.questions;
   const chapters = await api('/chapters');
   $app.innerHTML = `
-    <div class="hero">
-      <div>
-        <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
-        <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
-        <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي (مسارات)، الفصل الدراسي الأول 1448هـ</p>
+    <div class="hero banner">
+      <div class="hero-ic">
+        <img class="banner-mark" src="assets/itqan-mark.png" alt="" width="74" height="74">
+        <div>
+          <span class="eyebrow">${icon('spark', 18)} إتقان · بنك أسئلة الكيمياء</span>
+          <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
+          <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
+          <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي (مسارات)، الفصل الدراسي الأول 1448هـ</p>
+        </div>
       </div>
       <div class="actions no-print">
-        <a class="btn primary" href="#/chapters">تصفح الفصول</a>
+        <a class="btn primary" href="#/chapters">${icon('chapters', 22, 'navy')}تصفح الفصول</a>
         <a class="btn" href="#/bank">بنك الأسئلة</a>
       </div>
     </div>
     <div class="grid kpi">
-      ${kpi(s.chapters, 'فصول')}${kpi(s.lessons, 'دروس')}${kpi(o.n, 'هدفًا تعليميًا')}
-      ${kpi(q.mcq || 0, 'سؤال اختيار من متعدد')}${kpi(q.essay || 0, 'سؤالًا مقاليًا')}
+      ${kpi(s.chapters, 'فصول', 'chapters')}${kpi(s.lessons, 'دروس', 'lessons')}${kpi(o.n, 'هدفًا تعليميًا', 'objectives')}
+      ${kpi(q.mcq || 0, 'سؤال اختيار من متعدد', 'mcq')}${kpi(q.essay || 0, 'سؤالًا مقاليًا', 'essay')}
     </div>
     <div class="grid cards" style="margin-top:1rem">
       <div class="card">
-        <h2>مؤشرات المراجعة</h2>
+        ${ttl('shield', 'مؤشرات المراجعة')}
         <div class="levels">
           ${progress('الأهداف التي روجعت', o.reviewed, o.n)}
           ${progress('الأهداف المعتمدة', o.approved, o.n, 'ok')}
@@ -153,7 +180,7 @@ async function pageHome() {
         <p class="small muted" style="margin-top:.6rem">تُحسب المؤشرات مباشرة من قاعدة البيانات، ولا يدخل في مؤشرات الاعتماد إلا ما اعتمده مراجع بشري.</p>
       </div>
       <div class="card">
-        <h2>التغطية التقويمية</h2>
+        ${ttl('pie', 'التغطية التقويمية')}
         <div class="levels">
           ${progress('أهداف بلغت العدد المطلوب من الأسئلة (7 + 3)', s.coverage.complete, o.n)}
           ${progress('أهداف اكتملت أسئلتها المعتمدة', s.coverage.approved_complete, o.n, 'ok')}
@@ -162,16 +189,17 @@ async function pageHome() {
         <p class="small muted" style="margin-top:.6rem">اكتمل بنك الأسئلة لجميع الأهداف. اعتُمدت الأسئلة بقرار مالك المشروع دون مراجعة تفصيلية لكل سؤال، والتفاصيل في سجل كل سؤال.</p>
       </div>
     </div>
-    <div class="section-title"><h2>الفصول</h2><a href="#/chapters">عرض الكل</a></div>
+    <div class="section-title">${ttl('chapters', 'الفصول')}<a class="see-all" href="#/chapters">عرض الكل ${line('next', 16)}</a></div>
     <div class="grid cards">${chapters.map(chapterCard).join('')}</div>`;
 }
-const kpi = (v, l) => `<div class="card"><div class="value">${esc(v ?? 0)}</div><div class="label">${esc(l)}</div></div>`;
+const kpi = (v, l, ic = 'reports', tone) => `<div class="card">${icon(ic, 46, tone)}<div class="value">${esc(v ?? 0)}</div><div class="label">${esc(l)}</div></div>`;
 const progress = (label, v, t, cls = '') => `<div class="progress-line"><span>${esc(label)}</span>
   <span class="muted small">${v || 0} من ${t || 0} (${pct(v, t)}%)</span>${bar(v, t, cls)}</div>`;
 
 function chapterCard(c) {
   return `<a class="card chapter-card" href="#/chapter/${c.number}">
-    <div class="actions"><span class="chapter-num">${c.number}</span><h3 style="margin:0">${esc(c.title)}</h3></div>
+    <div class="ch-head"><span class="ch-ic">${icon(CHAPTER_ICONS[c.number] || 'practice', 50)}<span class="chapter-num">${c.number}</span></span>
+      <div><span class="ch-kicker">الفصل ${c.number}</span><h3>${esc(c.title)}</h3></div></div>
     <div class="meta-row">${badge(`${c.lessons} دروس`)}${badge(`${c.objectives} هدفًا`)}${badge(`${c.questions} سؤالًا`, c.questions ? 'brand' : '')}</div>
     <div class="progress-line small"><span>الأهداف المعتمدة</span><span class="muted">${c.approved || 0}/${c.objectives}</span>${bar(c.approved, c.objectives, 'ok')}</div>
   </a>`;
@@ -180,18 +208,18 @@ function chapterCard(c) {
 async function pageChapters() {
   const chapters = await api('/chapters');
   $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ الفصول</div>
-    <h1>فصول المقرر</h1><p class="muted">مرتبة وفق ملف أهداف المقرر المعتمد في المشروع.</p>
+    <div class="hero"><div class="hero-ic">${icon('chapters', 52)}<div><h1>فصول المقرر</h1><p class="muted">مرتبة وفق ملف أهداف المقرر المعتمد في المشروع.</p></div></div></div>
     <div class="grid cards">${chapters.map(chapterCard).join('')}</div>`;
 }
 
 async function pageChapter(n) {
   const ch = await api('/chapters/' + n);
   $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ <a href="#/chapters">الفصول</a> ‹ الفصل ${ch.number}</div>
-    <h1>الفصل ${ch.number}: ${esc(ch.title)}</h1>
+    <div class="hero"><div class="hero-ic">${icon(CHAPTER_ICONS[ch.number] || 'chapters', 52)}<div><h1>الفصل ${ch.number}: ${esc(ch.title)}</h1></div></div></div>
     ${ch.lessons.map(l => `
       <section class="card lesson" id="lesson-${l.number}">
         <div class="lesson-head">
-          <h2>الدرس ${ch.number}-${l.number}: ${esc(l.title)}</h2>
+          ${ttl('lessons', `الدرس ${ch.number}-${l.number}: ${esc(l.title)}`, 'h2', 32)}
           <span class="meta-row">${badge(`${l.objectives.length} هدفًا`)}
             ${badge(`${l.objectives.filter(o => o.reviewStatus === 'approved').length} معتمد`, 'ok')}</span>
         </div>
@@ -235,7 +263,7 @@ async function pageObjective(code) {
     </div>
 
     <section class="card no-print">
-      <h2>معلومات الهدف</h2>
+      ${ttl('objectives', 'معلومات الهدف')}
       <div class="text-compare">
         <div class="text-box"><h4>نص الهدف الأصلي (من ملف الأهداف)</h4>${esc(o.originalText)}</div>
         <div class="text-box"><h4>الصياغة المقترحة (مراجعة آلية — غير معتمدة)</h4>${esc(o.proposedText || '—')}
@@ -260,13 +288,13 @@ async function pageObjective(code) {
 
     <section class="card" id="mcq-section">
       <div class="section-title" style="margin-top:0">
-        <h2>أسئلة الاختيار من متعدد <span class="muted small">(${mcq.filter(active).length} من ${o.requiredMcq} مطلوبة)</span></h2>
+        ${ttl('mcq', `أسئلة الاختيار من متعدد <span class="muted small">(${mcq.filter(active).length} من ${o.requiredMcq} مطلوبة)</span>`)}
         <div class="actions no-print">
           <div class="seg" role="group" aria-label="نمط العرض">
             ${modeBtn('test', 'وضع الاختبار')}${modeBtn('practice', 'تدريب فوري')}${data.answersIncluded ? modeBtn('review', 'وضع المراجعة') : ''}
           </div>
-          <button type="button" data-print="student">طباعة دون حلول</button>
-          ${data.answersIncluded ? `<button type="button" data-print="teacher">طباعة مع الحلول</button>` : ''}
+          <button type="button" data-print="student">${line('print', 17)}طباعة دون حلول</button>
+          ${data.answersIncluded ? `<button type="button" data-print="teacher">${line('print', 17)}طباعة مع الحلول</button>` : ''}
           ${isReviewer() ? `<button type="button" class="primary" data-add="mcq">+ سؤال اختيار</button>` : ''}
         </div>
       </div>
@@ -277,7 +305,7 @@ async function pageObjective(code) {
 
     <section class="card" id="essay-section">
       <div class="section-title" style="margin-top:0">
-        <h2>الأسئلة المقالية <span class="muted small">(${essay.filter(active).length} من ${o.requiredEssay} مطلوبة)</span></h2>
+        ${ttl('essay', `الأسئلة المقالية <span class="muted small">(${essay.filter(active).length} من ${o.requiredEssay} مطلوبة)</span>`)}
         ${isReviewer() ? `<button type="button" class="primary no-print" data-add="essay">+ سؤال مقالي</button>` : ''}
       </div>
       ${essay.length ? essay.map(q => essayCard(q, data.answersIncluded)).join('') : '<div class="empty">لا توجد أسئلة مقالية لهذا الهدف بعد.</div>'}
@@ -296,8 +324,8 @@ function modeHint(answers) {
 }
 
 function reviewPanel(o) {
-  return `<div class="card" style="margin-top:1rem;background:var(--surface-2)">
-    <h3>مراجعة الهدف واعتماده</h3>
+  return `<div class="card review-panel">
+    ${ttl('shield', 'مراجعة الهدف واعتماده', 'h3', 28)}
     <div class="field"><label for="approved-text">الصياغة التي ستُعتمد</label>
       <textarea id="approved-text">${esc(o.approvedText || o.proposedText || o.originalText)}</textarea></div>
     <div class="form-grid">
@@ -315,7 +343,7 @@ function reviewPanel(o) {
 
 function supplementCard(s) {
   return `<section class="card no-print">
-    <div class="section-title" style="margin-top:0"><h2>المحتوى العلمي المكمّل</h2>
+    <div class="section-title" style="margin-top:0">${ttl('spark', 'المحتوى العلمي المكمّل')}
       <span class="meta-row">${objBadge(s.reviewStatus)}${badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn')}</span></div>
     <p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>
     ${s.memoBasis ? `<p><strong>ما يقدمه الكتاب المدرسي:</strong> ${esc(cleanRef(s.memoBasis))}</p>` : ''}
@@ -489,7 +517,7 @@ function printAs(kind) {
 
 // ---------- النوافذ ----------
 function dialog(title, body, buttons) {
-  $dlg.innerHTML = `<div class="dlg-head"><h2 style="margin:0">${esc(title)}</h2><button type="button" data-close aria-label="إغلاق">✕</button></div>
+  $dlg.innerHTML = `<div class="dlg-head"><h2 style="margin:0">${esc(title)}</h2><button type="button" data-close aria-label="إغلاق">${line('close', 18)}</button></div>
     <div class="dlg-body">${body}</div><div class="dlg-foot">${buttons}<button type="button" data-close>إغلاق</button></div>`;
   $dlg.querySelectorAll('[data-close]').forEach(b => b.onclick = () => $dlg.close());
   $dlg.showModal();
@@ -582,7 +610,7 @@ async function pageBank() {
   const f = (k, label, opts) => `<div><label for="f-${k}">${label}</label><select id="f-${k}" data-f="${k}"><option value="">الكل</option>
     ${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(bankFilter[k] || '') === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
   $app.innerHTML = `<div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ بنك الأسئلة</div>
-    <div class="hero no-print"><div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div>
+    <div class="hero no-print"><div class="hero-ic">${icon('bank', 52)}<div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div></div>
       <div class="actions">${isReviewer() ? (state.supabase
         ? `<button class="btn" data-export="questions">تصدير الأسئلة CSV</button><button class="btn" data-export="objectives">تصدير الأهداف CSV</button>`
         : `<a class="btn" href="api/export/questions.csv">تصدير الأسئلة CSV</a><a class="btn" href="api/export/objectives.csv">تصدير الأهداف CSV</a>`) : ''}</div></div>
@@ -595,7 +623,7 @@ async function pageBank() {
         ${f('difficulty', 'الصعوبة', [['سهل', 'سهل'], ['متوسط', 'متوسط'], ['صعب', 'صعب']])}
         ${f('status', 'حالة المراجعة', Object.entries(Q_STATUS).map(([k, [t]]) => [k, t]))}
         <div><label for="f-q">بحث بالكلمات</label><input id="f-q" value="${esc(bankFilter.q || '')}" placeholder="مثال: الفوتون"></div>
-        <div class="actions"><button type="button" class="primary" id="f-apply">بحث</button><button type="button" id="f-clear">مسح</button></div>
+        <div class="actions"><button type="button" class="primary" id="f-apply">${line('search', 17)}بحث</button><button type="button" id="f-clear">مسح</button></div>
       </div>
     </section>
     <div class="section-title no-print"><h2>${res.questions.length} سؤالًا ${state.selection.size ? `· المحدد للاختبار: ${state.selection.size}` : ''}</h2>
@@ -672,22 +700,23 @@ async function pageReports() {
   const o = s.objectives, q = s.questions;
   const maxLevel = Math.max(1, ...s.levels.map(l => l.n));
   const maxCh = Math.max(1, ...s.byChapter.map(c => c.questions));
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ التقارير</div><h1>التقارير والمؤشرات</h1>
-    <p class="muted">تُحسب كل الأرقام لحظيًا من قاعدة البيانات.</p>
-    <div class="grid kpi">${kpi(o.n, 'إجمالي الأهداف')}${kpi(o.reviewed || 0, 'أهداف روجعت')}${kpi(o.approved || 0, 'أهداف معتمدة')}
-      ${kpi(o.returned || 0, 'أهداف تحتاج إلى تعديل')}${kpi(q.mcq || 0, 'أسئلة اختيار')}${kpi(q.essay || 0, 'أسئلة مقالية')}
-      ${kpi(q.approved || 0, 'أسئلة معتمدة')}${kpi((q.n || 0) - (q.approved || 0), 'أسئلة تحتاج إلى مراجعة')}</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ التقارير</div>
+    <div class="hero"><div class="hero-ic">${icon('reports', 52)}<div><h1>التقارير والمؤشرات</h1>
+    <p class="muted">تُحسب كل الأرقام لحظيًا من قاعدة البيانات.</p></div></div></div>
+    <div class="grid kpi">${kpi(o.n, 'إجمالي الأهداف', 'objectives')}${kpi(o.reviewed || 0, 'أهداف روجعت', 'shield', 'navy')}${kpi(o.approved || 0, 'أهداف معتمدة', 'check')}
+      ${kpi(o.returned || 0, 'أهداف تحتاج إلى تعديل', 'essay')}${kpi(q.mcq || 0, 'أسئلة اختيار', 'mcq')}${kpi(q.essay || 0, 'أسئلة مقالية', 'essay', 'navy')}
+      ${kpi(q.approved || 0, 'أسئلة معتمدة', 'check')}${kpi((q.n || 0) - (q.approved || 0), 'أسئلة تحتاج إلى مراجعة', 'bank', 'gold')}</div>
     <div class="grid cards" style="margin-top:1rem">
-      <section class="card"><h2>توزيع الأهداف حسب مستوى التفكير</h2><p class="small muted">تصنيف مقترح آليًا حتى يعتمده المراجع.</p>
+      <section class="card">${ttl('objectives', 'توزيع الأهداف حسب مستوى التفكير')}<p class="small muted">تصنيف مقترح آليًا حتى يعتمده المراجع.</p>
         <div class="levels">${s.levels.map(l => `<div class="progress-line"><span>${esc(l.level)}</span><span class="muted small">${l.n}</span>${bar(l.n, maxLevel)}</div>`).join('')}</div></section>
-      <section class="card"><h2>توزيع الأسئلة حسب الفصول</h2>
+      <section class="card">${ttl('reports', 'توزيع الأسئلة حسب الفصول')}
         <div class="levels">${s.byChapter.map(c => `<div class="progress-line"><span>${c.number}. ${esc(c.title)}</span><span class="muted small">${c.questions}</span>${bar(c.questions, maxCh)}</div>`).join('')}</div></section>
-      <section class="card"><h2>اكتمال التغطية التقويمية</h2><div class="levels">
+      <section class="card">${ttl('pie', 'اكتمال التغطية التقويمية')}<div class="levels">
         ${progress('أهداف لها العدد المطلوب من الأسئلة', s.coverage.complete, o.n)}
         ${progress('أهداف بدأ إنتاج أسئلتها', s.coverage.started, o.n)}
         ${progress('أهداف اكتملت أسئلتها المعتمدة', s.coverage.approved_complete, o.n, 'ok')}</div></section>
     </div>
-    ${isReviewer() ? `<section class="card" style="margin-top:1rem"><h2>آخر التعديلات</h2><div id="revs" class="table-wrap">جارٍ التحميل…</div></section>` : ''}`;
+    ${isReviewer() ? `<section class="card" style="margin-top:1rem">${ttl('history', 'آخر التعديلات')}<div id="revs" class="table-wrap">جارٍ التحميل…</div></section>` : ''}`;
   if (isReviewer()) {
     const rows = await api('/revisions?limit=50');
     document.getElementById('revs').innerHTML = rows.length ? `<table class="list"><thead><tr><th>التاريخ</th><th>المستخدم</th><th>العنصر</th><th>الإجراء</th><th>ملاحظة</th></tr></thead>
@@ -702,13 +731,13 @@ const LOGO = '<img class="login-logo" src="assets/itqan-logo.png" alt="إتقا�
 function pageLogin() {
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
     ${LOGO}
-    <h1>تسجيل الدخول</h1>
+    <h1>${icon('lock', 28)}<span>تسجيل الدخول</span></h1>
     ${state.offline ? '<p class="notice bad">تعذر الاتصال بقاعدة البيانات؛ تحقق من الإنترنت ثم أعد تحميل الصفحة.</p>' : ''}
     <form id="login-form" novalidate>
       <div class="field"><label for="l-user">اسم المستخدم</label>
-        <input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
+        <div class="in-ic">${line('user', 19)}<input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="أدخل اسم المستخدم" required></div></div>
       <div class="field"><label for="l-pass">كلمة المرور</label>
-        <div class="pass-wrap"><input id="l-pass" type="password" dir="ltr" autocomplete="current-password" required>
+        <div class="pass-wrap in-ic">${line('lock', 19)}<input id="l-pass" type="password" dir="ltr" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
         <button type="button" class="pass-toggle" id="l-show" aria-pressed="false">إظهار</button></div></div>
       <button class="primary" type="submit" id="l-submit">دخول</button>
     </form>
@@ -739,7 +768,7 @@ function pageLogin() {
 function pagePending() {
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
     ${LOGO}
-    <h1>حسابك بانتظار التفعيل</h1>
+    <h1>${icon('history', 28)}<span>حسابك بانتظار التفعيل</span></h1>
     <p class="muted">مرحبًا ${esc(state.user.displayName)}. سيظهر لك المحتوى بعد أن يحدد المشرف صلاحيتك.</p>
     <button type="button" class="primary" id="p-out">تسجيل الخروج</button>
   </div></div>`;

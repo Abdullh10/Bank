@@ -1,4 +1,6 @@
 // منشئ نماذج الاختبارات: اختيار الفصول والعدد والمستوى والنوع، ونماذج متعددة، وكليشة المدرسة، وتصدير PDF عبر الطباعة.
+import { icon } from './icons.js';
+const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'];
 const DIFFS = ['سهل', 'متوسط', 'صعب'];
 const MODEL_NAMES = ['أ', 'ب', 'ج', 'د'];
@@ -145,11 +147,11 @@ export async function pageExam(ctx) {
 
   $app.innerHTML = `
     <div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ منشئ الاختبارات</div>
-    <div class="hero no-print"><div><h1>منشئ نماذج الاختبارات</h1>
-      <p class="muted">اختر الفصول وعدد الأسئلة ومستواها ونوعها، ثم صدّر الاختبار PDF جاهزًا للطباعة بكليشة المدرسة.</p></div></div>
+    <div class="hero no-print"><div class="hero-ic">${icon('exam', 52)}<div><h1>منشئ نماذج الاختبارات</h1>
+      <p class="muted">اختر الفصول وعدد الأسئلة ومستواها ونوعها، ثم صدّر الاختبار PDF جاهزًا للطباعة بكليشة المدرسة.</p></div></div></div>
     <div class="grid exam-setup no-print">
       <section class="card">
-        <h2>محتوى الاختبار</h2>
+        ${ttl('chapters', 'محتوى الاختبار')}
         <h3>الفصول</h3>
         <div class="chk-grid">${chapters.map(c => chk('ch', c.number, o.chapters.includes(c.number), `${c.number}. ${c.title}`)).join('')}</div>
         <div class="form-grid" style="margin-top:.75rem">
@@ -162,7 +164,7 @@ export async function pageExam(ctx) {
         <div class="chk-grid">${DIFFS.map(d => chk('df', d, o.diffs.includes(d), d)).join('')}</div>
       </section>
       <section class="card">
-        <h2>إعدادات النماذج والدرجات</h2>
+        ${ttl('sliders', 'إعدادات النماذج والدرجات')}
         <div class="form-grid">
           <div><label for="x-models">عدد النماذج</label><select id="x-models">${[1, 2, 3, 4].map(n => `<option ${o.models === n ? 'selected' : ''} value="${n}">${n === 1 ? 'نموذج واحد' : `${n} نماذج (${MODEL_NAMES.slice(0, n).join('، ')})`}</option>`).join('')}</select></div>
           <div><label for="x-mmark">درجة سؤال الاختيار</label><input id="x-mmark" type="number" min="0.25" step="0.25" value="${o.mcqMark}"></div>
@@ -172,7 +174,7 @@ export async function pageExam(ctx) {
         ${chk('opt', 'shuffleOptions', o.shuffleOptions, 'خلط ترتيب البدائل بين النماذج')}
         ${chk('opt', 'answerGrid', o.answerGrid, 'إضافة جدول إجابة لأسئلة الاختيار في ورقة الطالب')}
         ${chk('opt', 'approvedOnly', o.approvedOnly, 'الأسئلة المعتمدة فقط')}
-        <h2 style="margin-top:1rem">بيانات الكليشة</h2>
+        ${ttl('exam', 'بيانات الكليشة').replace('class="ttl"', 'class="ttl" style="margin-top:1.2rem"')}
         <div class="form-grid">
           ${sel('country', 'الدولة')}${sel('org', 'الجهة')}${sel('dept', 'الإدارة')}${field('school', 'المدرسة')}
           ${sel('title', 'عنوان الاختبار')}${sel('year', 'العام الدراسي')}${sel('subject', 'المادة')}${sel('grade', 'الصف')}

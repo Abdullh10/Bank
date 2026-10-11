@@ -1,22 +1,25 @@
 // صفحات الطاقم للطلاب: لوحة تقدم الطلاب (للمعلمين والمراجعين والمشرف) وإدارة حسابات الطلاب (للمشرف فقط).
+import { icon, line } from './icons.js';
+
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
+const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const ROLE = { student: 'نشط', pending: 'موقوف' };
 
 export async function pageTeacherProgress(ctx, section = '') {
   const { esc, $app, api } = ctx;
   const d = await api('/teacher/progress' + (section ? '?section=' + encodeURIComponent(section) : ''));
   $app.innerHTML = `
-    <section class="hero"><div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div>
+    <section class="hero"><div class="hero-ic">${icon('progress', 52)}<div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div></div>
       <div class="actions"><label for="tp-sec" class="small">الشعبة</label>
         <select id="tp-sec"><option value="">كل الشعب</option>${d.sections.map(s => `<option ${s === section ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div></section>
-    <section class="card"><h2>الطلاب</h2>
+    <section class="card">${ttl('students', 'الطلاب')}
       ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>الإجابات الصحيحة</th><th>آخر نشاط</th></tr></thead><tbody>
         ${d.students.map(s => `<tr><td>${esc(s.name)} <span class="small muted ltr">${esc(s.username)}</span></td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td>
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
           <td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
       </tbody></table></div>` : '<div class="empty">لا يوجد طلاب بعد.</div>'}
     </section>
-    <section class="card"><h2>الأهداف الأضعف</h2>
+    <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
       ${d.weakObjectives.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الهدف</th><th>الدرس</th><th>الإجابات</th><th>الصحيحة</th></tr></thead><tbody>
         ${d.weakObjectives.map(o => `<tr><td><a href="#/objective/${encodeURIComponent(o.code)}">${esc(o.text)}</a></td><td>${esc(o.lesson)}</td><td>${o.n}</td><td>${o.pct}%</td></tr>`).join('')}
@@ -115,17 +118,17 @@ export async function pageAdminStudents(ctx) {
     && (!adminFilter.q || (s.name + ' ' + s.username).includes(adminFilter.q)));
   let pending = [];
   $app.innerHTML = `
-    <section class="hero"><div><h1>حسابات الطلاب</h1><p class="muted">الطالب يرى صفحة التدريب فقط: لا إجابات جماعية ولا مراجعة ولا منشئ اختبارات.</p></div></section>
-    <section class="card"><h2>إضافة طلاب</h2>
+    <section class="hero"><div class="hero-ic">${icon('students', 52)}<div><h1>حسابات الطلاب</h1><p class="muted">الطالب يرى صفحة التدريب فقط: لا إجابات جماعية ولا مراجعة ولا منشئ اختبارات.</p></div></div></section>
+    <section class="card">${ttl('students', 'إضافة طلاب', 'h2', 30)}
       <div class="as-add">
         <div>
-          <h3>من ملف Excel</h3>
+          <h3>${icon('upload', 26, 'green')}من ملف Excel</h3>
           <p class="small muted">أعمدة: <b>الاسم، الصف، الشعبة</b>، واختياريًا: اسم المستخدم، كلمة المرور. الصف الأول عناوين الأعمدة.</p>
           <input type="file" id="as-file" accept=".xlsx,.xls,.csv">
-          <div class="actions"><button type="button" id="as-template">تحميل نموذج Excel</button></div>
+          <div class="actions"><button type="button" id="as-template">${line('download', 17)}تحميل نموذج Excel</button></div>
         </div>
         <div>
-          <h3>أو بالكتابة</h3>
+          <h3>${icon('essay', 26)}أو بالكتابة</h3>
           <p class="small muted">سطر لكل طالب: <b>الاسم، الصف، الشعبة</b>.</p>
           <textarea id="as-lines" rows="4" placeholder="أحمد محمد علي، ثاني ثانوي، 1&#10;سعد خالد، ثاني ثانوي، 2"></textarea>
           <div class="actions"><button type="button" id="as-read-lines">معاينة</button></div>
@@ -134,12 +137,12 @@ export async function pageAdminStudents(ctx) {
       <div id="as-preview"></div>
       <div id="as-result"></div>
     </section>
-    <section class="card"><div class="as-listhead"><h2>الطلاب (${list.length}${list.length !== all.length ? ` من ${all.length}` : ''})</h2>
+    <section class="card"><div class="as-listhead">${ttl('students', `الطلاب (${list.length}${list.length !== all.length ? ` من ${all.length}` : ''})`)}
       <div class="actions">
         <select id="af-grade" aria-label="الصف"><option value="">كل الصفوف</option>${grades.map(g => `<option ${g === adminFilter.grade ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select>
         <select id="af-sec" aria-label="الشعبة"><option value="">كل الشعب</option>${sections.map(g => `<option ${g === adminFilter.section ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select>
         <input id="af-q" placeholder="بحث بالاسم" value="${esc(adminFilter.q)}" style="max-width:11rem">
-        <button type="button" id="as-export">تصدير Excel</button>
+        <button type="button" id="as-export">${line('download', 17)}تصدير Excel</button>
       </div></div>
       ${list.length ? `<div class="table-wrap"><table class="list as-table"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th><th>التدريب</th><th></th></tr></thead><tbody>
         ${list.map(s => `<tr data-id="${s.id}" data-user="${esc(s.username)}">
