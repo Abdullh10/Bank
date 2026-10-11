@@ -124,7 +124,8 @@ ok('anon: exam builder builds from Supabase bank', (await p.locator('.set-studen
 
 // تسجيل دخول المعلم: يرى الإجابات ولا يرى أدوات المراجعة
 await p.goto(BASE + '#/login'); await p.waitForSelector('#l-user');
-ok('login form asks for ID', (await p.locator('label[for="l-user"]').innerText()).includes('المعرّف'));
+ok('login form: username + password + logo', (await p.locator('label[for="l-user"]').innerText()).includes('اسم المستخدم') && await p.locator('.login-logo').evaluate(i => i.complete && i.naturalWidth > 0));
+await p.screenshot({ path: `${OUT}/supa-login.png` });
 await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
 await p.waitForSelector('#logout');
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');

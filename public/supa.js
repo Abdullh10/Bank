@@ -88,7 +88,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     const id = String(body.username || '').trim().toLowerCase();
     const email = id.includes('@') || !loginDomain ? id : `${id}@${loginDomain}`;
     const { error } = await client.auth.signInWithPassword({ email, password: body.password || '' });
-    if (error) throw Object.assign(new Error('المعرّف أو كلمة المرور غير صحيحة'), { status: 401 });
+    if (error) throw Object.assign(new Error('اسم المستخدم أو كلمة المرور غير صحيحة'), { status: 401 });
     const user = await rpc('get_me');
     if (!user) throw new Error('الحساب غير مرتبط بملف مستخدم؛ تواصل مع المشرف');
     return { user };

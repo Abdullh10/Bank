@@ -746,20 +746,41 @@ async function pageReports() {
 
 // ---------- تسجيل الدخول ----------
 function pageLogin() {
-  if (state.static) { $app.innerHTML = '<div class="notice">تسجيل الدخول غير متاح في نسخة العرض؛ يلزم تشغيل المنصة على خادم.</div>'; return; }
-  $app.innerHTML = `<div class="card" style="max-width:420px;margin:2rem auto">
-    <h1>تسجيل الدخول</h1><p class="muted small">حسابات المراجعين والمعلمين ينشئها المشرف${state.supabase ? '' : ' من الخادم'}.</p>
-    <form id="login-form">
-      <div class="field"><label for="l-user">${state.supabase ? 'المعرّف (ID)' : 'اسم المستخدم'}</label><input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
-      <div class="field"><label for="l-pass">كلمة المرور</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
-      <button class="primary" type="submit">دخول</button>
-    </form></div>`;
+  const logo = '<img class="login-logo" src="assets/itqan-logo.png" alt="إتقان — بنك أسئلة الكيمياء" width="520" height="513">';
+  if (state.static) {
+    $app.innerHTML = `<div class="login-wrap"><div class="login-card">${logo}<p class="notice">تسجيل الدخول غير متاح في نسخة العرض؛ يلزم الاتصال بقاعدة البيانات.</p></div></div>`;
+    return;
+  }
+  $app.innerHTML = `<div class="login-wrap"><div class="login-card">
+    ${logo}
+    <h1>تسجيل الدخول</h1>
+    <p class="muted small">للمعلمين والمراجعين. الحسابات ينشئها المشرف.</p>
+    <form id="login-form" novalidate>
+      <div class="field"><label for="l-user">اسم المستخدم</label>
+        <input id="l-user" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
+      <div class="field"><label for="l-pass">كلمة المرور</label>
+        <div class="pass-wrap"><input id="l-pass" type="password" dir="ltr" autocomplete="current-password" required>
+        <button type="button" class="pass-toggle" id="l-show" aria-pressed="false">إظهار</button></div></div>
+      <button class="primary" type="submit" id="l-submit">دخول</button>
+    </form>
+    <p class="login-foot">نسيت كلمة المرور؟ تواصل مع المشرف لإعادة تعيينها.</p>
+  </div></div>`;
+  const user = document.getElementById('l-user'), pass = document.getElementById('l-pass'), btn = document.getElementById('l-submit');
+  user.focus();
+  document.getElementById('l-show').onclick = e => {
+    const show = pass.type === 'password';
+    pass.type = show ? 'text' : 'password';
+    e.target.textContent = show ? 'إخفاء' : 'إظهار';
+    e.target.setAttribute('aria-pressed', String(show));
+  };
   document.getElementById('login-form').onsubmit = async e => {
     e.preventDefault();
+    if (!user.value.trim() || !pass.value) { toast('اكتب اسم المستخدم وكلمة المرور', true); return; }
+    btn.disabled = true; btn.textContent = 'جارٍ الدخول…';
     try {
-      const r = await api('/login', { method: 'POST', body: { username: document.getElementById('l-user').value, password: document.getElementById('l-pass').value } });
+      const r = await api('/login', { method: 'POST', body: { username: user.value, password: pass.value } });
       state.user = r.user; renderUserbox(); toast('مرحبًا ' + r.user.displayName); location.hash = '#/';
-    } catch (err) { fail(err); }
+    } catch (err) { fail(err); btn.disabled = false; btn.textContent = 'دخول'; }
   };
 }
 
