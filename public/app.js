@@ -1,4 +1,5 @@
 // واجهة المنصة: تطبيق صفحة واحدة بوحدات ES دون أدوات بناء.
+import { pageExam } from './exam.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set() };
@@ -733,7 +734,7 @@ async function route() {
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
     a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))));
-  document.body.classList.remove('print-student', 'print-teacher');
+  document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
   try {
     if (!page) await pageHome();
     else if (page === 'chapters') await pageChapters();
@@ -741,6 +742,7 @@ async function route() {
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
     else if (page === 'bank') await pageBank();
     else if (page === 'reports') await pageReports();
+    else if (page === 'exam') await pageExam({ api, esc, fail, toast, $app });
     else if (page === 'login') pageLogin();
     else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
   } catch (e) {
