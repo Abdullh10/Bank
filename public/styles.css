@@ -1,15 +1,15 @@
 :root {
-  /* ألوان مستوحاة من شعار «إتقان»: برونزي دافئ مع أخضر للتمييز */
-  --bg: #f8f6f1;
+  /* ألوان مستوحاة من شعار «إتقان»: كحلي مع بيج */
+  --bg: #f7f6f1;
   --surface: #ffffff;
-  --surface-2: #f2ede3;
-  --ink: #2a2117;
-  --ink-2: #6a5c4a;
-  --line: #e4dccd;
-  --brand: #7a5a2e;
-  --brand-2: #5c4220;
-  --brand-soft: #f3ead9;
-  --accent: #1f6b4a;
+  --surface-2: #efece0;
+  --ink: #141c33;
+  --ink-2: #4c5570;
+  --line: #dfdccf;
+  --brand: #1f3473;
+  --brand-2: #16274f;
+  --brand-soft: #e6eaf5;
+  --accent: #2f7a5a;
   --on-brand: #ffffff;
   --on-ok: #ffffff;
   --ok: #1d7a46;
@@ -25,15 +25,15 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #16130e; --surface: #201b14; --surface-2: #2a231a; --ink: #f1ebe1; --ink-2: #bcae97;
-    --line: #3d3426; --brand: #d6b47e; --brand-2: #e8cfa3; --brand-soft: #3a2e1c; --accent: #6fcf9f; --on-brand: #1d160c; --on-ok: #0d2418;
+    --bg: #0f1424; --surface: #161d33; --surface-2: #1d2640; --ink: #e8ebf4; --ink-2: #a7afc6;
+    --line: #2c3654; --brand: #9fb3ec; --brand-2: #c3d0f5; --brand-soft: #1f2a4d; --accent: #6fcf9f; --on-brand: #0f1424; --on-ok: #0d2418;
     --ok: #5fcf8e; --ok-soft: #173826; --warn: #e6b450; --warn-soft: #3a2f16; --bad: #ff8a80; --bad-soft: #42201d;
     --info-soft: #1e2a44; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #16130e; --surface: #201b14; --surface-2: #2a231a; --ink: #f1ebe1; --ink-2: #bcae97;
-  --line: #3d3426; --brand: #d6b47e; --brand-2: #e8cfa3; --brand-soft: #3a2e1c; --accent: #6fcf9f; --on-brand: #1d160c; --on-ok: #0d2418;
+  --bg: #0f1424; --surface: #161d33; --surface-2: #1d2640; --ink: #e8ebf4; --ink-2: #a7afc6;
+  --line: #2c3654; --brand: #9fb3ec; --brand-2: #c3d0f5; --brand-soft: #1f2a4d; --accent: #6fcf9f; --on-brand: #0f1424; --on-ok: #0d2418;
   --ok: #5fcf8e; --ok-soft: #173826; --warn: #e6b450; --warn-soft: #3a2f16; --bad: #ff8a80; --bad-soft: #42201d;
   --info-soft: #1e2a44; color-scheme: dark;
 }
@@ -319,7 +319,7 @@ body.locked { background: radial-gradient(1200px 600px at 50% -10%, var(--brand-
 body.locked main { padding-top: 0; }
 .login-wrap { min-height: calc(100vh - 90px); display: grid; place-items: center; padding: 2rem 0 1rem; }
 .login-card { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
-  box-shadow: 0 1px 2px rgba(60, 40, 10, .05), 0 12px 32px rgba(60, 40, 10, .08); padding: 1.75rem 1.5rem 1.4rem; text-align: center; }
+  box-shadow: 0 1px 2px rgba(20, 30, 70, .05), 0 12px 32px rgba(20, 30, 70, .08); padding: 1.75rem 1.5rem 1.4rem; text-align: center; }
 .login-logo { width: 150px; height: auto; margin: 0 auto 1rem; display: block; }
 .login-card h1 { font-size: 1.15rem; margin: 0 0 1.1rem; color: var(--brand-2); }
 .login-card form { text-align: start; }
