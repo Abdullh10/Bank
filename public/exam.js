@@ -112,6 +112,19 @@ function pick(pool, count, rand) {
 
 const state = { header: loadHeader(), opts: null, exam: null };
 
+// مكتبة docx (إصدار مثبت) تُحمَّل من CDN عند أول تصدير Word فقط
+const DOCX_URL = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
+let docxLoading = null;
+function loadDocx() {
+  if (window.docx) return Promise.resolve(window.docx);
+  docxLoading ||= new Promise((resolve, reject) => {
+    const sc = Object.assign(document.createElement('script'), { src: DOCX_URL, onload: () => resolve(window.docx),
+      onerror: () => { docxLoading = null; reject(new Error('تعذر تحميل مكتبة Word؛ تحقق من الإنترنت ثم أعد المحاولة')); } });
+    document.head.append(sc);
+  });
+  return docxLoading;
+}
+
 // يُستدعى عند الخروج: لا يبقى اختبار المستخدم السابق (ومفتاحه) على الجهاز
 export const resetExam = () => { state.exam = null; state.opts = null; };
 
@@ -122,8 +135,9 @@ export async function pageExam(ctx) {
   const hasAnswers = all.some(q => q.type === 'mcq' && Number.isInteger(q.correctIndex));
   state.opts = state.opts || {
     chapters: chapters.map(c => c.number), mcq: 20, essay: 4, levels: [...LEVELS], diffs: [...DIFFS],
-    approvedOnly: true, models: 1, shuffleOptions: true, mcqMark: 1, essayMark: 0, answerGrid: true, seed: Math.floor(Math.random() * 1e6),
+    approvedOnly: true, models: 1, shuffleOptions: true, mcqMark: 1, essayMark: 0, answerGrid: true, density: 'auto', seed: Math.floor(Math.random() * 1e6),
   };
+  state.opts.density ||= 'auto';
   const o = state.opts, h = state.header;
   const poolFor = type => all.filter(q => q.type === type && !q.excluded && o.chapters.includes(q.chapter.number)
     && (!q.thinkingLevel || o.levels.includes(q.thinkingLevel)) && (!q.difficulty || o.diffs.includes(q.difficulty))
@@ -173,6 +187,8 @@ export async function pageExam(ctx) {
           <div><label for="x-mmark">درجة سؤال الاختيار</label><input id="x-mmark" type="number" min="0.25" step="0.25" value="${o.mcqMark}"></div>
           <div><label for="x-emark">درجة السؤال المقالي</label><input id="x-emark" type="number" min="0" step="0.5" value="${o.essayMark}" title="صفر = حسب توزيع الدرجات في السؤال"><span class="small muted">صفر = حسب توزيع الدرجات في سلم التصحيح</span></div>
           <div><label for="x-seed">رقم الاختيار (لإعادة إنتاج الاختبار نفسه)</label><input id="x-seed" type="number" value="${o.seed}"></div>
+          <div><label for="x-density">تنسيق الورقة (A4)</label><select id="x-density">${[['auto', 'تلقائي: صفحتان قدر الإمكان'], ['normal', 'عادي'], ['compact', 'مضغوط']]
+            .map(([v, t]) => `<option value="${v}" ${o.density === v ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
         </div>
         ${chk('opt', 'shuffleOptions', o.shuffleOptions, 'خلط ترتيب البدائل بين النماذج')}
         ${chk('opt', 'answerGrid', o.answerGrid, 'إضافة جدول إجابة لأسئلة الاختيار في ورقة الطالب')}
@@ -205,6 +221,7 @@ export async function pageExam(ctx) {
     o.mcqMark = Number($app.querySelector('#x-mmark').value) || 1;
     o.essayMark = Math.max(0, Number($app.querySelector('#x-emark').value) || 0);
     o.seed = Number($app.querySelector('#x-seed').value) || 1;
+    o.density = $app.querySelector('#x-density').value;
     for (const i of $app.querySelectorAll('[data-h]')) h[i.dataset.h] = i.value.trim();
     for (const i of $app.querySelectorAll('[data-hsel]')) {
       const k = i.dataset.hsel;
@@ -330,6 +347,11 @@ export async function pageExam(ctx) {
         ${hasAnswers ? `<button type="button" data-xprint="key">تصدير PDF — مفتاح الإجابة</button><button type="button" data-xprint="all">تصدير الكل</button>` : '<span class="small muted">مفتاح الإجابة يتطلب تسجيل الدخول</span>'}
         <span class="small muted">في نافذة الطباعة اختر «حفظ بصيغة PDF» والحجم A4.</span>
       </div>
+      <div class="actions no-print exam-actions">
+        <button type="button" data-xword="student">تحميل Word — نسخة الطالب</button>
+        ${hasAnswers ? `<button type="button" data-xword="key">Word — مفتاح الإجابة</button><button type="button" data-xword="all">Word — الكل</button>` : ''}
+        <span class="small muted">ملف Word قابل للتعديل والتنسيق، وكل سؤال فيه لا ينقسم بين صفحتين.</span>
+      </div>
       <p class="small muted no-print">لاستبدال سؤال في النموذج (أ): اضغط عليه في المعاينة.</p>
       <div class="papers">
         <div class="set-student">${ex.models.map(studentPaper).join('')}</div>
@@ -341,6 +363,54 @@ export async function pageExam(ctx) {
       window.print();
     });
     out.querySelectorAll('.set-student .paper:first-child [data-swap]').forEach(li => li.onclick = () => swap(li.dataset.swap));
+    fitPapers(out);
+    out.querySelectorAll('[data-xword]').forEach(b => b.onclick = async () => {
+      if (b.disabled) return;
+      const label = b.textContent; b.disabled = true; b.textContent = 'جارٍ إنشاء ملف Word…';
+      try { await exportWord(b.dataset.xword); toast('تم تحميل ملف Word'); }
+      catch (e) { fail(e); } finally { b.disabled = false; b.textContent = label; }
+    });
+  };
+
+  // ---------- ملاءمة صفحات A4 ----------
+  // ارتفاع محتوى صفحة A4 بعد الهوامش (297 − 10 − 14 مم) بالبكسل، مع هامش أمان لأن الأسئلة لا تنقسم بين الصفحات
+  const PAGE_PX = (273 * 96) / 25.4 * 0.95;
+  const DENSITIES = ['', 'dense-1', 'dense-2'];
+  const pagesOf = paper => {
+    const cs = getComputedStyle(paper);
+    return (paper.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) / PAGE_PX;
+  };
+  const fitPapers = async out => {
+    if (document.fonts?.ready) await document.fonts.ready.catch(() => {});
+    const papers = [...out.querySelectorAll('.paper')];
+    const setLevel = lv => papers.forEach(p => { p.classList.remove('dense-1', 'dense-2'); if (DENSITIES[lv]) p.classList.add(DENSITIES[lv]); });
+    const maxPages = () => Math.max(...papers.filter(p => p.closest('.set-student')).map(pagesOf));
+    let level = 0;
+    if (o.density === 'compact') level = 2;
+    else if (o.density === 'auto') {
+      // أخف تنسيق يجعل الورقة صفحتين أو أقل؛ وإن تعذّر يبقى التنسيق الذي يقلل عدد الصفحات أكثر
+      const tries = [0, 1, 2].map(lv => { setLevel(lv); return { lv, pages: Math.ceil(maxPages()) }; });
+      const fit = tries.find(t => t.pages <= 2);
+      level = fit ? fit.lv : tries.reduce((a, b) => (b.pages < a.pages ? b : a)).lv;
+    }
+    setLevel(level);
+    const n = Math.max(1, Math.ceil(maxPages()));
+    const st = $app.querySelector('#x-status');
+    if (st && !st.textContent.includes('الطباعة:')) st.textContent += ` · الطباعة: ${n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتان' : n + ' صفحات'} لكل نموذج${level ? ' (تنسيق مضغوط)' : ''}`;
+  };
+
+  // ---------- تصدير Word ----------
+  const exportWord = async kind => {
+    const [D, { buildExamDocx }, logo] = await Promise.all([loadDocx(), import('./exam-docx.js'),
+      fetch('assets/org-logo.png').then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null)]);
+    const doc = buildExamDocx(D, { exam: state.exam, header: h, opts: o, kind, logo, letters: LETTERS, ordinals: ORDINALS, fmt });
+    const blob = await D.Packer.toBlob(doc);
+    // أسماء ملفات إنجليزية: بعض المتصفحات تتجاهل الأسماء العربية فيُحفظ الملف دون امتداد
+    const names = { student: 'student', key: 'answer-key', all: 'full' };
+    const stamp = new Date().toISOString().slice(0, 10);
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `itqan-exam-${names[kind]}-${stamp}.docx` });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
 
   const swap = key => {

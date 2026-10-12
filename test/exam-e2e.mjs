@@ -52,6 +52,18 @@ const first = await p.locator('.set-student .paper:first-child .paper-mcq > li')
 await p.locator('.set-student .paper:first-child .paper-mcq > li').first().click(); await p.waitForTimeout(300);
 const after = await p.locator('.set-student .paper:first-child .paper-mcq > li').first().innerText();
 ok('swap replaces question', first !== after);
+// تقدير صفحات الطباعة وتصدير Word
+ok('status shows print page estimate', (await p.locator('#x-status').innerText()).includes('الطباعة:'), await p.locator('#x-status').innerText());
+if (process.env.DOCX_UMD) {
+  await p.route('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js', r => r.fulfill({ contentType: 'text/javascript', body: require('fs').readFileSync(process.env.DOCX_UMD, 'utf8') }));
+  const [dl] = await Promise.all([p.waitForEvent('download', { timeout: 30000 }), p.click('[data-xword="all"]')]);
+  const file = await dl.path();
+  const xml = execSync(`unzip -p "${file}" word/document.xml`).toString();
+  const stem = (await p.locator('.set-student .paper:first-child .pq-stem').first().innerText()).replace(/^\d+/, '').trim().slice(0, 20);
+  ok('word export: docx with RTL text, logo and both models', dl.suggestedFilename().endsWith('.docx') && xml.includes('w:bidi') && xml.includes(stem)
+    && execSync(`unzip -l "${file}"`).toString().includes('media/') && (xml.match(/النموذج \((أ|ب)\)/g) || []).length >= 4, JSON.stringify(stem));
+  require('fs').copyFileSync(file, `${OUT}/exam.docx`);
+}
 // جوال
 const m = await b.newPage({ viewport: { width: 390, height: 844 } });
 await login(m); await m.goto(BASE + '/#/exam'); await m.waitForSelector('#x-build');

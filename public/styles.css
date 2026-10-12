@@ -794,3 +794,32 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 #bank-list > .q { content-visibility: auto; contain-intrinsic-size: auto 240px; }
 .bank-more { justify-content: center; margin: 1rem 0; }
 @media print { #bank-list > .q { content-visibility: visible; } }
+
+/* ---------- ورقة الاختبار: لا ينقسم سؤال بين صفحتين، وتنسيق مضغوط ليتسع في صفحتين ---------- */
+.pq, .key-list li { display: block; break-inside: avoid; page-break-inside: avoid; }
+.q-title { break-after: avoid; page-break-after: avoid; }
+.paper-table, .answer-grid, .answer-lines, .paper-head, .paper-info, .paper-meta, .paper-end { break-inside: avoid; page-break-inside: avoid; }
+.paper-q > .answer-grid { break-after: avoid; page-break-after: avoid; }
+@media print {
+  /* الشبكة (grid) تمنع Safari من احترام عدم التقسيم؛ في الطباعة تصبح كتلًا عادية */
+  body.exam-printing .set-student, body.exam-printing .set-key, body.exam-printing .paper-q { display: block; }
+  body.exam-printing .paper-mcq, body.exam-printing .paper-essay { display: block; }
+}
+.paper.dense-1 { font-size: 11.5pt; line-height: 1.5; }
+.paper.dense-1 .paper-q { margin-top: 3.5mm; }
+.paper.dense-1 .pq { padding: 1mm 0 1.4mm; }
+.paper.dense-1 .answer-lines div { height: 7.5mm; }
+.paper.dense-1 .ph-logo img { height: 23mm; }
+.paper.dense-1 .paper-info td { height: 7mm; }
+.paper.dense-2 { font-size: 10.8pt; line-height: 1.42; }
+.paper.dense-2 .paper-q { margin-top: 2.5mm; }
+.paper.dense-2 .pq { padding: .7mm 0 1mm; }
+.paper.dense-2 .pq-opts { gap: .5mm 4mm; margin-top: .5mm; }
+.paper.dense-2 .answer-lines div { height: 6.6mm; }
+.paper.dense-2 .ph-logo img { height: 20mm; }
+.paper.dense-2 .paper-head { padding: 2.5mm 4mm; }
+.paper.dense-2 .ph-right, .paper.dense-2 .ph-left { font-size: 9.8pt; line-height: 1.7; }
+.paper.dense-2 .paper-info td { height: 6.5mm; }
+.paper.dense-2 .paper-info th, .paper.dense-2 .paper-info td, .paper.dense-2 .answer-grid th, .paper.dense-2 .answer-grid td { padding: 1mm 2mm; }
+.paper.dense-2 .answer-grid td { height: 6.5mm; }
+.paper.dense-2 .paper-end { margin-top: 4mm; }

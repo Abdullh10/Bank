@@ -195,7 +195,7 @@ export async function pageAdminStudents(ctx) {
         ${results.map(r => r.ok ? `<tr><td>${esc(r.name)}</td><td>${esc(r.grade)}</td><td>${esc(r.section)}</td><td class="ltr"><b>${esc(r.username)}</b></td><td class="ltr"><b>${esc(r.password)}</b></td></tr>`
           : `<tr><td>${esc(r.name)}</td><td colspan="4" class="bad">${esc(r.error)}</td></tr>`).join('')}</tbody></table></div>
         <div class="actions"><button type="button" id="as-cred-xlsx" class="primary">تحميل كلمات المرور Excel</button><button type="button" id="as-print">طباعة بطاقات الدخول</button><button type="button" id="as-refresh">تحديث القائمة</button></div>`;
-      document.getElementById('as-cred-xlsx').onclick = () => downloadXlsx('حسابات-الطلاب', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم', 'كلمة المرور', 'رابط المنصة'],
+      document.getElementById('as-cred-xlsx').onclick = () => downloadXlsx('itqan-student-accounts', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم', 'كلمة المرور', 'رابط المنصة'],
         ok.map(r => [r.name, r.grade, r.section, r.username, r.password, SITE_URL]));
       document.getElementById('as-print').onclick = () => printCards(ok, esc);
       document.getElementById('as-refresh').onclick = () => pageAdminStudents(ctx).catch(fail);
@@ -210,9 +210,9 @@ export async function pageAdminStudents(ctx) {
     try { showPreview(await readStudentFile(f)); } catch (err) { fail(err); }
   };
   document.getElementById('as-read-lines').onclick = () => showPreview(parseStudentLines(document.getElementById('as-lines').value));
-  document.getElementById('as-template').onclick = () => downloadXlsx('نموذج-أسماء-الطلاب', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم (اختياري)', 'كلمة المرور (اختياري)'],
+  document.getElementById('as-template').onclick = () => downloadXlsx('itqan-students-template', ['الاسم', 'الصف', 'الشعبة', 'اسم المستخدم (اختياري)', 'كلمة المرور (اختياري)'],
     [['أحمد محمد علي', 'ثاني ثانوي', '1', '', ''], ['سعد خالد العتيبي', 'ثاني ثانوي', '2', 'saad22', '']]);
-  document.getElementById('as-export').onclick = () => downloadXlsx('قائمة-الطلاب', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'الحالة', 'الجلسات', 'الأسئلة', 'نسبة الصحيح', 'آخر نشاط'],
+  document.getElementById('as-export').onclick = () => downloadXlsx('itqan-students-list', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'الحالة', 'الجلسات', 'الأسئلة', 'نسبة الصحيح', 'آخر نشاط'],
     list.map(s => [s.name, s.username, s.grade || '', s.section || '', ROLE[s.role], s.sessions, s.answered, s.answered ? pct(s.correct, s.answered) + '%' : '',
       s.lastActive ? new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn') : '']));
   const refilter = () => pageAdminStudents(ctx).catch(fail);
