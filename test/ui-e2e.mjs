@@ -70,6 +70,20 @@ check('edit: status moved to in_review', await p.locator('#q-2 .badge.warn', { h
 await p.locator('[data-qhist]').nth(1).click(); await p.waitForSelector('dialog[open] table');
 check('history: edit row present', (await p.locator('dialog[open] td', { hasText: 'تعديل' }).count()) >= 1);
 await p.keyboard.press('Escape');
+// المحرر يعرض النص المخزن كما هو («المذكرة» لا تتحول عند الحفظ)
+await p.locator('[data-qedit]').nth(2).click(); await p.waitForSelector('#e-src');
+check('editor shows stored source text unchanged', (await p.inputValue('#e-src')).includes('المذكرة'), await p.inputValue('#e-src'));
+await p.keyboard.press('Escape');
+// النقر المزدوج على «حفظ» لا ينشئ السؤال مرتين
+const essaysBefore = await p.locator('#essay-section .q').count();
+await p.route('**/api/objectives/*/questions', async r => { await new Promise(res => setTimeout(res, 800)); await r.continue(); });
+await p.locator('[data-add="essay"]').click(); await p.waitForSelector('#e-model');
+await p.fill('#e-stem', 'اشرح العلاقة بين تردد الفوتون وطاقته مع مثال من الطيف الكهرومغناطيسي.');
+await p.fill('#e-model', 'الطاقة تتناسب طرديًا مع التردد وفق E = hν.');
+await p.fill('#e-marks', 'العلاقة | 2'); await p.fill('#e-rubric', 'كامل | يذكر العلاقة والمثال\nجزئي | يذكر العلاقة فقط');
+await p.locator('#e-save').dblclick();
+await p.waitForTimeout(2500); await p.unroute('**/api/objectives/*/questions');
+check('double-click save creates one question', (await p.locator('#essay-section .q').count()) === essaysBefore + 1, `${essaysBefore} -> ${await p.locator('#essay-section .q').count()}`);
 // اعتماد الهدف
 await p.click('[data-review="approve"]'); await p.waitForTimeout(500);
 check('objective approved badge', (await p.locator('.hero .badge.ok', { hasText: 'معتمد' }).count()) === 1);
@@ -84,9 +98,9 @@ await p.pdf({ path: `${OUT}/teacher.pdf` });
 await p.emulateMedia({ media: 'screen' });
 // البنك
 await p.goto(BASE + '/#/bank'); await p.waitForSelector('#bank-list .q');
-check('bank: 10 questions', (await p.locator('#bank-list .q').count()) === 10);
+check('bank: 11 questions (10 + the one added above)', (await p.locator('#bank-list .q').count()) === 11);
 await p.selectOption('#f-type', 'essay'); await p.waitForTimeout(400);
-check('bank: filter essay -> 3', (await p.locator('#bank-list .q').count()) === 3);
+check('bank: filter essay -> 4', (await p.locator('#bank-list .q').count()) === 4);
 await p.click('#f-clear'); await p.waitForTimeout(300);
 await p.fill('#f-q', 'الميكروويف'); await p.click('#f-apply'); await p.waitForTimeout(300);
 check('bank: search', (await p.locator('#bank-list .q').count()) >= 1);

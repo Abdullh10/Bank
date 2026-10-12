@@ -83,6 +83,23 @@ export function tokens(s) {
   return new Set(norm(s).replace(/[ً-ْ]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ')
     .split(' ').filter(w => w.length > 1 && !STOP.has(w)));
 }
+// أزواج الأسئلة المتشابهة: تُقطَّع كل جملة مرة واحدة ثم تُقارن المجموعات (أسرع بكثير من similarity لكل زوج).
+export function similarPairs(items, threshold = 0.5) {
+  const toks = items.map(q => tokens(q.stem));
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    const A = toks[i]; if (!A.size) continue;
+    for (let j = i + 1; j < items.length; j++) {
+      const B = toks[j]; if (!B.size) continue;
+      // الحد الأعلى الممكن للتشابه = الأصغر/الأكبر؛ يُتجاوز الزوج إن كان دون العتبة
+      if (Math.min(A.size, B.size) / Math.max(A.size, B.size) < threshold) continue;
+      let inter = 0; for (const w of A) if (B.has(w)) inter++;
+      const sc = inter / (A.size + B.size - inter);
+      if (sc >= threshold) out.push({ a: items[i].id, b: items[j].id, score: Math.round(sc * 100) });
+    }
+  }
+  return out;
+}
 export function similarity(a, b) {
   const A = tokens(a), B = tokens(b);
   if (!A.size || !B.size) return 0;

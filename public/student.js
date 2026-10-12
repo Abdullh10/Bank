@@ -35,19 +35,21 @@ export function pageStudentConfirm(ctx) {
     <form id="c-form" novalidate>
       <div class="field"><label for="c-name">الاسم</label><input id="c-name" value="${esc(state.user.displayName)}" required></div>
       ${state.user.grade ? `<div class="field"><label>الصف</label><div class="st-readonly">${esc(state.user.grade)}</div></div>` : ''}
-      <div class="field"><label for="c-sec">الشعبة</label><input id="c-sec" value="${esc(state.user.section || '')}" placeholder="مثال: 2/1" required></div>
+      <div class="field"><label for="c-sec">الشعبة</label><input id="c-sec" value="${esc(state.user.section || '')}" placeholder="مثال: 2/1" required ${state.user.section ? 'readonly title="حددها المشرف"' : ''}></div>
       <button class="primary" type="submit">تأكيد والبدء</button>
     </form>
     <p class="login-foot">التدريب لا يدخل في الدرجات، ويرى معلمك تقدّمك فيه.</p>
   </div></div>`;
   document.getElementById('c-form').onsubmit = async e => {
     e.preventDefault();
+    const btn = e.currentTarget.querySelector('button[type=submit]');
+    if (btn.disabled) return; btn.disabled = true;
     try {
       const name = document.getElementById('c-name').value.trim(), section = document.getElementById('c-sec').value.trim();
       await api('/student/confirm', { method: 'POST', body: { name, section } });
       Object.assign(state.user, { displayName: name, section, profileConfirmed: true });
       toast('تم تثبيت بياناتك'); ctx.done();
-    } catch (err) { fail(err); }
+    } catch (err) { fail(err); btn.disabled = false; }
   };
 }
 
@@ -148,11 +150,13 @@ function renderQuestion(ctx) {
   $app.querySelectorAll('.st-opt:not([disabled])').forEach(b => b.onclick = async () => {
     $app.querySelectorAll('.st-opt').forEach(x => { x.disabled = true; });
     b.classList.add('chosen');
+    const sess = session;
     try {
-      const r = await api('/student/answer', { method: 'POST', body: { session: session.id, question: q.id, choice: Number(b.dataset.orig) } });
-      session.answers[q.id] = { ...r, choice: Number(b.dataset.orig) };
-      renderQuestion(ctx);
-    } catch (e) { fail(e); renderQuestion(ctx); }
+      // keep: تُحفظ نتيجة الإجابة حتى لو انتقل الطالب إلى «سجلي» قبل وصول الرد
+      const r = await api('/student/answer', { method: 'POST', body: { session: sess.id, question: q.id, choice: Number(b.dataset.orig) }, keep: true });
+      sess.answers[q.id] = { ...r, choice: Number(b.dataset.orig) };
+      if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx);
+    } catch (e) { fail(e); if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx); }
   });
   const others = document.getElementById('st-others');
   if (others) others.onclick = () => { document.getElementById('st-others-list').hidden = false; others.remove(); };
@@ -195,13 +199,18 @@ function tickTimer() {
   session.timer = setInterval(draw, 1000);
 }
 
+let finishing = false;
 async function finishSession(ctx) {
   const { api, fail } = ctx;
-  stopTimer();
+  if (finishing || !session) return;
+  finishing = true;
   try {
-    session.summary = await api('/student/finish', { method: 'POST', body: { session: session.id } });
-    renderSummary(ctx);
-  } catch (e) { fail(e); }
+    const sum = await api('/student/finish', { method: 'POST', body: { session: session.id }, keep: true });
+    stopTimer(); // يتوقف المؤقت بعد نجاح الإنهاء فقط
+    if (!session) return;
+    session.summary = sum;
+    if (document.querySelector('.st-run')) renderSummary(ctx);
+  } catch (e) { fail(e); } finally { finishing = false; }
 }
 
 function renderSummary(ctx) {

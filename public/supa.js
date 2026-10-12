@@ -1,16 +1,20 @@
 // طبقة الربط مع Supabase: تحوّل مسارات الواجهة البرمجية التي تستخدمها الصفحات إلى استدعاءات دوال قاعدة البيانات،
 // فتبقى الصفحات كما هي سواء عملت على الخادم المحلي أو على Supabase.
 // كل الكتابة تمر عبر دوال محمية في قاعدة البيانات تتحقق من الدور وتسجل التعديل؛ التحقق هنا لتوضيح الأخطاء مبكرًا فقط.
-import { cleanQuestion, cleanObjectiveEdit, autoCheck, similarity, ValidationError } from './validate.js';
+import { cleanQuestion, cleanObjectiveEdit, autoCheck, similarPairs, ValidationError } from './validate.js';
 
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 let client;
+let signedOutHandler = null;
+export const onSignedOut = fn => { signedOutHandler = fn; };
 let loginDomain = '';
 
 export async function initSupabase(cfg) {
   const { createClient } = await import(SDK);
   loginDomain = cfg.loginDomain || '';
   client = createClient(cfg.url, cfg.key, { auth: { persistSession: true, autoRefreshToken: true } });
+  // انتهاء الجلسة أو إلغاؤها (مثل فشل تجديد التوكن): تُبلَّغ الواجهة لتعود إلى صفحة الدخول
+  client.auth.onAuthStateChange?.(event => { if (event === 'SIGNED_OUT') signedOutHandler?.(); });
   return client;
 }
 
@@ -18,7 +22,7 @@ async function rpc(fn, args = {}) {
   const { data, error } = await client.rpc(fn, args);
   if (error) {
     const msg = error.message || 'تعذر تنفيذ الطلب';
-    const status = error.code === '28000' ? 401 : error.code === '42501' ? 403 : error.code === 'P0002' ? 404 : 400;
+    const status = error.code === '28000' || error.code === 'PGRST301' || /JWT expired|invalid JWT/i.test(msg) ? 401 : error.code === '42501' ? 403 : error.code === 'P0002' ? 404 : 400;
     throw Object.assign(new Error(msg), { errors: error.code === '22023' ? msg.split('؛ ') : undefined, status });
   }
   return data;
@@ -79,13 +83,22 @@ export async function exportCsv(kind) {
 
 // إنشاء الحسابات وإعادة تعيين كلمات المرور عبر دالة الحافة admin-users (تعمل داخل Supabase بمفتاح الخدمة).
 async function adminUsers(body) {
+  // إنشاء الحسابات على دفعات صغيرة: طلب واحد ضخم قد يتجاوز مهلة الدالة ويضيع كلمات المرور
+  if (body.action === 'create' && body.students.length > 25) {
+    const results = [];
+    for (let i = 0; i < body.students.length; i += 25)
+      results.push(...(await adminUsers({ action: 'create', students: body.students.slice(i, i + 25) })).results);
+    return { results };
+  }
   const { data, error } = await client.functions.invoke('admin-users', { body });
   if (!error) return data;
-  let msg = error.message || '';
+  let msg = error.message || '', status = error.context?.status;
   try { const j = await error.context?.json?.(); if (j?.error) msg = j.error; } catch { /* ليس JSON */ }
-  if (!msg || /Failed to send|not found|404|FunctionsFetchError|FunctionsRelayError/i.test(msg))
+  if (status === 404 && !/[\u0600-\u06FF]/.test(msg))
     msg = 'دالة إنشاء الحسابات (admin-users) غير منشورة في Supabase بعد؛ راجع خطوات النشر في docs/supabase-setup.md';
-  throw new Error(msg);
+  else if (/Failed to send|FunctionsFetchError|NetworkError|Load failed/i.test(msg))
+    msg = 'تعذر الاتصال بدالة إنشاء الحسابات؛ تحقق من الإنترنت ثم أعد المحاولة (راجع القائمة أولًا: قد يكون بعض الحسابات أُنشئ)';
+  throw Object.assign(new Error(msg), { status: status === 401 ? 401 : 400 });
 }
 
 export async function supaApi(path, { method = 'GET', body = {} } = {}) {
@@ -104,7 +117,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     if (!user) throw new Error('الحساب غير مرتبط بملف مستخدم؛ تواصل مع المشرف');
     return { user };
   }
-  if (p === '/logout') { await client.auth.signOut(); return { ok: true }; }
+  if (p === '/logout') { await client.auth.signOut({ scope: 'local' }); return { ok: true }; } // الخروج من هذا الجهاز فقط
   if (p === '/stats') return rpc('get_stats');
   if (p === '/chapters') return rpc('get_chapters');
   if ((m = p.match(/^\/chapters\/(\d+)$/))) return rpc('get_chapter', { p_number: Number(m[1]) });
@@ -164,12 +177,8 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/bank') {
     const questions = await rpc('get_bank', { f });
     if (f.similar === '1') {
-      const similar = [];
-      for (let i = 0; i < questions.length; i++) for (let j = i + 1; j < questions.length; j++) {
-        const s = similarity(questions[i].stem, questions[j].stem);
-        if (s >= 0.5) similar.push({ a: questions[i].id, b: questions[j].id, score: Math.round(s * 100) });
-      }
-      return { questions, similar };
+      if (questions.length > 900) throw Object.assign(new Error('اختر فصلًا أو درسًا أولًا: اكتشاف المتشابهة يعمل على 900 سؤال كحد أقصى'), { status: 400 });
+      return { questions, similar: similarPairs(questions) };
     }
     return { questions };
   }

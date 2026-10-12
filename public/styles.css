@@ -790,3 +790,7 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .as-chk { width: 2.4rem; text-align: center; }
 .as-chk input { width: 1.1rem; height: 1.1rem; margin: 0; }
 .as-table tr.picked td { background: var(--bad-soft); }
+/* الأداء: المتصفح يتجاهل رسم البطاقات البعيدة عن الشاشة (Safari 18+ وChrome) */
+#bank-list > .q { content-visibility: auto; contain-intrinsic-size: auto 240px; }
+.bank-more { justify-content: center; margin: 1rem 0; }
+@media print { #bank-list > .q { content-visibility: visible; } }

@@ -1,8 +1,9 @@
 // واجهة المنصة: تطبيق صفحة واحدة بوحدات ES دون أدوات بناء.
-import { pageExam } from './exam.js';
+import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
+import { similarPairs } from './validate.js';
 import { pageStudentHome, pageStudentHistory, pageStudentConfirm, resetStudentSession } from './student.js';
-import { pageTeacherProgress, pageAdminStudents } from './staff.js';
+import { pageTeacherProgress, pageAdminStudents, resetStaffState } from './staff.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
@@ -44,6 +45,8 @@ const cleanRef = s => {
     .replace(/\s*—\s*/g, ' — ').replace(/(\s—\s*)+$/g, '').replace(/^\s*—\s*/, '')
     .replace(/(\s—\s){2,}/g, ' — ').replace(/\s+([؛،.)])/g, '$1').replace(/\s{2,}/g, ' ').trim();
 };
+const escRaw = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// للعرض: المصطلح المعتمد؛ وفي حقول التحرير يُستخدم escRaw حتى لا يتغير النص المخزن عند الحفظ.
 const esc = s => term(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const LETTERS = ['أ', 'ب', 'ج'];
@@ -54,6 +57,7 @@ async function useSupabase() {
   if (!SUPABASE?.url || !SUPABASE?.key) return false;
   try {
     supa = await import('./supa.js');
+    supa.onSignedOut(() => { if (state.user) { toast('انتهت الجلسة؛ سجّل الدخول مرة أخرى', true); signedOut(); } });
     await supa.initSupabase(SUPABASE);
     state.supabase = true;
     return true;
@@ -63,10 +67,20 @@ async function useSupabase() {
 // القراءة التي تصل بعد انتقال المستخدم إلى صفحة أخرى تُهمل حتى لا تكتب الصفحة القديمة فوق الجديدة.
 let routeSeq = 0;
 const STALE = Object.assign(new Error('stale'), { stale: true });
+// البنك كاملًا يُحمَّل مرة واحدة ويُحفظ في الذاكرة (بنك الأسئلة ومنشئ الاختبارات وأوراق الأسئلة)،
+// ويُمسح بعد أي كتابة أو عند الخروج حتى لا يُعرض محتوى قديم.
+let bankCache = null;
 async function api(path, opts = {}) {
   const seq = routeSeq;
-  const data = await apiRaw(path, opts);
-  if ((!opts.method || opts.method === 'GET') && seq !== routeSeq) throw STALE;
+  const write = opts.method && opts.method !== 'GET';
+  if (write) bankCache = null;
+  let data;
+  if (path === '/bank' && !write) data = await (bankCache ||= apiRaw('/bank').catch(e => { bankCache = null; throw e; }));
+  else data = await apiRaw(path, opts);
+  if (write) bankCache = null;
+  // قراءة أو كتابة انتهت بعد انتقال المستخدم: لا تُرسم الصفحة القديمة فوق الجديدة (الكتابة نفسها تمت)
+  // keep: الطلبات التي يجب حفظ نتيجتها حتى لو انتقل المستخدم (مثل إجابة الطالب)
+  if (seq !== routeSeq && !opts.keep) throw STALE;
   return data;
 }
 
@@ -99,7 +113,19 @@ function toast(msg, error = false) {
   document.body.append(t);
   setTimeout(() => t.remove(), error ? 6000 : 3000);
 }
-const fail = e => e?.stale || toast(e.errors?.length ? e.errors.join('، ') : e.message, true);
+// يمنع النقر المزدوج: الزر يُعطَّل حتى ينتهي الطلب (فلا يُنشأ سؤال أو نسخة مرتين)
+const guard = fn => async function (e) {
+  const b = e?.currentTarget;
+  if (b?.dataset.busy) return;
+  if (b) { b.dataset.busy = '1'; b.disabled = true; }
+  try { await fn.call(this, e); } finally { if (b) { delete b.dataset.busy; b.disabled = false; } }
+};
+
+const fail = e => {
+  if (e?.stale) return;
+  if (e?.status === 401 && state.user) { toast('انتهت الجلسة؛ سجّل الدخول مرة أخرى', true); return signedOut(); }
+  toast(e.errors?.length ? e.errors.join('، ') : e.message, true);
+};
 
 const isReviewer = () => ['reviewer', 'admin'].includes(state.user?.role);
 
@@ -137,7 +163,7 @@ function renderUserbox() {
     box.innerHTML = `<span class="avatar" aria-hidden="true">${esc((state.user.displayName || '؟').trim().charAt(0))}</span>
       <span class="who"><b>${esc(state.user.displayName)}</b><span>${roles[state.user.role]}</span></span>
       <button type="button" id="logout" title="تسجيل الخروج">${line('logout', 17)}<span>خروج</span></button>`;
-    box.querySelector('#logout').onclick = async () => { resetStudentSession(); await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); location.hash = '#/'; route(); };
+    box.querySelector('#logout').onclick = async () => { state.user = null; await apiRaw('/logout', { method: 'POST' }).catch(() => {}); signedOut(); };
   } else {
     box.innerHTML = `<a class="btn" href="#/login">تسجيل الدخول</a>`;
   }
@@ -239,6 +265,17 @@ async function pageChapter(n) {
 
 // ---------- صفحة الهدف ----------
 const objState = { mode: 'test', answers: {} };
+
+// الخروج (أو انتهاء الجلسة): تُمسح كل حالة المستخدم السابق من الجهاز قبل عرض صفحة الدخول.
+function signedOut() {
+  resetStudentSession(); resetExam(); resetStaffState(); bankCache = null;
+  for (const k in bankFilter) delete bankFilter[k];
+  state.selection.clear();
+  Object.assign(objState, { mode: 'test', answers: {} });
+  if ($dlg.open) $dlg.close();
+  state.user = null; renderUserbox();
+  if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
+}
 
 async function pageObjective(code) {
   const data = await api('/objectives/' + encodeURIComponent(code));
@@ -461,45 +498,45 @@ function bindObjective(o, questions) {
     await reload();
     toast(`النتيجة: ${right} من ${mcq.length}`);
   };
-  $app.querySelectorAll('[data-review]').forEach(b => b.onclick = async () => {
+  $app.querySelectorAll('[data-review]').forEach(b => b.onclick = guard(async () => {
     try {
       await api(`/objectives/${o.code}/review`, { method: 'POST', body: {
         action: b.dataset.review, approved_text: document.getElementById('approved-text').value, note: document.getElementById('review-note').value } });
       toast('تم حفظ قرار المراجعة'); reload();
     } catch (e) { fail(e); }
-  });
+  }));
   const sc = document.getElementById('save-counts');
-  if (sc) sc.onclick = async () => {
+  if (sc) sc.onclick = guard(async () => {
     try {
       await api(`/objectives/${o.code}`, { method: 'PATCH', body: {
         required_mcq: Number(document.getElementById('req-mcq').value), required_essay: Number(document.getElementById('req-essay').value) } });
       toast('تم حفظ الأعداد المطلوبة'); reload();
     } catch (e) { fail(e); }
-  };
-  $app.querySelectorAll('[data-sup]').forEach(b => b.onclick = async () => {
+  });
+  $app.querySelectorAll('[data-sup]').forEach(b => b.onclick = guard(async () => {
     const action = b.dataset.sup;
-    if (action === 'edit') return editSupplement(o.code, document.getElementById('sup-text').textContent, reload);
+    if (action === 'edit') return editSupplement(o.code, s?.supplement || '', reload);
     let note = '';
     if (action === 'return') { note = prompt('سبب الإعادة للمراجعة:') || ''; if (!note.trim()) return; }
     try { await api(`/objectives/${o.code}/supplement-review`, { method: 'POST', body: { action, note } }); toast('تم الحفظ'); reload(); }
     catch (e) { fail(e); }
-  });
-  $app.querySelectorAll('[data-qstatus]').forEach(b => b.onclick = async () => {
+  }));
+  $app.querySelectorAll('[data-qstatus]').forEach(b => b.onclick = guard(async () => {
     const [id, status] = b.dataset.qstatus.split(':');
     let note = null;
     if (status === 'needs_revision') { note = prompt('ما المطلوب تعديله؟') || ''; if (!note.trim()) return; }
     try { await api(`/questions/${id}/status`, { method: 'POST', body: { status, note } }); toast('تم تحديث حالة السؤال'); reload(); }
     catch (e) { fail(e); }
-  });
-  $app.querySelectorAll('[data-qexclude]').forEach(b => b.onclick = async () => {
+  }));
+  $app.querySelectorAll('[data-qexclude]').forEach(b => b.onclick = guard(async () => {
     const [id, ex] = b.dataset.qexclude.split(':').map(Number);
     let note = '';
     if (ex) { note = prompt('سبب الاستبعاد (يُحفظ في سجل التعديلات):') || ''; if (!note.trim()) return; }
     try { await api(`/questions/${id}/exclude`, { method: 'POST', body: { excluded: !!ex, note } }); reload(); } catch (e) { fail(e); }
-  });
-  $app.querySelectorAll('[data-qdup]').forEach(b => b.onclick = async () => {
+  }));
+  $app.querySelectorAll('[data-qdup]').forEach(b => b.onclick = guard(async () => {
     try { await api(`/questions/${b.dataset.qdup}/duplicate`, { method: 'POST' }); toast('أُنشئت نسخة من السؤال'); reload(); } catch (e) { fail(e); }
-  });
+  }));
   $app.querySelectorAll('[data-qedit]').forEach(b => b.onclick = () => {
     const q = questions.find(x => x.id === Number(b.dataset.qedit));
     openEditor(q.type, q, async body => { await api(`/questions/${q.id}`, { method: 'PATCH', body }); }, reload);
@@ -525,16 +562,16 @@ function dialog(title, body, buttons) {
 }
 
 function editSupplement(code, text, done) {
-  const d = dialog('تعديل المحتوى المكمّل', `<label for="sup-edit">النص</label><textarea id="sup-edit" style="min-height:12rem">${esc(text)}</textarea>
+  const d = dialog('تعديل المحتوى المكمّل', `<label for="sup-edit">النص</label><textarea id="sup-edit" style="min-height:12rem">${escRaw(text)}</textarea>
     <label for="sup-note" style="margin-top:.6rem">ملاحظة التعديل</label><input id="sup-note">`,
   `<button type="button" class="primary" id="sup-save">حفظ (يبقى بانتظار الاعتماد)</button>`);
-  d.querySelector('#sup-save').onclick = async () => {
+  d.querySelector('#sup-save').onclick = guard(async () => {
     try {
       await api(`/objectives/${code}/supplement-review`, { method: 'POST', body: {
         action: 'reset', supplement: d.querySelector('#sup-edit').value, note: d.querySelector('#sup-note').value } });
       d.close(); toast('تم حفظ التعديل'); done();
     } catch (e) { fail(e); }
-  };
+  });
 }
 
 const LEVEL_OPTS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'];
@@ -550,34 +587,34 @@ const parsePairs = (v, k1, k2, num) => parseLines(v).map(l => {
 function openEditor(type, q, save, done) {
   q = q || { options: ['', '', ''], correctIndex: 0 };
   const common = `
-    <div class="field"><label for="e-stem">نص السؤال</label><textarea id="e-stem">${esc(q.stem)}</textarea></div>
+    <div class="field"><label for="e-stem">نص السؤال</label><textarea id="e-stem">${escRaw(q.stem)}</textarea></div>
     <div class="form-grid">
       <div class="field"><label for="e-level">مستوى التفكير</label>${sel('e-level', LEVEL_OPTS, q.thinkingLevel)}</div>
       <div class="field"><label for="e-diff">درجة الصعوبة</label>${sel('e-diff', ['سهل', 'متوسط', 'صعب'], q.difficulty)}</div>
-      <div class="field"><label for="e-kind">نوع السؤال</label><input id="e-kind" value="${esc(q.questionKind)}"></div>
-      <div class="field"><label for="e-src">المرجع</label><input id="e-src" value="${esc(q.sourceRef)}"></div>
+      <div class="field"><label for="e-kind">نوع السؤال</label><input id="e-kind" value="${escRaw(q.questionKind)}"></div>
+      <div class="field"><label for="e-src">المرجع</label><input id="e-src" value="${escRaw(q.sourceRef)}"></div>
     </div>`;
   const mcq = `${q.options.map((op, i) => `
       <div class="field"><label for="e-opt${i}">البديل ${LETTERS[i]} ${i === q.correctIndex ? '(الصحيح حاليًا)' : ''}</label>
-        <input id="e-opt${i}" value="${esc(op)}"></div>`).join('')}
+        <input id="e-opt${i}" value="${escRaw(op)}"></div>`).join('')}
     <div class="field"><label for="e-correct">الإجابة الصحيحة</label>
       <select id="e-correct">${LETTERS.map((l, i) => `<option value="${i}" ${i === q.correctIndex ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-    <div class="field"><label for="e-expl">تفسير الإجابة الصحيحة</label><textarea id="e-expl">${esc(q.explanation)}</textarea></div>
+    <div class="field"><label for="e-expl">تفسير الإجابة الصحيحة</label><textarea id="e-expl">${escRaw(q.explanation)}</textarea></div>
     <div class="field"><label for="e-dist">سبب خطأ البدائل (سطر لكل بديل بالترتيب، واترك سطر الصحيح فارغًا)</label>
-      <textarea id="e-dist">${esc((q.distractorNotes || ['', '', '']).join('\n'))}</textarea></div>`;
+      <textarea id="e-dist">${escRaw((q.distractorNotes || ['', '', '']).join('\n'))}</textarea></div>`;
   const essay = `
-    <div class="field"><label for="e-model">الإجابة النموذجية</label><textarea id="e-model" style="min-height:7rem">${esc(q.modelAnswer)}</textarea></div>
-    <div class="field"><label for="e-elems">عناصر الإجابة (سطر لكل عنصر)</label><textarea id="e-elems">${esc(lines(q.answerElements))}</textarea></div>
-    <div class="field"><label for="e-steps">خطوات الحل (سطر لكل خطوة)</label><textarea id="e-steps">${esc(lines(q.solutionSteps))}</textarea></div>
-    <div class="field"><label for="e-marks">توزيع الدرجات (العنصر | الدرجة)</label><textarea id="e-marks">${esc(pairs(q.marks, 'element', 'marks'))}</textarea></div>
-    <div class="field"><label for="e-rubric">سلم التصحيح (المستوى | الوصف)</label><textarea id="e-rubric">${esc(pairs(q.rubric, 'level', 'description'))}</textarea></div>
-    <div class="field"><label for="e-errors">الأخطاء الشائعة (سطر لكل خطأ)</label><textarea id="e-errors">${esc(lines(q.commonErrors))}</textarea></div>`;
+    <div class="field"><label for="e-model">الإجابة النموذجية</label><textarea id="e-model" style="min-height:7rem">${escRaw(q.modelAnswer)}</textarea></div>
+    <div class="field"><label for="e-elems">عناصر الإجابة (سطر لكل عنصر)</label><textarea id="e-elems">${escRaw(lines(q.answerElements))}</textarea></div>
+    <div class="field"><label for="e-steps">خطوات الحل (سطر لكل خطوة)</label><textarea id="e-steps">${escRaw(lines(q.solutionSteps))}</textarea></div>
+    <div class="field"><label for="e-marks">توزيع الدرجات (العنصر | الدرجة)</label><textarea id="e-marks">${escRaw(pairs(q.marks, 'element', 'marks'))}</textarea></div>
+    <div class="field"><label for="e-rubric">سلم التصحيح (المستوى | الوصف)</label><textarea id="e-rubric">${escRaw(pairs(q.rubric, 'level', 'description'))}</textarea></div>
+    <div class="field"><label for="e-errors">الأخطاء الشائعة (سطر لكل خطأ)</label><textarea id="e-errors">${escRaw(lines(q.commonErrors))}</textarea></div>`;
   const d = dialog(q.id ? `تعديل السؤال ${q.number}` : (type === 'mcq' ? 'سؤال اختيار جديد' : 'سؤال مقالي جديد'),
     `${q.stimulus ? '<p class="notice info">جدول البيانات المرفق بالسؤال يبقى كما هو.</p>' : ''}${common}${type === 'mcq' ? mcq : essay}
      <p class="small muted">أي تعديل على سؤال معتمد يعيده إلى «قيد المراجعة»، ويُحفظ الإصدار السابق في سجل التعديلات.</p>`,
     `<button type="button" class="primary" id="e-save">حفظ</button>`);
   const v = id => d.querySelector('#' + id).value;
-  d.querySelector('#e-save').onclick = async () => {
+  d.querySelector('#e-save').onclick = guard(async () => {
     const body = { stem: v('e-stem'), thinking_level: v('e-level') || null, difficulty: v('e-diff') || null,
       question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null };
     if (type === 'mcq') Object.assign(body, { options: [0, 1, 2].map(i => v('e-opt' + i)), correct_index: Number(v('e-correct')),
@@ -585,7 +622,7 @@ function openEditor(type, q, save, done) {
     else Object.assign(body, { model_answer: v('e-model'), answer_elements: parseLines(v('e-elems')), solution_steps: parseLines(v('e-steps')),
       marks: parsePairs(v('e-marks'), 'element', 'marks', true), rubric: parsePairs(v('e-rubric'), 'level', 'description'), common_errors: parseLines(v('e-errors')) });
     try { await save(body); d.close(); toast('تم الحفظ'); done(); } catch (e) { fail(e); }
-  };
+  });
 }
 
 async function showHistory(id) {
@@ -601,14 +638,25 @@ async function showHistory(id) {
 
 // ---------- بنك الأسئلة ----------
 const bankFilter = {};
+const BANK_CHUNK = 60;
+// التصفية في المتصفح على البنك المحفوظ (نفس قواعد الخادم): لا طلب جديد عند تغيير أي مرشح.
+function filterBank(all, f) {
+  const q = (f.q || '').trim();
+  return all.filter(x => (!f.chapter || x.chapter.number === Number(f.chapter)) && (!f.lesson || x.lesson.number === Number(f.lesson))
+    && (!f.objective || x.objectiveCode === f.objective) && (!f.type || x.type === f.type) && (!f.level || x.thinkingLevel === f.level)
+    && (!f.difficulty || x.difficulty === f.difficulty) && (!f.status || x.status === f.status)
+    && (!q || x.stem.includes(q) || (x.options || []).some(o => String(o).includes(q))));
+}
 async function pageBank() {
-  const chapters = await api('/chapters');
-  const lessons = bankFilter.chapter ? (await api('/chapters/' + bankFilter.chapter)).lessons : [];
-  const qs = new URLSearchParams(Object.entries(bankFilter).filter(([, v]) => v));
-  const res = await api('/bank?' + qs.toString());
+  const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
+  const lessons = bankFilter.chapter
+    ? [...new Map(bank.questions.filter(x => x.chapter.number === Number(bankFilter.chapter)).map(x => [x.lesson.number, x.lesson])).values()].sort((a, b) => a.number - b.number)
+    : [];
+  const res = { questions: filterBank(bank.questions, bankFilter) };
   const answers = !!state.user;
   const f = (k, label, opts) => `<div><label for="f-${k}">${label}</label><select id="f-${k}" data-f="${k}"><option value="">الكل</option>
     ${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(bankFilter[k] || '') === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
+  const countText = () => `${res.questions.length} سؤالًا ${state.selection.size ? `· المحدد للاختبار: ${state.selection.size}` : ''}`;
   $app.innerHTML = `<div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ بنك الأسئلة</div>
     <div class="hero no-print"><div class="hero-ic">${icon('bank', 52)}<div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div></div>
       <div class="actions">${isReviewer() ? (state.supabase
@@ -626,7 +674,7 @@ async function pageBank() {
         <div class="actions"><button type="button" class="primary" id="f-apply">${line('search', 17)}بحث</button><button type="button" id="f-clear">مسح</button></div>
       </div>
     </section>
-    <div class="section-title no-print"><h2>${res.questions.length} سؤالًا ${state.selection.size ? `· المحدد للاختبار: ${state.selection.size}` : ''}</h2>
+    <div class="section-title no-print"><h2 id="bank-count">${countText()}</h2>
       <div class="actions">
         <button type="button" id="sel-all">تحديد نتائج البحث</button><button type="button" id="sel-none">إلغاء التحديد</button>
         <button type="button" data-sheet="student">ورقة الطالب</button>
@@ -635,30 +683,57 @@ async function pageBank() {
       </div></div>
     <p class="small muted no-print">الورقة تُنشأ من الأسئلة المحددة، وإن لم تحدد شيئًا فمن نتائج البحث الحالية. لإنشاء ورقة هدف أو درس أو فصل اختر التصفية المناسبة.</p>
     <div id="similar-out"></div>
-    <div id="bank-list">${res.questions.length ? res.questions.map(q => bankRow(q)).join('') : '<div class="empty">لا توجد أسئلة مطابقة.</div>'}</div>`;
+    <div id="bank-list">${res.questions.length ? '' : '<div class="empty">لا توجد أسئلة مطابقة.</div>'}</div>
+    <div class="actions no-print bank-more" id="bank-more-wrap" hidden><button type="button" id="bank-more"></button></div>`;
+  // العرض على دفعات: أول 60 بطاقة، ثم المزيد عند الاقتراب من نهاية القائمة (رسم 2580 بطاقة دفعة واحدة كان يستغرق ثوانٍ طويلة على الآيباد)
+  const list = document.getElementById('bank-list'), moreWrap = document.getElementById('bank-more-wrap'), moreBtn = document.getElementById('bank-more');
+  let shown = 0, io = null;
+  const renderMore = () => {
+    const next = res.questions.slice(shown, shown + BANK_CHUNK);
+    list.insertAdjacentHTML('beforeend', next.map(q => bankRow(q)).join(''));
+    shown += next.length;
+    const left = res.questions.length - shown;
+    moreWrap.hidden = left <= 0;
+    moreBtn.textContent = `عرض المزيد (${left} متبقيًا)`;
+    if (left <= 0 && io) { io.disconnect(); io = null; }
+  };
+  renderMore();
+  moreBtn.onclick = renderMore;
+  if ('IntersectionObserver' in window && shown < res.questions.length) {
+    io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) renderMore(); }, { rootMargin: '600px' });
+    io.observe(moreWrap);
+  }
+  const rerender = () => pageBank().catch(fail);
   $app.querySelectorAll('[data-f]').forEach(s => s.onchange = () => {
-    bankFilter[s.dataset.f] = s.value; if (s.dataset.f === 'chapter') delete bankFilter.lesson; pageBank().catch(fail);
+    bankFilter[s.dataset.f] = s.value; if (s.dataset.f === 'chapter') delete bankFilter.lesson; rerender();
   });
-  document.getElementById('f-apply').onclick = () => { bankFilter.q = document.getElementById('f-q').value.trim(); pageBank().catch(fail); };
+  document.getElementById('f-apply').onclick = () => { bankFilter.q = document.getElementById('f-q').value.trim(); rerender(); };
   document.getElementById('f-q').onkeydown = e => { if (e.key === 'Enter') document.getElementById('f-apply').click(); };
-  document.getElementById('f-clear').onclick = () => { for (const k in bankFilter) delete bankFilter[k]; pageBank().catch(fail); };
+  document.getElementById('f-clear').onclick = () => { for (const k in bankFilter) delete bankFilter[k]; rerender(); };
   $app.querySelectorAll('[data-export]').forEach(b => b.onclick = async () => {
     b.disabled = true;
     try { await supa.exportCsv(b.dataset.export); } catch (e) { fail(e); } finally { b.disabled = false; }
   });
-  document.getElementById('sel-all').onclick = () => { res.questions.forEach(q => state.selection.add(q.id)); pageBank().catch(fail); };
-  document.getElementById('sel-none').onclick = () => { state.selection.clear(); pageBank().catch(fail); };
-  $app.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => {
-    const id = Number(c.dataset.pick); c.checked ? state.selection.add(id) : state.selection.delete(id);
-  });
+  // التحديد دون إعادة بناء الصفحة
+  const syncCount = () => { document.getElementById('bank-count').textContent = countText(); };
+  document.getElementById('sel-all').onclick = () => {
+    res.questions.forEach(q => state.selection.add(q.id));
+    list.querySelectorAll('[data-pick]').forEach(c => { c.checked = true; }); syncCount();
+  };
+  document.getElementById('sel-none').onclick = () => {
+    state.selection.clear(); list.querySelectorAll('[data-pick]').forEach(c => { c.checked = false; }); syncCount();
+  };
+  list.onchange = e => {
+    const c = e.target.closest('[data-pick]'); if (!c) return;
+    const id = Number(c.dataset.pick); c.checked ? state.selection.add(id) : state.selection.delete(id); syncCount();
+  };
   $app.querySelectorAll('[data-sheet]').forEach(b => b.onclick = () => buildSheet(b.dataset.sheet, res.questions));
-  document.getElementById('similar').onclick = async () => {
-    try {
-      const r = await api('/bank?' + new URLSearchParams({ ...Object.fromEntries(qs), similar: '1' }).toString());
-      document.getElementById('similar-out').innerHTML = `<div class="notice ${r.similar.length ? '' : 'ok'}">${r.similar.length
-        ? 'أزواج متشابهة للمراجعة: ' + r.similar.map(p => `#${p.a} و#${p.b} (${p.score}%)`).join('، ')
-        : 'لا توجد أسئلة متشابهة بدرجة مرتفعة ضمن النتائج.'}</div>`;
-    } catch (e) { fail(e); }
+  document.getElementById('similar').onclick = () => {
+    if (res.questions.length > 900) return fail(new Error('اختر فصلًا أو درسًا أولًا: اكتشاف المتشابهة يعمل على 900 سؤال كحد أقصى'));
+    const pairs = similarPairs(res.questions);
+    document.getElementById('similar-out').innerHTML = `<div class="notice ${pairs.length ? '' : 'ok'}">${pairs.length
+      ? 'أزواج متشابهة للمراجعة: ' + pairs.map(p => `#${p.a} و#${p.b} (${p.score}%)`).join('، ')
+      : 'لا توجد أسئلة متشابهة بدرجة مرتفعة ضمن النتائج.'}</div>`;
   };
 }
 
@@ -666,7 +741,7 @@ function bankRow(q) {
   return `<article class="q" id="q-${q.id}">
     <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)"><input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>
       <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span></label>${qMeta(q)}</div>
-    <div class="small muted">الفصل ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${q.objectiveCode}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
+    <div class="small muted">الفصل ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
     ${q.type === 'mcq' ? `<ol class="opts">${q.options.map((o, i) => `<li class="opt ${state.user && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>` : ''}
   </article>`;
@@ -776,12 +851,14 @@ function pagePending() {
     <p class="muted">مرحبًا ${esc(state.user.displayName)}. سيظهر لك المحتوى بعد أن يحدد المشرف صلاحيتك.</p>
     <button type="button" class="primary" id="p-out">تسجيل الخروج</button>
   </div></div>`;
-  document.getElementById('p-out').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); state.user = null; renderUserbox(); route(); };
+  document.getElementById('p-out').onclick = async () => { state.user = null; await apiRaw('/logout', { method: 'POST' }).catch(() => {}); signedOut(); };
 }
 
 // ---------- الموجّه ----------
 async function route() {
   const seq = ++routeSeq;
+  // نافذة تحرير مفتوحة لا تبقى بعد الانتقال (مثل السحب للرجوع على الآيباد)
+  if ($dlg.open) $dlg.close();
   const hash = location.hash.replace(/^#/, '') || '/';
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
@@ -803,7 +880,10 @@ async function route() {
       if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
       else if (page === 'history') await pageStudentHistory(ctx);
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
-    } catch (e) { if (!e?.stale && seq === routeSeq) $app.innerHTML = `<div class="notice bad">${esc(e.message)}</div>`; }
+    } catch (e) {
+      if (e?.status === 401) return fail(e);
+      if (!e?.stale && seq === routeSeq) $app.innerHTML = `<div class="notice bad">${esc(e.message)}</div>`;
+    }
     window.scrollTo(0, 0);
     return;
   }
@@ -821,11 +901,17 @@ async function route() {
     else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
   } catch (e) {
     if (e?.stale || seq !== routeSeq) return;
+    if (e?.status === 401 && state.user) return fail(e);
     $app.innerHTML = `<div class="notice bad">${esc(e.message)}</div>`;
   }
   window.scrollTo(0, 0);
 }
 
 window.addEventListener('hashchange', route);
+// رابط إلى الصفحة الحالية نفسها (مثل «بنك الأسئلة» من ورقة الأسئلة) لا يطلق hashchange؛ يُعاد عرض الصفحة
+document.addEventListener('click', e => {
+  const a = e.target.closest?.('a[href^="#/"]');
+  if (a && a.getAttribute('href') === (location.hash || '#/') && !e.defaultPrevented) { e.preventDefault(); route(); }
+});
 window.addEventListener('afterprint', () => document.body.classList.remove('print-student', 'print-teacher'));
 api('/me').then(r => { state.user = r.user; renderUserbox(); route(); }).catch(() => { renderUserbox(); route(); });

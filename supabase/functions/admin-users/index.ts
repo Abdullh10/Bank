@@ -35,6 +35,7 @@ export async function handle(body, jwt, deps) {
     if (list.length > 100) return { status: 400, body: { error: 'الحد الأقصى 100 طالب في المرة الواحدة' } };
     const results = [];
     for (const s of list) {
+      if (!s || typeof s !== 'object') { results.push({ name: '', ok: false, error: 'سطر غير صالح' }); continue; }
       const name = String(s.name || '').trim();
       const section = String(s.section || '').trim();
       const grade = String(s.grade || '').trim();
@@ -52,7 +53,11 @@ export async function handle(body, jwt, deps) {
       }
       if (!created) { results.push({ name, ok: false, error: lastErr }); continue; }
       const init = await deps.initStudent(jwt, created.id, { name, section, grade });
-      if (init?.error) { results.push({ name, ok: false, error: 'أُنشئ الحساب ولم يُضبط ملفه: ' + init.error }); continue; }
+      if (init?.error) {
+        // لا يبقى حساب معلّق بكلمة مرور معروفة: يُحذف الحساب الذي لم يكتمل ضبطه
+        await deps.deleteUser(created.id);
+        results.push({ name, ok: false, error: 'تعذر ضبط ملف الطالب فأُلغي الحساب: ' + init.error }); continue;
+      }
       results.push({ name, grade, section, username: created.username, password, ok: true });
     }
     return { status: 200, body: { results } };

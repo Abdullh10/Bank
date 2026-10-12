@@ -112,6 +112,9 @@ function pick(pool, count, rand) {
 
 const state = { header: loadHeader(), opts: null, exam: null };
 
+// يُستدعى عند الخروج: لا يبقى اختبار المستخدم السابق (ومفتاحه) على الجهاز
+export const resetExam = () => { state.exam = null; state.opts = null; };
+
 export async function pageExam(ctx) {
   const { api, esc, fail, toast, $app } = ctx;
   const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
@@ -345,6 +348,7 @@ export async function pageExam(ctx) {
     const ex = state.exam, m0 = ex.models[0];
     const used = new Set([...m0.mcq.map(x => x.q.id), ...m0.essay.map(q => q.id)]);
     const cur = all.find(q => q.id === Number(id));
+    if (!cur) { toast('هذا السؤال لم يعد في البنك؛ أعد إنشاء الاختبار', true); return; }
     const rand = rng(Date.now() % 1e9);
     const cands = poolFor(type).filter(q => !used.has(q.id) && q.chapter.number === cur.chapter.number);
     const alt = shuffle(cands.length ? cands : poolFor(type).filter(q => !used.has(q.id)), rand)[0];

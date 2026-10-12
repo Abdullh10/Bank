@@ -43,23 +43,28 @@ function loadXlsx() {
   return xlsxLoading;
 }
 
+// الترتيب مهم: «اسم المستخدم» يُفحص قبل «الاسم» حتى لا يُعدّ عمود المستخدم عمود الاسم.
 const COLS = [
-  ['name', /اسم الطالب|^الاسم|^اسم$|name/i],
-  ['grade', /الصف|grade/i],
-  ['section', /الشعبة|^الفصل|section|class/i],
-  ['username', /اسم المستخدم|المستخدم|user/i],
-  ['password', /كلمة المرور|password/i],
+  ['username', /اسم المستخدم|المستخدم|^user\s*name$|^username$|^user$|^login$/i],
+  ['password', /كلمة المرور|^password$/i],
+  ['name', /اسم الطالب|^الاسم|^اسم$|^name$|^student\s*name$|^full\s*name$/i],
+  ['grade', /الصف|^grade$/i],
+  ['section', /الشعبة|^الفصل|^section$|^class$/i],
 ];
+const OUT_COLS = ['name', 'grade', 'section', 'username', 'password'];
 // يحوّل صفوف الجدول إلى طلاب: يتعرف على الأعمدة من عناوينها، وإلا يفترض الترتيب: الاسم، الصف، الشعبة، اسم المستخدم، كلمة المرور.
 export function rowsToStudents(rows) {
   rows = rows.map(r => r.map(c => String(c ?? '').trim())).filter(r => r.some(Boolean));
   if (!rows.length) return [];
-  const head = rows[0];
-  const map = {};
-  head.forEach((h, i) => { const hit = COLS.find(([k, re]) => !(k in map) && re.test(h)); if (hit) map[hit[0]] = i; });
-  const hasHeader = 'name' in map;
-  const idx = hasHeader ? map : { name: 0, grade: 1, section: 2, username: 3, password: 4 };
-  return (hasHeader ? rows.slice(1) : rows).map(r => Object.fromEntries(COLS.map(([k]) => [k, idx[k] != null ? r[idx[k]] || '' : ''])))
+  // صف العناوين قد يسبقه عنوان للملف: يُبحث عنه في أول 5 صفوف
+  let headAt = -1, map = {};
+  for (let h = 0; h < Math.min(5, rows.length) && headAt < 0; h++) {
+    const m = {};
+    rows[h].forEach((cell, i) => { const hit = COLS.find(([k, re]) => !(k in m) && re.test(cell)); if (hit) m[hit[0]] = i; });
+    if ('name' in m) { headAt = h; map = m; }
+  }
+  const idx = headAt >= 0 ? map : { name: 0, grade: 1, section: 2, username: 3, password: 4 };
+  return rows.slice(headAt + 1).map(r => Object.fromEntries(OUT_COLS.map(k => [k, idx[k] != null ? r[idx[k]] || '' : ''])))
     .filter(s => s.name);
 }
 function parseCsv(text) {
@@ -70,8 +75,8 @@ function parseCsv(text) {
     if (q) { if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (ch === '"') q = false; else cell += ch; }
     else if (ch === '"') q = true;
     else if (ch === ',' || ch === ';' || ch === '\t') { row.push(cell); cell = ''; }
-    else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
-    else if (ch !== '\r') cell += ch;
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
   }
   row.push(cell); rows.push(row);
   return rows;
@@ -80,7 +85,7 @@ async function readStudentFile(file) {
   if (/\.csv$/i.test(file.name)) return rowsToStudents(parseCsv(await file.text()));
   const XLSX = await loadXlsx();
   const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-  return rowsToStudents(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' }));
+  return rowsToStudents(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false }));
 }
 async function downloadXlsx(name, header, rows) {
   try {
@@ -92,7 +97,8 @@ async function downloadXlsx(name, header, rows) {
     XLSX.writeFile(wb, name + '.xlsx');
   } catch {
     // بديل دون المكتبة: CSV يفتحه Excel مباشرة
-    const cell = v => { const t = String(v ?? ''); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+    // خلية تبدأ بـ = + - @ تُسبق بفاصلة عليا حتى لا ينفذها Excel كمعادلة
+    const cell = v => { let t = String(v ?? ''); if (/^[=+\-@]/.test(t)) t = "'" + t; return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
     const blob = new Blob(['﻿' + [header, ...rows].map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: name + '.csv' });
     document.body.append(a); a.click(); a.remove();
@@ -109,12 +115,15 @@ export function parseStudentLines(text) {
 }
 
 const adminFilter = { grade: '', section: '', q: '' };
+export const resetStaffState = () => Object.assign(adminFilter, { grade: '', section: '', q: '' });
 
 export async function pageAdminStudents(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const all = await api('/admin/students');
   const grades = [...new Set(all.map(s => s.grade).filter(Boolean))].sort();
+  if (adminFilter.grade && !grades.includes(adminFilter.grade)) adminFilter.grade = '';
   const sections = [...new Set(all.filter(s => !adminFilter.grade || s.grade === adminFilter.grade).map(s => s.section).filter(Boolean))].sort();
+  if (adminFilter.section && !sections.includes(adminFilter.section)) adminFilter.section = '';
   const list = all.filter(s => (!adminFilter.grade || s.grade === adminFilter.grade) && (!adminFilter.section || s.section === adminFilter.section)
     && (!adminFilter.q || (s.name + ' ' + s.username).includes(adminFilter.q)));
   let pending = [];
@@ -228,22 +237,24 @@ export async function pageAdminStudents(ctx) {
   if (allBox) {
     allBox.onchange = () => { picks.forEach(c => { c.checked = allBox.checked; }); syncBulk(); };
     document.getElementById('as-del-many').onclick = async e => {
+      const btn = e.currentTarget;
       const ids = picks.filter(c => c.checked).map(c => c.closest('tr').dataset.id);
       if (!ids.length) return;
       if (!confirm(`حذف ${ids.length} حسابًا نهائيًا مع سجل تدريبهم؟ لا يمكن التراجع.`)) return;
       if (ids.length >= 10 && prompt(`للتأكيد اكتب العدد: ${ids.length}`) !== String(ids.length)) return toast('أُلغي الحذف', true);
-      e.currentTarget.disabled = true;
+      btn.disabled = true;
       try {
         const r = await api('/admin/students/delete-many', { method: 'POST', body: { userIds: ids } });
         toast(`حُذف ${r.deleted} حسابًا` + (r.failed?.length ? `، وتعذر ${r.failed.length}` : ''), !!r.failed?.length);
         refilter();
-      } catch (err) { fail(err); e.currentTarget.disabled = false; }
+      } catch (err) { fail(err); btn.disabled = false; }
     };
   }
 
   $app.querySelectorAll('tr[data-id]').forEach(tr => {
     const id = tr.dataset.id;
-    tr.querySelector('.as-save').onclick = async () => {
+    tr.querySelector('.as-save').onclick = async e => {
+      const btn = e.currentTarget; if (btn.disabled) return; btn.disabled = true;
       try {
         await api('/admin/students/update', { method: 'POST', body: { id, name: tr.querySelector('.as-name').value,
           grade: tr.querySelector('.as-grade').value, section: tr.querySelector('.as-sec').value, role: tr.querySelector('.as-role').value } });
@@ -253,7 +264,7 @@ export async function pageAdminStudents(ctx) {
           tr.dataset.user = r.username; tr.querySelector('.as-user').value = r.username;
         }
         toast('تم الحفظ');
-      } catch (err) { fail(err); }
+      } catch (err) { fail(err); } finally { btn.disabled = false; }
     };
     tr.querySelector('.as-reset').onclick = async () => {
       const pw = prompt('اكتب كلمة المرور الجديدة (8 أحرف على الأقل)، أو اتركها فارغة لتوليدها تلقائيًا:', '');
@@ -273,7 +284,7 @@ export async function pageAdminStudents(ctx) {
 // بطاقات دخول للطباعة: اسم الطالب واسم المستخدم وكلمة المرور ورابط الموقع.
 function printCards(rows, esc) {
   const w = window.open('', '_blank');
-  if (!w) return;
+  if (!w) { alert('تعذر فتح نافذة الطباعة: اسمح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة، أو حمّل ملف Excel.'); return; }
   const url = SITE_URL;
   w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>بطاقات دخول الطلاب</title>
     <style>body{font-family:system-ui,sans-serif;margin:12mm}.g{display:grid;grid-template-columns:1fr 1fr;gap:6mm}

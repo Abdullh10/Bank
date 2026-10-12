@@ -17,6 +17,9 @@ create table if not exists public.profiles (
 
 alter table public.profiles add column if not exists section text;
 alter table public.profiles add column if not exists grade text;
+-- حساب طالب أنشأه المشرف (لا حساب سجّل نفسه): وحده يظهر في «حسابات الطلاب» ويمكن إدارته
+alter table public.profiles add column if not exists managed boolean not null default false;
+update public.profiles set managed = true where role = 'student' and not managed;
 alter table public.profiles add column if not exists profile_confirmed boolean not null default false;
 alter table public.profiles alter column role set default 'pending';
 alter table public.profiles drop constraint if exists profiles_role_check;
@@ -24,7 +27,7 @@ alter table public.profiles add constraint profiles_role_check check (role in ('
 
 -- كل مستخدم جديد في Authentication يحصل على ملف بدور «بانتظار التفعيل».
 create or replace function public.handle_new_user() returns trigger
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   insert into public.profiles (user_id, email, display_name)
   values (new.id, new.email, coalesce(new.raw_user_meta_data->>'display_name', split_part(new.email, '@', 1)))
@@ -36,15 +39,15 @@ create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
 
 create or replace function public.my_role() returns text
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select role from public.profiles where user_id = auth.uid()
 $$;
 create or replace function public.is_reviewer() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select coalesce((select role in ('reviewer', 'admin') from public.profiles where user_id = auth.uid()), false)
 $$;
 create or replace function public.is_member() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select exists (select 1 from public.profiles where user_id = auth.uid() and role in ('viewer', 'reviewer', 'admin'))
 $$;
 
@@ -215,21 +218,21 @@ grant select on public.question_answers, public.revisions, public.profiles to au
 
 -- ---------- دوال مساعدة ----------
 create or replace function public._log(p_entity text, p_id bigint, p_action text, p_before jsonb, p_after jsonb, p_note text)
-returns void language sql security definer set search_path = public as $$
+returns void language sql security definer set search_path = public, pg_temp as $$
   insert into public.revisions (entity, entity_id, action, before_json, after_json, note, user_id, user_name)
   values (p_entity, p_id, p_action, p_before, p_after, nullif(trim(coalesce(p_note, '')), ''), auth.uid(),
           (select display_name from public.profiles where user_id = auth.uid()));
 $$;
 
 create or replace function public._require_reviewer() returns void
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
   if not public.is_reviewer() then raise exception 'لا تملك صلاحية تنفيذ هذا الإجراء' using errcode = '42501'; end if;
 end $$;
 
 create or replace function public._require_member() returns void
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
   if not public.is_member() then raise exception 'حسابك بانتظار التفعيل من المشرف' using errcode = '42501'; end if;
@@ -237,7 +240,7 @@ end $$;
 
 -- ---------- التدريب الفوري: تصحيح إجابة دون كشف بقية الإجابات ----------
 create or replace function public.check_answer(p_question bigint, p_choice int) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare r record;
 begin
   perform public._require_member();
@@ -252,7 +255,7 @@ end $$;
 
 -- ---------- الأهداف ----------
 create or replace function public.review_objective(p_code text, p_action text, p_approved_text text default null, p_note text default null)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; v_status text; v_text text;
 begin
   perform public._require_reviewer();
@@ -272,7 +275,7 @@ begin
 end $$;
 
 create or replace function public.patch_objective(p_code text, p jsonb)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; v_text text;
 begin
   perform public._require_reviewer();
@@ -297,7 +300,7 @@ begin
 end $$;
 
 create or replace function public.review_supplement(p_code text, p_action text, p_supplement text default null, p_note text default null)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; s public.supplements; v_status text; v_text text;
 begin
   perform public._require_reviewer();
@@ -335,13 +338,13 @@ begin
 end $$;
 
 create or replace function public._question_json(p_id bigint) returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select to_jsonb(q) || coalesce(to_jsonb(a) - 'question_id', '{}'::jsonb)
   from public.questions q left join public.question_answers a on a.question_id = q.id where q.id = p_id
 $$;
 
 create or replace function public.update_question(p_id bigint, p jsonb, p_auto_check jsonb default null)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions; v_before jsonb;
 begin
   perform public._require_reviewer();
@@ -373,7 +376,7 @@ begin
 end $$;
 
 create or replace function public.create_question(p_code text, p_type text, p jsonb, p_auto_check jsonb default null)
-returns bigint language plpgsql security definer set search_path = public as $$
+returns bigint language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; v_id bigint; v_num int;
 begin
   perform public._require_reviewer();
@@ -394,7 +397,7 @@ begin
 end $$;
 
 create or replace function public.set_question_status(p_id bigint, p_status text, p_note text default null)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions; a public.question_answers;
 begin
   perform public._require_reviewer();
@@ -412,7 +415,7 @@ begin
 end $$;
 
 create or replace function public.exclude_question(p_id bigint, p_excluded boolean, p_note text default null)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions;
 begin
   perform public._require_reviewer();
@@ -425,7 +428,7 @@ begin
 end $$;
 
 create or replace function public.duplicate_question(p_id bigint, p_auto_check jsonb default null)
-returns bigint language plpgsql security definer set search_path = public as $$
+returns bigint language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions; v_id bigint; v_num int;
 begin
   perform public._require_reviewer();
@@ -444,7 +447,7 @@ end $$;
 
 -- ---------- المؤشرات (تُحسب من البيانات الفعلية) ----------
 create or replace function public._stats_data() returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   with o as (select * from public.objectives),
   q as (select * from public.questions where not excluded),
   cov as (
@@ -513,7 +516,7 @@ language sql stable as $$
 $$;
 
 create or replace function public._chapters_data() returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select coalesce(jsonb_agg(to_jsonb(c) || jsonb_build_object(
     'lessons', (select count(*) from lessons l where l.chapter_id = c.id),
     'objectives', (select count(*) from objectives o join lessons l on l.id = o.lesson_id where l.chapter_id = c.id),
@@ -525,7 +528,7 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 create or replace function public.get_chapter(p_number int) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare c public.chapters;
 begin
   perform public._require_member();
@@ -539,7 +542,7 @@ begin
 end $$;
 
 create or replace function public.get_objective(p_code text) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare o public.objectives; l public.lessons; c public.chapters; s public.supplements; v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
 begin
   perform public._require_member();
@@ -562,7 +565,7 @@ end $$;
 
 -- بنك الأسئلة مع التصفية؛ الفلاتر اختيارية: chapter, lesson, objective, type, level, difficulty, status, q, excluded
 create or replace function public.get_bank(f jsonb default '{}') returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
 begin
   perform public._require_member();
@@ -585,14 +588,14 @@ begin
 end $$;
 
 create or replace function public.get_question(p_id bigint) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_reviewer();
   return (select public._q_public(q, a, true) from questions q left join question_answers a on a.question_id = q.id where q.id = p_id);
 end $$;
 
 create or replace function public.get_revisions(p_limit int default 100, p_question bigint default null) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_reviewer();
   return (select coalesce(jsonb_agg(jsonb_build_object('id', r.id, 'entity', r.entity, 'entity_id', r.entity_id, 'action', r.action,
@@ -602,9 +605,9 @@ begin
 end $$;
 
 create or replace function public.get_me() returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select case when auth.uid() is null then null else
-    (select jsonb_build_object('id', user_id, 'username', split_part(email, '@', 1), 'displayName', display_name, 'role', role,
+    (select jsonb_build_object('id', user_id, 'username', split_part(coalesce((select u.email from auth.users u where u.id = profiles.user_id), email), '@', 1), 'displayName', display_name, 'role', role,
        'section', section, 'grade', grade, 'profileConfirmed', profile_confirmed) from profiles where user_id = auth.uid()) end
 $$;
 
@@ -613,7 +616,7 @@ grant execute on function public.get_question(bigint), public.get_revisions(int,
 
 -- حفظ نتيجة التحقق الآلي فقط (بعد الإنشاء أو النسخ)؛ لا يغير محتوى السؤال ولا حالته.
 create or replace function public.set_auto_check(p_id bigint, p_auto_check jsonb) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_reviewer();
   if jsonb_typeof(p_auto_check->'passed') is distinct from 'boolean' then raise exception 'نتيجة تحقق غير صالحة'; end if;
@@ -625,14 +628,14 @@ grant execute on function public.set_auto_check(bigint, jsonb) to authenticated;
 -- إغلاق المنصة: المحتوى للحسابات المفعّلة فقط.
 -- =====================================================================
 create or replace function public.get_stats() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
   return public._stats_data();
 end $$;
 
 create or replace function public.get_chapters() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
   return public._chapters_data();
@@ -653,11 +656,11 @@ revoke execute on function public._stats_data(), public._chapters_data(), public
 -- ويرى السؤال دون إجابته حتى يجيب، سؤالًا سؤالًا، داخل جلسة تدريب مسجلة باسمه.
 -- =====================================================================
 create or replace function public.is_student() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select coalesce((select role = 'student' from public.profiles where user_id = auth.uid()), false)
 $$;
 create or replace function public._require_student() returns void
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
   if not public.is_student() then raise exception 'هذه الصفحة لحسابات الطلاب' using errcode = '42501'; end if;
@@ -694,20 +697,21 @@ revoke all on public.practice_sessions, public.practice_answers from anon, authe
 
 -- الطالب يؤكد اسمه وشعبته مرة واحدة عند أول دخول؛ بعدها يعدّلهما المشرف فقط.
 create or replace function public.student_confirm_profile(p_name text, p_section text) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 declare pr public.profiles;
 begin
   perform public._require_student();
   select * into pr from public.profiles where user_id = auth.uid();
   if pr.profile_confirmed then raise exception 'البيانات مثبتة؛ تواصل مع المشرف لتعديلها'; end if;
   if length(trim(coalesce(p_name, ''))) < 3 then raise exception 'اكتب اسمك كاملًا'; end if;
-  if length(trim(coalesce(p_section, ''))) < 1 then raise exception 'اكتب الشعبة'; end if;
-  update public.profiles set display_name = trim(p_name), section = trim(p_section), profile_confirmed = true where user_id = auth.uid();
+  if pr.section is null and length(trim(coalesce(p_section, ''))) < 1 then raise exception 'اكتب الشعبة'; end if;
+  -- الشعبة التي حددها المشرف تبقى كما هي؛ يكتبها الطالب فقط إن لم تُحدد
+  update public.profiles set display_name = trim(p_name), section = coalesce(section, trim(p_section)), profile_confirmed = true where user_id = auth.uid();
 end $$;
 
 -- الدروس المتاحة للتدريب مع عدد أسئلة الاختيار المعتمدة في كل مجموعة مستوى.
 create or replace function public.student_catalog() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_student();
   return (select coalesce(jsonb_agg(jsonb_build_object('number', c.number, 'title', c.title, 'lessons',
@@ -724,7 +728,7 @@ end $$;
 
 -- السؤال كما يراه الطالب: دون الإجابة ولا التفسير ولا أي بيانات مراجعة.
 create or replace function public._student_q(q public.questions) returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select jsonb_build_object('id', q.id, 'stem', q.stem, 'stimulus', q.stimulus, 'options', q.options,
     'group', public._level_group(q.thinking_level), 'difficulty', q.difficulty,
     'lesson', (select l.title from objectives o join lessons l on l.id = o.lesson_id where o.id = q.objective_id))
@@ -732,32 +736,41 @@ $$;
 
 -- بدء جلسة: p = {lessons:[id], count, levels:'graded'|'basic'|'apply'|'higher', timed:bool, retry:session_id}
 create or replace function public.student_start(p jsonb) returns jsonb
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 declare v_count int; v_levels text; v_ids bigint[] := '{}'; v_lessons bigint[]; v_retry bigint; v_limit int; v_sid bigint; v_today int;
+  v_wrong bigint[]; v_alts bigint[] := '{}'; v_alt bigint; w record; v_timed boolean := coalesce((p->>'timed')::boolean, false);
+  v_basic int; v_apply int; v_higher int;
 begin
   perform public._require_student();
+  -- قفل لكل طالب حتى لا تتجاوز الطلبات المتزامنة الحد اليومي
+  perform pg_advisory_xact_lock(hashtext('practice:' || auth.uid()::text));
   select count(*) into v_today from practice_sessions where user_id = auth.uid() and created_at > now() - interval '1 day';
   if v_today >= 40 then raise exception 'وصلت إلى الحد اليومي للتدريب (40 جلسة)؛ عد غدًا'; end if;
   v_retry := nullif(p->>'retry', '')::bigint;
   if v_retry is not null then
-    -- «أعد الأخطاء»: سؤال آخر من الهدف نفسه لكل خطأ، ثم الأسئلة الأصلية نفسها في آخر الجلسة (بعد فاصل).
+    -- «أعد الأخطاء»: سؤال آخر من الهدف نفسه لكل خطأ (دون تكرار)، ثم الأسئلة الأصلية نفسها في آخر الجلسة.
     if not exists (select 1 from practice_sessions where id = v_retry and user_id = auth.uid()) then raise exception 'الجلسة غير موجودة'; end if;
-    with wrong as (
-      select a.question_id, q.objective_id from practice_answers a join questions q on q.id = a.question_id
-      where a.session_id = v_retry and not a.correct),
-    sib as (
-      select distinct on (w.question_id) w.question_id orig, q2.id alt
-      from wrong w join questions q2 on q2.objective_id = w.objective_id and q2.id <> w.question_id
-        and q2.type = 'mcq' and q2.status = 'approved' and not q2.excluded
-      order by w.question_id, random())
-    select coalesce(array_agg(alt order by random()), '{}') || coalesce((select array_agg(question_id order by random()) from wrong), '{}')
-      into v_ids from sib;
-    if coalesce(array_length(v_ids, 1), 0) = 0 then raise exception 'لا توجد أخطاء في هذه الجلسة'; end if;
+    select coalesce(array_agg(a.question_id order by random()), '{}') into v_wrong
+      from practice_answers a join questions q on q.id = a.question_id
+      where a.session_id = v_retry and not a.correct and q.status = 'approved' and not q.excluded;
+    if cardinality(v_wrong) = 0 then raise exception 'لا توجد أخطاء في هذه الجلسة'; end if;
+    for w in select q.id, q.objective_id from questions q where q.id = any(v_wrong) loop
+      select q2.id into v_alt from questions q2
+        where q2.objective_id = w.objective_id and q2.type = 'mcq' and q2.status = 'approved' and not q2.excluded
+          and not (q2.id = any(v_wrong)) and not (q2.id = any(v_alts))
+        order by random() limit 1;
+      if v_alt is not null then v_alts := v_alts || v_alt; end if;
+      v_alt := null;
+    end loop;
+    v_ids := v_alts || v_wrong;
   else
     v_count := least(greatest(coalesce((p->>'count')::int, 10), 3), 30);
     v_levels := coalesce(p->>'levels', 'graded');
-    select array_agg(x::bigint) into v_lessons from jsonb_array_elements_text(coalesce(p->'lessons', '[]')) x;
+    if v_levels not in ('graded', 'basic', 'apply', 'higher') then v_levels := 'graded'; end if;
+    select array_agg(distinct x::bigint) into v_lessons from jsonb_array_elements_text(coalesce(p->'lessons', '[]')) x;
     if coalesce(array_length(v_lessons, 1), 0) = 0 then raise exception 'اختر درسًا واحدًا على الأقل'; end if;
+    -- متدرّج: 40% تطبيق و20% تفكير عليا (مقربة للأسفل) والباقي أساسي، ويُكمل النقص من بقية المجموعات
+    v_apply := floor(v_count * .4); v_higher := floor(v_count * .2); v_basic := v_count - v_apply - v_higher;
     with pool as (
       select q.id, public._level_group(q.thinking_level) g,
         case q.difficulty when 'سهل' then 1 when 'متوسط' then 2 else 3 end d, random() r
@@ -765,9 +778,8 @@ begin
       where o.lesson_id = any(v_lessons) and q.type = 'mcq' and q.status = 'approved' and not q.excluded
         and (v_levels = 'graded' or public._level_group(q.thinking_level) = v_levels)),
     ranked as (select *, row_number() over (partition by g order by r) rn from pool),
-    -- متدرّج: نحو 40% أساسي و40% تطبيق و20% تفكير عليا، ويُكمل النقص من بقية المجموعات
     quota as (select * from ranked where v_levels <> 'graded'
-              or (g = 'basic' and rn <= ceil(v_count * .4)) or (g = 'apply' and rn <= ceil(v_count * .4)) or (g = 'higher' and rn <= ceil(v_count * .2))),
+              or (g = 'basic' and rn <= v_basic) or (g = 'apply' and rn <= v_apply) or (g = 'higher' and rn <= v_higher)),
     picked as (
       (select id, d, r, 0 pri from quota order by r limit v_count)
       union all
@@ -777,18 +789,20 @@ begin
     select coalesce(array_agg(id order by d, r), '{}') into v_ids from final;
     if coalesce(array_length(v_ids, 1), 0) = 0 then raise exception 'لا توجد أسئلة بهذه الاختيارات؛ غيّر الدروس أو المستوى'; end if;
   end if;
-  if coalesce((p->>'timed')::boolean, false) then
+  if v_timed then
     select sum(case when public._level_group(thinking_level) = 'basic' then 60 else 105 end) into v_limit from questions where id = any(v_ids);
   end if;
+  -- تُخزن الإعدادات المعروفة فقط (لا يُحفظ جسم الطلب كما هو)
   insert into practice_sessions (user_id, settings, question_ids, time_limit_sec, total)
-  values (auth.uid(), p, v_ids, v_limit, array_length(v_ids, 1)) returning id into v_sid;
+  values (auth.uid(), jsonb_build_object('lessons', to_jsonb(v_lessons), 'count', v_count, 'levels', v_levels, 'timed', v_timed, 'retry', v_retry),
+    v_ids, v_limit, cardinality(v_ids)) returning id into v_sid;
   return jsonb_build_object('id', v_sid, 'timeLimit', v_limit, 'retry', v_retry is not null,
     'questions', (select jsonb_agg(public._student_q(q) order by array_position(v_ids, q.id)) from questions q where q.id = any(v_ids)));
 end $$;
 
 -- الإجابة على سؤال واحد: تُسجل مرة واحدة، وتُرجع التصحيح والتفسير لهذا السؤال فقط.
 create or replace function public.student_answer(p_session bigint, p_question bigint, p_choice int) returns jsonb
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 declare s public.practice_sessions; a public.question_answers; v_ok boolean;
 begin
   perform public._require_student();
@@ -798,6 +812,11 @@ begin
   if not (p_question = any(s.question_ids)) then raise exception 'السؤال ليس من هذه الجلسة'; end if;
   if p_choice is null or p_choice not between 0 and 2 then raise exception 'اختيار غير صالح'; end if;
   if exists (select 1 from practice_answers where session_id = p_session and question_id = p_question) then raise exception 'أجبت عن هذا السؤال'; end if;
+  -- حد يومي للإجابات يمنع جمع مفاتيح الإجابة آليًا
+  if (select count(*) from practice_answers pa join practice_sessions ps on ps.id = pa.session_id
+      where ps.user_id = auth.uid() and pa.answered_at > now() - interval '1 day') >= 400 then
+    raise exception 'وصلت إلى الحد اليومي للإجابات (400)؛ عد غدًا';
+  end if;
   select * into a from question_answers where question_id = p_question;
   v_ok := p_choice = a.correct_index;
   insert into practice_answers (session_id, question_id, choice, correct) values (p_session, p_question, p_choice, v_ok);
@@ -807,7 +826,7 @@ end $$;
 
 -- إنهاء الجلسة: النتيجة وتحليلها حسب الدرس ومجموعة المستوى.
 create or replace function public.student_finish(p_session bigint) returns jsonb
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 declare s public.practice_sessions; v_score int;
 begin
   perform public._require_student();
@@ -819,14 +838,14 @@ begin
 end $$;
 
 create or replace function public._session_summary(p_session bigint) returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, pg_temp as $$
   select jsonb_build_object('id', s.id, 'createdAt', s.created_at, 'finishedAt', s.finished_at, 'total', s.total,
     'answered', (select count(*) from practice_answers where session_id = s.id),
     'score', (select count(*) filter (where correct) from practice_answers where session_id = s.id),
     'wrong', (select count(*) filter (where not correct) from practice_answers where session_id = s.id),
     'byLesson', (select coalesce(jsonb_agg(jsonb_build_object('lesson', t.title, 'n', t.n, 'correct', t.c) order by t.title), '[]') from
        (select l.title, count(*) n, count(*) filter (where a.correct) c from practice_answers a join questions q on q.id = a.question_id
-          join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id where a.session_id = s.id group by l.title) t),
+          join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id where a.session_id = s.id group by l.id, l.title) t),
     'byGroup', (select coalesce(jsonb_agg(jsonb_build_object('group', t.g, 'n', t.n, 'correct', t.c)), '[]') from
        (select public._level_group(q.thinking_level) g, count(*) n, count(*) filter (where a.correct) c from practice_answers a
           join questions q on q.id = a.question_id where a.session_id = s.id group by 1) t))
@@ -834,7 +853,7 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 create or replace function public.student_history() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_student();
   return (select coalesce(jsonb_agg(public._session_summary(id) order by created_at desc), '[]')
@@ -845,50 +864,53 @@ end $$;
 -- لوحة المعلم: تقدم الطلاب حسب الشعبة (للمعلم والمراجع والمشرف). لا يرى الطلاب بيانات بعضهم.
 -- =====================================================================
 create or replace function public.teacher_progress(p_section text default null) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
   return jsonb_build_object(
     'sections', (select coalesce(jsonb_agg(distinct section), '[]') from profiles where role = 'student' and section is not null),
-    'students', (select coalesce(jsonb_agg(jsonb_build_object('name', pr.display_name, 'username', split_part(u.email, '@', 1), 'section', pr.section, 'grade', pr.grade,
-        'sessions', (select count(*) from practice_sessions s where s.user_id = pr.user_id),
-        'answered', (select count(*) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
-        'correct', (select count(*) filter (where a.correct) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
-        'lastActive', (select max(created_at) from practice_sessions s where s.user_id = pr.user_id)) order by pr.section, pr.display_name), '[]')
-      from profiles pr join auth.users u on u.id = pr.user_id where pr.role = 'student' and (p_section is null or pr.section = p_section)),
-    -- الأهداف الأضعف في الشعبة (10 أهداف على الأقل إجابات) — تكشف المفاهيم البديلة
-    'weakObjectives', (select coalesce(jsonb_agg(t order by t.pct, t.n desc), '[]') from (
-      select o.code, coalesce(o.approved_text, o.original_text) as text, l.title as lesson, count(*) n,
-        round(100.0 * count(*) filter (where a.correct) / count(*)) pct
-      from practice_answers a join practice_sessions s on s.id = a.session_id join profiles pr on pr.user_id = s.user_id
-        join questions q on q.id = a.question_id join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id
-      where pr.role = 'student' and (p_section is null or pr.section = p_section)
-      group by o.code, o.approved_text, o.original_text, l.title having count(*) >= 5
-      order by 5, 4 desc limit 15) t));
+    'students', (with st as (
+        select ps.user_id, count(distinct ps.id) sessions, count(a.question_id) answered, count(*) filter (where a.correct) correct, max(ps.created_at) last_active
+        from practice_sessions ps left join practice_answers a on a.session_id = ps.id group by ps.user_id)
+      select coalesce(jsonb_agg(jsonb_build_object('name', pr.display_name, 'username', split_part(u.email, '@', 1), 'section', pr.section, 'grade', pr.grade,
+        'sessions', coalesce(st.sessions, 0), 'answered', coalesce(st.answered, 0), 'correct', coalesce(st.correct, 0), 'lastActive', st.last_active)
+        order by pr.section, pr.display_name), '[]')
+      from profiles pr join auth.users u on u.id = pr.user_id left join st on st.user_id = pr.user_id
+      where pr.role = 'student' and (p_section is null or pr.section = p_section)),
+    -- الأهداف الأضعف في الشعبة (5 إجابات على الأقل لكل هدف) — تكشف المفاهيم البديلة
+    'weakObjectives', (select coalesce(jsonb_agg(jsonb_build_object('code', o.code, 'text', coalesce(o.approved_text, o.original_text), 'lesson', l.title,
+        'n', t.n, 'pct', t.pct) order by t.pct, t.n desc), '[]')
+      from (select q.objective_id, count(*) n, round(100.0 * count(*) filter (where a.correct) / count(*)) pct
+            from practice_answers a join practice_sessions s on s.id = a.session_id join profiles pr on pr.user_id = s.user_id
+              join questions q on q.id = a.question_id
+            where pr.role = 'student' and (p_section is null or pr.section = p_section)
+            group by q.objective_id having count(*) >= 5 order by 3, 2 desc limit 15) t
+      join objectives o on o.id = t.objective_id join lessons l on l.id = o.lesson_id));
 end $$;
 
 -- إدارة الطلاب للمشرف: عرض وتعديل الاسم والشعبة والدور (إنشاء الحساب نفسه عبر دالة الحافة admin-users).
 create or replace function public.admin_list_students() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
-  return (select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
+  return (with st as (
+      select ps.user_id, count(distinct ps.id) sessions, count(a.question_id) answered, count(*) filter (where a.correct) correct, max(ps.created_at) last_active
+      from practice_sessions ps left join practice_answers a on a.session_id = ps.id group by ps.user_id)
+    select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
       'grade', pr.grade, 'section', pr.section, 'role', pr.role, 'confirmed', pr.profile_confirmed, 'createdAt', pr.created_at,
-      'sessions', (select count(*) from practice_sessions s where s.user_id = pr.user_id),
-      'answered', (select count(*) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
-      'correct', (select count(*) filter (where a.correct) from practice_answers a join practice_sessions s on s.id = a.session_id where s.user_id = pr.user_id),
-      'lastActive', (select max(created_at) from practice_sessions s where s.user_id = pr.user_id))
+      'sessions', coalesce(st.sessions, 0), 'answered', coalesce(st.answered, 0), 'correct', coalesce(st.correct, 0), 'lastActive', st.last_active)
       order by pr.grade nulls last, pr.section nulls last, pr.display_name), '[]')
-    from profiles pr join auth.users u on u.id = pr.user_id where pr.role in ('student', 'pending'));
+    from profiles pr join auth.users u on u.id = pr.user_id left join st on st.user_id = pr.user_id
+    where pr.managed and pr.role in ('student', 'pending'));
 end $$;
 
 drop function if exists public.admin_update_student(uuid, text, text, text);
 create or replace function public.admin_update_student(p_id uuid, p_name text, p_section text, p_role text, p_grade text default null) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   if p_role not in ('student', 'pending') then raise exception 'الدور غير صالح'; end if;
-  if not exists (select 1 from profiles where user_id = p_id and role in ('student', 'pending')) then raise exception 'الحساب ليس حساب طالب'; end if;
+  if not exists (select 1 from profiles where user_id = p_id and managed and role in ('student', 'pending')) then raise exception 'الحساب ليس حساب طالب'; end if;
   update profiles set display_name = coalesce(nullif(trim(p_name), ''), display_name), section = nullif(trim(p_section), ''),
     grade = nullif(trim(p_grade), ''), role = p_role where user_id = p_id;
 end $$;
@@ -903,18 +925,23 @@ revoke execute on function public._require_student(), public._student_q(public.q
 -- تستدعيها دالة الحافة admin-users بتوكن المشرف نفسه (لا بمفتاح الخدمة) بعد إنشاء حساب الطالب.
 drop function if exists public.admin_init_student(uuid, text, text);
 create or replace function public.admin_init_student(p_id uuid, p_name text, p_section text, p_grade text default null) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
   if not exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student')) then raise exception 'الحساب ليس حساب طالب جديد'; end if;
-  update profiles set role = 'student', display_name = coalesce(nullif(trim(p_name), ''), display_name),
+  update profiles set role = 'student', managed = true, display_name = coalesce(nullif(trim(p_name), ''), display_name),
     section = nullif(trim(p_section), ''), grade = nullif(trim(p_grade), ''), profile_confirmed = false where user_id = p_id;
 end $$;
 create or replace function public.admin_is_student(p_id uuid) returns boolean
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
-  return exists (select 1 from profiles where user_id = p_id and role in ('pending', 'student'));
+  return exists (select 1 from profiles where user_id = p_id and managed and role in ('pending', 'student'));
 end $$;
 revoke execute on function public.admin_init_student(uuid, text, text, text), public.admin_is_student(uuid) from anon, public;
 grant execute on function public.admin_init_student(uuid, text, text, text), public.admin_is_student(uuid) to authenticated;
+
+-- فهارس وتشديد إضافي
+create index if not exists idx_pa_question on public.practice_answers(question_id);
+create index if not exists idx_pa_session_time on public.practice_answers(session_id, answered_at);
+revoke all on all sequences in schema public from anon, authenticated;

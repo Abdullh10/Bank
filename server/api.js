@@ -1,7 +1,7 @@
 import express from 'express';
 import { getDb, tx, J } from './db.js';
 import { login, logout, requireRole } from './auth.js';
-import { cleanQuestion, autoCheck, cleanObjectiveEdit, ValidationError, similarity } from './validate.js';
+import { cleanQuestion, autoCheck, cleanObjectiveEdit, ValidationError, similarPairs } from './validate.js';
 
 export const api = express.Router();
 const db = () => getDb();
@@ -344,12 +344,8 @@ api.get('/bank', (req, res) => {
     lesson: { number: r.lesson_number, title: r.lesson_title }, chapter: { number: r.chapter_number, title: r.chapter_title } }));
   // اكتشاف الأسئلة المتشابهة داخل النتائج (للمراجعة).
   if (f.similar === '1') {
-    const pairs = [];
-    for (let i = 0; i < out.length; i++) for (let j = i + 1; j < out.length; j++) {
-      const s = similarity(out[i].stem, out[j].stem);
-      if (s >= 0.5) pairs.push({ a: out[i].id, b: out[j].id, score: Math.round(s * 100) });
-    }
-    return res.json({ questions: out, similar: pairs });
+    if (out.length > 900) return res.status(400).json({ error: 'اختر فصلًا أو درسًا أولًا: اكتشاف المتشابهة يعمل على 900 سؤال كحد أقصى' });
+    return res.json({ questions: out, similar: similarPairs(out) });
   }
   res.json({ questions: out });
 });
