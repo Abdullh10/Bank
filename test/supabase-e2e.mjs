@@ -156,6 +156,7 @@ await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('bu
 await p.waitForSelector('.kpi .value');
 ok('viewer: header visible after login', await p.locator('.topbar').isVisible());
 ok('term: textbook, not memo (home)', !/مذكر/.test(await p.locator('main').innerText()));
+ok('no «مسارات» on home', !/مسارات/.test(await p.locator('main').innerText()));
 ok('home: term 1448', (await p.locator('main').innerText()).includes('الفصل الدراسي الأول 1448هـ'));
 ok('viewer: stats show 2580 questions', /2580|2,580/.test(await p.locator('main').innerText()));
 await p.screenshot({ path: `${OUT}/supa-home.png` });
@@ -174,6 +175,9 @@ await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, table, .empty', { ti
 ok('viewer: no export buttons', (await p.locator('[data-export]').count()) === 0);
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
 await p.click('#x-build'); await p.waitForSelector('.paper');
+{ const opts = await p.$$eval('#x-setup select, select', ss => ss.flatMap(s => [...s.options].map(o => o.textContent)));
+  ok('exam lists: no «مسارات», no third term, three secondary grades', !opts.some(t => /مسارات|الفصل الدراسي الثالث|السنة المشتركة/.test(t))
+    && ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي'].every(g => opts.includes(g))); }
 ok('viewer: exam builder builds from Supabase bank', (await p.locator('.set-student .paper').count()) >= 1);
 await p.click('#logout'); await p.waitForSelector('#l-user');
 ok('logout returns to login', !(await p.locator('.topbar').isVisible()));

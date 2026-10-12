@@ -22,10 +22,10 @@ function todayHijri() {
 const HIJRI_NOW = todayHijri();
 const yearsAround = () => Array.from({ length: 5 }, (_, i) => `${HIJRI_NOW.y - 1 + i}هـ`);
 const CHOICES = {
-  title: ['اختبار الفصل الدراسي الأول', 'اختبار الفصل الدراسي الثاني', 'اختبار الفصل الدراسي الثالث', 'اختبار منتصف الفصل الدراسي', 'اختبار الدور الثاني', 'اختبار قصير', 'اختبار تجريبي', 'ورقة عمل'],
+  title: ['اختبار الفصل الدراسي الأول', 'اختبار الفصل الدراسي الثاني', 'اختبار منتصف الفصل الدراسي', 'اختبار الدور الثاني', 'اختبار قصير', 'اختبار تجريبي', 'ورقة عمل'],
   year: yearsAround(),
   subject: ['الكيمياء 2-1', 'الكيمياء 1', 'الكيمياء 2', 'الكيمياء 3', 'الكيمياء 4'],
-  grade: ['الثاني الثانوي – مسارات', 'الأول الثانوي – مسارات', 'الثالث الثانوي – مسارات', 'السنة المشتركة'],
+  grade: ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي'],
   duration: ['ساعتان ونصف', 'ساعتان', 'ساعة ونصف', 'ساعة واحدة', 'ثلاث ساعات', '45 دقيقة', '30 دقيقة', '20 دقيقة'],
   country: ['المملكة العربية السعودية'],
   org: ['الهيئة الملكية بالجبيل', 'الهيئة الملكية بينبع', 'وزارة التعليم'],
@@ -46,7 +46,7 @@ const DEFAULT_HEADER = {
   title: 'اختبار الفصل الدراسي الأول',
   year: `${HIJRI_NOW.y}هـ`,
   subject: 'الكيمياء 2-1',
-  grade: 'الثاني الثانوي – مسارات',
+  grade: 'الثاني الثانوي',
   duration: 'ساعتان ونصف',
   date: '..../..../1448هـ',
   dateDay: '',
@@ -58,7 +58,13 @@ const DEFAULT_HEADER = {
 };
 
 function loadHeader() {
-  try { return { ...DEFAULT_HEADER, ...JSON.parse(localStorage.getItem(STORE_KEY) || '{}') }; } catch { return { ...DEFAULT_HEADER }; }
+  let h;
+  try { h = { ...DEFAULT_HEADER, ...JSON.parse(localStorage.getItem(STORE_KEY) || '{}') }; } catch { h = { ...DEFAULT_HEADER }; }
+  // ترحيل اختيارات محفوظة قديمة: لا «مسارات» ولا «السنة المشتركة» ولا «الفصل الدراسي الثالث»
+  h.grade = String(h.grade || '').replace(/\s*[–-]?\s*\(?مسارات\)?/g, '').trim() || DEFAULT_HEADER.grade;
+  if (h.grade === 'السنة المشتركة') h.grade = DEFAULT_HEADER.grade;
+  if (/الفصل الدراسي الثالث/.test(h.title || '')) h.title = DEFAULT_HEADER.title;
+  return h;
 }
 function saveHeader(h) { try { localStorage.setItem(STORE_KEY, JSON.stringify(h)); } catch { /* التخزين غير متاح */ } }
 

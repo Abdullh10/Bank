@@ -945,3 +945,6 @@ grant execute on function public.admin_init_student(uuid, text, text, text), pub
 create index if not exists idx_pa_question on public.practice_answers(question_id);
 create index if not exists idx_pa_session_time on public.practice_answers(session_id, answered_at);
 revoke all on all sequences in schema public from anon, authenticated;
+
+-- 2026-10-12: لا يُستخدم مصطلح «مسارات» في المنصة
+update public.courses set grade = trim(regexp_replace(grade, '\s*\(?مسارات\)?', '', 'g')) where grade like '%مسارات%';
