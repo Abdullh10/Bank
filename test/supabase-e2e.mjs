@@ -121,10 +121,10 @@ export function createClient() {
 const browser = await chromium.launch();
 const results = [], errors = [];
 const ok = (n, v, extra = '') => results.push(`${v ? 'PASS' : 'FAIL'} ${n} ${extra}`);
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', acceptDownloads: true });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1) });
 await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
-await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
 const p = await ctx.newPage();
 p.on('pageerror', e => errors.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|404/.test(m.text())) errors.push('console: ' + m.text()); });
@@ -276,6 +276,7 @@ await p.goto(BASE + '#/bank'); await p.waitForSelector('#s-start');
 ok('student: teacher pages redirect to practice', !(await p.locator('#bank-list, .kpi').count()));
 const blocked = await p.evaluate(async () => (await fetch('http://localhost:8766/mock/rpc/get_bank', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('student: database refuses teacher reads', !!blocked.error);
+await p.locator('.toast').first().waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
 await p.screenshot({ path: `${OUT}/student-setup.png`, fullPage: true });
 await p.locator('details.st-ch').first().locator('summary').click();
 await p.locator('[data-lesson]').first().check();
@@ -285,12 +286,14 @@ ok('student: session started with timer', (await p.locator('.st-top').innerText(
 ok('student: no answer marked before answering', (await p.locator('.st-opt.ok, .st-opt.bad').count()) === 0);
 for (let i = 0; i < 5; i++) {
   await p.locator('.st-opt').first().click(); await p.waitForSelector('.st-fb');
-  if (i === 0) { ok('student: immediate feedback with explanation', (await p.locator('.st-fb').innerText()).includes('التفسير')); await p.screenshot({ path: `${OUT}/student-feedback.png` }); }
+  if (i === 0) { ok('student: immediate feedback with explanation', (await p.locator('.st-fb').innerText()).includes('التفسير')); await p.locator('.toast').first().waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
+await p.screenshot({ path: `${OUT}/student-feedback.png` }); }
   await p.click('#st-next');
 }
 await p.waitForSelector('.st-result');
 const res = await p.locator('.st-score').innerText();
 ok('student: result shown', /من 5/.test(res), res);
+await p.locator('.toast').first().waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
 await p.screenshot({ path: `${OUT}/student-result.png`, fullPage: true });
 if (await p.locator('#st-retry').count()) {
   await p.click('#st-retry'); await p.waitForSelector('.st-opt');
