@@ -1,4 +1,4 @@
-// اختبار واجهة شامل بالمتصفح (Playwright). التشغيل: خادم على المنفذ 3123 بقاعدة بيانات تجريبية ومستخدم reviewer1، ثم: node test/ui-e2e.mjs <مجلد الصور>
+// اختبار واجهة شامل بالمتصفح (Playwright). التشغيل: خادم على المنفذ 3123 بقاعدة بيانات تجريبية ومستخدم owner1 بدور admin (تعديل المحتوى لمالك المشروع فقط)، ثم: node test/ui-e2e.mjs <مجلد الصور>
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
@@ -7,7 +7,7 @@ const OUT = process.argv[2], BASE = 'http://localhost:3123';
 async function login(pg) {
   await pg.goto(BASE + '/#/'); await pg.waitForSelector('#l-user');
   check('login page first, header hidden', !(await pg.locator('.topbar').isVisible()));
-  await pg.fill('#l-user', 'reviewer1'); await pg.fill('#l-pass', 'Test-Pass-12345'); await pg.click('button[type=submit]');
+  await pg.fill('#l-user', process.env.E2E_USER || 'owner1'); await pg.fill('#l-pass', 'Test-Pass-12345'); await pg.click('button[type=submit]');
   await pg.waitForSelector('#logout');
 }
 const browser = await chromium.launch();

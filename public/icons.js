@@ -28,6 +28,8 @@ const GLYPHS = {
   spark: `<path d="M22 13.5c.9 5.4 2.6 7.1 8 8-5.4.9-7.1 2.6-8 8-.9-5.4-2.6-7.1-8-8 5.4-.9 7.1-2.6 8-8z"/><path d="M31.5 25.5c.5 2.6 1.3 3.4 3.9 3.9-2.6.5-3.4 1.3-3.9 3.9-.5-2.6-1.3-3.4-3.9-3.9 2.6-.5 3.4-1.3 3.9-3.9z" fill="{a}" stroke="none"/>`,
   check: `<path d="m16 24 5.5 5.5L32.5 18" stroke-width="3.6"/>`,
   cross: `<path d="m17.5 17 13 13M30.5 17l-13 13" stroke-width="3.6"/>`,
+  notes: `<path d="M14.5 15.5h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H23l-5.5 4.5V30.5h-3a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2z"/><path d="M18.5 20.5h11M18.5 25h7" stroke="{a}"/>`,
+  team: `<circle cx="24" cy="17.5" r="3.8"/><path d="M17 31c0-4.4 3.1-7.2 7-7.2s7 2.8 7 7.2"/><circle cx="14.8" cy="21" r="2.6" stroke="{a}"/><circle cx="33.2" cy="21" r="2.6" stroke="{a}"/><path d="M11 30.5c.3-2.8 1.8-4.6 4-5M37 30.5c-.3-2.8-1.8-4.6-4-5" stroke="{a}"/>`,
   upload: `<path d="M15 28v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M24 29V14.5" stroke="{a}"/><path d="m18.8 19.5 5.2-5.2 5.2 5.2" stroke="{a}"/>`,
   // رموز فصول المقرر
   atom: `<ellipse cx="24" cy="23.5" rx="11" ry="4.3" stroke-width="2.3"/><ellipse cx="24" cy="23.5" rx="11" ry="4.3" stroke-width="2.3" transform="rotate(60 24 23.5)"/><ellipse cx="24" cy="23.5" rx="11" ry="4.3" stroke-width="2.3" transform="rotate(120 24 23.5)"/><circle cx="24" cy="23.5" r="2.4" fill="{a}" stroke="none"/>`,
@@ -43,7 +45,7 @@ const GLYPHS = {
 export const CHAPTER_ICONS = { 1: 'atom', 2: 'periodic', 3: 'crystal', 4: 'molecule', 5: 'calc', 6: 'drop', 7: 'bubbles' };
 
 // لون البلاطة الافتراضي لكل رمز
-const TONE = { trophy: 'gold', check: 'green', cross: 'rose', spark: 'teal', practice: 'teal', history: 'gold', pie: 'teal', shield: 'green', essay: 'gold', mcq: 'teal' };
+const TONE = { notes: 'gold', team: 'teal', trophy: 'gold', check: 'green', cross: 'rose', spark: 'teal', practice: 'teal', history: 'gold', pie: 'teal', shield: 'green', essay: 'gold', mcq: 'teal' };
 const TONES = ['navy', 'teal', 'gold', 'green', 'rose'];
 
 let sprite = null;

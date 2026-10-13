@@ -1,12 +1,12 @@
-// اختبار منشئ الاختبارات بالمتصفح على الخادم المحلي (المنفذ 3123، بيانات كاملة npm run seed، ومستخدم reviewer1): node test/exam-e2e.mjs <مجلد الإخراج>
+// اختبار منشئ الاختبارات بالمتصفح على الخادم المحلي (المنفذ 3123، بيانات كاملة npm run seed، ومستخدم owner1 بدور admin): node test/exam-e2e.mjs <مجلد الإخراج>
 import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
 const BASE = process.env.BASE || 'http://localhost:3123';
-// المنصة مغلقة: كل اختبار يبدأ بتسجيل الدخول (خادم محلي بمستخدم reviewer1 / Test-Pass-12345).
+// المنصة مغلقة: كل اختبار يبدأ بتسجيل الدخول (خادم محلي بمستخدم owner1 / Test-Pass-12345).
 async function login(pg) {
   await pg.goto(BASE + '/#/'); await pg.waitForSelector('#l-user');
-  await pg.fill('#l-user', process.env.E2E_USER || 'reviewer1'); await pg.fill('#l-pass', process.env.E2E_PASS || 'Test-Pass-12345');
+  await pg.fill('#l-user', process.env.E2E_USER || 'owner1'); await pg.fill('#l-pass', process.env.E2E_PASS || 'Test-Pass-12345');
   await pg.click('button[type=submit]'); await pg.waitForSelector('#logout');
 }
 const OUT = process.argv[2]; const b = await chromium.launch(); const errs = []; const res = [];

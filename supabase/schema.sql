@@ -11,7 +11,7 @@ create table if not exists public.profiles (
   email text,
   display_name text not null default '',
   -- كل حساب جديد «بانتظار التفعيل» ولا يرى الإجابات حتى يحدد المشرف دوره (حماية لو بقي التسجيل الذاتي مفعّلًا).
-  role text not null default 'pending' check (role in ('admin', 'reviewer', 'viewer', 'student', 'pending')),
+  role text not null default 'pending' check (role in ('admin', 'reviewer', 'viewer', 'supervisor', 'principal', 'student', 'pending')),
   created_at timestamptz not null default now()
 );
 
@@ -23,7 +23,7 @@ update public.profiles set managed = true where role = 'student' and not managed
 alter table public.profiles add column if not exists profile_confirmed boolean not null default false;
 alter table public.profiles alter column role set default 'pending';
 alter table public.profiles drop constraint if exists profiles_role_check;
-alter table public.profiles add constraint profiles_role_check check (role in ('admin', 'reviewer', 'viewer', 'student', 'pending'));
+alter table public.profiles add constraint profiles_role_check check (role in ('admin', 'reviewer', 'viewer', 'supervisor', 'principal', 'student', 'pending'));
 
 -- كل مستخدم جديد في Authentication يحصل على ملف بدور «بانتظار التفعيل».
 create or replace function public.handle_new_user() returns trigger
@@ -48,7 +48,17 @@ language sql stable security definer set search_path = public, pg_temp as $$
 $$;
 create or replace function public.is_member() returns boolean
 language sql stable security definer set search_path = public, pg_temp as $$
-  select exists (select 1 from public.profiles where user_id = auth.uid() and role in ('viewer', 'reviewer', 'admin'))
+  select exists (select 1 from public.profiles where user_id = auth.uid() and role in ('viewer', 'reviewer', 'supervisor', 'principal', 'admin'))
+$$;
+-- الأدوار (2026-10-13):
+--   admin      مالك المشروع: كل شيء، وتعديل المحتوى، وإدارة الحسابات.
+--   reviewer   مراجع علمي: اعتماد الأهداف والأسئلة وإعادتها، وكتابة الملاحظات؛ لا يعدّل نص المحتوى.
+--   viewer     معلم: اطلاع وإنشاء اختبارات ومتابعة تقدم الطلاب.
+--   supervisor مشرف تربوي: اطلاع على الأهداف والأسئلة وإنشاء اختبارات ولوحة المؤشرات؛ دون تعديل ولا أسماء طلاب.
+--   principal  مدير المدرسة: اطلاع على الأسئلة ولوحة المؤشرات فقط.
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = public, pg_temp as $$
+  select coalesce((select role = 'admin' from public.profiles where user_id = auth.uid()), false)
 $$;
 
 -- ---------- البنية ----------
@@ -231,6 +241,13 @@ begin
   if not public.is_reviewer() then raise exception 'لا تملك صلاحية تنفيذ هذا الإجراء' using errcode = '42501'; end if;
 end $$;
 
+create or replace function public._require_admin() returns void
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
+  if not public.is_admin() then raise exception 'تعديل المحتوى لمالك المشروع فقط؛ اكتب ملاحظتك بدلًا من ذلك' using errcode = '42501'; end if;
+end $$;
+
 create or replace function public._require_member() returns void
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
@@ -266,7 +283,8 @@ begin
   if p_action = 'return' and coalesce(trim(p_note), '') = '' then raise exception 'اكتب سبب الإعادة للمراجعة'; end if;
   v_text := o.approved_text;
   if p_action = 'approve' then
-    v_text := trim(coalesce(nullif(p_approved_text, ''), o.approved_text, o.proposed_text, o.original_text));
+    -- المراجع يعتمد الصياغة الحالية فقط؛ تغيير الصياغة لمالك المشروع
+    v_text := trim(coalesce(case when public.is_admin() then nullif(p_approved_text, '') end, o.approved_text, o.proposed_text, o.original_text));
     if length(v_text) < 8 then raise exception 'الصياغة المعتمدة غير صالحة'; end if;
   end if;
   update public.objectives set review_status = v_status, approved_text = v_text, reviewed_by = auth.uid(), reviewed_at = now() where id = o.id;
@@ -278,7 +296,7 @@ create or replace function public.patch_objective(p_code text, p jsonb)
 returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; v_text text;
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   select * into o from public.objectives where code = p_code;
   if not found then raise exception 'الهدف غير موجود'; end if;
   if p ? 'approved_text' then
@@ -309,6 +327,9 @@ begin
   if not found then raise exception 'لا يوجد محتوى مكمّل لهذا الهدف'; end if;
   v_status := case p_action when 'approve' then 'approved' when 'return' then 'returned' when 'reset' then 'pending' end;
   if v_status is null then raise exception 'إجراء غير صالح'; end if;
+  if nullif(trim(p_supplement), '') is not null and trim(p_supplement) <> s.supplement and not public.is_admin() then
+    raise exception 'تعديل نص المحتوى لمالك المشروع فقط؛ اكتب ملاحظتك بدلًا من ذلك' using errcode = '42501';
+  end if;
   v_text := coalesce(nullif(trim(p_supplement), ''), s.supplement);
   update public.supplements set review_status = v_status, supplement = v_text where objective_id = o.id;
   perform public._log('supplement', o.id, p_action, jsonb_build_object('reviewStatus', s.review_status, 'supplement', s.supplement),
@@ -347,7 +368,7 @@ create or replace function public.update_question(p_id bigint, p jsonb, p_auto_c
 returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions; v_before jsonb;
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   perform public._validate_question(q.type, p);
@@ -379,7 +400,7 @@ create or replace function public.create_question(p_code text, p_type text, p js
 returns bigint language plpgsql security definer set search_path = public, pg_temp as $$
 declare o public.objectives; v_id bigint; v_num int;
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   select * into o from public.objectives where code = p_code;
   if not found then raise exception 'الهدف غير موجود'; end if;
   if p_type not in ('mcq', 'essay') then raise exception 'نوع غير صالح'; end if;
@@ -418,7 +439,7 @@ create or replace function public.exclude_question(p_id bigint, p_excluded boole
 returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions;
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   if p_excluded and coalesce(trim(p_note), '') = '' then raise exception 'اكتب سبب الاستبعاد'; end if;
@@ -431,7 +452,7 @@ create or replace function public.duplicate_question(p_id bigint, p_auto_check j
 returns bigint language plpgsql security definer set search_path = public, pg_temp as $$
 declare q public.questions; v_id bigint; v_num int;
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   select max(number) + 1 into v_num from public.questions where objective_id = q.objective_id and type = q.type;
@@ -618,7 +639,7 @@ grant execute on function public.get_question(bigint), public.get_revisions(int,
 create or replace function public.set_auto_check(p_id bigint, p_auto_check jsonb) returns void
 language plpgsql security definer set search_path = public, pg_temp as $$
 begin
-  perform public._require_reviewer();
+  perform public._require_admin();
   if jsonb_typeof(p_auto_check->'passed') is distinct from 'boolean' then raise exception 'نتيجة تحقق غير صالحة'; end if;
   update public.question_answers set auto_check = p_auto_check where question_id = p_id;
 end $$;
@@ -867,6 +888,7 @@ create or replace function public.teacher_progress(p_section text default null) 
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
+  if public.my_role() not in ('admin', 'viewer', 'reviewer') then raise exception 'تقدم الطلاب بالأسماء للمعلم ومالك المشروع؛ المؤشرات العامة في «لوحة المؤشرات»' using errcode = '42501'; end if;
   return jsonb_build_object(
     'sections', (select coalesce(jsonb_agg(distinct section), '[]') from profiles where role = 'student' and section is not null),
     'students', (with st as (
@@ -948,3 +970,206 @@ revoke all on all sequences in schema public from anon, authenticated;
 
 -- 2026-10-12: لا يُستخدم مصطلح «مسارات» في المنصة
 update public.courses set grade = trim(regexp_replace(grade, '\s*\(?مسارات\)?', '', 'g')) where grade like '%مسارات%';
+
+-- =====================================================================
+-- 2026-10-13: حسابات الفريق بأدوار مختلفة، وملاحظات المراجعة، ولوحة المؤشرات
+-- =====================================================================
+-- حساب فريق أنشأه مالك المشروع (مراجع، معلم، مشرف تربوي، مدير مدرسة) يُميَّز عن حسابات الطلاب
+alter table public.profiles add column if not exists staff boolean not null default false;
+
+-- ---------- ملاحظات المراجعة: يكتبها المراجع على هدف أو سؤال أو محتوى مكمّل دون تعديل المحتوى نفسه ----------
+create table if not exists public.review_notes (
+  id bigint generated by default as identity primary key,
+  objective_id bigint not null references public.objectives(id) on delete cascade,
+  question_id bigint references public.questions(id) on delete cascade,
+  entity text not null check (entity in ('objective', 'question', 'supplement')),
+  body text not null,
+  author uuid,
+  author_name text,
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz,
+  resolved_by_name text,
+  response text
+);
+create index if not exists idx_notes_obj on public.review_notes(objective_id);
+create index if not exists idx_notes_open on public.review_notes(created_at desc) where resolved_at is null;
+alter table public.review_notes enable row level security;
+revoke all on public.review_notes from anon, authenticated;
+
+create or replace function public._note_json(n public.review_notes) returns jsonb
+language sql stable security definer set search_path = public, pg_temp as $$
+  select jsonb_build_object('id', n.id, 'entity', n.entity, 'body', n.body, 'author', n.author_name, 'mine', n.author = auth.uid(),
+    'createdAt', n.created_at, 'resolvedAt', n.resolved_at, 'resolvedBy', n.resolved_by_name, 'response', n.response,
+    'objectiveCode', o.code, 'objectiveText', coalesce(o.approved_text, o.original_text),
+    'questionId', n.question_id, 'questionType', q.type, 'questionNumber', q.number, 'questionStem', left(q.stem, 160))
+  from public.objectives o left join public.questions q on q.id = n.question_id where o.id = n.objective_id
+$$;
+
+create or replace function public.add_note(p_code text, p_entity text, p_body text, p_question bigint default null) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare o public.objectives; n public.review_notes;
+begin
+  perform public._require_reviewer();
+  select * into o from public.objectives where code = p_code;
+  if not found then raise exception 'الهدف غير موجود'; end if;
+  if p_entity not in ('objective', 'question', 'supplement') then raise exception 'نوع الملاحظة غير صالح'; end if;
+  if p_entity = 'question' and not exists (select 1 from public.questions where id = p_question and objective_id = o.id) then raise exception 'السؤال غير موجود في هذا الهدف'; end if;
+  if length(trim(coalesce(p_body, ''))) < 3 then raise exception 'اكتب الملاحظة'; end if;
+  if length(p_body) > 2000 then raise exception 'الملاحظة طويلة جدًا (2000 حرف كحد أقصى)'; end if;
+  insert into public.review_notes (objective_id, question_id, entity, body, author, author_name)
+  values (o.id, case when p_entity = 'question' then p_question end, p_entity, trim(p_body), auth.uid(),
+    (select display_name from public.profiles where user_id = auth.uid()))
+  returning * into n;
+  return public._note_json(n);
+end $$;
+
+-- p_code: ملاحظات هدف واحد (كلها)، أو بدونه: كل الملاحظات حسب الحالة open | resolved | all
+create or replace function public.get_notes(p_code text default null, p_status text default 'open') returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_reviewer();
+  return (select coalesce(jsonb_agg(public._note_json(n) order by n.created_at desc), '[]') from (
+    select n.* from public.review_notes n join public.objectives o on o.id = n.objective_id
+    where (p_code is null or o.code = p_code)
+      and (p_code is not null or coalesce(p_status, 'open') = 'all'
+           or (coalesce(p_status, 'open') = 'open' and n.resolved_at is null)
+           or (p_status = 'resolved' and n.resolved_at is not null))
+    order by n.created_at desc limit 500) n);
+end $$;
+
+-- مالك المشروع يغلق الملاحظة (بعد تنفيذها أو مع رد) أو يعيد فتحها
+create or replace function public.resolve_note(p_id bigint, p_resolved boolean, p_response text default null) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if auth.uid() is null then raise exception 'يلزم تسجيل الدخول' using errcode = '28000'; end if;
+  if not public.is_admin() then raise exception 'إغلاق الملاحظات لمالك المشروع' using errcode = '42501'; end if;
+  update public.review_notes set
+    resolved_at = case when p_resolved then now() end,
+    resolved_by_name = case when p_resolved then (select display_name from public.profiles where user_id = auth.uid()) end,
+    response = coalesce(nullif(trim(p_response), ''), response)
+  where id = p_id;
+  if not found then raise exception 'الملاحظة غير موجودة'; end if;
+end $$;
+
+-- يحذف كاتب الملاحظة ملاحظته ما دامت مفتوحة، ومالك المشروع أي ملاحظة
+create or replace function public.delete_note(p_id bigint) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_reviewer();
+  delete from public.review_notes where id = p_id and (public.is_admin() or (author = auth.uid() and resolved_at is null));
+  if not found then raise exception 'لا يمكن حذف هذه الملاحظة' using errcode = '42501'; end if;
+end $$;
+
+-- ---------- لوحة المؤشرات: أرقام مجمّعة فقط (لا أسماء طلاب) لكل الحسابات المفعّلة من الفريق ----------
+create or replace function public.get_dashboard() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_now timestamptz := now();
+begin
+  perform public._require_member();
+  return jsonb_build_object(
+    'generatedAt', v_now,
+    'bank', public._stats_data(),
+    'questionLevels', (select coalesce(jsonb_agg(jsonb_build_object('group', g, 'n', n)), '[]') from
+       (select public._level_group(thinking_level) g, count(*) n from public.questions where not excluded group by 1) t),
+    'students', (select jsonb_build_object('n', count(*), 'confirmed', count(*) filter (where profile_confirmed),
+       'active', count(*) filter (where exists (select 1 from practice_sessions ps where ps.user_id = p.user_id)),
+       'active7', count(*) filter (where exists (select 1 from practice_sessions ps where ps.user_id = p.user_id and ps.created_at > v_now - interval '7 days')))
+       from public.profiles p where p.role = 'student'),
+    'practice', (select jsonb_build_object('sessions', (select count(*) from practice_sessions s join profiles p on p.user_id = s.user_id where p.role = 'student'),
+       'answers', count(*), 'correct', count(*) filter (where a.correct),
+       'answers7', count(*) filter (where a.answered_at > v_now - interval '7 days'))
+       from practice_answers a join practice_sessions s on s.id = a.session_id join profiles p on p.user_id = s.user_id where p.role = 'student'),
+    'bySection', (select coalesce(jsonb_agg(jsonb_build_object('section', t.section, 'students', t.students, 'active', t.active,
+         'active7', t.active7, 'answers', t.answers, 'correct', t.correct) order by t.section), '[]') from (
+       select coalesce(p.section, 'بدون شعبة') section, count(distinct p.user_id) students,
+         count(distinct s.user_id) active,
+         count(distinct s.user_id) filter (where s.created_at > v_now - interval '7 days') active7,
+         count(a.question_id) answers, count(a.question_id) filter (where a.correct) correct
+       from profiles p left join practice_sessions s on s.user_id = p.user_id left join practice_answers a on a.session_id = s.id
+       where p.role = 'student' group by 1) t),
+    -- آخر 8 أسابيع (بتوقيت الرياض): عدد الإجابات والطلاب النشطين
+    'weekly', (select coalesce(jsonb_agg(jsonb_build_object('week', to_char(w.wk, 'YYYY-MM-DD'), 'answers', coalesce(x.answers, 0),
+         'students', coalesce(x.students, 0), 'correct', coalesce(x.correct, 0)) order by w.wk), '[]')
+       from generate_series(date_trunc('week', (v_now at time zone 'Asia/Riyadh')) - interval '7 weeks',
+                            date_trunc('week', (v_now at time zone 'Asia/Riyadh')), interval '1 week') w(wk)
+       left join (select date_trunc('week', a.answered_at at time zone 'Asia/Riyadh') wk, count(*) answers,
+                    count(*) filter (where a.correct) correct, count(distinct s.user_id) students
+                  from practice_answers a join practice_sessions s on s.id = a.session_id join profiles p on p.user_id = s.user_id
+                  where p.role = 'student' and a.answered_at > v_now - interval '9 weeks' group by 1) x on x.wk = w.wk),
+    'byChapter', (select coalesce(jsonb_agg(jsonb_build_object('number', c.number, 'title', c.title, 'answers', coalesce(x.n, 0), 'correct', coalesce(x.c, 0)) order by c.number), '[]')
+       from chapters c left join (select l.chapter_id, count(*) n, count(*) filter (where a.correct) c
+         from practice_answers a join practice_sessions s on s.id = a.session_id join profiles p on p.user_id = s.user_id
+           join questions q on q.id = a.question_id join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id
+         where p.role = 'student' group by l.chapter_id) x on x.chapter_id = c.id),
+    'byGroup', (select coalesce(jsonb_agg(jsonb_build_object('group', g, 'answers', n, 'correct', c)), '[]') from
+       (select public._level_group(q.thinking_level) g, count(*) n, count(*) filter (where a.correct) c
+        from practice_answers a join practice_sessions s on s.id = a.session_id join profiles p on p.user_id = s.user_id join questions q on q.id = a.question_id
+        where p.role = 'student' group by 1) t),
+    'notes', case when public.is_reviewer() then (select jsonb_build_object('open', count(*) filter (where resolved_at is null), 'n', count(*)) from review_notes) end
+  );
+end $$;
+
+-- ---------- حسابات الفريق (لمالك المشروع) ----------
+create or replace function public.admin_list_staff() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
+      'role', pr.role, 'createdAt', pr.created_at, 'lastSignIn', u.last_sign_in_at, 'self', pr.user_id = auth.uid())
+      order by case pr.role when 'admin' then 0 when 'reviewer' then 1 when 'supervisor' then 2 when 'principal' then 3 when 'viewer' then 4 else 5 end, pr.display_name), '[]')
+    from profiles pr join auth.users u on u.id = pr.user_id
+    where pr.role in ('admin', 'reviewer', 'viewer', 'supervisor', 'principal') or (pr.role = 'pending' and (pr.staff or not pr.managed)));
+end $$;
+
+-- تستدعيها دالة الحافة admin-users بتوكن مالك المشروع بعد إنشاء حساب الفريق
+create or replace function public.admin_init_staff(p_id uuid, p_name text, p_role text) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  if p_role not in ('reviewer', 'viewer', 'supervisor', 'principal') then raise exception 'الدور غير صالح'; end if;
+  if not exists (select 1 from profiles where user_id = p_id and role = 'pending' and not managed) then raise exception 'الحساب ليس حسابًا جديدًا'; end if;
+  update profiles set role = p_role, staff = true, display_name = coalesce(nullif(trim(p_name), ''), display_name) where user_id = p_id;
+end $$;
+
+-- تغيير الاسم أو الدور (أو الإيقاف بدور pending). لا يُمنح دور المالك من الواجهة، ولا يُعدَّل حساب مالك.
+create or replace function public.admin_update_staff(p_id uuid, p_name text, p_role text) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  if p_role not in ('reviewer', 'viewer', 'supervisor', 'principal', 'pending') then raise exception 'الدور غير صالح'; end if;
+  if p_id = auth.uid() then raise exception 'لا يمكن تعديل حسابك من هنا'; end if;
+  if not exists (select 1 from profiles where user_id = p_id and role <> 'admin' and role <> 'student' and (staff or not managed)) then raise exception 'الحساب ليس حساب فريق'; end if;
+  update profiles set display_name = coalesce(nullif(trim(p_name), ''), display_name), role = p_role, staff = true where user_id = p_id;
+end $$;
+
+-- يُسمح بإعادة كلمة المرور وتغيير اسم المستخدم والحذف لأي حساب عدا حسابات المالك
+create or replace function public.admin_can_manage(p_id uuid) returns boolean
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  return exists (select 1 from profiles where user_id = p_id and role <> 'admin' and user_id <> auth.uid());
+end $$;
+
+-- الطلاب: حسابات الفريق الموقوفة لا تظهر في قائمة الطلاب
+create or replace function public.admin_list_students() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  if not exists (select 1 from profiles where user_id = auth.uid() and role = 'admin') then raise exception 'للمشرف فقط' using errcode = '42501'; end if;
+  return (with st as (
+      select ps.user_id, count(distinct ps.id) sessions, count(a.question_id) answered, count(*) filter (where a.correct) correct, max(ps.created_at) last_active
+      from practice_sessions ps left join practice_answers a on a.session_id = ps.id group by ps.user_id)
+    select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
+      'grade', pr.grade, 'section', pr.section, 'role', pr.role, 'confirmed', pr.profile_confirmed, 'createdAt', pr.created_at,
+      'sessions', coalesce(st.sessions, 0), 'answered', coalesce(st.answered, 0), 'correct', coalesce(st.correct, 0), 'lastActive', st.last_active)
+      order by pr.grade nulls last, pr.section nulls last, pr.display_name), '[]')
+    from profiles pr join auth.users u on u.id = pr.user_id left join st on st.user_id = pr.user_id
+    where pr.managed and not pr.staff and pr.role in ('student', 'pending'));
+end $$;
+
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.is_admin(), public.add_note(text, text, text, bigint), public.get_notes(text, text),
+  public.resolve_note(bigint, boolean, text), public.delete_note(bigint), public.get_dashboard(),
+  public.admin_list_staff(), public.admin_init_staff(uuid, text, text), public.admin_update_staff(uuid, text, text),
+  public.admin_can_manage(uuid) to authenticated;
+revoke execute on function public._require_admin(), public._note_json(public.review_notes) from authenticated;

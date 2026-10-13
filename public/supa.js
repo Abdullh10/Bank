@@ -202,5 +202,17 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/admin/students/rename') return adminUsers({ action: 'rename', userId: body.userId, username: body.username });
   if (p === '/admin/students/delete') return adminUsers({ action: 'delete', userId: body.userId });
   if (p === '/admin/students/delete-many') return adminUsers({ action: 'deleteMany', userIds: body.userIds });
+  // ---------- حسابات الفريق ----------
+  if (p === '/admin/team') return rpc('admin_list_staff');
+  if (p === '/admin/team/create') return adminUsers({ action: 'create', role: body.role, students: [{ name: body.name, username: body.username, password: body.password || '' }] });
+  if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
+  // ---------- الملاحظات ولوحة المؤشرات ----------
+  if (p === '/dashboard') return rpc('get_dashboard');
+  if (p === '/notes') {
+    if (method === 'GET') return rpc('get_notes', { p_code: f.code || null, p_status: f.status || 'open' });
+    return rpc('add_note', { p_code: body.code, p_entity: body.entity, p_body: body.body, p_question: body.question ?? null });
+  }
+  if ((m = p.match(/^\/notes\/(\d+)\/resolve$/))) { await rpc('resolve_note', { p_id: Number(m[1]), p_resolved: !!body.resolved, p_response: body.response || null }); return { ok: true }; }
+  if ((m = p.match(/^\/notes\/(\d+)\/delete$/))) { await rpc('delete_note', { p_id: Number(m[1]) }); return { ok: true }; }
   throw new Error('مسار غير معروف: ' + p);
 }

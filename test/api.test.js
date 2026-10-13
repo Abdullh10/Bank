@@ -24,9 +24,10 @@ before(async () => {
   seed({ log: () => {} });
   createUser({ username: 'rev', role: 'reviewer', displayName: 'مراجع', password: 'reviewer-pass-1' });
   createUser({ username: 'view', role: 'viewer', displayName: 'معلم', password: 'viewer-pass-12' });
+  createUser({ username: 'own', role: 'admin', displayName: 'مالك المشروع', password: 'owner-pass-123' });
   server = createApp().listen(0);
   base = `http://127.0.0.1:${server.address().port}/api`;
-  for (const [u, p] of [['rev', 'reviewer-pass-1'], ['view', 'viewer-pass-12']]) {
+  for (const [u, p] of [['rev', 'reviewer-pass-1'], ['view', 'viewer-pass-12'], ['own', 'owner-pass-123']]) {
     const r = await fetch(base + '/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
     assert.equal(r.status, 200);
     cookies[u] = r.headers.get('set-cookie').split(';')[0];
@@ -110,7 +111,7 @@ test('اعتماد الهدف وإعادته للمراجعة مع سجل الت
 });
 
 test('التحقق من بيانات السؤال قبل الحفظ', async () => {
-  const r = await call('/objectives/C1-L1-O14/questions', { method: 'POST', as: 'rev',
+  const r = await call('/objectives/C1-L1-O14/questions', { method: 'POST', as: 'own',
     body: { type: 'mcq', stem: 'سؤال تجريبي عن الفوتون؟', options: ['أ', 'ب'], correct_index: 5 } });
   assert.equal(r.status, 400);
   assert.ok(r.body.errors.length >= 2);
@@ -120,7 +121,12 @@ test('تعديل سؤال معتمد يعيده إلى قيد المراجعة �
   const { body } = await call('/objectives/C1-L1-O14', { as: 'rev' });
   const q = body.questions.find(x => x.type === 'mcq' && x.number === 1);
   assert.equal((await call(`/questions/${q.id}/status`, { method: 'POST', body: { status: 'approved' }, as: 'rev' })).status, 200);
-  const edit = await call(`/questions/${q.id}`, { method: 'PATCH', as: 'rev', body: {
+  const patch = {
+    stem: q.stem + ' (معدل)', options: q.options, correct_index: q.correctIndex, explanation: q.explanation,
+    distractor_notes: q.distractorNotes, thinking_level: q.thinkingLevel, difficulty: q.difficulty };
+  // المراجع العلمي لا يعدّل نص السؤال؛ التعديل لمالك المشروع
+  assert.equal((await call(`/questions/${q.id}`, { method: 'PATCH', as: 'rev', body: patch })).status, 403);
+  const edit = await call(`/questions/${q.id}`, { method: 'PATCH', as: 'own', body: {
     stem: q.stem + ' (معدل)', options: q.options, correct_index: q.correctIndex, explanation: q.explanation,
     distractor_notes: q.distractorNotes, thinking_level: q.thinkingLevel, difficulty: q.difficulty } });
   assert.equal(edit.status, 200);
@@ -134,17 +140,18 @@ test('تعديل سؤال معتمد يعيده إلى قيد المراجعة �
 test('الاستبعاد يتطلب سببًا ويُخفي السؤال عن الزائر مع بقائه في السجل', async () => {
   const { body } = await call('/objectives/C1-L1-O14', { as: 'rev' });
   const q = body.questions.find(x => x.type === 'mcq' && x.number === 7);
-  assert.equal((await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: true }, as: 'rev' })).status, 400);
-  assert.equal((await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: true, note: 'اختبار' }, as: 'rev' })).status, 200);
+  assert.equal((await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: true, note: 'اختبار' }, as: 'rev' })).status, 403);
+  assert.equal((await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: true }, as: 'own' })).status, 400);
+  assert.equal((await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: true, note: 'اختبار' }, as: 'own' })).status, 200);
   const anon = await call('/objectives/C1-L1-O14');
   assert.ok(!anon.body.questions.some(x => x.id === q.id));
-  await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: false }, as: 'rev' });
+  await call(`/questions/${q.id}/exclude`, { method: 'POST', body: { excluded: false }, as: 'own' });
 });
 
 test('النسخ والبحث والتصفية واكتشاف المتشابه', async () => {
   const { body } = await call('/objectives/C1-L1-O14', { as: 'rev' });
   const q = body.questions.find(x => x.type === 'mcq' && x.number === 3);
-  const dup = await call(`/questions/${q.id}/duplicate`, { method: 'POST', as: 'rev' });
+  const dup = await call(`/questions/${q.id}/duplicate`, { method: 'POST', as: 'own' });
   assert.equal(dup.status, 200);
   assert.equal(dup.body.autoCheck.passed, false, 'النسخة المطابقة يجب أن تُنبه للتشابه');
   const sim = await call('/bank?chapter=1&similar=1', { as: 'rev' });
