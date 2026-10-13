@@ -1,14 +1,23 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { getDb } from './db.js';
 import { sessionMiddleware } from './auth.js';
 import { api } from './api.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
+// بصمة خريطة الاستيراد المضمّنة في index.html (ختم الإصدار) حتى تسمح بها سياسة أمان المحتوى دون فتح السكربتات المضمّنة
+function importMapHash() {
+  const m = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8').match(/<script type="importmap">([\s\S]*?)<\/script>/);
+  return m ? ` 'sha256-${crypto.createHash('sha256').update(m[1]).digest('base64')}'` : '';
+}
+
 export function createApp() {
   getDb();
+  const mapHash = importMapHash();
   const app = express();
   app.disable('x-powered-by');
   app.use((_req, res, next) => {
@@ -16,7 +25,7 @@ export function createApp() {
     res.setHeader('Referrer-Policy', 'same-origin');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Content-Security-Policy',
-      "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self'");
+      `default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'${mapHash} https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self'`);
     next();
   });
   app.use(express.json({ limit: '1mb' }));
