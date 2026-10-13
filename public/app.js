@@ -867,6 +867,7 @@ async function route() {
   // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
   const locked = !state.user || state.user.role === 'pending';
   document.body.classList.toggle('locked', locked);
+  document.body.classList.remove('booting');
   if (locked) { if (state.user) pagePending(); else pageLogin(); window.scrollTo(0, 0); return; }
   // القائمة حسب الدور: الطالب يرى «تدرّب» و«سجلي» فقط، و«حسابات الطلاب» للمشرف.
   const role = state.user.role, isStudent = role === 'student';
@@ -914,4 +915,28 @@ document.addEventListener('click', e => {
   if (a && a.getAttribute('href') === (location.hash || '#/') && !e.defaultPrevented) { e.preventDefault(); route(); }
 });
 window.addEventListener('afterprint', () => document.body.classList.remove('print-student', 'print-teacher'));
-api('/me').then(r => { state.user = r.user; renderUserbox(); route(); }).catch(() => { renderUserbox(); route(); });
+// على الموقع المنشور لا يوجد خادم محلي: نتصل بـ Supabase مباشرة بدل انتظار طلب api/me الفاشل.
+// حتى تكتمل معرفة الجلسة تبقى شاشة الانتظار، فلا تظهر المنصة لحظة ثم تُستبدل بصفحة الدخول.
+const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+(async () => {
+  if (!LOCAL_HOST) await useSupabase();
+  return api('/me');
+})().then(r => { state.user = r.user; renderUserbox(); route(); }).catch(() => { renderUserbox(); route(); });
+
+// الرجوع إلى تبويب بقي مفتوحًا طويلًا (مثل الآيباد): قد تكون الجلسة انتهت، فنتحقق منها خلف شاشة الانتظار
+// بدل عرض الصفحة القديمة ثم الانتقال فجأة إلى صفحة الدخول.
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden) { hiddenAt = Date.now(); return; }
+  if (!state.supabase || !state.user || Date.now() - hiddenAt < 10 * 60 * 1000) return;
+  document.body.classList.add('locked', 'booting');
+  try {
+    const r = await supa.supaApi('/me');
+    if (!r.user) { state.user = null; signedOut(); return; }
+    state.user = r.user; renderUserbox();
+  } catch (e) { if (e?.status === 401) { state.user = null; signedOut(); return; } }
+  if (!state.user) return;
+  // الجلسة سليمة: تبقى الصفحة كما هي (دون إعادة رسم تُضيع اختبارًا قيد الإعداد أو تدريبًا قيد الحل)
+  document.body.classList.toggle('locked', state.user.role === 'pending');
+  document.body.classList.remove('booting');
+});

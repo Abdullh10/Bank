@@ -10,9 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
   <script type="module" src="app.js"></script>
 </head>
-<body>
+<body class="locked booting">
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#/">
@@ -33,7 +34,8 @@
       <div class="userbox" id="userbox"></div>
     </div>
   </header>
-  <main id="app" tabindex="-1"><p class="muted">جارٍ التحميل…</p></main>
+  <div class="boot-splash" role="status" aria-label="جارٍ التحميل"><img src="assets/itqan-mark.png" alt="" width="72" height="72"><span class="boot-spin" aria-hidden="true"></span></div>
+  <main id="app" tabindex="-1"></main>
   <footer class="footer">جميع الحقوق محفوظة © 2026 · برمجة وتطوير الأستاذ عبدالله حمدي</footer>
   <dialog id="dlg"></dialog>
 </body>
