@@ -978,7 +978,26 @@ window.addEventListener('afterprint', () => document.body.classList.remove('prin
 // على الموقع المنشور لا يوجد خادم محلي: نتصل بـ Supabase مباشرة بدل انتظار طلب api/me الفاشل.
 // حتى تكتمل معرفة الجلسة تبقى شاشة الانتظار، فلا تظهر المنصة لحظة ثم تُستبدل بصفحة الدخول.
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+// نُشر إصدار أحدث من المحفوظ في المتصفح؟ (version.json لا يُحفظ أبدًا) تُجلب الصفحة من الخادم ثم يُعاد تحميلها مرة واحدة،
+// فيظهر التحديث فور النشر بدل انتظار انتهاء ذاكرة المتصفح.
+async function reloadIfNewer() {
+  const cur = document.querySelector('meta[name="itqan-version"]')?.content;
+  if (!cur || LOCAL_HOST) return false;
+  try {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 2500);
+    const { v } = await (await fetch('version.json', { cache: 'no-store', signal: ctl.signal })).json();
+    clearTimeout(t);
+    if (!v || v === cur) return false;
+    const key = 'itqan-reloaded-' + v;
+    if (sessionStorage.getItem(key)) return false; // لا حلقة إعادة تحميل
+    sessionStorage.setItem(key, '1');
+    await fetch(location.pathname, { cache: 'reload' }).catch(() => {});
+    location.reload();
+    return true;
+  } catch { return false; }
+}
 (async () => {
+  if (await reloadIfNewer()) return new Promise(() => {}); // تبقى شاشة الانتظار حتى يكتمل إعادة التحميل
   if (!LOCAL_HOST) await useSupabase();
   return api('/me');
 })().then(r => { state.user = r.user; renderUserbox(); route(); }).catch(() => { renderUserbox(); route(); });
