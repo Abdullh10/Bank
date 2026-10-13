@@ -57,8 +57,15 @@ export async function pageStudentHome(ctx) {
   const { state, esc, $app, api, fail } = ctx;
   if (session && !session.summary) return renderQuestion(ctx); // جلسة جارية
   const catalog = await api('/student/catalog');
+  if (!catalog.length) {
+    $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
+      <h1>مرحبًا ${esc(state.user.displayName.split(' ')[0])}</h1>
+      <p class="muted">لم يُسند لك مقرر بعد؛ راجع معلمك ليسند لك مقررك، ثم أعد تحميل الصفحة.</p></div></div></section>`;
+    return;
+  }
   const prefs = { count: 10, levels: 'graded', timed: false, lessons: [], ...loadPrefs() };
   const chosen = new Set(prefs.lessons);
+  const multi = new Set(catalog.map(c => c.courseId)).size > 1;
   $app.innerHTML = `
     <section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
       <span class="eyebrow">${icon('spark', 18)} تدريب ذاتي لا يدخل في الدرجات</span>
@@ -67,7 +74,7 @@ export async function pageStudentHome(ctx) {
     <div class="grid2 st-setup">
       <section class="card">${ttl('lessons', 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
-          <summary>${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span><b>الفصل ${c.number}:</b> ${esc(c.title)}</span></summary>
+          <summary>${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span>${multi && c.course ? `<small class="muted">${esc(c.course)} · </small>` : ''}<b>الفصل ${c.number}:</b> ${esc(c.title)}</span></summary>
           ${c.lessons.map(l => {
             const n = l.basic + l.apply + l.higher;
             return `<label class="st-lesson"><input type="checkbox" data-lesson="${l.id}" ${chosen.has(l.id) ? 'checked' : ''} ${n ? '' : 'disabled'}>

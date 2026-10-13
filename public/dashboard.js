@@ -71,7 +71,7 @@ export async function pageDashboard(ctx) {
   const wkLabel = w => { const [, m, day] = w.week.split('-'); return `${Number(day)}/${Number(m)}`; };
   const hasPractice = pr.answers > 0;
 
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ لوحة المؤشرات</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ لوحة المؤشرات</div>
     <div class="hero"><div class="hero-ic">${icon('reports', 52)}<div><h1>لوحة المؤشرات</h1>
       <p class="muted">أرقام مجمّعة تُحسب لحظيًا من قاعدة البيانات، دون أسماء الطلاب. آخر تحديث: ${esc(new Date(d.generatedAt).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }))}</p></div></div>
       <div class="actions no-print"><button type="button" id="d-refresh">${line('clock', 17)}تحديث</button><button type="button" id="d-print">${line('print', 17)}طباعة</button></div></div>

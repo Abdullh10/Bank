@@ -86,8 +86,10 @@ const server = http.createServer(async (req, res) => {
         const meta = await pool.query(`select unnest(proargnames) n, unnest(proargtypes::regtype[]::text[]) t from pg_proc where proname = $1 and pronamespace = 'public'::regnamespace`, [fn]);
         const names = Object.keys(b);
         const args = names.map((n, i) => `${n} => $${i + 1}::${meta.rows.find(r => r.n === n)?.t || 'text'}`);
+        // مصفوفات PostgreSQL (uuid[] و text[]) تُمرَّر مصفوفة كما يفعل PostgREST؛ وبقية الكائنات JSON
+        const isArr = n => /\[\]$/.test(meta.rows.find(r => r.n === n)?.t || '');
         out = await asRole(uid, `select to_jsonb(public.${fn}(${args.join(', ')})) r`,
-          names.map(n => b[n] !== null && typeof b[n] === 'object' ? JSON.stringify(b[n]) : b[n]));
+          names.map(n => b[n] !== null && typeof b[n] === 'object' && !isArr(n) ? JSON.stringify(b[n]) : b[n]));
       }
     }
     res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(out)); return;
@@ -154,8 +156,16 @@ await p.click('#p-out'); await p.waitForSelector('#l-user');
 
 // المعلم: يرى المحتوى والإجابات ولا يرى أدوات المراجعة
 await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]');
-await p.waitForSelector('.kpi .value');
+// الصفحة الأولى: المقررات الأربعة، كيمياء 2-1 متاح والبقية قيد الإعداد (لا تُفتح لغير المالك)
+await p.waitForSelector('.course-card');
 ok('viewer: header visible after login', await p.locator('.topbar').isVisible());
+const courseCards = await p.$$eval('.course-card', cs => cs.map(c => c.querySelector('h2').textContent + ':' + (c.classList.contains('preparing') ? 'p' : 'r') + ':' + (c.querySelector('[data-course]') ? 'open' : 'locked')));
+ok('courses: 4 cards in order, only 2-1 ready, preparing locked for teacher', JSON.stringify(courseCards) === JSON.stringify(['كيمياء 1:p:locked', 'كيمياء 2-1:r:open', 'كيمياء 2-2:p:locked', 'كيمياء 3:p:locked']), JSON.stringify(courseCards));
+ok('courses: header line shows chosen course', (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-1 · الصف الثاني الثانوي · الفصل الدراسي الأول'));
+await p.screenshot({ path: `${OUT}/courses.png`, fullPage: true });
+await p.locator('.course-card [data-course="1"]').first().click();
+await p.waitForSelector('.kpi .value');
+ok('courses: card opens course home', (await p.evaluate(() => location.hash)) === '#/course');
 ok('term: textbook, not memo (home)', !/مذكر/.test(await p.locator('main').innerText()));
 ok('no «مسارات» on home', !/مسارات/.test(await p.locator('main').innerText()));
 ok('home: term 1448', (await p.locator('main').innerText()).includes('الفصل الدراسي الأول 1448هـ'));
@@ -228,6 +238,15 @@ ok('export objectives CSV', fs.readFileSync(await dl2.path(), 'utf8').trim().spl
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
+// مالك المشروع: يفتح المقرر «قيد الإعداد» ليتابعه، والتبديل بين المقررات يغيّر البنك والترويسة
+await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
+ok('owner: preparing courses openable', (await p.locator('.course-card.preparing [data-course]').count()) === 3);
+await p.locator('[data-course="3"]').click(); await p.waitForSelector('.notice.warn');
+ok('owner: 2-2 home shows preparing notice + header', (await p.locator('main').innerText()).includes('قيد الإعداد') && (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-2 · الصف الثاني الثانوي · الفصل الدراسي الثاني'));
+await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
+ok('owner: 2-2 bank is empty', (await p.locator('#bank-count').innerText()).trim().startsWith('0'));
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+ok('objective link switches back to its course', (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-1'));
 // مالك المشروع: يعدّل المحتوى ويغلق الملاحظات
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
@@ -278,6 +297,15 @@ const credWb = XL.readFile(await dlc.path()); const credRows = XL.utils.sheet_to
 ok('admin: credentials Excel downloaded with site link', credRows.length === 4 && credRows[0].includes('كلمة المرور') && credRows[1].includes('https://itqanchem.com'), JSON.stringify(credRows[1]));
 await p.click('#as-refresh'); await p.waitForSelector('tr[data-id]');
 ok('admin: list shows grade', (await p.locator('.as-table').innerText()).length > 0 && (await p.inputValue('tr[data-user="st2test"] .as-grade')) === 'ثاني ثانوي');
+ok('admin: new accounts assigned to current course', (await p.locator('tr[data-user="st2test"]').innerText()).includes('كيمياء 2-1'));
+await p.locator('tr[data-user="st2test"] .as-pick').check();
+await p.selectOption('#as-enroll-course', '3'); p.once('dialog', d => d.accept());
+await p.click('#as-enroll-set'); await p.waitForTimeout(900);
+ok('admin: move student to another course', (await p.locator('tr[data-user="st2test"]').innerText()).includes('كيمياء 2-2') && !(await p.locator('tr[data-user="st2test"]').innerText()).includes('كيمياء 2-1'));
+await p.locator('tr[data-user="st2test"] .as-pick').check();
+await p.selectOption('#as-enroll-course', '1'); p.once('dialog', d => d.accept());
+await p.click('#as-enroll-set'); await p.waitForTimeout(900);
+ok('admin: move back to 2-1', (await p.locator('tr[data-user="st2test"]').innerText()).includes('كيمياء 2-1'));
 await p.screenshot({ path: `${OUT}/admin-students.png`, fullPage: true });
 await p.selectOption('#af-grade', 'ثالث ثانوي'); await p.waitForTimeout(600);
 ok('admin: filter by grade', (await p.locator('tr[data-id]').count()) === 1);

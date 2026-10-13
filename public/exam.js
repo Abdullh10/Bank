@@ -24,7 +24,7 @@ const yearsAround = () => Array.from({ length: 5 }, (_, i) => `${HIJRI_NOW.y - 1
 const CHOICES = {
   title: ['اختبار الفصل الدراسي الأول', 'اختبار الفصل الدراسي الثاني', 'اختبار منتصف الفصل الدراسي', 'اختبار الدور الثاني', 'اختبار قصير', 'اختبار تجريبي', 'ورقة عمل'],
   year: yearsAround(),
-  subject: ['الكيمياء 2-1', 'الكيمياء 1', 'الكيمياء 2', 'الكيمياء 3', 'الكيمياء 4'],
+  subject: ['الكيمياء 1', 'الكيمياء 2-1', 'الكيمياء 2-2', 'الكيمياء 3', 'الكيمياء 4'],
   grade: ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي'],
   duration: ['ساعتان ونصف', 'ساعتان', 'ساعة ونصف', 'ساعة واحدة', 'ثلاث ساعات', '45 دقيقة', '30 دقيقة', '20 دقيقة'],
   country: ['المملكة العربية السعودية'],
@@ -135,7 +135,16 @@ function loadDocx() {
 export const resetExam = () => { state.exam = null; state.opts = null; };
 
 export async function pageExam(ctx) {
-  const { api, esc, fail, toast, $app } = ctx;
+  const { api, esc, fail, toast, $app, course } = ctx;
+  // الكليشة تتبع المقرر المختار: المادة والصف وعنوان الفصل الدراسي (مرة عند تغيير المقرر؛ تعديلاتك بعدها تبقى)
+  if (course) {
+    const prev = state.header.courseId ?? 1;
+    if (prev !== course.id) {
+      Object.assign(state.header, { subject: course.title || course.code, grade: course.grade,
+        title: course.term === 'الثاني' ? 'اختبار الفصل الدراسي الثاني' : 'اختبار الفصل الدراسي الأول' });
+    }
+    state.header.courseId = course.id; saveHeader(state.header);
+  }
   const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
   const all = bank.questions;
   const hasAnswers = all.some(q => q.type === 'mcq' && Number.isInteger(q.correctIndex));
@@ -169,7 +178,7 @@ export async function pageExam(ctx) {
   const chk = (name, val, on, label) => `<label class="chk"><input type="checkbox" data-${name}="${esc(val)}" ${on ? 'checked' : ''}> ${esc(label)}</label>`;
 
   $app.innerHTML = `
-    <div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ منشئ الاختبارات</div>
+    <div class="crumbs no-print"><a href="#/course">الرئيسية</a> ‹ منشئ الاختبارات</div>
     <div class="hero no-print"><div class="hero-ic">${icon('exam', 52)}<div><h1>منشئ نماذج الاختبارات</h1>
       <p class="muted">اختر الفصول وعدد الأسئلة ومستواها ونوعها، ثم صدّر الاختبار PDF جاهزًا للطباعة بكليشة المدرسة.</p></div></div></div>
     <div class="grid exam-setup no-print">

@@ -901,3 +901,28 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .tm-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .2rem .9rem; align-items: end; }
 .tm-form .tm-desc, .tm-form .actions { grid-column: 1 / -1; }
 .tm-roles td:first-child { white-space: nowrap; }
+
+/* ---------- صفحة المقررات ---------- */
+.course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.course-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.1rem 1.15rem 1.15rem;
+  display: flex; flex-direction: column; gap: .75rem; position: relative; overflow: hidden; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+.course-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, var(--brand-3), var(--sand)); }
+.course-card:not([aria-disabled]):hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.course-card.current { border-color: var(--brand-3); box-shadow: var(--shadow), 0 0 0 2px var(--brand-soft); }
+.course-card.preparing::before { background: var(--line-2); }
+.course-card[aria-disabled] { opacity: .62; }
+.course-card[aria-disabled] .ic { filter: grayscale(.7); }
+.cc-head { display: flex; align-items: center; gap: .8rem; }
+.cc-head h2 { margin: 0; font-size: 1.35rem; color: var(--brand-2); }
+.cc-head p { margin: .15rem 0 0; color: var(--ink-2); font-size: .9rem; line-height: 1.6; }
+.cc-status { display: flex; flex-wrap: wrap; gap: .4rem; }
+.cc-status .badge { display: inline-flex; align-items: center; gap: .25rem; }
+.cc-nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; margin: 0; }
+.cc-nums div { background: var(--surface-2); border-radius: var(--radius-xs); padding: .45rem .3rem; text-align: center; }
+.cc-nums dt { font-size: .74rem; color: var(--ink-3); order: 2; }
+.cc-nums dd { margin: 0; font-weight: 700; color: var(--brand-2); font-variant-numeric: tabular-nums; }
+.cc-note { margin: 0; flex: 1; }
+.course-card > button { margin-top: auto; justify-content: center; }
+.as-course { max-width: 22rem; margin-top: .6rem; }
+.as-enroll { display: inline-flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.as-enroll select { width: auto; }

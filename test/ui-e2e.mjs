@@ -26,7 +26,7 @@ const noHScroll = p => p.evaluate(() => document.documentElement.scrollWidth <= 
 for (const [name, vp] of [['desktop', { width: 1366, height: 900 }], ['ipad', { width: 820, height: 1180 }], ['mobile', { width: 390, height: 844 }]]) {
   const p = await page(vp);
   await login(p);
-  await p.goto(BASE + '/#/'); await p.waitForSelector('.kpi .value');
+  await p.goto(BASE + '/#/course'); await p.waitForSelector('.kpi .value');
   check(`${name}: RTL`, await p.evaluate(() => getComputedStyle(document.body).direction === 'rtl'));
   check(`${name}: no horizontal scroll (home)`, await noHScroll(p));
   await p.screenshot({ path: `${OUT}/${name}-home.png`, fullPage: true });
