@@ -102,7 +102,7 @@ const server = http.createServer(async (req, res) => {
 }).listen(8766);
 
 const FAKE_SDK = `
-const M = 'http://localhost:8766/mock';
+const M = location.origin + '/mock';
 export function createClient() {
   let token = localStorage.getItem('mocktok');
   const post = (p, b) => fetch(M + p, { method: 'POST', headers: { 'content-type': 'application/json', ...(token ? { authorization: token } : {}) }, body: JSON.stringify(b || {}) }).then(r => r.json());
@@ -128,7 +128,7 @@ if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/
 const p = await ctx.newPage();
 p.on('pageerror', e => errors.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|404/.test(m.text())) errors.push('console: ' + m.text()); });
-const BASE = 'http://localhost:8766/Bank/public/';
+const BASE = `http://${process.env.E2E_HOST || 'localhost'}:8766/Bank/public/`;
 const Q2 = sel => p.locator('#mcq-list .q').nth(1).locator(sel);
 
 try {
@@ -141,7 +141,7 @@ await p.screenshot({ path: `${OUT}/supa-login.png` });
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#l-user');
 ok('anon: deep link still shows login only', !(await p.locator('.q').count()));
 const direct = await p.evaluate(async () => Promise.all(['get_bank', 'get_stats', 'get_chapters'].map(fn =>
-  fetch('http://localhost:8766/mock/rpc/' + fn, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(r => r.json()))));
+  fetch(location.origin + '/mock/rpc/' + fn, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(r => r.json()))));
 ok('anon: database refuses direct reads', direct.every(r => r.error && !r.data), JSON.stringify(direct.map(r => r.error?.code)));
 
 // حساب جديد لم يفعّله المشرف: رسالة انتظار فقط
@@ -274,7 +274,7 @@ await p.click('#c-form button[type=submit]'); await p.waitForSelector('#s-start'
 ok('student: nav shows only practice + history', await p.locator('[data-nav="history"]').isVisible() && !(await p.locator('[data-nav="bank"]').isVisible()) && !(await p.locator('[data-nav="exam"]').isVisible()));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#s-start');
 ok('student: teacher pages redirect to practice', !(await p.locator('#bank-list, .kpi').count()));
-const blocked = await p.evaluate(async () => (await fetch('http://localhost:8766/mock/rpc/get_bank', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
+const blocked = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('student: database refuses teacher reads', !!blocked.error);
 await p.locator('.toast').first().waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
 await p.screenshot({ path: `${OUT}/student-setup.png`, fullPage: true });
