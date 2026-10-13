@@ -29,7 +29,8 @@ const fnDeps = {
   deleteUser: async id => { await pool.query('delete from auth.users where id = $1', [id]); return {}; },
   callerRole: async jwt => { const r = await asRole(jwt, 'select to_jsonb(public.get_me()) r'); return r.error ? { error: r.error.message } : { role: r.data?.role || null }; },
   initStudent: async (jwt, id, { name, section, grade }) => { const r = await asRole(jwt, 'select to_jsonb(public.admin_init_student($1, $2, $3, $4)) r', [id, name, section || null, grade || null]); return r.error ? { error: r.error.message } : {}; },
-  isStudent: async (jwt, id) => (await asRole(jwt, 'select to_jsonb(public.admin_is_student($1)) r', [id])).data === true,
+  initStaff: async (jwt, id, { name, role }) => { const r = await asRole(jwt, 'select to_jsonb(public.admin_init_staff($1, $2, $3)) r', [id, name, role]); return r.error ? { error: r.error.message } : {}; },
+  canManage: async (jwt, id) => (await asRole(jwt, 'select to_jsonb(public.admin_can_manage($1)) r', [id])).data === true,
   createUser: async ({ email }) => {
     if ((await pool.query('select 1 from auth.users where email = $1', [email])).rowCount) return { error: 'User already registered' };
     return { id: (await pool.query('insert into auth.users (email) values ($1) returning id', [email])).rows[0].id };
@@ -121,7 +122,7 @@ export function createClient() {
 const browser = await chromium.launch();
 const results = [], errors = [];
 const ok = (n, v, extra = '') => results.push(`${v ? 'PASS' : 'FAIL'} ${n} ${extra}`);
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1) });
+const ctx = await browser.newContext({ viewport: { width: Number(process.env.E2E_WIDTH || 1280), height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1) });
 await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
 if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
@@ -192,21 +193,30 @@ await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
 ok('reviewer: answers visible', (await p.locator('#mcq-list .answer:visible').count()) === 7);
 ok('reviewer: questions approved by owner decision', (await p.locator('#mcq-list .badge.ok').count()) === 7);
-await p.locator('[data-qedit]').nth(1).click(); await p.waitForSelector('#e-stem');
-await p.fill('#e-stem', 'ما وحدة قياس طاقة الفوتون في النظام الدولي للوحدات؟');
-await p.click('#e-save');
-ok('edit saved through RPC', await Q2('.q-stem', { hasText: 'في النظام الدولي للوحدات' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
-ok('edit moved approved -> in_review', await Q2('.badge.warn', { hasText: 'قيد المراجعة' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
-await p.locator('[data-qhist]').nth(1).click(); await p.waitForSelector('dialog[open] table');
-const hist = await p.locator('dialog[open] table').innerText();
-ok('history shows edit by reviewer + owner approval', hist.includes('تعديل') && hist.includes('عبدالله حمدي') && hist.includes('مالك المشروع'));
-await p.keyboard.press('Escape');
+// المراجع العلمي: يعتمد ويعيد ويكتب ملاحظات، ولا يعدّل نص المحتوى
+ok('reviewer: no edit/duplicate/exclude/add buttons', (await p.locator('[data-qedit], [data-qdup], [data-qexclude], [data-add], #approved-text, #save-counts').count()) === 0);
+const revEdit = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/exclude_question', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_id: 1, p_excluded: true, p_note: 'x' }) })).json());
+ok('reviewer: database rejects content edits', !!revEdit.error && /لمالك المشروع/.test(revEdit.error.message || ''), JSON.stringify(revEdit).slice(0, 160));
+await p.locator('[data-qnote]').nth(1).click(); await p.waitForSelector('#nd-body');
+await p.fill('#nd-body', 'البديل الثاني يحتاج صياغة أدق للوحدة');
+await p.click('#nd-save');
+ok('reviewer: note on question saved', await p.locator('#notes-card .note', { hasText: 'صياغة أدق للوحدة' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
+await p.selectOption('#n-target', 'objective:'); await p.fill('#n-body', 'يقترح المراجع تحديد السلوك في صياغة الهدف');
+await p.click('#n-save');
+ok('reviewer: note on objective saved', await p.locator('#notes-card .note', { hasText: 'تحديد السلوك' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
+await p.locator('[data-qstatus$=":in_review"]').nth(1).click();
+ok('reviewer: status -> in_review', await Q2('.badge.warn', { hasText: 'قيد المراجعة' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
 await p.locator('[data-qstatus$=":approved"]').nth(1).click(); await p.waitForTimeout(800);
-ok('re-approve after passing auto-check', (await Q2('.badge.ok').count()) >= 1);
+ok('reviewer: re-approve', (await Q2('.badge.ok').count()) >= 1);
 await p.click('[data-review="approve"]'); await p.waitForTimeout(800);
 ok('objective approved', (await p.locator('.hero .badge.ok', { hasText: 'معتمد' }).count()) === 1);
 await p.goto(BASE + '#/reports'); await p.waitForSelector('#revs table', { timeout: 8000 });
-ok('reports: revisions list', (await p.locator('#revs tbody tr').count()) >= 3);
+ok('dashboard (reviewer): revisions list + open notes', (await p.locator('#revs tbody tr').count()) >= 3 && (await p.locator('.d-big').innerText()).trim() === '2');
+ok('dashboard: bank charts rendered', (await p.locator('.d-stack .d-seg').count()) === 3 && (await p.locator('.d-bars').count()) >= 1);
+await p.screenshot({ path: `${OUT}/dashboard.png`, fullPage: true });
+await p.goto(BASE + '#/notes'); await p.waitForSelector('.notes .note');
+ok('reviewer: notes page lists open notes, no resolve button', (await p.locator('.notes .note').count()) === 2 && (await p.locator('[data-nresolve]').count()) === 0);
 await p.goto(BASE + '#/bank'); await p.waitForSelector('[data-export]', { timeout: 15000 });
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('[data-export="questions"]')]);
 const csv = fs.readFileSync(await dl.path(), 'utf8');
@@ -218,6 +228,38 @@ ok('export objectives CSV', fs.readFileSync(await dl2.path(), 'utf8').trim().spl
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
+// مالك المشروع: يعدّل المحتوى ويغلق الملاحظات
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
+await p.locator('[data-qedit]').nth(1).click(); await p.waitForSelector('#e-stem');
+await p.fill('#e-stem', 'ما وحدة قياس طاقة الفوتون في النظام الدولي للوحدات؟');
+await p.click('#e-save');
+ok('owner: edit saved through RPC', await Q2('.q-stem', { hasText: 'في النظام الدولي للوحدات' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
+ok('owner: edit moved approved -> in_review', await Q2('.badge.warn', { hasText: 'قيد المراجعة' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
+await p.locator('[data-qhist]').nth(1).click(); await p.waitForSelector('dialog[open] table');
+const hist = await p.locator('dialog[open] table').innerText();
+ok('history shows reviewer status change + owner edit', hist.includes('تعديل') && hist.includes('عبدالله حمدي') && hist.includes('مالك المشروع'));
+await p.keyboard.press('Escape');
+await p.locator('[data-qstatus$=":approved"]').nth(1).click(); await p.waitForTimeout(800);
+await p.goto(BASE + '#/notes'); await p.waitForSelector('[data-nresolve]');
+p.once('dialog', d => d.accept('عُدّلت الصياغة'));
+await p.locator('[data-nresolve]').first().click();
+await p.waitForTimeout(900);
+ok('owner: note resolved', (await p.locator('.notes .note').count()) === 1);
+await p.locator('[data-nstatus="resolved"]').click(); await p.waitForTimeout(600);
+ok('owner: resolved tab shows response', (await p.locator('.note.done .note-resp').innerText()).includes('عُدّلت الصياغة'));
+// حسابات الفريق: إنشاء مدير مدرسة ومشرف تربوي
+await p.goto(BASE + '#/team'); await p.waitForSelector('#tm-form');
+await pool.query(`delete from auth.users where email in ('principal1@chem21.local', 'super1@chem21.local')`);
+await p.fill('#tm-name', 'مدير المدرسة التجريبي'); await p.selectOption('#tm-role', 'principal'); await p.fill('#tm-user', 'principal1'); await p.fill('#tm-pass', 'Prin-Pass-1');
+await p.click('#tm-create'); await p.waitForSelector('#tm-result .notice.ok');
+await p.fill('#tm-name', 'مشرف تربوي تجريبي'); await p.selectOption('#tm-role', 'supervisor'); await p.fill('#tm-user', 'super1');
+await p.click('#tm-create'); await p.locator('#tm-result .notice.ok', { hasText: 'super1' }).waitFor();
+const teamRows = await p.$$eval('tr[data-user]', trs => trs.map(tr => tr.dataset.user + ':' + tr.querySelector('.tm-r').value));
+ok('owner: team accounts created with roles', teamRows.includes('principal1:principal') && teamRows.includes('super1:supervisor'), JSON.stringify(teamRows));
+await p.screenshot({ path: `${OUT}/team.png`, fullPage: true });
+await p.goto(BASE + '#/students'); await p.waitForSelector('#as-file');
+ok('owner: team accounts not listed as students', !(await p.locator('.as-table').count()) || !(await p.locator('.as-table').innerText()).includes('مدير المدرسة التجريبي'));
 await p.goto(BASE + '#/students'); await p.waitForSelector('#as-file');
 // ملف Excel حقيقي بعناوين عربية
 const XL = createRequire(process.env.XLSX_MODULE + '/')('xlsx');
@@ -309,6 +351,32 @@ await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('bu
 await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
 ok('teacher: progress lists student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي'));
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
+// مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
+await p.click('#logout'); await p.waitForSelector('#l-user');
+await p.fill('#l-user', 'principal1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
+const navOf = async () => p.$$eval('.nav a', as => as.filter(a => !a.hidden).map(a => a.dataset.nav));
+ok('principal: role label', (await p.locator('#userbox').innerText()).includes('مدير المدرسة'));
+ok('principal: nav = home, chapters, bank, dashboard', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'reports']), JSON.stringify(await navOf()));
+await p.goto(BASE + '#/reports'); await p.waitForSelector('.d-cols');
+ok('principal: dashboard with weekly + section charts, no revisions/notes', (await p.locator('.d-col').count()) === 8 && (await p.locator('.d-bars').count()) >= 4 && !(await p.locator('#revs').count()));
+await p.screenshot({ path: `${OUT}/dashboard-principal.png`, fullPage: true });
+ok('principal: dashboard shows no student names', !(await p.locator('main').innerText()).includes('طالب ثان تجريبي'));
+await p.goto(BASE + '#/progress'); await p.waitForTimeout(600);
+ok('principal: progress page blocked', (await p.locator('main').innerText()).includes('غير متاحة لدورك'));
+const prinProg = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/teacher_progress', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
+ok('principal: database rejects student names', !!prinProg.error);
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+ok('principal: questions readable, no review tools', (await p.locator('.review-panel, [data-add], #notes-card').count()) === 0);
+// المشرف التربوي: اطلاع + منشئ الاختبارات + لوحة المؤشرات، دون تعديل
+await p.click('#logout'); await p.waitForSelector('#l-user');
+await p.fill('#l-user', 'super1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
+ok('supervisor: nav includes exam builder + dashboard, no progress/notes/accounts', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'exam', 'reports']), JSON.stringify(await navOf()));
+await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
+ok('supervisor: exam builder opens', true);
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
+ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);
 
 } catch (e) { results.push('FAIL exception: ' + e.message.split('\n')[0]); await p.screenshot({ path: `${OUT}/supa-fail.png` }); }
 console.log(results.join('\n'));

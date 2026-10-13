@@ -3,7 +3,10 @@ import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { similarPairs } from './validate.js';
 import { pageStudentHome, pageStudentHistory, pageStudentConfirm, resetStudentSession } from './student.js';
-import { pageTeacherProgress, pageAdminStudents, resetStaffState } from './staff.js';
+import { pageTeacherProgress, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
+import { pageDashboard } from './dashboard.js';
+import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
+import { PERMS, ROLE_NAMES } from './roles.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
@@ -127,7 +130,9 @@ const fail = e => {
   toast(e.errors?.length ? e.errors.join('، ') : e.message, true);
 };
 
-const isReviewer = () => ['reviewer', 'admin'].includes(state.user?.role);
+// الصلاحيات حسب الدور (roles.js)، وقاعدة البيانات تفرض الشيء نفسه في دوالها المحمية.
+const can = perm => !!PERMS[state.user?.role]?.includes(perm);
+const isReviewer = () => can('review');
 
 const OBJ_STATUS = { pending: ['بانتظار المراجعة', ''], approved: ['معتمد', 'ok'], returned: ['أُعيد للتعديل', 'bad'] };
 const Q_STATUS = {
@@ -159,9 +164,8 @@ const list = (arr, tag = 'ul') => (arr?.length ? `<${tag}>${arr.map(x => `<li>${
 function renderUserbox() {
   const box = document.getElementById('userbox');
   if (state.user) {
-    const roles = { admin: 'مشرف', reviewer: 'مراجع', viewer: 'معلم (اطلاع)', student: 'طالب', pending: 'بانتظار التفعيل' };
     box.innerHTML = `<span class="avatar" aria-hidden="true">${esc((state.user.displayName || '؟').trim().charAt(0))}</span>
-      <span class="who"><b>${esc(state.user.displayName)}</b><span>${roles[state.user.role]}</span></span>
+      <span class="who"><b>${esc(state.user.displayName)}</b><span>${ROLE_NAMES[state.user.role] || ''}</span></span>
       <button type="button" id="logout" title="تسجيل الخروج">${line('logout', 17)}<span>خروج</span></button>`;
     box.querySelector('#logout').onclick = async () => { state.user = null; await apiRaw('/logout', { method: 'POST' }).catch(() => {}); signedOut(); };
   } else {
@@ -268,7 +272,7 @@ const objState = { mode: 'test', answers: {} };
 
 // الخروج (أو انتهاء الجلسة): تُمسح كل حالة المستخدم السابق من الجهاز قبل عرض صفحة الدخول.
 function signedOut() {
-  resetStudentSession(); resetExam(); resetStaffState(); bankCache = null;
+  resetStudentSession(); resetExam(); resetStaffState(); resetNotesState(); bankCache = null;
   for (const k in bankFilter) delete bankFilter[k];
   state.selection.clear();
   Object.assign(objState, { mode: 'test', answers: {} });
@@ -318,7 +322,7 @@ async function pageObjective(code) {
         <dt>المرجع في الكتاب المدرسي</dt><dd>${o.memoNote ? esc(cleanRef(o.memoNote)) : '—'}</dd>
         ${o.duplicateOf ? `<dt>تكرار</dt><dd>${badge('مكرر للهدف ' + o.duplicateOf, 'warn')}</dd>` : ''}
       </dl>
-      ${isReviewer() ? reviewPanel(o) : `<p class="small muted" style="margin-top:.6rem">اعتماد الهدف متاح للمراجعين بعد تسجيل الدخول.</p>`}
+      ${isReviewer() ? reviewPanel(o) : ''}
     </section>
 
     ${s ? supplementCard(s) : ''}
@@ -332,7 +336,7 @@ async function pageObjective(code) {
           </div>
           <button type="button" data-print="student">${line('print', 17)}طباعة دون حلول</button>
           ${data.answersIncluded ? `<button type="button" data-print="teacher">${line('print', 17)}طباعة مع الحلول</button>` : ''}
-          ${isReviewer() ? `<button type="button" class="primary" data-add="mcq">+ سؤال اختيار</button>` : ''}
+          ${can('edit') ? `<button type="button" class="primary" data-add="mcq">+ سؤال اختيار</button>` : ''}
         </div>
       </div>
       ${modeHint(data.answersIncluded)}
@@ -343,11 +347,13 @@ async function pageObjective(code) {
     <section class="card" id="essay-section">
       <div class="section-title" style="margin-top:0">
         ${ttl('essay', `الأسئلة المقالية <span class="muted small">(${essay.filter(active).length} من ${o.requiredEssay} مطلوبة)</span>`)}
-        ${isReviewer() ? `<button type="button" class="primary no-print" data-add="essay">+ سؤال مقالي</button>` : ''}
+        ${can('edit') ? `<button type="button" class="primary no-print" data-add="essay">+ سؤال مقالي</button>` : ''}
       </div>
       ${essay.length ? essay.map(q => essayCard(q, data.answersIncluded)).join('') : '<div class="empty">لا توجد أسئلة مقالية لهذا الهدف بعد.</div>'}
-    </section>`;
-  bindObjective(o, questions);
+    </section>
+    ${can('notes') && state.supabase ? '<section class="card no-print" id="notes-card"></section>' : ''}`;
+  bindObjective(o, questions, s);
+  if (can('notes') && state.supabase) notesCard(nctx(), document.getElementById('notes-card'), o, questions, s);
 }
 
 const modeBtn = (m, label) => `<button type="button" class="${objState.mode === m ? 'on' : ''}" data-mode="${m}">${label}</button>`;
@@ -361,20 +367,21 @@ function modeHint(answers) {
 }
 
 function reviewPanel(o) {
+  const owner = can('edit');
   return `<div class="card review-panel">
     ${ttl('shield', 'مراجعة الهدف واعتماده', 'h3', 28)}
-    <div class="field"><label for="approved-text">الصياغة التي ستُعتمد</label>
+    ${owner ? `<div class="field"><label for="approved-text">الصياغة التي ستُعتمد</label>
       <textarea id="approved-text">${esc(o.approvedText || o.proposedText || o.originalText)}</textarea></div>
     <div class="form-grid">
       <div class="field"><label for="req-mcq">عدد أسئلة الاختيار المطلوب</label><input id="req-mcq" type="number" min="0" max="30" value="${o.requiredMcq}"></div>
       <div class="field"><label for="req-essay">عدد الأسئلة المقالية المطلوب</label><input id="req-essay" type="number" min="0" max="30" value="${o.requiredEssay}"></div>
-    </div>
-    <div class="field"><label for="review-note">ملاحظات المراجع (إلزامية عند الإعادة)</label><textarea id="review-note"></textarea></div>
+    </div>` : `<p class="small muted">يُعتمد الهدف بصياغته الحالية. لاقتراح صياغة أخرى اكتب «ملاحظة» في أسفل الصفحة، ويطّلع عليها مالك المشروع.</p>`}
+    <div class="field"><label for="review-note">سبب القرار (إلزامي عند الإعادة)</label><textarea id="review-note"></textarea></div>
     <div class="actions">
       <button type="button" class="ok" data-review="approve">اعتماد الهدف</button>
       <button type="button" class="danger" data-review="return">إعادة للتعديل</button>
       <button type="button" data-review="reset">إلغاء الاعتماد</button>
-      <button type="button" id="save-counts">حفظ الأعداد المطلوبة</button>
+      ${owner ? '<button type="button" id="save-counts">حفظ الأعداد المطلوبة</button>' : ''}
     </div></div>`;
 }
 
@@ -390,7 +397,7 @@ function supplementCard(s) {
     ${s.scientificNotes ? `<p class="small muted"><strong>ملاحظات علمية:</strong> ${esc(cleanRef(s.scientificNotes))}</p>` : ''}
     ${isReviewer() ? `<div class="actions">
       <button type="button" class="ok" data-sup="approve">اعتماد المحتوى</button>
-      <button type="button" data-sup="edit">تعديل</button>
+      ${can('edit') ? '<button type="button" data-sup="edit">تعديل</button>' : ''}
       <button type="button" class="danger" data-sup="return">إعادة للمراجعة</button></div>` : ''}
   </section>`;
 }
@@ -461,14 +468,15 @@ function reviewTools(q) {
       <button type="button" class="ok" data-qstatus="${q.id}:approved">اعتماد</button>
       <button type="button" data-qstatus="${q.id}:in_review">قيد المراجعة</button>
       <button type="button" class="danger" data-qstatus="${q.id}:needs_revision">يحتاج إلى تعديل</button>
-      <button type="button" data-qedit="${q.id}">تعديل</button>
+      ${can('notes') && state.supabase ? `<button type="button" data-qnote="${q.id}">${line('plus', 15)}ملاحظة</button>` : ''}
+      ${can('edit') ? `<button type="button" data-qedit="${q.id}">تعديل</button>
       <button type="button" data-qdup="${q.id}">نسخ</button>
-      <button type="button" data-qexclude="${q.id}:${q.excluded ? 0 : 1}">${q.excluded ? 'إرجاع' : 'استبعاد'}</button>
+      <button type="button" data-qexclude="${q.id}:${q.excluded ? 0 : 1}">${q.excluded ? 'إرجاع' : 'استبعاد'}</button>` : ''}
       <button type="button" data-qhist="${q.id}">سجل التعديلات</button>
     </div>` : ''}`;
 }
 
-function bindObjective(o, questions) {
+function bindObjective(o, questions, s) {
   const reload = () => pageObjective(o.code).catch(fail);
   $app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { objState.mode = b.dataset.mode; objState.answers = {}; reload(); });
   $app.querySelectorAll('[data-print]').forEach(b => b.onclick = () => printAs(b.dataset.print));
@@ -501,7 +509,7 @@ function bindObjective(o, questions) {
   $app.querySelectorAll('[data-review]').forEach(b => b.onclick = guard(async () => {
     try {
       await api(`/objectives/${o.code}/review`, { method: 'POST', body: {
-        action: b.dataset.review, approved_text: document.getElementById('approved-text').value, note: document.getElementById('review-note').value } });
+        action: b.dataset.review, approved_text: document.getElementById('approved-text')?.value ?? null, note: document.getElementById('review-note').value } });
       toast('تم حفظ قرار المراجعة'); reload();
     } catch (e) { fail(e); }
   }));
@@ -544,7 +552,13 @@ function bindObjective(o, questions) {
   $app.querySelectorAll('[data-add]').forEach(b => b.onclick = () =>
     openEditor(b.dataset.add, null, async body => { await api(`/objectives/${o.code}/questions`, { method: 'POST', body: { ...body, type: b.dataset.add } }); }, reload));
   $app.querySelectorAll('[data-qhist]').forEach(b => b.onclick = () => showHistory(Number(b.dataset.qhist)));
+  $app.querySelectorAll('[data-qnote]').forEach(b => b.onclick = () => {
+    const q = questions.find(x => x.id === Number(b.dataset.qnote));
+    noteDialog(nctx(), { code: o.code, entity: 'question', question: q }, reload);
+  });
 }
+// سياق صفحات الملاحظات ولوحة المؤشرات
+const nctx = () => ({ api, esc, fail, toast, $app, state, can, dialog, guard, badge, ttl, done: () => route() });
 
 function printAs(kind) {
   document.body.classList.remove('print-student', 'print-teacher');
@@ -862,7 +876,8 @@ async function route() {
   const hash = location.hash.replace(/^#/, '') || '/';
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
-    a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))));
+    a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))
+    || (a.dataset.nav === 'students' && page === 'team')));
   document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
   // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
   const locked = !state.user || state.user.role === 'pending';
@@ -871,9 +886,9 @@ async function route() {
   if (locked) { if (state.user) pagePending(); else pageLogin(); window.scrollTo(0, 0); return; }
   // القائمة حسب الدور: الطالب يرى «تدرّب» و«سجلي» فقط، و«حسابات الطلاب» للمشرف.
   const role = state.user.role, isStudent = role === 'student';
-  document.querySelectorAll('[data-roles]').forEach(a => {
-    const r = a.dataset.roles;
-    a.hidden = !(r === 'student' ? isStudent : r === 'admin' ? role === 'admin' : !isStudent);
+  document.querySelectorAll('[data-perm]').forEach(a => {
+    const p = a.dataset.perm;
+    a.hidden = !(p === 'student' ? isStudent : p === 'staff' ? !isStudent : can(p) && (state.supabase || !SUPABASE_ONLY.includes(p)));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
@@ -894,12 +909,14 @@ async function route() {
     else if (page === 'chapter') await pageChapter(arg);
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
     else if (page === 'bank') await pageBank();
-    else if (page === 'reports') await pageReports();
-    else if (page === 'exam') await pageExam({ api, esc, fail, toast, $app });
-    else if (page === 'progress') await pageTeacherProgress(ctx);
-    else if (page === 'students' && role === 'admin') await pageAdminStudents(ctx);
+    else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
+    else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app });
+    else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
+    else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
+    else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);
+    else if (page === 'team' && can('accounts') && state.supabase) await pageAdminTeam(ctx);
     else if (page === 'login') location.hash = '#/';
-    else $app.innerHTML = '<div class="empty">الصفحة غير موجودة.</div>';
+    else $app.innerHTML = '<div class="empty">الصفحة غير موجودة أو غير متاحة لدورك.</div>';
   } catch (e) {
     if (e?.stale || seq !== routeSeq) return;
     if (e?.status === 401 && state.user) return fail(e);
@@ -908,6 +925,8 @@ async function route() {
   window.scrollTo(0, 0);
 }
 
+// صفحات تعمل على قاعدة Supabase فقط (لا يوفرها الخادم المحلي القديم)
+const SUPABASE_ONLY = ['notes'];
 window.addEventListener('hashchange', route);
 // رابط إلى الصفحة الحالية نفسها (مثل «بنك الأسئلة» من ورقة الأسئلة) لا يطلق hashchange؛ يُعاد عرض الصفحة
 document.addEventListener('click', e => {

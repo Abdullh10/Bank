@@ -1,4 +1,5 @@
-// دالة حافة (Edge Function) لإدارة حسابات الطلاب: إنشاء حسابات وإعادة تعيين كلمات المرور.
+// دالة حافة (Edge Function) لإدارة الحسابات: إنشاء حسابات الطلاب وحسابات الفريق (مراجع، معلم، مشرف تربوي، مدير مدرسة)،
+// وإعادة تعيين كلمات المرور وتغيير اسم المستخدم والحذف.
 // تعمل داخل Supabase، ويصلها مفتاح الخدمة تلقائيًا من بيئة Supabase (SUPABASE_SERVICE_ROLE_KEY)؛ لا يوضع في الموقع ولا في المستودع.
 // لا تنفذ شيئًا إلا إذا كان المستدعي مسجلًا بدور «admin».
 // النشر: Supabase ← Edge Functions ← Deploy a new function ← Via Editor، الاسم: admin-users، والصق هذا الملف كاملًا.
@@ -17,10 +18,12 @@ export function randomUsername() {
 }
 export const cleanUsername = u => String(u || '').trim().toLowerCase();
 export const validUsername = u => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(u);
+export const STAFF_ROLES = ['reviewer', 'viewer', 'supervisor', 'principal'];
 
 // المنطق مستقل عن Supabase ليُختبر. التحقق من الدور وتحديث ملف الطالب يتمان بتوكن المشرف نفسه (عبر دوال قاعدة البيانات)،
 // ومفتاح الخدمة لا يُستخدم إلا لإنشاء الحساب وتغيير كلمة المرور في Supabase Auth.
-// deps = { callerRole(jwt) → {role}|{error}, initStudent(jwt, id, {name, section, grade}) → {}|{error}, isStudent(jwt, id) → bool,
+// deps = { callerRole(jwt) → {role}|{error}, initStudent(jwt, id, {name, section, grade}) → {}|{error},
+//          initStaff(jwt, id, {name, role}) → {}|{error}, canManage(jwt, id) → bool (أي حساب عدا حسابات المالك),
 //          createUser({email,password,name}) → {id}|{error}, setPassword(id, password) → {}|{error},
 //          setEmail(id, email) → {}|{error}, deleteUser(id) → {}|{error} }
 export async function handle(body, jwt, deps) {
@@ -30,8 +33,11 @@ export async function handle(body, jwt, deps) {
   if (who.role !== 'admin') return { status: 403, body: { error: `للمشرف فقط (دور الحساب الحالي: ${who.role || 'غير معروف'})` } };
 
   if (body?.action === 'create') {
+    // حساب فريق: role أحد أدوار الفريق؛ وإلا فهو حساب طالب
+    const staffRole = body.role ? String(body.role) : null;
+    if (staffRole && !STAFF_ROLES.includes(staffRole)) return { status: 400, body: { error: 'الدور غير صالح' } };
     const list = Array.isArray(body.students) ? body.students : [];
-    if (!list.length) return { status: 400, body: { error: 'لا توجد بيانات طلاب' } };
+    if (!list.length) return { status: 400, body: { error: staffRole ? 'لا توجد بيانات الحساب' : 'لا توجد بيانات طلاب' } };
     if (list.length > 100) return { status: 400, body: { error: 'الحد الأقصى 100 طالب في المرة الواحدة' } };
     const results = [];
     for (const s of list) {
@@ -44,6 +50,7 @@ export async function handle(body, jwt, deps) {
       if (name.length < 3) { results.push({ name, ok: false, error: 'الاسم قصير' }); continue; }
       if (username && !validUsername(username)) { results.push({ name, ok: false, error: 'اسم المستخدم: حروف إنجليزية صغيرة وأرقام (3 إلى 30)' }); continue; }
       if (password.length < 8) { results.push({ name, ok: false, error: 'كلمة المرور 8 أحرف على الأقل' }); continue; }
+      if (staffRole && !username) { results.push({ name, ok: false, error: 'اكتب اسم المستخدم لحساب الفريق' }); continue; }
       let created = null, lastErr = '';
       for (let attempt = 0; attempt < (username ? 1 : 5) && !created; attempt++) {
         const u = username || randomUsername();
@@ -52,34 +59,36 @@ export async function handle(body, jwt, deps) {
         else lastErr = /already|exists|registered/i.test(r.error || '') ? 'اسم المستخدم مستخدم من قبل' : (r.error || 'تعذر إنشاء الحساب');
       }
       if (!created) { results.push({ name, ok: false, error: lastErr }); continue; }
-      const init = await deps.initStudent(jwt, created.id, { name, section, grade });
+      const init = staffRole ? await deps.initStaff(jwt, created.id, { name, role: staffRole })
+        : await deps.initStudent(jwt, created.id, { name, section, grade });
       if (init?.error) {
         // لا يبقى حساب معلّق بكلمة مرور معروفة: يُحذف الحساب الذي لم يكتمل ضبطه
         await deps.deleteUser(created.id);
-        results.push({ name, ok: false, error: 'تعذر ضبط ملف الطالب فأُلغي الحساب: ' + init.error }); continue;
+        results.push({ name, ok: false, error: 'تعذر ضبط ملف الحساب فأُلغي: ' + init.error }); continue;
       }
-      results.push({ name, grade, section, username: created.username, password, ok: true });
+      results.push(staffRole ? { name, role: staffRole, username: created.username, password, ok: true }
+        : { name, grade, section, username: created.username, password, ok: true });
     }
     return { status: 200, body: { results } };
   }
 
-  // حذف دفعة: قائمة معرّفات، ويُتحقق من كل حساب أنه حساب طالب قبل حذفه
+  // حذف دفعة: قائمة معرّفات، ويُتحقق من كل حساب أنه ليس حساب مالك قبل حذفه
   if (body?.action === 'deleteMany') {
     const ids = Array.isArray(body.userIds) ? [...new Set(body.userIds)] : [];
     if (!ids.length) return { status: 400, body: { error: 'لم يُحدد أي حساب' } };
     if (ids.length > 300) return { status: 400, body: { error: 'الحد الأقصى 300 حساب في المرة الواحدة' } };
     let deleted = 0; const failed = [];
     for (const id of ids) {
-      if (!(await deps.isStudent(jwt, id))) { failed.push({ id, error: 'ليس حساب طالب' }); continue; }
+      if (!(await deps.canManage(jwt, id))) { failed.push({ id, error: 'لا يمكن حذف هذا الحساب' }); continue; }
       const r = await deps.deleteUser(id);
       if (r?.error) failed.push({ id, error: r.error }); else deleted++;
     }
     return { status: 200, body: { deleted, failed } };
   }
 
-  // الإجراءات التالية لحسابات الطلاب فقط
-  if (['reset', 'rename', 'delete'].includes(body?.action) && !(await deps.isStudent(jwt, body.userId)))
-    return { status: 400, body: { error: 'هذا الإجراء متاح لحسابات الطلاب فقط' } };
+  // الإجراءات التالية لأي حساب عدا حسابات مالك المشروع
+  if (['reset', 'rename', 'delete'].includes(body?.action) && !(await deps.canManage(jwt, body.userId)))
+    return { status: 400, body: { error: 'لا يمكن تنفيذ هذا الإجراء على حساب مالك المشروع' } };
 
   if (body?.action === 'rename') {
     const username = cleanUsername(body.username);
@@ -130,7 +139,11 @@ if (typeof Deno !== 'undefined') {
       const { error } = await asCaller(jwt).rpc('admin_init_student', { p_id: id, p_name: name, p_section: section || null, p_grade: grade || null });
       return error ? { error: error.message } : {};
     },
-    isStudent: async (jwt, id) => (await asCaller(jwt).rpc('admin_is_student', { p_id: id })).data === true,
+    initStaff: async (jwt, id, { name, role }) => {
+      const { error } = await asCaller(jwt).rpc('admin_init_staff', { p_id: id, p_name: name, p_role: role });
+      return error ? { error: error.message } : {};
+    },
+    canManage: async (jwt, id) => (await asCaller(jwt).rpc('admin_can_manage', { p_id: id })).data === true,
     createUser: async ({ email, password, name }) => {
       const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { display_name: name } });
       return error ? { error: error.message } : { id: data.user.id };

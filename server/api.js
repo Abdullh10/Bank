@@ -159,7 +159,7 @@ api.post('/questions/:id/check', (req, res) => {
     distractorNote: J.parse(q.distractor_notes, [])[choice] || null });
 });
 
-api.patch('/objectives/:code', requireRole('reviewer'), (req, res) => {
+api.patch('/objectives/:code', requireRole('admin'), (req, res) => {
   const o = loadObjective(req.params.code);
   if (!o) return res.status(404).json({ error: 'الهدف غير موجود' });
   const v = cleanObjectiveEdit(req.body || {});
@@ -185,7 +185,9 @@ api.post('/objectives/:code/review', requireRole('reviewer'), (req, res) => {
   if (action === 'return' && !String(note || '').trim()) return res.status(400).json({ error: 'اكتب سبب الإعادة للمراجعة' });
   let approvedText = o.approved_text;
   if (action === 'approve') {
-    approvedText = String(req.body.approved_text || o.approved_text || o.proposed_text || o.original_text).trim();
+    // المراجع يعتمد الصياغة الحالية فقط؛ تغيير الصياغة لمالك المشروع
+    const asked = req.user.role === 'admin' ? req.body.approved_text : null;
+    approvedText = String(asked || o.approved_text || o.proposed_text || o.original_text).trim();
     if (approvedText.length < 8) return res.status(400).json({ error: 'الصياغة المعتمدة غير صالحة' });
   }
   tx(d => {
@@ -205,6 +207,7 @@ api.post('/objectives/:code/supplement-review', requireRole('reviewer'), (req, r
   const map = { approve: 'approved', return: 'returned', reset: 'pending' };
   if (!map[action]) return res.status(400).json({ error: 'إجراء غير صالح' });
   const text = supplement != null ? String(supplement).trim() : s.supplement;
+  if (text !== s.supplement && req.user.role !== 'admin') return res.status(403).json({ error: 'تعديل نص المحتوى لمالك المشروع فقط' });
   if (!text) return res.status(400).json({ error: 'نص المحتوى المكمّل فارغ' });
   tx(d => {
     d.prepare('UPDATE supplements SET review_status = ?, supplement = ? WHERE objective_id = ?').run(map[action], text, o.id);
@@ -232,7 +235,7 @@ const Q_COLS = ['stem', 'stimulus', 'options', 'correct_index', 'explanation', '
   'difficulty', 'source_ref', 'reviewer_notes'];
 const JSON_COLS = new Set(['stimulus', 'options', 'distractor_notes', 'answer_elements', 'solution_steps', 'marks', 'rubric', 'common_errors']);
 
-api.post('/objectives/:code/questions', requireRole('reviewer'), (req, res) => {
+api.post('/objectives/:code/questions', requireRole('admin'), (req, res) => {
   const o = loadObjective(req.params.code);
   if (!o) return res.status(404).json({ error: 'الهدف غير موجود' });
   const type = req.body?.type === 'essay' ? 'essay' : 'mcq';
@@ -256,7 +259,7 @@ api.get('/questions/:id', requireRole('reviewer'), (req, res) => {
   res.json(questionRow(q, true));
 });
 
-api.patch('/questions/:id', requireRole('reviewer'), (req, res) => {
+api.patch('/questions/:id', requireRole('admin'), (req, res) => {
   const q = db().prepare('SELECT * FROM questions WHERE id = ?').get(Number(req.params.id));
   if (!q) return res.status(404).json({ error: 'السؤال غير موجود' });
   const v = cleanQuestion(req.body || {}, q.type);
@@ -289,7 +292,7 @@ api.post('/questions/:id/status', requireRole('reviewer'), (req, res) => {
   res.json({ ok: true });
 });
 
-api.post('/questions/:id/exclude', requireRole('reviewer'), (req, res) => {
+api.post('/questions/:id/exclude', requireRole('admin'), (req, res) => {
   const q = db().prepare('SELECT * FROM questions WHERE id = ?').get(Number(req.params.id));
   if (!q) return res.status(404).json({ error: 'السؤال غير موجود' });
   const excluded = req.body?.excluded ? 1 : 0;
@@ -302,7 +305,7 @@ api.post('/questions/:id/exclude', requireRole('reviewer'), (req, res) => {
   res.json({ ok: true });
 });
 
-api.post('/questions/:id/duplicate', requireRole('reviewer'), (req, res) => {
+api.post('/questions/:id/duplicate', requireRole('admin'), (req, res) => {
   const q = db().prepare('SELECT * FROM questions WHERE id = ?').get(Number(req.params.id));
   if (!q) return res.status(404).json({ error: 'السؤال غير موجود' });
   const id = tx(d => {

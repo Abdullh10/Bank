@@ -1,6 +1,7 @@
 // صفحات الطاقم للطلاب: لوحة تقدم الطلاب (للمعلمين والمراجعين والمشرف) وإدارة حسابات الطلاب (للمشرف فقط).
 import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
+import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
@@ -128,7 +129,8 @@ export async function pageAdminStudents(ctx) {
     && (!adminFilter.q || (s.name + ' ' + s.username).includes(adminFilter.q)));
   let pending = [];
   $app.innerHTML = `
-    <section class="hero"><div class="hero-ic">${icon('students', 52)}<div><h1>حسابات الطلاب</h1><p class="muted">الطالب يرى صفحة التدريب فقط: لا إجابات جماعية ولا مراجعة ولا منشئ اختبارات.</p></div></div></section>
+    <section class="hero"><div class="hero-ic">${icon('students', 52)}<div><h1>حسابات الطلاب</h1><p class="muted">الطالب يرى صفحة التدريب فقط: لا إجابات جماعية ولا مراجعة ولا منشئ اختبارات.</p></div></div>
+      ${accountTabs('students', ctx)}</section>
     <section class="card">${ttl('students', 'إضافة طلاب', 'h2', 30)}
       <div class="as-add">
         <div>
@@ -281,6 +283,97 @@ export async function pageAdminStudents(ctx) {
     };
   });
 }
+// تبويبا صفحة الحسابات: الطلاب | الفريق (الفريق على Supabase فقط)
+const accountTabs = (cur, ctx) => (ctx.state?.supabase ? `<div class="seg no-print" role="tablist" aria-label="نوع الحسابات">
+  <a class="btn ${cur === 'students' ? 'on' : ''}" href="#/students" role="tab" aria-selected="${cur === 'students'}">${icon('students', 22)}الطلاب</a>
+  <a class="btn ${cur === 'team' ? 'on' : ''}" href="#/team" role="tab" aria-selected="${cur === 'team'}">${icon('team', 22)}الفريق</a></div>` : '');
+
+// ---------- حسابات الفريق: مراجع علمي، مشرف تربوي، مدير المدرسة، معلم ----------
+export async function pageAdminTeam(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const all = await api('/admin/team');
+  const roleOpts = (cur, withPending = true) => [...STAFF_ROLES.map(([v, t]) => [v, t]), ...(withPending ? [['pending', 'موقوف']] : [])]
+    .map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('');
+  const fmt = d => (d ? new Date(d).toLocaleDateString('ar-SA-u-nu-latn') : '—');
+  $app.innerHTML = `
+    <section class="hero"><div class="hero-ic">${icon('team', 52)}<div><h1>حسابات الفريق</h1><p class="muted">حسابات للمراجعة والاطلاع بأدوار محددة. كل دور يرى ما يخصه فقط، وقاعدة البيانات ترفض ما سواه.</p></div></div>
+      ${accountTabs('team', ctx)}</section>
+    <section class="card">${ttl('team', 'الأدوار وصلاحياتها')}
+      <div class="table-wrap"><table class="list tm-roles"><thead><tr><th>الدور</th><th>ماذا يستطيع</th></tr></thead><tbody>
+        <tr><td><b>مالك المشروع</b></td><td>كل شيء: تعديل المحتوى واعتماده، وتنفيذ الملاحظات، وإدارة الحسابات.</td></tr>
+        ${STAFF_ROLES.map(([, t, d]) => `<tr><td><b>${t}</b></td><td>${d}</td></tr>`).join('')}
+      </tbody></table></div></section>
+    <section class="card">${ttl('students', 'إضافة حساب')}
+      <form id="tm-form" class="tm-form" novalidate>
+        <div class="field"><label for="tm-name">الاسم الظاهر</label><input id="tm-name" required placeholder="مثال: أ. خالد السبيعي"></div>
+        <div class="field"><label for="tm-role">الدور</label><select id="tm-role">${roleOpts('reviewer', false)}</select></div>
+        <div class="field"><label for="tm-user">اسم المستخدم</label><input id="tm-user" class="ltr" required autocapitalize="none" spellcheck="false" placeholder="مثال: khaled.rev"></div>
+        <div class="field"><label for="tm-pass">كلمة المرور (اختياري)</label><input id="tm-pass" class="ltr" placeholder="تُولَّد تلقائيًا إن تُركت فارغة"></div>
+        <p class="small muted tm-desc" id="tm-desc"></p>
+        <div class="actions"><button type="submit" class="primary" id="tm-create">إنشاء الحساب</button></div>
+      </form>
+      <div id="tm-result"></div></section>
+    <section class="card">${ttl('team', `الحسابات (${all.length})`)}
+      <div class="table-wrap"><table class="list"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>آخر دخول</th><th></th></tr></thead><tbody>
+      ${all.map(u => (u.role === 'admin' || u.self) ? `<tr><td>${esc(u.name)}</td><td class="ltr">${esc(u.username)}</td><td>${esc(ROLE_NAMES[u.role])}</td><td class="small">${fmt(u.lastSignIn)}</td><td class="small muted">${u.self ? 'حسابك' : ''}</td></tr>`
+        : `<tr data-id="${u.id}" data-user="${esc(u.username)}">
+          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم"></td>
+          <td><input class="tm-u ltr" value="${esc(u.username)}" aria-label="اسم المستخدم" style="max-width:10rem"></td>
+          <td><select class="tm-r" aria-label="الدور">${roleOpts(u.role)}</select></td>
+          <td class="small">${fmt(u.lastSignIn)}</td>
+          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button><button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="small muted">«موقوف» يمنع الحساب من رؤية أي محتوى دون حذفه. لا يمكن منح دور «مالك المشروع» من هنا.</p></section>`;
+  const reload = () => pageAdminTeam(ctx).catch(fail);
+  const desc = () => { document.getElementById('tm-desc').textContent = STAFF_ROLES.find(r => r[0] === document.getElementById('tm-role').value)?.[2] || ''; };
+  document.getElementById('tm-role').onchange = desc; desc();
+  document.getElementById('tm-form').onsubmit = async e => {
+    e.preventDefault();
+    const btn = document.getElementById('tm-create'); if (btn.disabled) return;
+    const body = { name: document.getElementById('tm-name').value.trim(), role: document.getElementById('tm-role').value,
+      username: document.getElementById('tm-user').value.trim().toLowerCase(), password: document.getElementById('tm-pass').value.trim() };
+    if (body.name.length < 3) return toast('اكتب الاسم', true);
+    if (!body.username) return toast('اكتب اسم المستخدم', true);
+    btn.disabled = true;
+    try {
+      const { results } = await api('/admin/team/create', { method: 'POST', body });
+      const r = results[0];
+      if (!r?.ok) throw new Error(r?.error || 'تعذر إنشاء الحساب');
+      await reload();
+      document.getElementById('tm-result').innerHTML = `<div class="notice ok">أُنشئ حساب <b>${esc(r.name)}</b> بدور «${esc(ROLE_NAMES[r.role])}».
+        اسم المستخدم: <b class="ltr">${esc(r.username)}</b> · كلمة المرور: <b class="ltr">${esc(r.password)}</b> · الرابط: <span class="ltr">${esc(SITE_URL)}</span>
+        <div class="small">احفظ كلمة المرور الآن؛ لا تظهر مرة أخرى.</div></div>`;
+    } catch (err) { fail(err); btn.disabled = false; }
+  };
+  $app.querySelectorAll('tr[data-id]').forEach(tr => {
+    const id = tr.dataset.id;
+    tr.querySelector('.tm-save').onclick = async e => {
+      const btn = e.currentTarget; if (btn.disabled) return; btn.disabled = true;
+      try {
+        await api('/admin/team/update', { method: 'POST', body: { id, name: tr.querySelector('.tm-n').value, role: tr.querySelector('.tm-r').value } });
+        const user = tr.querySelector('.tm-u').value.trim().toLowerCase();
+        if (user !== tr.dataset.user) {
+          const r = await api('/admin/students/rename', { method: 'POST', body: { userId: id, username: user } });
+          tr.dataset.user = r.username; tr.querySelector('.tm-u').value = r.username;
+        }
+        toast('تم الحفظ');
+      } catch (err) { fail(err); } finally { btn.disabled = false; }
+    };
+    tr.querySelector('.tm-reset').onclick = async () => {
+      const pw = prompt('اكتب كلمة المرور الجديدة (8 أحرف على الأقل)، أو اتركها فارغة لتوليدها تلقائيًا:', '');
+      if (pw === null) return;
+      try {
+        const { password } = await api('/admin/students/reset', { method: 'POST', body: { userId: id, password: pw.trim() } });
+        prompt(`كلمة المرور الجديدة لـ ${tr.querySelector('.tm-n').value} (انسخها الآن):`, password);
+      } catch (err) { fail(err); }
+    };
+    tr.querySelector('.tm-del').onclick = async () => {
+      if (!confirm(`حذف حساب «${tr.querySelector('.tm-n').value}» نهائيًا؟ تبقى ملاحظاته وتعديلاته محفوظة باسمه.`)) return;
+      try { await api('/admin/students/delete', { method: 'POST', body: { userId: id } }); toast('حُذف الحساب'); reload(); } catch (err) { fail(err); }
+    };
+  });
+}
+
 // بطاقات دخول للطباعة: اسم الطالب واسم المستخدم وكلمة المرور ورابط الموقع.
 function printCards(rows, esc) {
   const w = window.open('', '_blank');
