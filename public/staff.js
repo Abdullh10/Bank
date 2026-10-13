@@ -121,6 +121,11 @@ export const resetStaffState = () => Object.assign(adminFilter, { grade: '', sec
 export async function pageAdminStudents(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const all = await api('/admin/students');
+  // المقررات (على Supabase): عمود «المقرر» وإسناد دفعة، ومقرر الحسابات الجديدة
+  const courses = ctx.state?.supabase ? (ctx.state.courses || []) : [];
+  const cur = ctx.state?.course;
+  const courseName = id => courses.find(c => c.id === id)?.code || '';
+  const courseOpts = sel => courses.map(c => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${esc(c.code)}${c.status === 'ready' ? '' : ' (قيد الإعداد)'}</option>`).join('');
   const grades = [...new Set(all.map(s => s.grade).filter(Boolean))].sort();
   if (adminFilter.grade && !grades.includes(adminFilter.grade)) adminFilter.grade = '';
   const sections = [...new Set(all.filter(s => !adminFilter.grade || s.grade === adminFilter.grade).map(s => s.section).filter(Boolean))].sort();
@@ -146,6 +151,8 @@ export async function pageAdminStudents(ctx) {
           <div class="actions"><button type="button" id="as-read-lines">معاينة</button></div>
         </div>
       </div>
+      ${courses.length ? `<div class="field as-course"><label for="as-new-course">مقرر الحسابات الجديدة</label>
+        <select id="as-new-course">${courseOpts(cur?.id)}</select></div>` : ''}
       <div id="as-preview"></div>
       <div id="as-result"></div>
     </section>
@@ -159,15 +166,19 @@ export async function pageAdminStudents(ctx) {
       ${list.length ? `<div class="as-bulk" id="as-bulk">
         <label class="st-radio"><input type="checkbox" id="as-all"> تحديد الكل المعروض (${list.length})</label>
         <span id="as-count" class="muted small">لم يُحدد أحد</span>
+        ${courses.length ? `<span class="as-enroll"><select id="as-enroll-course" aria-label="المقرر">${courseOpts(cur?.id)}</select>
+          <button type="button" id="as-enroll-add" disabled>إسناد المقرر</button>
+          <button type="button" id="as-enroll-set" disabled title="يصبح هذا مقررهم الوحيد؛ سجل تدريبهم السابق يبقى">نقل إليه</button></span>` : ''}
         <button type="button" id="as-del-many" class="danger" disabled>${line('trash', 16)}حذف المحدد</button>
       </div>
-      <div class="table-wrap"><table class="list as-table"><thead><tr><th class="as-chk"></th><th>الاسم</th><th>اسم المستخدم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th><th>التدريب</th><th></th></tr></thead><tbody>
+      <div class="table-wrap"><table class="list as-table"><thead><tr><th class="as-chk"></th><th>الاسم</th><th>اسم المستخدم</th><th>الصف</th><th>الشعبة</th>${courses.length ? '<th>المقرر</th>' : ''}<th>الحالة</th><th>التدريب</th><th></th></tr></thead><tbody>
         ${list.map(s => `<tr data-id="${s.id}" data-user="${esc(s.username)}">
           <td class="as-chk"><input type="checkbox" class="as-pick" aria-label="تحديد ${esc(s.name)}"></td>
           <td><input class="as-name" value="${esc(s.name)}" aria-label="الاسم"></td>
           <td><input class="as-user ltr" value="${esc(s.username)}" aria-label="اسم المستخدم" style="max-width:9rem"></td>
           <td><input class="as-grade" value="${esc(s.grade || '')}" aria-label="الصف" style="max-width:8rem"></td>
           <td><input class="as-sec" value="${esc(s.section || '')}" aria-label="الشعبة" style="max-width:5rem"></td>
+          ${courses.length ? `<td class="small">${(s.courses || []).map(courseName).filter(Boolean).map(esc).join('، ') || '<span class="bad">بلا مقرر</span>'}</td>` : ''}
           <td><select class="as-role" aria-label="الحالة">${Object.entries(ROLE).map(([v, t]) => `<option value="${v}" ${v === s.role ? 'selected' : ''}>${t}</option>`).join('')}</select></td>
           <td class="small">${s.sessions ? `${s.sessions} جلسة · ${pct(s.correct, s.answered)}%` : '—'}</td>
           <td class="actions as-acts"><button type="button" class="as-save">حفظ</button><button type="button" class="as-reset">كلمة المرور</button><button type="button" class="as-del danger">حذف</button></td></tr>`).join('')}
@@ -190,6 +201,11 @@ export async function pageAdminStudents(ctx) {
     try {
       const { results } = await api('/admin/students/create', { method: 'POST', body: { students: pending } });
       const ok = results.filter(r => r.ok);
+      const newCourse = Number(document.getElementById('as-new-course')?.value) || null;
+      if (newCourse && ok.length) {
+        try { await api('/admin/students/enroll-usernames', { method: 'POST', body: { usernames: ok.map(r => r.username), course: newCourse } }); }
+        catch (err) { toast('أُنشئت الحسابات لكن تعذر إسناد المقرر؛ أسنده من القائمة: ' + err.message, true); }
+      }
       document.getElementById('as-preview').innerHTML = '';
       document.getElementById('as-result').innerHTML = `
         <p class="notice ${ok.length === results.length ? 'ok' : 'warn'}">أُنشئ ${ok.length} من ${results.length}. احفظ كلمات المرور الآن (Excel أو بطاقات)؛ لا تظهر مرة أخرى.</p>
@@ -230,6 +246,7 @@ export async function pageAdminStudents(ctx) {
     const delBtn = document.getElementById('as-del-many');
     if (!delBtn) return;
     delBtn.disabled = !n;
+    ['as-enroll-add', 'as-enroll-set'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = !n; });
     delBtn.lastChild.textContent = n ? `حذف المحدد (${n})` : 'حذف المحدد';
     document.getElementById('as-count').textContent = n ? `حُدد ${n} من ${picks.length}` : 'لم يُحدد أحد';
     allBox.checked = n === picks.length && n > 0; allBox.indeterminate = n > 0 && n < picks.length;
@@ -238,6 +255,21 @@ export async function pageAdminStudents(ctx) {
   picks.forEach(c => c.onchange = syncBulk);
   if (allBox) {
     allBox.onchange = () => { picks.forEach(c => { c.checked = allBox.checked; }); syncBulk(); };
+    const enroll = mode => async e => {
+      const btn = e.currentTarget;
+      const ids = picks.filter(c => c.checked).map(c => c.closest('tr').dataset.id);
+      const course = Number(document.getElementById('as-enroll-course').value);
+      if (!ids.length || !course) return;
+      if (mode === 'set' && !confirm(`نقل ${ids.length} طالبًا إلى ${courseName(course)} وإلغاء مقرراتهم الأخرى؟ سجل تدريبهم السابق يبقى محفوظًا.`)) return;
+      btn.disabled = true;
+      try {
+        await api('/admin/students/enroll', { method: 'POST', body: { ids, course, mode } });
+        toast(`${mode === 'set' ? 'نُقل' : 'أُسند المقرر إلى'} ${ids.length} طالبًا`); refilter();
+      } catch (err) { fail(err); btn.disabled = false; }
+    };
+    const ea = document.getElementById('as-enroll-add'), es = document.getElementById('as-enroll-set');
+    if (ea) ea.onclick = enroll('add');
+    if (es) es.onclick = enroll('set');
     document.getElementById('as-del-many').onclick = async e => {
       const btn = e.currentTarget;
       const ids = picks.filter(c => c.checked).map(c => c.closest('tr').dataset.id);

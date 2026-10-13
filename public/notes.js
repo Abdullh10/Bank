@@ -101,7 +101,7 @@ export async function pageNotes(ctx) {
   const { api, $app, can } = ctx;
   const notes = await api('/notes?status=' + notesFilter.status);
   const seg = (v, t) => `<button type="button" class="${notesFilter.status === v ? 'on' : ''}" data-nstatus="${v}">${t}</button>`;
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ الملاحظات</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ الملاحظات</div>
     <div class="hero"><div class="hero-ic">${icon('notes', 52)}<div><h1>ملاحظات المراجعة</h1>
       <p class="muted">${can('edit') ? 'ملاحظات المراجعين على الأهداف والأسئلة. افتح الهدف لتنفيذ التعديل، ثم اضغط «تم التنفيذ».'
         : 'ملاحظاتك وملاحظات بقية المراجعين. ينفذها مالك المشروع ويغلقها.'}</p></div></div>

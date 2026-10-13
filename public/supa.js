@@ -8,6 +8,9 @@ let client;
 let signedOutHandler = null;
 export const onSignedOut = fn => { signedOutHandler = fn; };
 let loginDomain = '';
+// المقرر المختار: تُمرَّر قيمته لكل دوال القراءة الخاصة بمقرر (null = المقرر الافتراضي في قاعدة البيانات)
+let course = null;
+export const setCourse = id => { course = id ?? null; };
 
 export async function initSupabase(cfg) {
   const { createClient } = await import(SDK);
@@ -59,7 +62,7 @@ function download(name, rows) {
 
 export async function exportCsv(kind) {
   if (kind === 'questions') {
-    const rows = await rpc('get_bank', { f: { excluded: '1' } });
+    const rows = await rpc('get_bank', { f: { excluded: '1', course } });
     download('questions.csv', [
       ['الفصل', 'الدرس', 'الهدف', 'النوع', 'رقم السؤال', 'نص السؤال', 'البديل 1', 'البديل 2', 'البديل 3', 'الإجابة الصحيحة',
         'التفسير', 'الإجابة النموذجية', 'مستوى التفكير', 'نوع السؤال', 'الصعوبة', 'المرجع', 'الحالة', 'مستبعد', 'ملاحظات المراجع'],
@@ -67,10 +70,10 @@ export async function exportCsv(kind) {
         r.options[0] ?? '', r.options[1] ?? '', r.options[2] ?? '', r.type === 'mcq' ? r.correctIndex + 1 : '', r.explanation, r.modelAnswer,
         r.thinkingLevel, r.questionKind, r.difficulty, r.sourceRef, r.status, r.excluded ? 'نعم' : 'لا', r.reviewerNotes])]);
   } else {
-    const chapters = await rpc('get_chapters');
+    const chapters = await rpc('get_chapters', { p_course: course });
     const all = [];
     for (const c of chapters) {
-      const ch = await rpc('get_chapter', { p_number: c.number });
+      const ch = await rpc('get_chapter', { p_number: c.number, p_course: course });
       for (const l of ch.lessons) for (const o of l.objectives) all.push([o.code, o.originalCode, `${ch.number} ${ch.title}`, `${l.number} ${l.title}`,
         o.originalText, o.proposedText, (o.splitInto || []).join(' | '), o.approvedText, o.revisionReason, o.revisionType, o.aiReviewStatus,
         o.thinkingLevel, o.knowledgeType, (o.concepts || []).join('، '), (o.memoPages || []).join('، '), o.memoCoverage, o.reviewStatus]);
@@ -118,9 +121,10 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     return { user };
   }
   if (p === '/logout') { await client.auth.signOut({ scope: 'local' }); return { ok: true }; } // الخروج من هذا الجهاز فقط
-  if (p === '/stats') return rpc('get_stats');
-  if (p === '/chapters') return rpc('get_chapters');
-  if ((m = p.match(/^\/chapters\/(\d+)$/))) return rpc('get_chapter', { p_number: Number(m[1]) });
+  if (p === '/courses') return rpc('get_courses');
+  if (p === '/stats') return rpc('get_stats', { p_course: course });
+  if (p === '/chapters') return rpc('get_chapters', { p_course: course });
+  if ((m = p.match(/^\/chapters\/(\d+)$/))) return rpc('get_chapter', { p_number: Number(m[1]), p_course: course });
 
   if ((m = p.match(/^\/objectives\/([^/]+)$/))) {
     const code = decodeURIComponent(m[1]);
@@ -175,7 +179,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   }
 
   if (p === '/bank') {
-    const questions = await rpc('get_bank', { f });
+    const questions = await rpc('get_bank', { f: { ...f, course } });
     if (f.similar === '1') {
       if (questions.length > 900) throw Object.assign(new Error('اختر فصلًا أو درسًا أولًا: اكتشاف المتشابهة يعمل على 900 سؤال كحد أقصى'), { status: 400 });
       return { questions, similar: similarPairs(questions) };
@@ -191,7 +195,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
   if (p === '/student/history') return rpc('student_history');
   // ---------- المعلم والمشرف ----------
-  if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null });
+  if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null, p_course: course });
   if (p === '/admin/students') return rpc('admin_list_students');
   if (p === '/admin/students/update') {
     await rpc('admin_update_student', { p_id: body.id, p_name: body.name, p_section: body.section, p_role: body.role, p_grade: body.grade ?? null });
@@ -201,13 +205,15 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/admin/students/reset') return adminUsers({ action: 'reset', userId: body.userId, password: body.password || '' });
   if (p === '/admin/students/rename') return adminUsers({ action: 'rename', userId: body.userId, username: body.username });
   if (p === '/admin/students/delete') return adminUsers({ action: 'delete', userId: body.userId });
+  if (p === '/admin/students/enroll') return { n: await rpc('admin_enroll', { p_ids: body.ids, p_course: body.course, p_mode: body.mode || 'add' }) };
+  if (p === '/admin/students/enroll-usernames') return { n: await rpc('admin_enroll_usernames', { p_usernames: body.usernames, p_course: body.course }) };
   if (p === '/admin/students/delete-many') return adminUsers({ action: 'deleteMany', userIds: body.userIds });
   // ---------- حسابات الفريق ----------
   if (p === '/admin/team') return rpc('admin_list_staff');
   if (p === '/admin/team/create') return adminUsers({ action: 'create', role: body.role, students: [{ name: body.name, username: body.username, password: body.password || '' }] });
   if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
   // ---------- الملاحظات ولوحة المؤشرات ----------
-  if (p === '/dashboard') return rpc('get_dashboard');
+  if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });
   if (p === '/notes') {
     if (method === 'GET') return rpc('get_notes', { p_code: f.code || null, p_status: f.status || 'open' });
     return rpc('add_note', { p_code: body.code, p_entity: body.entity, p_body: body.body, p_question: body.question ?? null });

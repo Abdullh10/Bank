@@ -7,10 +7,11 @@ import { pageTeacherProgress, pageAdminStudents, pageAdminTeam, resetStaffState 
 import { pageDashboard } from './dashboard.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
+import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
-const state = { user: null, selection: new Set() };
+const state = { user: null, selection: new Set(), courses: null, course: null };
 
 // ---------- لمسات العرض ----------
 hydrateIcons(document);
@@ -134,6 +135,38 @@ const fail = e => {
 const can = perm => !!PERMS[state.user?.role]?.includes(perm);
 const isReviewer = () => can('review');
 
+// ---------- المقرر المختار ----------
+const $brandSub = document.getElementById('brand-sub');
+const BRAND_DEFAULT = $brandSub?.textContent || '';
+function showCourseLine() {
+  const c = state.user?.role === 'student' ? state.user.courses?.[0] : state.course;
+  if ($brandSub) $brandSub.textContent = c ? courseLine(c) : BRAND_DEFAULT;
+}
+// قائمة المقررات (مرة بعد الدخول). الخادم المحلي القديم لا يعرف المقررات: مقرر واحد من /stats.
+async function ensureCourses() {
+  if (!state.courses) {
+    try { if (!state.supabase) throw 0; state.courses = await apiRaw('/courses'); }
+    catch {
+      const s = await apiRaw('/stats');
+      state.courses = [{ id: s.course?.id || 1, code: s.course?.code || 'كيمياء 2-1', title: s.course?.title, grade: s.course?.grade || 'الثاني الثانوي',
+        term: s.course?.term || 'الأول', status: 'ready', objectives: s.objectives?.n, questions: s.questions?.n, approved: s.questions?.approved, students: 0 }];
+    }
+  }
+  if (!state.course) setCourse(pickCourse(state.courses, null, can('edit'))?.id, false);
+}
+// تغيير المقرر: كل ما يخص المقرر السابق يُمسح (البنك المحفوظ، التحديد، الاختبار قيد الإعداد)
+function setCourse(id, go) {
+  const c = state.courses?.find(x => x.id === id);
+  if (!c) return;
+  if (state.course?.id !== c.id) {
+    state.course = c; bankCache = null; state.selection.clear(); resetExam();
+    for (const k in bankFilter) delete bankFilter[k];
+    supa?.setCourse(c.id); rememberCourse(c.id);
+  }
+  showCourseLine();
+  if (go) { if (location.hash === '#/course') route(); else location.hash = '#/course'; }
+}
+
 const OBJ_STATUS = { pending: ['بانتظار المراجعة', ''], approved: ['معتمد', 'ok'], returned: ['أُعيد للتعديل', 'bad'] };
 const Q_STATUS = {
   generated: ['مسودة مولدة', 'info'], in_review: ['قيد المراجعة', 'warn'],
@@ -162,6 +195,7 @@ const list = (arr, tag = 'ul') => (arr?.length ? `<${tag}>${arr.map(x => `<li>${
 
 // ---------- الترويسة والجلسة ----------
 function renderUserbox() {
+  showCourseLine();
   const box = document.getElementById('userbox');
   if (state.user) {
     box.innerHTML = `<span class="avatar" aria-hidden="true">${esc((state.user.displayName || '؟').trim().charAt(0))}</span>
@@ -186,14 +220,16 @@ async function pageHome() {
           <span class="eyebrow">${icon('spark', 18)} إتقان · بنك أسئلة الكيمياء</span>
           <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
           <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
-          <p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي، الفصل الدراسي الأول 1448هـ</p>
+          ${s.course?.id === 1 ? `<p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي، الفصل الدراسي الأول 1448هـ</p>` : ''}
         </div>
       </div>
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">${icon('chapters', 22, 'navy')}تصفح الفصول</a>
         <a class="btn" href="#/bank">بنك الأسئلة</a>
+        <a class="btn" href="#/">${line('prev', 16)}كل المقررات</a>
       </div>
     </div>
+    ${s.course?.status === 'preparing' ? `<p class="notice warn">هذا المقرر <b>قيد الإعداد</b> ولا يظهر لغير مالك المشروع. تُضاف أهدافه وأسئلته في مرحلة المحتوى.</p>` : ''}
     <div class="grid kpi">
       ${kpi(s.chapters, 'فصول', 'chapters')}${kpi(s.lessons, 'دروس', 'lessons')}${kpi(o.n, 'هدفًا تعليميًا', 'objectives')}
       ${kpi(q.mcq || 0, 'سؤال اختيار من متعدد', 'mcq')}${kpi(q.essay || 0, 'سؤالًا مقاليًا', 'essay')}
@@ -237,14 +273,14 @@ function chapterCard(c) {
 
 async function pageChapters() {
   const chapters = await api('/chapters');
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ الفصول</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ الفصول</div>
     <div class="hero"><div class="hero-ic">${icon('chapters', 52)}<div><h1>فصول المقرر</h1><p class="muted">مرتبة وفق ملف أهداف المقرر المعتمد في المشروع.</p></div></div></div>
     <div class="grid cards">${chapters.map(chapterCard).join('')}</div>`;
 }
 
 async function pageChapter(n) {
   const ch = await api('/chapters/' + n);
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ <a href="#/chapters">الفصول</a> ‹ الفصل ${ch.number}</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapters">الفصول</a> ‹ الفصل ${ch.number}</div>
     <div class="hero"><div class="hero-ic">${icon(CHAPTER_ICONS[ch.number] || 'chapters', 52)}<div><h1>الفصل ${ch.number}: ${esc(ch.title)}</h1></div></div></div>
     ${ch.lessons.map(l => `
       <section class="card lesson" id="lesson-${l.number}">
@@ -277,19 +313,21 @@ function signedOut() {
   state.selection.clear();
   Object.assign(objState, { mode: 'test', answers: {} });
   if ($dlg.open) $dlg.close();
-  state.user = null; renderUserbox();
+  state.user = null; state.courses = null; state.course = null; supa?.setCourse(null); showCourseLine(); renderUserbox();
   if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
 }
 
 async function pageObjective(code) {
   const data = await api('/objectives/' + encodeURIComponent(code));
   const { objective: o, supplement: s, questions } = data;
+  // رابط هدف من مقرر آخر: يصبح مقرره هو المختار
+  if (o.courseId && state.course && o.courseId !== state.course.id) setCourse(o.courseId, false);
   if (!data.answersIncluded && objState.mode === 'review') objState.mode = 'test';
   const mcq = questions.filter(q => q.type === 'mcq'), essay = questions.filter(q => q.type === 'essay');
   const active = q => !q.excluded;
   const idx = data.lessonNav.indexOf(o.code);
   $app.innerHTML = `
-    <div class="crumbs"><a href="#/">الرئيسية</a> ‹ <a href="#/chapter/${o.chapter.number}">الفصل ${o.chapter.number}: ${esc(o.chapter.title)}</a>
+    <div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapter/${o.chapter.number}">الفصل ${o.chapter.number}: ${esc(o.chapter.title)}</a>
       ‹ <a href="#/chapter/${o.chapter.number}">الدرس ${o.chapter.number}-${o.lesson.number}: ${esc(o.lesson.title)}</a></div>
     <div class="print-only"><h2>${esc(o.chapter.title)} — ${esc(o.lesson.title)}</h2></div>
     <div class="hero">
@@ -558,7 +596,7 @@ function bindObjective(o, questions, s) {
   });
 }
 // سياق صفحات الملاحظات ولوحة المؤشرات
-const nctx = () => ({ api, esc, fail, toast, $app, state, can, dialog, guard, badge, ttl, done: () => route() });
+const nctx = () => ({ api, esc, fail, toast, $app, state, can, dialog, guard, badge, ttl, course: state.course, done: () => route() });
 
 function printAs(kind) {
   document.body.classList.remove('print-student', 'print-teacher');
@@ -671,7 +709,7 @@ async function pageBank() {
   const f = (k, label, opts) => `<div><label for="f-${k}">${label}</label><select id="f-${k}" data-f="${k}"><option value="">الكل</option>
     ${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(bankFilter[k] || '') === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
   const countText = () => `${res.questions.length} سؤالًا ${state.selection.size ? `· المحدد للاختبار: ${state.selection.size}` : ''}`;
-  $app.innerHTML = `<div class="crumbs no-print"><a href="#/">الرئيسية</a> ‹ بنك الأسئلة</div>
+  $app.innerHTML = `<div class="crumbs no-print"><a href="#/course">الرئيسية</a> ‹ بنك الأسئلة</div>
     <div class="hero no-print"><div class="hero-ic">${icon('bank', 52)}<div><h1>بنك الأسئلة</h1><p class="muted">بحث وتصفية وإنشاء أوراق أسئلة لهدف أو درس أو فصل أو اختبار شامل.</p></div></div>
       <div class="actions">${isReviewer() ? (state.supabase
         ? `<button class="btn" data-export="questions">تصدير الأسئلة CSV</button><button class="btn" data-export="objectives">تصدير الأهداف CSV</button>`
@@ -789,7 +827,7 @@ async function pageReports() {
   const o = s.objectives, q = s.questions;
   const maxLevel = Math.max(1, ...s.levels.map(l => l.n));
   const maxCh = Math.max(1, ...s.byChapter.map(c => c.questions));
-  $app.innerHTML = `<div class="crumbs"><a href="#/">الرئيسية</a> ‹ التقارير</div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ التقارير</div>
     <div class="hero"><div class="hero-ic">${icon('reports', 52)}<div><h1>التقارير والمؤشرات</h1>
     <p class="muted">تُحسب كل الأرقام لحظيًا من قاعدة البيانات.</p></div></div></div>
     <div class="grid kpi">${kpi(o.n, 'إجمالي الأهداف', 'objectives')}${kpi(o.reviewed || 0, 'أهداف روجعت', 'shield', 'navy')}${kpi(o.approved || 0, 'أهداف معتمدة', 'check')}
@@ -877,7 +915,7 @@ async function route() {
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
     a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))
-    || (a.dataset.nav === 'students' && page === 'team')));
+    || (a.dataset.nav === 'students' && page === 'team') || (a.dataset.nav === 'home' && page === 'course')));
   document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
   // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
   const locked = !state.user || state.user.role === 'pending';
@@ -904,13 +942,16 @@ async function route() {
     return;
   }
   try {
-    if (!page) await pageHome();
+    await ensureCourses();
+    if (seq !== routeSeq) return;
+    if (!page) pageCourses({ esc, $app, courses: state.courses, current: state.course, isOwner: can('edit'), select: setCourse });
+    else if (page === 'course') await pageHome();
     else if (page === 'chapters') await pageChapters();
     else if (page === 'chapter') await pageChapter(arg);
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
     else if (page === 'bank') await pageBank();
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
-    else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app });
+    else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
     else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
     else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);
