@@ -263,6 +263,11 @@ await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
 await p.locator('[data-qedit]').nth(1).click(); await p.waitForSelector('#e-stem');
 await p.fill('#e-stem', 'ما وحدة قياس طاقة الفوتون في النظام الدولي للوحدات؟');
+// اتجاه الكتابة يتبع النص: الصيغة الكيميائية تُكتب من اليسار، والنص العربي من اليمين (لا تنقلب الأقواس)
+{ const v0 = await p.inputValue('#e-opt0'); await p.fill('#e-opt0', '(NH₄)₂SO₄');
+  ok('editor: formula typed left-to-right, Arabic right-to-left', await p.$eval('#e-opt0', el => el.matches(':dir(ltr)'))
+    && await p.$eval('#e-stem', el => el.matches(':dir(rtl)')));
+  await p.fill('#e-opt0', v0); }
 await p.click('#e-save');
 ok('owner: edit saved through RPC', await Q2('.q-stem', { hasText: 'في النظام الدولي للوحدات' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
 ok('owner: edit moved approved -> in_review', await Q2('.badge.warn', { hasText: 'قيد المراجعة' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
@@ -420,7 +425,7 @@ ok('database: one exam key request is capped at 100 questions', !!supExam.error)
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count', { timeout: 15000 });
-ok('supervisor: bank visible without answers or sheets', (await p.locator('[data-sheet], [data-pick], [data-export], #bank-list .opt.correct').count()) === 0);
+ok('supervisor: bank visible without answers or sheets', (await p.locator('[data-sheet], [data-pick], [data-export], #bank-list .opt.correct').count()) === 0, JSON.stringify(await Promise.all(['[data-sheet]', '[data-pick]', '[data-export]', '#bank-list .opt.correct'].map(s => p.locator(s).count()))));
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);
