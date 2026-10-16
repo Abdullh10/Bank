@@ -76,7 +76,8 @@ const STALE = Object.assign(new Error('stale'), { stale: true });
 let bankCache = null;
 async function api(path, opts = {}) {
   const seq = routeSeq;
-  const write = opts.method && opts.method !== 'GET';
+  // read: طلب POST لا يغيّر البيانات (مثل جلب مفتاح اختبار) فلا يُمسح البنك المحفوظ
+  const write = opts.method && opts.method !== 'GET' && !opts.read;
   if (write) bankCache = null;
   let data;
   if (path === '/bank' && !write) data = await (bankCache ||= apiRaw('/bank').catch(e => { bankCache = null; throw e; }));
@@ -134,6 +135,8 @@ const fail = e => {
 // الصلاحيات حسب الدور (roles.js)، وقاعدة البيانات تفرض الشيء نفسه في دوالها المحمية.
 const can = perm => !!PERMS[state.user?.role]?.includes(perm);
 const isReviewer = () => can('review');
+// البنك محمي (Supabase): لا طباعة للبنك، والإجابات في صفحة كل هدف، ومفتاح الاختبار لأسئلته فقط
+const protectedBank = () => state.supabase && !can('fullbank');
 
 // ---------- المقرر المختار ----------
 const $brandSub = document.getElementById('brand-sub');
@@ -372,8 +375,8 @@ async function pageObjective(code) {
           <div class="seg" role="group" aria-label="نمط العرض">
             ${modeBtn('test', 'وضع الاختبار')}${modeBtn('practice', 'تدريب فوري')}${data.answersIncluded ? modeBtn('review', 'وضع المراجعة') : ''}
           </div>
-          <button type="button" data-print="student">${line('print', 17)}طباعة دون حلول</button>
-          ${data.answersIncluded ? `<button type="button" data-print="teacher">${line('print', 17)}طباعة مع الحلول</button>` : ''}
+          ${protectedBank() ? '' : `<button type="button" data-print="student">${line('print', 17)}طباعة دون حلول</button>
+          ${data.answersIncluded ? `<button type="button" data-print="teacher">${line('print', 17)}طباعة مع الحلول</button>` : ''}`}
           ${can('edit') ? `<button type="button" class="primary" data-add="mcq">+ سؤال اختيار</button>` : ''}
         </div>
       </div>
@@ -728,12 +731,13 @@ async function pageBank() {
     </section>
     <div class="section-title no-print"><h2 id="bank-count">${countText()}</h2>
       <div class="actions">
-        <button type="button" id="sel-all">تحديد نتائج البحث</button><button type="button" id="sel-none">إلغاء التحديد</button>
+        ${protectedBank() ? '' : `<button type="button" id="sel-all">تحديد نتائج البحث</button><button type="button" id="sel-none">إلغاء التحديد</button>
         <button type="button" data-sheet="student">ورقة الطالب</button>
-        ${answers ? `<button type="button" data-sheet="teacher">نسخة المعلم (مع الإجابات)</button>` : ''}
+        ${answers ? `<button type="button" data-sheet="teacher">نسخة المعلم (مع الإجابات)</button>` : ''}`}
         <button type="button" id="similar">اكتشاف المتشابهة</button>
       </div></div>
-    <p class="small muted no-print">الورقة تُنشأ من الأسئلة المحددة، وإن لم تحدد شيئًا فمن نتائج البحث الحالية. لإنشاء ورقة هدف أو درس أو فصل اختر التصفية المناسبة.</p>
+    <p class="small muted no-print">${protectedBank() ? 'البنك للاطلاع: الإجابات تظهر في صفحة كل هدف، وأوراق الاختبار تُنشأ من «منشئ الاختبارات».'
+      : 'الورقة تُنشأ من الأسئلة المحددة، وإن لم تحدد شيئًا فمن نتائج البحث الحالية. لإنشاء ورقة هدف أو درس أو فصل اختر التصفية المناسبة.'}</p>
     <div id="similar-out"></div>
     <div id="bank-list">${res.questions.length ? '' : '<div class="empty">لا توجد أسئلة مطابقة.</div>'}</div>
     <div class="actions no-print bank-more" id="bank-more-wrap" hidden><button type="button" id="bank-more"></button></div>`;
@@ -768,11 +772,11 @@ async function pageBank() {
   });
   // التحديد دون إعادة بناء الصفحة
   const syncCount = () => { document.getElementById('bank-count').textContent = countText(); };
-  document.getElementById('sel-all').onclick = () => {
+  if (!protectedBank()) document.getElementById('sel-all').onclick = () => {
     res.questions.forEach(q => state.selection.add(q.id));
     list.querySelectorAll('[data-pick]').forEach(c => { c.checked = true; }); syncCount();
   };
-  document.getElementById('sel-none').onclick = () => {
+  if (!protectedBank()) document.getElementById('sel-none').onclick = () => {
     state.selection.clear(); list.querySelectorAll('[data-pick]').forEach(c => { c.checked = false; }); syncCount();
   };
   list.onchange = e => {
@@ -791,7 +795,7 @@ async function pageBank() {
 
 function bankRow(q) {
   return `<article class="q" id="q-${q.id}">
-    <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)"><input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>
+    <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)">${protectedBank() ? '' : `<input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>`}
       <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span></label>${qMeta(q)}</div>
     <div class="small muted">الفصل ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
@@ -951,7 +955,7 @@ async function route() {
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
     else if (page === 'bank') await pageBank();
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
-    else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course });
+    else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
     else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
     else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);

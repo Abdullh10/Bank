@@ -628,9 +628,10 @@ end $$;
 -- بنك الأسئلة مع التصفية؛ الفلاتر اختيارية: chapter, lesson, objective, type, level, difficulty, status, q, excluded
 create or replace function public.get_bank(f jsonb default '{}') returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
-declare v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
+declare v_ans boolean := public.is_member() and not public._restricted(); v_rev boolean := public.is_reviewer();
 begin
   perform public._require_member();
+  -- البنك كاملًا بإجاباته لمالك المشروع والمراجع فقط؛ غيرهما يستلم الأسئلة دون إجابات
   return (select coalesce(jsonb_agg(public._q_public(q, a, v_ans) || jsonb_build_object('objectiveCode', o.code,
       'objectiveText', coalesce(o.approved_text, o.original_text),
       'lesson', jsonb_build_object('number', l.number, 'title', l.title),
@@ -1295,3 +1296,33 @@ revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.get_courses(), public.admin_enroll(uuid[], bigint, text), public.admin_enroll_usernames(text[], bigint) to authenticated;
 revoke execute on function public._default_course() from authenticated;
+
+-- =====================================================================
+-- 2026-10-16: حماية البنك من النسخ والنشر (المعلم والمشرف التربوي والمدير)
+--   البنك كاملًا بإجاباته لمالك المشروع والمراجع فقط. غيرهما يستلم الأسئلة دون إجابات (get_bank)،
+--   والإجابات في صفحة الهدف الواحد، ومفتاح الاختبار لأسئلة الاختبار المختارة فقط (get_exam_answers).
+-- =====================================================================
+create or replace function public._restricted() returns boolean
+language sql stable security definer set search_path = public, pg_temp as $$
+  select coalesce((select role in ('viewer', 'supervisor', 'principal') from public.profiles where user_id = auth.uid()), false)
+$$;
+
+create or replace function public.get_exam_answers(p_ids bigint[]) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_ids bigint[];
+begin
+  perform public._require_member();
+  if public.my_role() = 'principal' then raise exception 'منشئ الاختبارات غير متاح لهذا الحساب' using errcode = '42501'; end if;
+  select coalesce(array_agg(distinct x), '{}') into v_ids from unnest(p_ids) x;
+  if cardinality(v_ids) > 100 then raise exception 'الاختبار الواحد 100 سؤال كحد أقصى'; end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'correctIndex', a.correct_index, 'explanation', a.explanation,
+      'distractorNotes', coalesce(a.distractor_notes, '[]'), 'modelAnswer', a.model_answer, 'answerElements', coalesce(a.answer_elements, '[]'),
+      'solutionSteps', coalesce(a.solution_steps, '[]'), 'marks', coalesce(a.marks, '[]'), 'rubric', coalesce(a.rubric, '[]'),
+      'commonErrors', coalesce(a.common_errors, '[]'))), '[]')
+    from questions q join question_answers a on a.question_id = q.id where q.id = any(v_ids) and not q.excluded);
+end $$;
+
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.get_exam_answers(bigint[]) to authenticated;
+revoke execute on function public._restricted() from authenticated;

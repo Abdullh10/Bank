@@ -135,7 +135,7 @@ function loadDocx() {
 export const resetExam = () => { state.exam = null; state.opts = null; };
 
 export async function pageExam(ctx) {
-  const { api, esc, fail, toast, $app, course } = ctx;
+  const { api, esc, fail, toast, $app, course, protectedBank } = ctx;
   // الكليشة تتبع المقرر المختار: المادة والصف وعنوان الفصل الدراسي (مرة عند تغيير المقرر؛ تعديلاتك بعدها تبقى)
   if (course) {
     const prev = state.header.courseId ?? 1;
@@ -147,7 +147,16 @@ export async function pageExam(ctx) {
   }
   const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
   const all = bank.questions;
-  const hasAnswers = all.some(q => q.type === 'mcq' && Number.isInteger(q.correctIndex));
+  // البنك المحمي يصل دون إجابات؛ مفتاح الاختبار يُجلب من الخادم للأسئلة المختارة فقط
+  const hasAnswers = protectedBank || all.some(q => q.type === 'mcq' && Number.isInteger(q.correctIndex));
+  const ensureAnswers = async qs => {
+    if (!protectedBank) return;
+    const need = qs.filter(q => !q.answersLoaded);
+    if (!need.length) return;
+    const rows = await api('/exam/answers', { method: 'POST', body: { ids: need.map(q => q.id) }, read: true });
+    const byId = new Map(rows.map(r => [r.id, r]));
+    for (const q of need) { const r = byId.get(q.id); if (r) Object.assign(q, r, { answersLoaded: true }); }
+  };
   state.opts = state.opts || {
     chapters: chapters.map(c => c.number), mcq: 20, essay: 4, levels: [...LEVELS], diffs: [...DIFFS],
     approvedOnly: true, models: 1, shuffleOptions: true, mcqMark: 1, essayMark: 0, answerGrid: true, density: 'auto', seed: Math.floor(Math.random() * 1e6),
@@ -247,7 +256,7 @@ export async function pageExam(ctx) {
     saveHeader(h);
   };
 
-  const build = () => {
+  const build = async () => {
     read();
     if (!o.chapters.length) return toast('اختر فصلًا واحدًا على الأقل', true);
     if (!o.mcq && !o.essay) return toast('حدد عدد الأسئلة', true);
@@ -257,6 +266,7 @@ export async function pageExam(ctx) {
     const notes = [];
     if (mcq.length < o.mcq) notes.push(`أسئلة الاختيار المتاحة بهذه الشروط ${mcqPool.length} فقط`);
     if (essay.length < o.essay) notes.push(`الأسئلة المقالية المتاحة بهذه الشروط ${essayPool.length} فقط`);
+    await ensureAnswers([...mcq, ...essay]);
     // النماذج: الأسئلة نفسها بترتيب مختلف (وبدائل مخلوطة اختياريًا). النموذج (أ) يحافظ على ترتيب الفصول.
     const sortByCh = list => list.slice().sort((a, b) => a.chapter.number - b.chapter.number || a.lesson.number - b.lesson.number);
     const models = MODEL_NAMES.slice(0, o.models).map((name, mi) => {
@@ -428,7 +438,7 @@ export async function pageExam(ctx) {
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
 
-  const swap = key => {
+  const swap = async key => {
     const [type, id] = key.split(':');
     const ex = state.exam, m0 = ex.models[0];
     const used = new Set([...m0.mcq.map(x => x.q.id), ...m0.essay.map(q => q.id)]);
@@ -438,6 +448,7 @@ export async function pageExam(ctx) {
     const cands = poolFor(type).filter(q => !used.has(q.id) && q.chapter.number === cur.chapter.number);
     const alt = shuffle(cands.length ? cands : poolFor(type).filter(q => !used.has(q.id)), rand)[0];
     if (!alt) return toast('لا يوجد سؤال بديل بهذه الشروط', true);
+    try { await ensureAnswers([alt]); } catch (e) { return fail(e); }
     for (const m of ex.models) {
       if (type === 'mcq') {
         const i = m.mcq.findIndex(x => x.q.id === cur.id);
@@ -471,8 +482,8 @@ export async function pageExam(ctx) {
     $app.querySelector('[data-hd="dateYear"]').value = `${HIJRI_NOW.y}هـ`;
     previewDate();
   };
-  $app.querySelector('#x-build').onclick = () => { try { build(); } catch (e) { fail(e); } };
-  $app.querySelector('#x-reroll').onclick = () => { $app.querySelector('#x-seed').value = Math.floor(Math.random() * 1e6); build(); };
+  $app.querySelector('#x-build').onclick = () => build().catch(fail);
+  $app.querySelector('#x-reroll').onclick = () => { $app.querySelector('#x-seed').value = Math.floor(Math.random() * 1e6); build().catch(fail); };
   if (state.exam) render();
 }
 

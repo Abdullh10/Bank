@@ -214,6 +214,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
   // ---------- الملاحظات ولوحة المؤشرات ----------
   if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });
+  if (p === '/exam/answers') return rpc('get_exam_answers', { p_ids: body.ids });
   if (p === '/notes') {
     if (method === 'GET') return rpc('get_notes', { p_code: f.code || null, p_status: f.status || 'open' });
     return rpc('add_note', { p_code: body.code, p_entity: body.entity, p_body: body.body, p_question: body.question ?? null });

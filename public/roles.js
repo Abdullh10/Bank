@@ -7,9 +7,10 @@
 //   progress  تقدم الطلاب بالأسماء
 //   dashboard لوحة المؤشرات (أرقام مجمّعة دون أسماء)
 //   accounts  إدارة حسابات الطلاب والفريق
+//   fullbank  البنك كاملًا بإجاباته وطباعته (غيرهما: إجابات هدف واحد في كل مرة، ومفتاح الاختبار لأسئلته فقط)
 export const PERMS = {
-  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'accounts'],
-  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard'],
+  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'accounts', 'fullbank'],
+  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard', 'fullbank'],
   viewer: ['exam', 'progress', 'dashboard'],
   supervisor: ['exam', 'dashboard'],
   principal: ['dashboard'],
