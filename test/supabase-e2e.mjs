@@ -46,6 +46,7 @@ await pool.query(`update public.profiles set role='viewer' where email='view@che
 await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
 await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local' or email like 'bulk_@chem21.local'`);
+await pool.query('delete from public.review_notes');
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
 async function asRole(uid, sql, params) {
@@ -181,15 +182,22 @@ await Q2('[data-choose]').nth(0).click();
 ok('viewer: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('viewer: sees answers but no review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools').count()) === 0);
+ok('viewer (protected bank): no print buttons on objective page', (await p.locator('[data-print]').count()) === 0);
 { const t = await p.locator('main').innerText(); ok('refs: no page numbers or worksheet labels', !/ص\s*\d|ورقة/.test(t) && t.includes('المرجع: الكتاب المدرسي —'), (t.match(/المرجع:[^\n]*/) || [''])[0]); }
 await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, table, .empty', { timeout: 15000 });
 ok('viewer: no export buttons', (await p.locator('[data-export]').count()) === 0);
+ok('viewer (protected bank): no sheets/selection, no answers in bank', (await p.locator('[data-sheet], #sel-all, [data-pick]').count()) === 0 && (await p.locator('#bank-list .opt.correct').count()) === 0);
+const vBank = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
+ok('viewer: database returns the bank without answers', vBank.data?.length === 2580 && !vBank.data.some(q => 'correctIndex' in q || 'modelAnswer' in q));
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
 await p.click('#x-build'); await p.waitForSelector('.paper');
 { const opts = await p.$$eval('#x-setup select, select', ss => ss.flatMap(s => [...s.options].map(o => o.textContent)));
   ok('exam lists: no «مسارات», no third term, three secondary grades', !opts.some(t => /مسارات|الفصل الدراسي الثالث|السنة المشتركة/.test(t))
     && ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي'].every(g => opts.includes(g))); }
 ok('viewer: exam builder builds from Supabase bank', (await p.locator('.set-student .paper').count()) >= 1);
+ok('viewer: answer key fetched for the exam questions only', /[أبج]/.test(await p.locator('.set-key .answer-grid.key').first().innerText())
+  && !(await p.locator('.set-key .answer-grid.key').first().innerText()).includes('؟'));
 await p.click('#logout'); await p.waitForSelector('#l-user');
 ok('logout returns to login', !(await p.locator('.topbar').isVisible()));
 
@@ -240,6 +248,7 @@ await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('b
 ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
 // مالك المشروع: يفتح المقرر «قيد الإعداد» ليتابعه، والتبديل بين المقررات يغيّر البنك والترويسة
 await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
+await p.goto(BASE + '#/');  await p.waitForSelector('.course-card');
 ok('owner: preparing courses openable', (await p.locator('.course-card.preparing [data-course]').count()) === 3);
 await p.locator('[data-course="3"]').click(); await p.waitForSelector('.notice.warn');
 ok('owner: 2-2 home shows preparing notice + header', (await p.locator('main').innerText()).includes('قيد الإعداد') && (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-2 · الصف الثاني الثانوي · الفصل الدراسي الثاني'));
@@ -401,7 +410,11 @@ await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'super1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 ok('supervisor: nav includes exam builder + dashboard, no progress/notes/accounts', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'exam', 'reports']), JSON.stringify(await navOf()));
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
-ok('supervisor: exam builder opens', true);
+await p.click('#x-build'); await p.waitForSelector('.set-key .answer-grid.key');
+ok('supervisor: exam built with its answer key', /[أبج]/.test(await p.locator('.set-key .answer-grid.key').first().innerText()));
+const supExam = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_exam_answers', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_ids: Array.from({ length: 101 }, (_, i) => i + 1) }) })).json());
+ok('database: one exam key request is capped at 100 questions', !!supExam.error);
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);
