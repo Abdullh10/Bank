@@ -12,7 +12,7 @@ const objectives = new Set(JSON.parse(fs.readFileSync(path.join(root, 'data', 'o
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5));
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'], DIFF = ['سهل', 'متوسط', 'صعب'];
 let bad = 0;
-const positions = [0, 0, 0];
+const positions = [0, 0, 0, 0];
 for (const id of ids) {
   const errs = [];
   const file = path.join(dir, id + '.json');
@@ -32,7 +32,13 @@ for (const id of ids) {
     if (!q.source_ref) errs.push(`${tag}: المرجع مفقود`);
     if (q.stimulus && (!Array.isArray(q.stimulus.headers) || !Array.isArray(q.stimulus.rows))) errs.push(`${tag}: جدول غير صالح`);
     if (q.type === 'mcq') {
-      if (!Array.isArray(q.distractor_notes) || q.distractor_notes.length !== 3) errs.push(`${tag}: distractor_notes يجب أن يكون 3 عناصر`);
+      const n = (q.options || []).length;
+      if (!Array.isArray(q.distractor_notes) || q.distractor_notes.length !== n) errs.push(`${tag}: distractor_notes يجب أن يساوي عدد البدائل (${n})`);
+      // حارس خلل ترتيب البدائل: ملاحظة البديل الصحيح وحدها فارغة، وفي موضع الإجابة الصحيحة تمامًا
+      else {
+        const empty = q.distractor_notes.map((x, k) => (String(x).trim() ? -1 : k)).filter(k => k >= 0);
+        if (empty.length !== 1 || empty[0] !== q.correct_index) errs.push(`${tag}: ملاحظة البديل الفارغة يجب أن تكون في موضع الإجابة الصحيحة فقط`);
+      }
       if (Number.isInteger(q.correct_index)) positions[q.correct_index]++;
     } else {
       for (const k of ['answer_elements', 'solution_steps', 'marks', 'rubric', 'common_errors'])
@@ -47,6 +53,6 @@ for (const id of ids) {
   else console.log(`✓ ${id}`);
 }
 const total = positions.reduce((a, b) => a + b, 0);
-if (total) console.log(`توزيع موضع الإجابة الصحيحة: أ=${positions[0]} ب=${positions[1]} ج=${positions[2]}`);
+if (total) console.log(`توزيع موضع الإجابة الصحيحة: أ=${positions[0]} ب=${positions[1]} ج=${positions[2]}${positions[3] ? ` د=${positions[3]}` : ''}`);
 console.log(bad ? `${bad} ملفًا فيه أخطاء` : `كل الملفات (${ids.length}) سليمة بنيويًا`);
 process.exit(bad ? 1 : 0);

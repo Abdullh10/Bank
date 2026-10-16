@@ -296,11 +296,11 @@ language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare r record;
 begin
   perform public._require_member();
-  if p_choice is null or p_choice < 0 or p_choice > 2 then raise exception 'اختيار غير صالح'; end if;
+  if p_choice is null or p_choice < 0 or p_choice > 3 then raise exception 'اختيار غير صالح'; end if;
   select q.id, a.correct_index, a.explanation, a.distractor_notes into r
     from public.questions q join public.question_answers a on a.question_id = q.id
-    where q.id = p_question and q.type = 'mcq' and not q.excluded;
-  if not found then raise exception 'السؤال غير موجود'; end if;
+    where q.id = p_question and q.type = 'mcq' and not q.excluded and p_choice < jsonb_array_length(q.options);
+  if not found then raise exception 'السؤال غير موجود أو الاختيار غير صالح'; end if;
   return jsonb_build_object('correct', p_choice = r.correct_index, 'correctIndex', r.correct_index,
     'explanation', r.explanation, 'distractorNote', nullif(r.distractor_notes->>p_choice, ''));
 end $$;
@@ -381,9 +381,10 @@ begin
   if p ? 'difficulty' and p->>'difficulty' is not null and p->>'difficulty' not in ('سهل', 'متوسط', 'صعب') then errs := array_append(errs, 'درجة الصعوبة غير صالحة'); end if;
   if p ? 'thinking_level' and p->>'thinking_level' is not null and p->>'thinking_level' not in ('تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع') then errs := array_append(errs, 'مستوى التفكير غير صالح'); end if;
   if p_type = 'mcq' then
-    if jsonb_typeof(p->'options') is distinct from 'array' or jsonb_array_length(p->'options') <> 3 then errs := array_append(errs, 'يجب أن يكون لسؤال الاختيار ثلاثة بدائل بالضبط');
+    -- ثلاثة بدائل (أ ب ج) أو أربعة (أ ب ج د) حسب المقرر
+    if jsonb_typeof(p->'options') is distinct from 'array' or jsonb_array_length(p->'options') not in (3, 4) then errs := array_append(errs, 'يجب أن يكون لسؤال الاختيار ثلاثة بدائل أو أربعة');
     elsif exists (select 1 from jsonb_array_elements_text(p->'options') x where trim(x) = '') then errs := array_append(errs, 'لا يجوز ترك بديل فارغ'); end if;
-    if coalesce((p->>'correct_index')::int, -1) not between 0 and 2 then errs := array_append(errs, 'حدد الإجابة الصحيحة'); end if;
+    if coalesce((p->>'correct_index')::int, -1) < 0 or coalesce((p->>'correct_index')::int, -1) >= coalesce(jsonb_array_length(case when jsonb_typeof(p->'options') = 'array' then p->'options' end), 3) then errs := array_append(errs, 'حدد الإجابة الصحيحة'); end if;
     if trim(coalesce(p->>'explanation', '')) = '' then errs := array_append(errs, 'تفسير الإجابة الصحيحة مطلوب'); end if;
   else
     if trim(coalesce(p->>'model_answer', '')) = '' then errs := array_append(errs, 'الإجابة النموذجية مطلوبة'); end if;
@@ -888,7 +889,7 @@ begin
   if not found then raise exception 'الجلسة غير موجودة'; end if;
   if s.finished_at is not null then raise exception 'انتهت هذه الجلسة'; end if;
   if not (p_question = any(s.question_ids)) then raise exception 'السؤال ليس من هذه الجلسة'; end if;
-  if p_choice is null or p_choice not between 0 and 2 then raise exception 'اختيار غير صالح'; end if;
+  if p_choice is null or p_choice < 0 or p_choice >= (select jsonb_array_length(options) from questions where id = p_question) then raise exception 'اختيار غير صالح'; end if;
   if exists (select 1 from practice_answers where session_id = p_session and question_id = p_question) then raise exception 'أجبت عن هذا السؤال'; end if;
   -- حد يومي للإجابات يمنع جمع مفاتيح الإجابة آليًا
   if (select count(*) from practice_answers pa join practice_sessions ps on ps.id = pa.session_id

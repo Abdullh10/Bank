@@ -82,7 +82,7 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
   };
   // البدائل في سطر واحد: جدول بلا حدود بثلاثة أعمدة (يحفظ ترتيب أ ب ج مع الرموز الإنجليزية)
   const optsRow = options => table([options.map((x, k) => cell(para([run(`${letters[k]}) `, { bold: true, color: NAVY }), run(x)], { after: 0 }),
-    { width: 33, borders: allBorders(none) }))], { borders: allBorders(none) });
+    { width: Math.floor(100 / options.length), borders: allBorders(none) }))], { borders: allBorders(none) });
   // أسطر الإجابة: صفوف جدول بخط منقط سفلي، كل صف مربوط بالتالي فلا تنفصل عن السؤال
   const answerLines = n => table(Array.from({ length: n }, (_, k) => [new TableCell({
     children: [new Paragraph({ keepNext: k < n - 1, keepLines: true, children: [run('')] })],
@@ -97,7 +97,8 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
       out.push(sectionTitle(`السؤال ${ordinals[qn++]}: اختر الإجابة الصحيحة لكل مما يأتي`, fmt(m.mcq.length * o.mcqMark)));
       if (o.answerGrid) out.push(...grid(m.mcq.length));
       m.mcq.forEach(({ q, options }, i) => {
-        const long = options.some(x => x.length > 28);
+        // أربعة بدائل في سطر واحد تضيق أسرع من ثلاثة
+        const long = options.some(x => x.length > (options.length > 3 ? 20 : 28));
         const stim = stimTable(q.stimulus);
         out.push(p(`${i + 1}. ${q.stem}`, { bold: true, keepNext: true, after: 40 }), ...stim);
         if (long) options.forEach((x, k) => out.push(p(`${letters[k]}) ${x}`, { keepNext: k < options.length - 1, indent: { right: 360 }, after: k < options.length - 1 ? 20 : 160 })));

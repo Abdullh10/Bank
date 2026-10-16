@@ -34,9 +34,11 @@ export function cleanQuestion(input, type) {
     q.correct_index = Number(input.correct_index);
     q.explanation = norm(input.explanation);
     q.distractor_notes = Array.isArray(input.distractor_notes) ? input.distractor_notes.map(norm) : [];
-    if (q.options.length !== 3) e.push('يجب أن يكون لسؤال الاختيار ثلاثة بدائل بالضبط');
+    // ثلاثة بدائل (أ ب ج) أو أربعة (أ ب ج د)، حسب المقرر
+    if (q.options.length !== 3 && q.options.length !== 4) e.push('يجب أن يكون لسؤال الاختيار ثلاثة بدائل أو أربعة');
     if (q.options.some(o => !o)) e.push('لا يجوز ترك بديل فارغ');
-    if (!(q.correct_index >= 0 && q.correct_index <= 2)) e.push('حدد الإجابة الصحيحة');
+    if (!(q.correct_index >= 0 && q.correct_index < q.options.length)) e.push('حدد الإجابة الصحيحة');
+    if (q.distractor_notes.length > q.options.length) q.distractor_notes = q.distractor_notes.slice(0, q.options.length);
     if (!q.explanation) e.push('تفسير الإجابة الصحيحة مطلوب');
   } else {
     q.model_answer = String(input.model_answer ?? '').trim();
@@ -56,7 +58,7 @@ export function autoCheck(q, siblings = []) {
   const add = (ok, label) => checks.push({ ok, label });
   if (q.type === 'mcq') {
     const opts = q.options || [];
-    add(opts.length === 3, 'ثلاثة بدائل');
+    add(opts.length === 3 || opts.length === 4, 'ثلاثة بدائل أو أربعة');
     add(new Set(opts.map(norm)).size === opts.length, 'البدائل غير مكررة');
     add(q.correct_index >= 0 && q.correct_index < opts.length, 'إجابة صحيحة واحدة محددة');
     const lens = opts.map(o => norm(o).length).filter(Boolean);
