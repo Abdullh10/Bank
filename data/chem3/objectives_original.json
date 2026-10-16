@@ -1,0 +1,724 @@
+{
+ "course": {
+  "subject": "الكيمياء",
+  "code": "كيمياء 3",
+  "grade": "الثالث الثانوي",
+  "term": "الأول",
+  "country": "السعودية",
+  "former_name": "كيمياء 4"
+ },
+ "source": {
+  "file": "أهداف كيمياء 3.pdf (عنوانه داخل الملف: «أهداف كيمياء 4»، الاسم السابق للمقرر)",
+  "author_meta": "Qhtani, Ahmed Mohamm.",
+  "created": "2023-08-17",
+  "pages": 5,
+  "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-10-16)",
+  "content_basis": "الكتاب المدرسي — كيمياء 3 (بانتظار الملفات)",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة تأتي في مرحلة مراجعة الأهداف. رموز [H+] و[OH-] كُتبت بالأرقام العلوية. مستوى التفكير منقول من عمود «مستوى التفكير» (خلايا مدمجة).",
+  "option_count": 4
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "المخاليط والمحاليل",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "أنواع المخاليط",
+     "objectives": [
+      {
+       "id": "K3-C1-L1-O01",
+       "text": "أن يعرف الطالب المخلوط",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O02",
+       "text": "أن يذكر الطالب أنواع المخاليط",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O03",
+       "text": "أن يعرف الطالب المخلوط غير المتجانس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O04",
+       "text": "أن يذكر الطالب أمثلة على المخاليط غير المتجانسة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O05",
+       "text": "أن يصنف الطالب المحاليل بالاعتماد على حالة المذيب",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O06",
+       "text": "أن يقارن الطالب بين المخلوط الحقيقي والمعلق والغروي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O07",
+       "text": "أن يعرف الطالب الترويق",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O08",
+       "text": "أن يوضح الطالب ظاهرة تندال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O09",
+       "text": "أن يفسر الطالب سبب بقاء جسيمات المذاب في المخلوط الغروي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O10",
+       "text": "أن يفسر الطالب صعوبة قيادة السيارة خلال أجواء الضباب",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تركيز المحلول",
+     "objectives": [
+      {
+       "id": "K3-C1-L2-O01",
+       "text": "ان يعرف الطالب تركيز المحلول",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O02",
+       "text": "أن يعدد الطالب طرق التعبير عن تركيز المحلول ( كميا)",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O03",
+       "text": "أن يفرق الطالب بين النسبة المئوية الكتلية والحجمية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O04",
+       "text": "أن يحسب الطالب النسبة المئوية الكتلية و الحجمية لمحلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O05",
+       "text": "أن يعرف الطالب المولارية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O06",
+       "text": "أن يحسب الطالب مولارية محلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O07",
+       "text": "أن يعرف الطالب المحلول القياسي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O08",
+       "text": "أن يحسب الطالب حجم محلول قياسي بمعلومية مولاريته",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O09",
+       "text": "أن يعرف الطالب المولالية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O10",
+       "text": "أن يحسب الطالب مولالية محلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O11",
+       "text": "أن يعرف الطالب الكسر المولي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O12",
+       "text": "أن يحسب الطالب الكسر المولي",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "العوامل المؤثرة في الذوبان",
+     "objectives": [
+      {
+       "id": "K3-C1-L3-O01",
+       "text": "أن يعرف الطالب الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O02",
+       "text": "أن يفسر الطالب سبب ذوبان المركبات الايونية في الماء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O03",
+       "text": "أن يفسر الطالب سبب ذوبان المركبات الجزيئية في الماء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O04",
+       "text": "أن يوضح الطالب أثر التحريك في سرعة الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O05",
+       "text": "أن يوضح الطالب أثر مساحة السطح في سرعة الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O06",
+       "text": "أن يعرف الطالب قانون هنري",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O07",
+       "text": "أن يفسر الطالب سبب اندفاع غاز ثاني اكسيد الكربون من علبة المشروب الغازي عند فتحها.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O08",
+       "text": "أن يحسب الطالب ذائبية غاز في سائل",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O09",
+       "text": "أن يعرف الطالب المحلول غير المشبع",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "الخواص الجامعة للمحاليل",
+     "objectives": [
+      {
+       "id": "K3-C1-L4-O01",
+       "text": "أن يعرف الطالب الخواص الجامعة للمحاليل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O02",
+       "text": "أن يعدد الطالب الخواص الجامعة للمحاليل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O03",
+       "text": "أن يوضح الطالب أثر التركيز على درجة الغليان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O04",
+       "text": "أن يفسر الطالب درجة غليان المحلول أعلى من درجة غليان المذيب النقي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O05",
+       "text": "أن يحسب الطالب درجة الغليان ودرجة تجمد محلول في مذيب",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O06",
+       "text": "أن يعرف الطالب الضغط الأسموزي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "الأحماض والقواعد",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "مقدمة في الأحماض والقواعد",
+     "objectives": [
+      {
+       "id": "K3-C2-L1-O01",
+       "text": "أن يعدد الطالب خواص الاحماض الفيزيائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O02",
+       "text": "أن يعدد الطالب خواص الاحماض الكيميائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O03",
+       "text": "أن يفسر الطالب محلول حمض الكلور موصل جيد للكهرباء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O04",
+       "text": "أن يفسر الطالب محلول هيدروكسيد الصوديوم موصل جيد للكهرباء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O05",
+       "text": "أن يعرف الطالب المحلول الحمضي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O06",
+       "text": "أن يعرف الطالب الحمض حسب نموذج أرهينيوس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O07",
+       "text": "أن يعدد الطالب قصور نموذج أرهينيوس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O08",
+       "text": "أن يعرف الطالب الحمض حسب نظرية لوري – برونشتد",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O09",
+       "text": "أن يحدد الطالب القاعدة المقترنة للحمض",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O10",
+       "text": "أن يحدد الطالب الحمض المقترن للقاعدة.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O11",
+       "text": "أن يعرف الطالب الحمض حسب نظرية لويس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O12",
+       "text": "أن يصنف الطالب المواد إلى حمض وقاعدة بموجب نظرية لويس",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O13",
+       "text": "أن يعرف الطالب المواد المترددة ( أمفوتيرية )",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O14",
+       "text": "أن يعرف الطالب أحماض أحادية البروتون",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O15",
+       "text": "ان يذكر الطالب أمثلة على أحماض أحادية البروتون",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O16",
+       "text": "ان يذكر الطالب أمثلة على الاحماض متعددة البروتونات",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O17",
+       "text": "أن يعرف الطالب أنهيدريد حمضي مع ذكر مثال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O18",
+       "text": "أن يعرف الطالب أنهيدريد قاعدي مع ذكر مثال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O19",
+       "text": "أن يعرف الطالب ملح إبسوم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O20",
+       "text": "أن يوضح الطالب تكوين ملح إبسوم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "قوة الأحماض والقواعد",
+     "objectives": [
+      {
+       "id": "K3-C2-L2-O01",
+       "text": "أن يعرف الطالب الاحماض القوية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O02",
+       "text": "أن يقارن الطالب بين الحموض الضعيفة من خلال معرفة قيم Ka",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O03",
+       "text": "أن يكتب الطالب معادلات التأين القواعد الضعيفة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O04",
+       "text": "أن يكتب الطالب معادلات التأين الاحماض الضعيفة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "أيونات الهيدروجين والرقم الهيدروجيني",
+     "objectives": [
+      {
+       "id": "K3-C2-L3-O01",
+       "text": "أن يرسم الطالب مدرج الحموضة بدلالة pH",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O02",
+       "text": "أن يحسب الطالب قيمة كل من [OH⁻] و pH و pOH بمعرفة تركيز أيون [H⁺]",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O03",
+       "text": "أن يحسب الطالب قيمة [OH⁻] بمعرفة [H⁺]",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O04",
+       "text": "أن يحسب الطالب قيمة كل من pOH و [H⁺] و [OH⁻] بمعرفة قيمة pH",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "التعادل",
+     "objectives": [
+      {
+       "id": "K3-C2-L4-O01",
+       "text": "أن يعرف الطالب المحلول التعادل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O02",
+       "text": "أن يعرف الطالب الأدلة ( الكواشف)",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O03",
+       "text": "أن يحسب الطالب مولارية محلول من بيانات المعايرة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O04",
+       "text": "أن يعرف الطالب تمية الأملاح",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O05",
+       "text": "أن يصنف الطالب الاملاح إلى حمضية أو قاعدية أو متعادلة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O06",
+       "text": "أن يعرف الطالب المحلول المنظم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O07",
+       "text": "أن يكتب الطالب مكونات المحلول المنظم",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O08",
+       "text": "أن يعدد الطالب مجالات استخدام المحاليل المنظمة في الحياة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "تفاعلات الأكسدة والاختزال",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الأكسدة والاختزال",
+     "objectives": [
+      {
+       "id": "K3-C3-L1-O01",
+       "text": "أن يعرف الطالب عملية الأكسدة و لاختزال قديما.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O02",
+       "text": "أن يحدد الطالب لعامل المؤكسد والعامل المختزل في المعادلة الكيميائية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O03",
+       "text": "أن يقارن الطالب ين العامل المؤكسد والعامل المختزل.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O04",
+       "text": "أن يعرف الطالب عدد التأكسد",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O05",
+       "text": "أن يحسب الطالب عدد الأكسدة لعنصر ما في مركب أو أيون.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O06",
+       "text": "ان يوضح الطالب علاقة تفاعلات الاكسدة والاختزال بالكهروسالبية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "وزن معادلات الأكسدة والاختزال",
+     "objectives": [
+      {
+       "id": "K3-C3-L2-O01",
+       "text": "أن يزن الطالب تفاعل أكسدة واختزال في وسط حامضي و قاعدي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "الكيمياء الكهربائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الخلايا الجلفانية",
+     "objectives": [
+      {
+       "id": "K3-C4-L1-O01",
+       "text": "ان يعرف الطالب الكيمياء الكهربائية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O02",
+       "text": "ان يعرف الطالب الخلية الجلفانية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O03",
+       "text": "أن يكتب الطالب رمز الخلية الجلفانية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O04",
+       "text": "ان يعدد الطالب فوائد القنطرة الملحية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O05",
+       "text": "ان يفسر الطالب سبب اختيار العلماء لقطب الهيدروجين القياسي عند قياس جهود الأقطاب الغير معلومة.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O06",
+       "text": "ان يحسب الطالب جهد القياسي بعد تحديد التفاعل الكلي للخلية ثم كتابة رمز الخلية مع الرسم.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O07",
+       "text": "ان يوضح الطالب استعمال جهود الاختزال القياسية.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "البطاريات",
+     "objectives": [
+      {
+       "id": "K3-C4-L2-O01",
+       "text": "ان يميز الطالب بين البطاريات الأولية والثانوية وتعطي مثالين على كل نوع.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O02",
+       "text": "ان يفسر الطالب تركيب خلية الوقود ( الهيدروجين – الاكسجين ) وعملها.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O03",
+       "text": "ان يعرف الطالب التآكل.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O04",
+       "text": "ان يصف الطالب عملية تآكل الحديد وطرائق حمايته من التآكل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O05",
+       "text": "ان يتعرف الطالب على الاقطاب في البطاريات المختلفة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O06",
+       "text": "ان يتعرف الطالب على الالكتروليتات في البطاريات المختلفة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O07",
+       "text": "ان يعلل الطالب تفضيل البطارية القلوية على خلية الكربون الخارصين",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O08",
+       "text": "ان يعلل الطالب خلية الروقود لاتنفذ مثل سائر البطاريات",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "التحليل الكهربائي",
+     "objectives": [
+      {
+       "id": "K3-C4-L3-O01",
+       "text": "أن يصف الطالب كيف يمكن عكس تفاعل الاكسدة والاختزال التلقائي في الخلية الكهروكيميائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O02",
+       "text": "أن يقارن الطالب التفاعلات المرتبطة مع التحليل الكهربائي لمصهور كلوريد الصوديوم بالتفاعلات المرتبطة مع التحليل الكهربائي لماء البحر.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O03",
+       "text": "ان يقارن الطالب بين الخلية الجلفانية والتحليل الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O04",
+       "text": "ان يعلل الطالب عدم انتاج الصوديوم من التحليل الكهربائي لماء البحر",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O05",
+       "text": "ان يعلل الطالب سبب توصيل محلول و او مصهور ملح الطعام للتيار الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
