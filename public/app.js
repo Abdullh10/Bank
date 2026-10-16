@@ -228,7 +228,7 @@ async function pageHome() {
       </div>
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">${icon('chapters', 22, 'navy')}تصفح الفصول</a>
-        <a class="btn" href="#/bank">بنك الأسئلة</a>
+        ${can('bank') ? '<a class="btn" href="#/bank">بنك الأسئلة</a>' : ''}
         <a class="btn" href="#/">${line('prev', 16)}كل المقررات</a>
       </div>
     </div>
@@ -404,7 +404,8 @@ function modeHint(answers) {
     practice: 'التدريب الفوري: تظهر التغذية الراجعة مباشرة بعد اختيار كل إجابة.',
     review: 'وضع المراجعة: تظهر الإجابات والتفسيرات وأدوات المراجعة.',
   };
-  return `<p class="notice info no-print">${t[objState.mode]}${!answers ? ' الإجابات النموذجية للأسئلة المقالية تظهر للمعلمين والمراجعين بعد تسجيل الدخول.' : ''}</p>`;
+  return `<p class="notice info no-print">${t[objState.mode]}${!answers ? (state.user ? ' الإجابات لا تُعرض هنا لحسابك؛ يصلك مفتاح الإجابة مع كل اختبار تنشئه من «منشئ الاختبارات».'
+    : ' الإجابات النموذجية للأسئلة المقالية تظهر للمعلمين والمراجعين بعد تسجيل الدخول.') : ''}</p>`;
 }
 
 function reviewPanel(o) {
@@ -412,12 +413,12 @@ function reviewPanel(o) {
   return `<div class="card review-panel">
     ${ttl('shield', 'مراجعة الهدف واعتماده', 'h3', 28)}
     ${owner ? `<div class="field"><label for="approved-text">الصياغة التي ستُعتمد</label>
-      <textarea id="approved-text">${esc(o.approvedText || o.proposedText || o.originalText)}</textarea></div>
+      <textarea dir="auto" id="approved-text">${esc(o.approvedText || o.proposedText || o.originalText)}</textarea></div>
     <div class="form-grid">
       <div class="field"><label for="req-mcq">عدد أسئلة الاختيار المطلوب</label><input id="req-mcq" type="number" min="0" max="30" value="${o.requiredMcq}"></div>
       <div class="field"><label for="req-essay">عدد الأسئلة المقالية المطلوب</label><input id="req-essay" type="number" min="0" max="30" value="${o.requiredEssay}"></div>
     </div>` : `<p class="small muted">يُعتمد الهدف بصياغته الحالية. لاقتراح صياغة أخرى اكتب «ملاحظة» في أسفل الصفحة، ويطّلع عليها مالك المشروع.</p>`}
-    <div class="field"><label for="review-note">سبب القرار (إلزامي عند الإعادة)</label><textarea id="review-note"></textarea></div>
+    <div class="field"><label for="review-note">سبب القرار (إلزامي عند الإعادة)</label><textarea dir="auto" id="review-note"></textarea></div>
     <div class="actions">
       <button type="button" class="ok" data-review="approve">اعتماد الهدف</button>
       <button type="button" class="danger" data-review="return">إعادة للتعديل</button>
@@ -617,8 +618,8 @@ function dialog(title, body, buttons) {
 }
 
 function editSupplement(code, text, done) {
-  const d = dialog('تعديل المحتوى المكمّل', `<label for="sup-edit">النص</label><textarea id="sup-edit" style="min-height:12rem">${escRaw(text)}</textarea>
-    <label for="sup-note" style="margin-top:.6rem">ملاحظة التعديل</label><input id="sup-note">`,
+  const d = dialog('تعديل المحتوى المكمّل', `<label for="sup-edit">النص</label><textarea dir="auto" id="sup-edit" style="min-height:12rem">${escRaw(text)}</textarea>
+    <label for="sup-note" style="margin-top:.6rem">ملاحظة التعديل</label><input dir="auto" id="sup-note">`,
   `<button type="button" class="primary" id="sup-save">حفظ (يبقى بانتظار الاعتماد)</button>`);
   d.querySelector('#sup-save').onclick = guard(async () => {
     try {
@@ -642,28 +643,28 @@ const parsePairs = (v, k1, k2, num) => parseLines(v).map(l => {
 function openEditor(type, q, save, done) {
   q = q || { options: ['', '', ''], correctIndex: 0 };
   const common = `
-    <div class="field"><label for="e-stem">نص السؤال</label><textarea id="e-stem">${escRaw(q.stem)}</textarea></div>
+    <div class="field"><label for="e-stem">نص السؤال</label><textarea dir="auto" id="e-stem">${escRaw(q.stem)}</textarea></div>
     <div class="form-grid">
       <div class="field"><label for="e-level">مستوى التفكير</label>${sel('e-level', LEVEL_OPTS, q.thinkingLevel)}</div>
       <div class="field"><label for="e-diff">درجة الصعوبة</label>${sel('e-diff', ['سهل', 'متوسط', 'صعب'], q.difficulty)}</div>
-      <div class="field"><label for="e-kind">نوع السؤال</label><input id="e-kind" value="${escRaw(q.questionKind)}"></div>
-      <div class="field"><label for="e-src">المرجع</label><input id="e-src" value="${escRaw(q.sourceRef)}"></div>
+      <div class="field"><label for="e-kind">نوع السؤال</label><input dir="auto" id="e-kind" value="${escRaw(q.questionKind)}"></div>
+      <div class="field"><label for="e-src">المرجع</label><input dir="auto" id="e-src" value="${escRaw(q.sourceRef)}"></div>
     </div>`;
   const mcq = `${q.options.map((op, i) => `
       <div class="field"><label for="e-opt${i}">البديل ${LETTERS[i]} ${i === q.correctIndex ? '(الصحيح حاليًا)' : ''}</label>
-        <input id="e-opt${i}" value="${escRaw(op)}"></div>`).join('')}
+        <input dir="auto" id="e-opt${i}" value="${escRaw(op)}"></div>`).join('')}
     <div class="field"><label for="e-correct">الإجابة الصحيحة</label>
       <select id="e-correct">${LETTERS.map((l, i) => `<option value="${i}" ${i === q.correctIndex ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-    <div class="field"><label for="e-expl">تفسير الإجابة الصحيحة</label><textarea id="e-expl">${escRaw(q.explanation)}</textarea></div>
+    <div class="field"><label for="e-expl">تفسير الإجابة الصحيحة</label><textarea dir="auto" id="e-expl">${escRaw(q.explanation)}</textarea></div>
     <div class="field"><label for="e-dist">سبب خطأ البدائل (سطر لكل بديل بالترتيب، واترك سطر الصحيح فارغًا)</label>
-      <textarea id="e-dist">${escRaw((q.distractorNotes || ['', '', '']).join('\n'))}</textarea></div>`;
+      <textarea dir="auto" id="e-dist">${escRaw((q.distractorNotes || ['', '', '']).join('\n'))}</textarea></div>`;
   const essay = `
-    <div class="field"><label for="e-model">الإجابة النموذجية</label><textarea id="e-model" style="min-height:7rem">${escRaw(q.modelAnswer)}</textarea></div>
-    <div class="field"><label for="e-elems">عناصر الإجابة (سطر لكل عنصر)</label><textarea id="e-elems">${escRaw(lines(q.answerElements))}</textarea></div>
-    <div class="field"><label for="e-steps">خطوات الحل (سطر لكل خطوة)</label><textarea id="e-steps">${escRaw(lines(q.solutionSteps))}</textarea></div>
-    <div class="field"><label for="e-marks">توزيع الدرجات (العنصر | الدرجة)</label><textarea id="e-marks">${escRaw(pairs(q.marks, 'element', 'marks'))}</textarea></div>
-    <div class="field"><label for="e-rubric">سلم التصحيح (المستوى | الوصف)</label><textarea id="e-rubric">${escRaw(pairs(q.rubric, 'level', 'description'))}</textarea></div>
-    <div class="field"><label for="e-errors">الأخطاء الشائعة (سطر لكل خطأ)</label><textarea id="e-errors">${escRaw(lines(q.commonErrors))}</textarea></div>`;
+    <div class="field"><label for="e-model">الإجابة النموذجية</label><textarea dir="auto" id="e-model" style="min-height:7rem">${escRaw(q.modelAnswer)}</textarea></div>
+    <div class="field"><label for="e-elems">عناصر الإجابة (سطر لكل عنصر)</label><textarea dir="auto" id="e-elems">${escRaw(lines(q.answerElements))}</textarea></div>
+    <div class="field"><label for="e-steps">خطوات الحل (سطر لكل خطوة)</label><textarea dir="auto" id="e-steps">${escRaw(lines(q.solutionSteps))}</textarea></div>
+    <div class="field"><label for="e-marks">توزيع الدرجات (العنصر | الدرجة)</label><textarea dir="auto" id="e-marks">${escRaw(pairs(q.marks, 'element', 'marks'))}</textarea></div>
+    <div class="field"><label for="e-rubric">سلم التصحيح (المستوى | الوصف)</label><textarea dir="auto" id="e-rubric">${escRaw(pairs(q.rubric, 'level', 'description'))}</textarea></div>
+    <div class="field"><label for="e-errors">الأخطاء الشائعة (سطر لكل خطأ)</label><textarea dir="auto" id="e-errors">${escRaw(lines(q.commonErrors))}</textarea></div>`;
   const d = dialog(q.id ? `تعديل السؤال ${q.number}` : (type === 'mcq' ? 'سؤال اختيار جديد' : 'سؤال مقالي جديد'),
     `${q.stimulus ? '<p class="notice info">جدول البيانات المرفق بالسؤال يبقى كما هو.</p>' : ''}${common}${type === 'mcq' ? mcq : essay}
      <p class="small muted">أي تعديل على سؤال معتمد يعيده إلى «قيد المراجعة»، ويُحفظ الإصدار السابق في سجل التعديلات.</p>`,
@@ -953,7 +954,7 @@ async function route() {
     else if (page === 'chapters') await pageChapters();
     else if (page === 'chapter') await pageChapter(arg);
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
-    else if (page === 'bank') await pageBank();
+    else if (page === 'bank' && can('bank')) await pageBank();
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
     else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);

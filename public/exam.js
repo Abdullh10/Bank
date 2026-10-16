@@ -146,7 +146,8 @@ export async function pageExam(ctx) {
     state.header.courseId = course.id; saveHeader(state.header);
   }
   const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
-  const all = bank.questions;
+  // البنك المحمي: نسخ مستقلة حتى لا تظهر إجابات مفتاح الاختبار في صفحة البنك المشتركة
+  const all = protectedBank ? bank.questions.map(q => ({ ...q })) : bank.questions;
   // البنك المحمي يصل دون إجابات؛ مفتاح الاختبار يُجلب من الخادم للأسئلة المختارة فقط
   const hasAnswers = protectedBank || all.some(q => q.type === 'mcq' && Number.isInteger(q.correctIndex));
   const ensureAnswers = async qs => {

@@ -7,13 +7,15 @@
 //   progress  تقدم الطلاب بالأسماء
 //   dashboard لوحة المؤشرات (أرقام مجمّعة دون أسماء)
 //   accounts  إدارة حسابات الطلاب والفريق
+//   bank      صفحة «بنك الأسئلة» (المعلم لا يراها؛ يختار أسئلته من منشئ الاختبارات)
+//   answers   الإجابات في صفحة الهدف (المعلم لا يراها؛ مفتاح الإجابة يأتيه مع الاختبار الذي ينشئه)
 //   fullbank  البنك كاملًا بإجاباته وطباعته (غيرهما: إجابات هدف واحد في كل مرة، ومفتاح الاختبار لأسئلته فقط)
 export const PERMS = {
-  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'accounts', 'fullbank'],
-  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard', 'fullbank'],
+  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'accounts', 'fullbank', 'bank', 'answers'],
+  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard', 'fullbank', 'bank', 'answers'],
   viewer: ['exam', 'progress', 'dashboard'],
-  supervisor: ['exam', 'dashboard'],
-  principal: ['dashboard'],
+  supervisor: ['exam', 'dashboard', 'bank', 'answers'],
+  principal: ['dashboard', 'bank', 'answers'],
 };
 
 export const ROLE_NAMES = {
@@ -26,5 +28,5 @@ export const STAFF_ROLES = [
   ['reviewer', 'مراجع علمي', 'يراجع الأهداف والأسئلة: يعتمدها أو يعيدها، ويكتب ملاحظاته. لا يعدّل نص المحتوى.'],
   ['supervisor', 'مشرف تربوي', 'يطّلع على الأهداف والأسئلة وإجاباتها، وينشئ اختبارات، ويرى لوحة المؤشرات. دون تعديل ودون أسماء الطلاب.'],
   ['principal', 'مدير المدرسة', 'يطّلع على الأسئلة ولوحة المؤشرات فقط.'],
-  ['viewer', 'معلم', 'يطّلع وينشئ اختبارات، ويتابع تقدم الطلاب بالأسماء.'],
+  ['viewer', 'معلم', 'يطّلع على الأهداف وأسئلتها دون إجاباتها، وينشئ اختبارات بمفاتيحها، ويتابع تقدم الطلاب بالأسماء.'],
 ];

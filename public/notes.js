@@ -61,7 +61,7 @@ export async function notesCard(ctx, el, o, questions, supplement) {
     <div class="note-add">
       <div class="field"><label for="n-target">الملاحظة على</label>
         <select id="n-target">${opts.map(([v, t]) => `<option value="${v}">${esc(t)}</option>`).join('')}</select></div>
-      <div class="field"><label for="n-body">الملاحظة</label><textarea id="n-body" maxlength="2000" placeholder="مثال: البديل (ب) صحيح أيضًا لأن…"></textarea></div>
+      <div class="field"><label for="n-body">الملاحظة</label><textarea dir="auto" id="n-body" maxlength="2000" placeholder="مثال: البديل (ب) صحيح أيضًا لأن…"></textarea></div>
       <div class="actions"><button type="button" class="primary" id="n-save">${line('plus', 16)}إضافة الملاحظة</button></div>
     </div>
     ${notes.length ? `<ul class="notes">${notes.map(n => noteItem(ctx, n)).join('')}</ul>` : ''}`;
@@ -82,7 +82,7 @@ export function noteDialog(ctx, { code, entity, question }, done) {
   const { api, esc, fail, toast, dialog, guard } = ctx;
   const d = dialog(`ملاحظة على ${question ? `${question.type === 'essay' ? 'السؤال المقالي' : 'سؤال الاختيار'} ${question.number}` : 'الهدف'}`,
     `${question ? `<p class="small muted">${esc(question.stem)}</p>` : ''}
-     <label for="nd-body">الملاحظة</label><textarea id="nd-body" maxlength="2000" style="min-height:8rem"></textarea>
+     <label for="nd-body">الملاحظة</label><textarea dir="auto" id="nd-body" maxlength="2000" style="min-height:8rem"></textarea>
      <p class="small muted">لا تغيّر الملاحظة السؤال؛ تظهر لمالك المشروع في صفحة «الملاحظات».</p>`,
     `<button type="button" class="primary" id="nd-save">حفظ الملاحظة</button>`);
   d.querySelector('#nd-body').focus();
