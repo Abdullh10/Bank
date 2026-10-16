@@ -586,6 +586,8 @@ label.chk input { width: auto; }
 .pq-mark { font-weight: 400; font-size: 11pt; color: #444; }
 .pq-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1mm 5mm; padding-inline-start: 9mm; margin-top: 1mm; }
 .pq-opts.stack { grid-template-columns: 1fr; }
+.pq-opts.n4 { grid-template-columns: repeat(4, 1fr); }
+.pq-opts.n4.two { grid-template-columns: repeat(2, 1fr); }
 .pq-opts b { color: var(--brand-p); }
 .paper-table { width: auto; margin: 1.5mm 9mm 1mm 0; }
 .answer-grid { margin-bottom: 3mm; table-layout: fixed; }
@@ -605,7 +607,7 @@ label.chk input { width: auto; }
   .ph-left { text-align: center; }
   .ph-logo img { margin: 0 auto; height: 22mm; }
   .paper-meta { grid-template-columns: 1fr; }
-  .pq-opts { grid-template-columns: 1fr; }
+  .pq-opts, .pq-opts.n4, .pq-opts.n4.two { grid-template-columns: 1fr; }
 }
 
 @page { size: A4; margin: 10mm 10mm 14mm; }

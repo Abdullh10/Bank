@@ -53,7 +53,8 @@ const escRaw = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<
 // للعرض: المصطلح المعتمد؛ وفي حقول التحرير يُستخدم escRaw حتى لا يتغير النص المخزن عند الحفظ.
 const esc = s => term(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
-const LETTERS = ['أ', 'ب', 'ج'];
+// حروف البدائل: ثلاثة (أ ب ج) أو أربعة (أ ب ج د) حسب عدد بدائل السؤال
+const LETTERS = ['أ', 'ب', 'ج', 'د'];
 
 // أوضاع التشغيل: خادم محلي (api/) ← Supabase (إن ضُبط config.js). لا توجد نسخة عامة: المحتوى للحسابات المفعّلة فقط.
 let supa = null;
@@ -592,7 +593,9 @@ function bindObjective(o, questions, s) {
     openEditor(q.type, q, async body => { await api(`/questions/${q.id}`, { method: 'PATCH', body }); }, reload);
   });
   $app.querySelectorAll('[data-add]').forEach(b => b.onclick = () =>
-    openEditor(b.dataset.add, null, async body => { await api(`/objectives/${o.code}/questions`, { method: 'POST', body: { ...body, type: b.dataset.add } }); }, reload));
+    openEditor(b.dataset.add, null, async body => { await api(`/objectives/${o.code}/questions`, { method: 'POST', body: { ...body, type: b.dataset.add } }); }, reload,
+      // سؤال جديد بعدد بدائل أسئلة الهدف نفسه (كيمياء 3 أربعة، وكيمياء 2-1 ثلاثة)
+      Math.max(3, ...questions.filter(x => x.type === 'mcq').map(x => x.options.length))));
   $app.querySelectorAll('[data-qhist]').forEach(b => b.onclick = () => showHistory(Number(b.dataset.qhist)));
   $app.querySelectorAll('[data-qnote]').forEach(b => b.onclick = () => {
     const q = questions.find(x => x.id === Number(b.dataset.qnote));
@@ -640,8 +643,10 @@ const parsePairs = (v, k1, k2, num) => parseLines(v).map(l => {
   return { [k1]: a.trim(), [k2]: num ? Number(b.join('|').trim()) : b.join('|').trim() };
 });
 
-function openEditor(type, q, save, done) {
-  q = q || { options: ['', '', ''], correctIndex: 0 };
+// nOpts: عدد بدائل السؤال الجديد (حسب أسئلة الهدف نفسه)؛ ويمكن تغييره في النافذة
+function openEditor(type, q, save, done, nOpts = 3) {
+  q = q || { options: Array(nOpts).fill(''), correctIndex: 0 };
+  const opts4 = [...q.options, '', '', '', ''].slice(0, 4);
   const common = `
     <div class="field"><label for="e-stem">نص السؤال</label><textarea dir="auto" id="e-stem">${escRaw(q.stem)}</textarea></div>
     <div class="form-grid">
@@ -650,14 +655,16 @@ function openEditor(type, q, save, done) {
       <div class="field"><label for="e-kind">نوع السؤال</label><input dir="auto" id="e-kind" value="${escRaw(q.questionKind)}"></div>
       <div class="field"><label for="e-src">المرجع</label><input dir="auto" id="e-src" value="${escRaw(q.sourceRef)}"></div>
     </div>`;
-  const mcq = `${q.options.map((op, i) => `
-      <div class="field"><label for="e-opt${i}">البديل ${LETTERS[i]} ${i === q.correctIndex ? '(الصحيح حاليًا)' : ''}</label>
+  const mcq = `<div class="field"><label for="e-n">عدد البدائل</label>
+      <select id="e-n"><option value="3" ${q.options.length !== 4 ? 'selected' : ''}>ثلاثة (أ ب ج)</option><option value="4" ${q.options.length === 4 ? 'selected' : ''}>أربعة (أ ب ج د)</option></select></div>
+    ${opts4.map((op, i) => `
+      <div class="field" data-optfield="${i}"><label for="e-opt${i}">البديل ${LETTERS[i]} ${i === q.correctIndex ? '(الصحيح حاليًا)' : ''}</label>
         <input dir="auto" id="e-opt${i}" value="${escRaw(op)}"></div>`).join('')}
     <div class="field"><label for="e-correct">الإجابة الصحيحة</label>
       <select id="e-correct">${LETTERS.map((l, i) => `<option value="${i}" ${i === q.correctIndex ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
     <div class="field"><label for="e-expl">تفسير الإجابة الصحيحة</label><textarea dir="auto" id="e-expl">${escRaw(q.explanation)}</textarea></div>
     <div class="field"><label for="e-dist">سبب خطأ البدائل (سطر لكل بديل بالترتيب، واترك سطر الصحيح فارغًا)</label>
-      <textarea dir="auto" id="e-dist">${escRaw((q.distractorNotes || ['', '', '']).join('\n'))}</textarea></div>`;
+      <textarea dir="auto" id="e-dist">${escRaw((q.distractorNotes || q.options.map(() => '')).join('\n'))}</textarea></div>`;
   const essay = `
     <div class="field"><label for="e-model">الإجابة النموذجية</label><textarea dir="auto" id="e-model" style="min-height:7rem">${escRaw(q.modelAnswer)}</textarea></div>
     <div class="field"><label for="e-elems">عناصر الإجابة (سطر لكل عنصر)</label><textarea dir="auto" id="e-elems">${escRaw(lines(q.answerElements))}</textarea></div>
@@ -669,12 +676,23 @@ function openEditor(type, q, save, done) {
     `${q.stimulus ? '<p class="notice info">جدول البيانات المرفق بالسؤال يبقى كما هو.</p>' : ''}${common}${type === 'mcq' ? mcq : essay}
      <p class="small muted">أي تعديل على سؤال معتمد يعيده إلى «قيد المراجعة»، ويُحفظ الإصدار السابق في سجل التعديلات.</p>`,
     `<button type="button" class="primary" id="e-save">حفظ</button>`);
+  // البديل «د» وخيار الإجابة «د» يظهران فقط مع أربعة بدائل
+  const syncN = () => {
+    const n = Number(d.querySelector('#e-n')?.value || 3);
+    d.querySelectorAll('[data-optfield]').forEach(f => { f.hidden = Number(f.dataset.optfield) >= n; });
+    d.querySelectorAll('#e-correct option').forEach(o => { o.hidden = o.disabled = Number(o.value) >= n; });
+    const c = d.querySelector('#e-correct'); if (c && Number(c.value) >= n) c.value = '0';
+  };
+  if (type === 'mcq') { d.querySelector('#e-n').onchange = syncN; syncN(); }
   const v = id => d.querySelector('#' + id).value;
   d.querySelector('#e-save').onclick = guard(async () => {
     const body = { stem: v('e-stem'), thinking_level: v('e-level') || null, difficulty: v('e-diff') || null,
       question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null };
-    if (type === 'mcq') Object.assign(body, { options: [0, 1, 2].map(i => v('e-opt' + i)), correct_index: Number(v('e-correct')),
-      explanation: v('e-expl'), distractor_notes: [0, 1, 2].map(i => v('e-dist').split('\n')[i] || '') });
+    if (type === 'mcq') {
+      const idx = [...Array(Number(v('e-n'))).keys()];
+      Object.assign(body, { options: idx.map(i => v('e-opt' + i)), correct_index: Number(v('e-correct')),
+        explanation: v('e-expl'), distractor_notes: idx.map(i => v('e-dist').split('\n')[i] || '') });
+    }
     else Object.assign(body, { model_answer: v('e-model'), answer_elements: parseLines(v('e-elems')), solution_steps: parseLines(v('e-steps')),
       marks: parsePairs(v('e-marks'), 'element', 'marks', true), rubric: parsePairs(v('e-rubric'), 'level', 'description'), common_errors: parseLines(v('e-errors')) });
     try { await save(body); d.close(); toast('تم الحفظ'); done(); } catch (e) { fail(e); }

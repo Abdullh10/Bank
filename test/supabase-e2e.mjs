@@ -271,6 +271,28 @@ await p.fill('#e-stem', 'ما وحدة قياس طاقة الفوتون في ا�
 await p.click('#e-save');
 ok('owner: edit saved through RPC', await Q2('.q-stem', { hasText: 'في النظام الدولي للوحدات' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
 ok('owner: edit moved approved -> in_review', await Q2('.badge.warn', { hasText: 'قيد المراجعة' }).waitFor({ timeout: 4000 }).then(() => true, () => false));
+// أربعة بدائل (لمقرر كيمياء 3): إنشاء سؤال بأربعة بدائل والإجابة «د»، وعرضه والتحقق منه
+await pool.query(`delete from public.questions where stem like 'سؤال تجريبي بأربعة بدائل%'`);
+await p.click('[data-add="mcq"]'); await p.waitForSelector('#e-n');
+ok('editor: new question in a 3-option objective defaults to 3 options, «د» hidden', await p.inputValue('#e-n') === '3' && !(await p.locator('[data-optfield="3"]').isVisible()));
+await p.selectOption('#e-n', '4');
+await p.fill('#e-stem', 'سؤال تجريبي بأربعة بدائل: أي الآتي غاز نبيل؟');
+for (const [i, t] of ['الأكسجين', 'النيتروجين', 'الكلور', 'الأرجون'].entries()) await p.fill('#e-opt' + i, t);
+await p.selectOption('#e-correct', '3'); await p.fill('#e-expl', 'الأرجون من الغازات النبيلة في المجموعة 18.');
+await p.fill('#e-dist', 'الأكسجين من المجموعة 16\nالنيتروجين من المجموعة 15\nالكلور من الهالوجينات\n');
+await p.click('#e-save');
+const q4 = p.locator('#mcq-list .q', { hasText: 'سؤال تجريبي بأربعة بدائل' });
+ok('owner: 4-option question saved and shown with «د» as the key', await q4.waitFor({ timeout: 5000 }).then(() => true, () => false)
+  && (await q4.locator('.opt').count()) === 4 && (await q4.locator('.answer h4').first().innerText()).includes('د) الأرجون'));
+const q4id = (await pool.query(`select id from public.questions where stem like 'سؤال تجريبي بأربعة بدائل%'`)).rows[0]?.id;
+const chk4 = await p.evaluate(async id => (await fetch(location.origin + '/mock/rpc/check_answer', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_question: id, p_choice: 3 }) })).json(), q4id);
+const chk3 = await p.evaluate(async id => (await fetch(location.origin + '/mock/rpc/check_answer', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_question: id, p_choice: 3 }) })).json(),
+  (await pool.query(`select q.id from public.questions q join public.objectives o on o.id = q.objective_id where o.code = 'C1-L1-O14' and q.type = 'mcq' and q.number = 1`)).rows[0].id);
+ok('database: choice «د» correct on a 4-option question, refused on a 3-option one', chk4.data?.correct === true && !!chk3.error);
+await pool.query(`delete from public.questions where stem like 'سؤال تجريبي بأربعة بدائل%'`);
+await p.reload(); await p.waitForSelector('#mcq-list .q'); await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
 await p.locator('[data-qhist]').nth(1).click(); await p.waitForSelector('dialog[open] table');
 const hist = await p.locator('dialog[open] table').innerText();
 ok('history shows reviewer status change + owner edit', hist.includes('تعديل') && hist.includes('عبدالله حمدي') && hist.includes('مالك المشروع'));
