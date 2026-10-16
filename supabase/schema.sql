@@ -605,7 +605,9 @@ end $$;
 
 create or replace function public.get_objective(p_code text) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
-declare o public.objectives; l public.lessons; c public.chapters; s public.supplements; v_ans boolean := public.is_member(); v_rev boolean := public.is_reviewer();
+-- المعلم لا يرى الإجابات في صفحة الهدف؛ يصله مفتاح الإجابة مع الاختبار الذي ينشئه (get_exam_answers)
+declare o public.objectives; l public.lessons; c public.chapters; s public.supplements;
+  v_ans boolean := public.is_member() and coalesce(public.my_role(), '') <> 'viewer'; v_rev boolean := public.is_reviewer();
 begin
   perform public._require_member();
   select * into o from objectives where code = p_code;

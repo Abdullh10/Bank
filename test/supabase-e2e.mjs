@@ -180,13 +180,14 @@ ok('viewer: 7 mcq + 3 essay', (await p.locator('#mcq-list .q').count()) === 7 &&
 await p.locator('[data-mode="practice"]').click(); await p.waitForTimeout(300);
 await Q2('[data-choose]').nth(0).click();
 ok('viewer: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
-await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
-ok('viewer: sees answers but no review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools').count()) === 0);
-ok('viewer (protected bank): no print buttons on objective page', (await p.locator('[data-print]').count()) === 0);
-{ const t = await p.locator('main').innerText(); ok('refs: no page numbers or worksheet labels', !/ص\s*\d|ورقة/.test(t) && t.includes('المرجع: الكتاب المدرسي —'), (t.match(/المرجع:[^\n]*/) || [''])[0]); }
-await p.goto(BASE + '#/bank'); await p.waitForSelector('.q, table, .empty', { timeout: 15000 });
-ok('viewer: no export buttons', (await p.locator('[data-export]').count()) === 0);
-ok('viewer (protected bank): no sheets/selection, no answers in bank', (await p.locator('[data-sheet], #sel-all, [data-pick]').count()) === 0 && (await p.locator('#bank-list .opt.correct').count()) === 0);
+// المعلم (الخيار ب): الأهداف وأسئلتها دون إجابات، ولا وضع مراجعة، ولا صفحة بنك
+ok('viewer: objective page without answers or review mode', (await p.locator('[data-mode="review"], .answer, .q-tools, [data-print]').count()) === 0);
+const vObj = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_objective', { method: 'POST',
+  headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_code: 'C1-L1-O14' }) })).json());
+ok('viewer: database withholds objective answers', vObj.data?.answersIncluded === false && !vObj.data.questions.some(q => 'correctIndex' in q || 'modelAnswer' in q));
+ok('viewer: no bank in menu', !(await p.locator('[data-nav="bank"]').isVisible()));
+await p.goto(BASE + '#/bank'); await p.waitForTimeout(600);
+ok('viewer: bank page unavailable', (await p.locator('main').innerText()).includes('غير متاحة لدورك'));
 const vBank = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST',
   headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('viewer: database returns the bank without answers', vBank.data?.length === 2580 && !vBank.data.some(q => 'correctIndex' in q || 'modelAnswer' in q));
@@ -210,6 +211,7 @@ ok('reviewer: name shown', (await p.locator('#userbox').innerText()).includes('�
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
 ok('reviewer: answers visible', (await p.locator('#mcq-list .answer:visible').count()) === 7);
+{ const t = await p.locator('main').innerText(); ok('refs: no page numbers or worksheet labels', !/ص\s*\d|ورقة/.test(t) && t.includes('المرجع: الكتاب المدرسي —'), (t.match(/المرجع:[^\n]*/) || [''])[0]); }
 ok('reviewer: questions approved by owner decision', (await p.locator('#mcq-list .badge.ok').count()) === 7);
 // المراجع العلمي: يعتمد ويعيد ويكتب ملاحظات، ولا يعدّل نص المحتوى
 ok('reviewer: no edit/duplicate/exclude/add buttons', (await p.locator('[data-qedit], [data-qdup], [data-qexclude], [data-add], #approved-text, #save-counts').count()) === 0);
@@ -415,6 +417,10 @@ ok('supervisor: exam built with its answer key', /[أبج]/.test(await p.locator
 const supExam = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_exam_answers', { method: 'POST',
   headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_ids: Array.from({ length: 101 }, (_, i) => i + 1) }) })).json());
 ok('database: one exam key request is capped at 100 questions', !!supExam.error);
+await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
+await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
+await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count', { timeout: 15000 });
+ok('supervisor: bank visible without answers or sheets', (await p.locator('[data-sheet], [data-pick], [data-export], #bank-list .opt.correct').count()) === 0);
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);

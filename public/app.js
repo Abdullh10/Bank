@@ -228,7 +228,7 @@ async function pageHome() {
       </div>
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">${icon('chapters', 22, 'navy')}تصفح الفصول</a>
-        <a class="btn" href="#/bank">بنك الأسئلة</a>
+        ${can('bank') ? '<a class="btn" href="#/bank">بنك الأسئلة</a>' : ''}
         <a class="btn" href="#/">${line('prev', 16)}كل المقررات</a>
       </div>
     </div>
@@ -404,7 +404,8 @@ function modeHint(answers) {
     practice: 'التدريب الفوري: تظهر التغذية الراجعة مباشرة بعد اختيار كل إجابة.',
     review: 'وضع المراجعة: تظهر الإجابات والتفسيرات وأدوات المراجعة.',
   };
-  return `<p class="notice info no-print">${t[objState.mode]}${!answers ? ' الإجابات النموذجية للأسئلة المقالية تظهر للمعلمين والمراجعين بعد تسجيل الدخول.' : ''}</p>`;
+  return `<p class="notice info no-print">${t[objState.mode]}${!answers ? (state.user ? ' الإجابات لا تُعرض هنا لحسابك؛ يصلك مفتاح الإجابة مع كل اختبار تنشئه من «منشئ الاختبارات».'
+    : ' الإجابات النموذجية للأسئلة المقالية تظهر للمعلمين والمراجعين بعد تسجيل الدخول.') : ''}</p>`;
 }
 
 function reviewPanel(o) {
@@ -953,7 +954,7 @@ async function route() {
     else if (page === 'chapters') await pageChapters();
     else if (page === 'chapter') await pageChapter(arg);
     else if (page === 'objective') { objState.answers = {}; await pageObjective(decodeURIComponent(arg)); }
-    else if (page === 'bank') await pageBank();
+    else if (page === 'bank' && can('bank')) await pageBank();
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
     else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
