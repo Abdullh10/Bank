@@ -64,10 +64,10 @@ export async function exportCsv(kind) {
   if (kind === 'questions') {
     const rows = await rpc('get_bank', { f: { excluded: '1', course } });
     download('questions.csv', [
-      ['الفصل', 'الدرس', 'الهدف', 'النوع', 'رقم السؤال', 'نص السؤال', 'البديل 1', 'البديل 2', 'البديل 3', 'الإجابة الصحيحة',
+      ['الفصل', 'الدرس', 'الهدف', 'النوع', 'رقم السؤال', 'نص السؤال', 'البديل 1', 'البديل 2', 'البديل 3', 'البديل 4', 'الإجابة الصحيحة',
         'التفسير', 'الإجابة النموذجية', 'مستوى التفكير', 'نوع السؤال', 'الصعوبة', 'المرجع', 'الحالة', 'مستبعد', 'ملاحظات المراجع'],
       ...rows.map(r => [r.chapter.number, r.lesson.number, r.objectiveCode, r.type === 'mcq' ? 'اختيار من متعدد' : 'مقالي', r.number, r.stem,
-        r.options[0] ?? '', r.options[1] ?? '', r.options[2] ?? '', r.type === 'mcq' ? r.correctIndex + 1 : '', r.explanation, r.modelAnswer,
+        r.options[0] ?? '', r.options[1] ?? '', r.options[2] ?? '', r.options[3] ?? '', r.type === 'mcq' ? r.correctIndex + 1 : '', r.explanation, r.modelAnswer,
         r.thinkingLevel, r.questionKind, r.difficulty, r.sourceRef, r.status, r.excluded ? 'نعم' : 'لا', r.reviewerNotes])]);
   } else {
     const chapters = await rpc('get_chapters', { p_course: course });

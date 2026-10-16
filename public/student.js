@@ -4,7 +4,7 @@
 
 import { icon, line, CHAPTER_ICONS } from './icons.js';
 
-const LETTERS = ['أ', 'ب', 'ج'];
+const LETTERS = ['أ', 'ب', 'ج', 'د'];
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const GROUPS = { basic: 'أساسي (تذكر وفهم)', apply: 'تطبيق', higher: 'تفكير عليا' };
 const LEVEL_CHOICES = [['graded', 'متدرّج (مستحسن)'], ['basic', GROUPS.basic], ['apply', GROUPS.apply], ['higher', GROUPS.higher]];
@@ -111,7 +111,7 @@ async function startSession(ctx, p) {
   if (btn) { btn.disabled = true; btn.textContent = 'جارٍ التحضير…'; }
   try {
     const s = await api('/student/start', { method: 'POST', body: p });
-    session = { ...s, idx: 0, answers: {}, order: Object.fromEntries(s.questions.map(q => [q.id, shuffle([0, 1, 2])])), startedAt: Date.now(), summary: null };
+    session = { ...s, idx: 0, answers: {}, order: Object.fromEntries(s.questions.map(q => [q.id, shuffle([...q.options.keys()])])), startedAt: Date.now(), summary: null };
     location.hash = '#/';
     renderQuestion(ctx);
   } catch (e) { fail(e); if (btn) { btn.disabled = false; btn.textContent = 'ابدأ التدريب'; } }
@@ -183,7 +183,7 @@ function renderQuestion(ctx) {
 function feedback(res, q, order, esc) {
   const notes = res.distractorNotes || [];
   const pos = o => LETTERS[order.indexOf(o)];
-  const otherWrong = [0, 1, 2].filter(o => o !== res.correctIndex && o !== res.choice && notes[o]);
+  const otherWrong = [...q.options.keys()].filter(o => o !== res.correctIndex && o !== res.choice && notes[o]);
   return `<div class="notice ${res.correct ? 'ok' : 'bad'} st-fb" role="status">
     <strong>${icon(res.correct ? 'check' : 'cross', 30)}<span>${res.correct ? 'إجابة صحيحة ✓' : `إجابة غير صحيحة. الصحيح: (${pos(res.correctIndex)})`}</span></strong>
     ${!res.correct && notes[res.choice] ? `<p><b>لماذا (${pos(res.choice)}) خطأ؟</b> ${esc(notes[res.choice])}</p>` : ''}

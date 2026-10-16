@@ -4,7 +4,7 @@ const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic,
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'];
 const DIFFS = ['سهل', 'متوسط', 'صعب'];
 const MODEL_NAMES = ['أ', 'ب', 'ج', 'د'];
-const LETTERS = ['أ', 'ب', 'ج'];
+const LETTERS = ['أ', 'ب', 'ج', 'د']; // بحسب عدد بدائل السؤال (3 أو 4)
 const ORDINALS = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس'];
 const STORE_KEY = 'chem21.exam.header.v1';
 const HIJRI_MONTHS = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
@@ -276,7 +276,8 @@ export async function pageExam(ctx) {
       return {
         name,
         mcq: order.map(q => {
-          const idx = mi > 0 && o.shuffleOptions ? shuffle([0, 1, 2], mr) : [0, 1, 2];
+          const base = [...q.options.keys()];
+          const idx = mi > 0 && o.shuffleOptions ? shuffle(base, mr) : base;
           return { q, options: idx.map(i => q.options[i]), correct: hasAnswers ? idx.indexOf(q.correctIndex) : -1 };
         }),
         essay: mi === 0 ? sortByCh(essay) : shuffle(essay, mr),
@@ -315,7 +316,9 @@ export async function pageExam(ctx) {
 
   const fmt = n => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, ''));
   const stim = s => s ? `<table class="paper-table"><thead><tr>${s.headers.map(x => `<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${s.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : '';
+  // البدائل في صف واحد إن قصرت؛ وأربعة بدائل متوسطة الطول في صفين (2×2)؛ والطويلة تحت بعضها
   const longOpts = opts => opts.some(x => x.length > 28);
+  const optsCls = opts => (longOpts(opts) ? 'stack' : opts.length === 4 ? (opts.some(x => x.length > 14) ? 'n4 two' : 'n4') : '');
 
   const studentPaper = m => {
     let qn = 0;
@@ -327,7 +330,7 @@ export async function pageExam(ctx) {
         <ol class="paper-mcq">${m.mcq.map(({ q, options }, i) => `
           <li class="pq" data-swap="mcq:${q.id}">
             <div class="pq-stem"><span class="pq-n">${i + 1}</span>${esc(q.stem)}</div>${stim(q.stimulus)}
-            <div class="pq-opts ${longOpts(options) ? 'stack' : ''}">${options.map((x, k) => `<span><b>${LETTERS[k]})</b> ${esc(x)}</span>`).join('')}</div>
+            <div class="pq-opts ${optsCls(options)}">${options.map((x, k) => `<span><b>${LETTERS[k]})</b> ${esc(x)}</span>`).join('')}</div>
           </li>`).join('')}</ol>
       </section>`);
     if (m.essay.length) parts.push(`
@@ -454,7 +457,9 @@ export async function pageExam(ctx) {
       if (type === 'mcq') {
         const i = m.mcq.findIndex(x => x.q.id === cur.id);
         const keep = m.mcq[i];
-        const idx = keep.options.map(op => cur.options.indexOf(op)); // نحافظ على نمط خلط البدائل للنموذج
+        // نحافظ على نمط خلط البدائل للنموذج؛ وإن اختلف عدد البدائل يُخلط البديل الجديد بنمط مستقل
+        let idx = keep.options.map(op => cur.options.indexOf(op));
+        if (alt.options.length !== idx.length) idx = m === m0 ? [...alt.options.keys()] : shuffle([...alt.options.keys()], rand);
         m.mcq[i] = { q: alt, options: idx.map(k => alt.options[k]), correct: hasAnswers ? idx.indexOf(alt.correctIndex) : -1 };
       } else {
         const i = m.essay.findIndex(q => q.id === cur.id);
