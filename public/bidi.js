@@ -32,6 +32,7 @@ function walk(root) {
 
 // يُشغَّل مرة واحدة: يعالج الصفحة الحالية وكل ما يُضاف إليها لاحقًا (دفعة واحدة لكل إطار).
 export function startBidi(root = document.body) {
+  if (window.__ITQAN_NO_BIDI) return; // مفتاح للاختبارات الآلية التي تقارن النص حرفيًا
   let pending = false;
   const run = () => { pending = false; obs.disconnect(); try { walk(root); } finally { obs.observe(root, { childList: true, subtree: true, characterData: true }); } };
   const obs = new MutationObserver(() => { if (!pending) { pending = true; requestAnimationFrame(run); } });

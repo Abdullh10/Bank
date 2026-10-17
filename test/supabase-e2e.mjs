@@ -129,6 +129,8 @@ const ctx = await browser.newContext({ viewport: { width: Number(process.env.E2E
 await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
 if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+// عزل الاتجاه (public/bidi.js) يضيف علامات غير مرئية داخل النص؛ تُعطَّل هنا لأن الاختبار يقارن النص حرفيًا
+await ctx.addInitScript(() => { window.__ITQAN_NO_BIDI = true; });
 const p = await ctx.newPage();
 p.on('pageerror', e => errors.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|404/.test(m.text())) errors.push('console: ' + m.text()); });
@@ -139,7 +141,7 @@ try {
 // الزائر: لا يرى إلا صفحة الدخول، وقاعدة البيانات ترفض طلباته مباشرة
 await p.goto(BASE + '#/'); await p.waitForSelector('#l-user');
 ok('anon: login page first, header hidden', !(await p.locator('.topbar').isVisible()) && !(await p.locator('.kpi').count()));
-ok('login form: username + password + logo', (await p.locator('label[for="l-user"]').innerText()).includes('اسم المستخدم') && await p.locator('.login-logo').evaluate(i => i.complete && i.naturalWidth > 0));
+ok('login form: username + password + logo', (await p.locator('label[for="l-user"]').innerText()).includes('اسم المستخدم') && await p.locator('.login-logo:visible').first().evaluate(i => i.complete && i.naturalWidth > 0));
 ok('footer: copyright', (await p.locator('.footer').innerText()).includes('برمجة وتطوير الأستاذ عبدالله حمدي'));
 await p.screenshot({ path: `${OUT}/supa-login.png` });
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#l-user');
