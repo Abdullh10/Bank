@@ -1,4 +1,5 @@
-// فاحص بنيوي لملفات data/questions: node scripts/check-questions.js [رموز الأهداف...]
+// فاحص بنيوي لملفات data/questions: node scripts/check-questions.js [--course chem3] [رموز الأهداف...]
+// --course chem3: ملفات data/chem3/questions، وعدد البدائل فيها مفروض بـ source.option_count (أربعة)
 // يتحقق من العدد والحقول والبدائل وتشابه الأسئلة داخل الهدف. لا يغني عن المراجعة العلمية البشرية.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -6,10 +7,15 @@ import { fileURLToPath } from 'node:url';
 import { autoCheck, similarity } from '../server/validate.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const dir = path.join(root, 'data', 'questions');
-const objectives = new Set(JSON.parse(fs.readFileSync(path.join(root, 'data', 'objectives_original.json'), 'utf8'))
-  .chapters.flatMap(c => c.lessons.flatMap(l => l.objectives.map(o => o.id))));
-const ids = process.argv.slice(2).length ? process.argv.slice(2) : fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5));
+const args = process.argv.slice(2);
+const ci = args.indexOf('--course');
+const course = ci >= 0 ? args.splice(ci, 2)[1] : '';
+const base = course ? path.join(root, 'data', course) : path.join(root, 'data');
+const dir = path.join(base, 'questions');
+const structure = JSON.parse(fs.readFileSync(path.join(base, 'objectives_original.json'), 'utf8'));
+const objectives = new Set(structure.chapters.flatMap(c => c.lessons.flatMap(l => l.objectives.map(o => o.id))));
+const optionCount = structure.source?.option_count || 0; // 0: ثلاثة أو أربعة
+const ids = args.length ? args : fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5));
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'], DIFF = ['سهل', 'متوسط', 'صعب'];
 let bad = 0;
 const positions = [0, 0, 0, 0];
@@ -33,6 +39,7 @@ for (const id of ids) {
     if (q.stimulus && (!Array.isArray(q.stimulus.headers) || !Array.isArray(q.stimulus.rows))) errs.push(`${tag}: جدول غير صالح`);
     if (q.type === 'mcq') {
       const n = (q.options || []).length;
+      if (optionCount && n !== optionCount) errs.push(`${tag}: عدد البدائل ${n} (المطلوب ${optionCount})`);
       if (!Array.isArray(q.distractor_notes) || q.distractor_notes.length !== n) errs.push(`${tag}: distractor_notes يجب أن يساوي عدد البدائل (${n})`);
       // حارس خلل ترتيب البدائل: ملاحظة البديل الصحيح وحدها فارغة، وفي موضع الإجابة الصحيحة تمامًا
       else {

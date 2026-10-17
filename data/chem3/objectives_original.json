@@ -1,0 +1,1261 @@
+{
+ "course": {
+  "subject": "الكيمياء",
+  "code": "كيمياء 3",
+  "grade": "الثالث الثانوي",
+  "term": "الأول",
+  "country": "السعودية",
+  "former_name": "كيمياء 4"
+ },
+ "source": {
+  "file": "أهداف كيمياء 3.pdf (عنوانه داخل الملف: «أهداف كيمياء 4»، الاسم السابق للمقرر)",
+  "author_meta": "Qhtani, Ahmed Mohamm.",
+  "created": "2023-08-17",
+  "pages": 5,
+  "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-10-16)",
+  "content_basis": "الكتاب المدرسي — كيمياء 3 (بانتظار الملفات)",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة تأتي في مرحلة مراجعة الأهداف. رموز [H+] و[OH-] كُتبت بالأرقام العلوية. مستوى التفكير منقول من عمود «مستوى التفكير» (خلايا مدمجة).",
+  "option_count": 4,
+  "added_objectives": "67 هدفًا مضافًا من الكتاب المدرسي (added_from_textbook) بطلب مالك المشروع بتاريخ 2026-10-16"
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "المخاليط والمحاليل",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "أنواع المخاليط",
+     "objectives": [
+      {
+       "id": "K3-C1-L1-O01",
+       "text": "أن يعرف الطالب المخلوط",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O02",
+       "text": "أن يذكر الطالب أنواع المخاليط",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O03",
+       "text": "أن يعرف الطالب المخلوط غير المتجانس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O04",
+       "text": "أن يذكر الطالب أمثلة على المخاليط غير المتجانسة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O05",
+       "text": "أن يصنف الطالب المحاليل بالاعتماد على حالة المذيب",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O06",
+       "text": "أن يقارن الطالب بين المخلوط الحقيقي والمعلق والغروي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O07",
+       "text": "أن يعرف الطالب الترويق",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O08",
+       "text": "أن يوضح الطالب ظاهرة تندال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O09",
+       "text": "أن يفسر الطالب سبب بقاء جسيمات المذاب في المخلوط الغروي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O10",
+       "text": "أن يفسر الطالب صعوبة قيادة السيارة خلال أجواء الضباب",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L1-O11",
+       "text": "أن يعرّف الطالب الحركة البراونية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L1-O12",
+       "text": "أن يصنّف الطالب المخاليط الغروية تبعًا للحالة الفيزيائية لكل من الجسيمات المنتشرة ووسط الانتشار.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L1-O13",
+       "text": "أن يفسّر الطالب تلف المخلوط الغروي وترسّب جسيماته عند إضافة مادة متأينة إليه أو تسخينه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L1-O14",
+       "text": "أن يميّز الطالب بين السوائل الممتزجة والسوائل غير الممتزجة مع ذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L1-O15",
+       "text": "أن يفرّق الطالب بين المادة الذائبة والمادة غير الذائبة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تركيز المحلول",
+     "objectives": [
+      {
+       "id": "K3-C1-L2-O01",
+       "text": "ان يعرف الطالب تركيز المحلول",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O02",
+       "text": "أن يعدد الطالب طرق التعبير عن تركيز المحلول ( كميا)",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O03",
+       "text": "أن يفرق الطالب بين النسبة المئوية الكتلية والحجمية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O04",
+       "text": "أن يحسب الطالب النسبة المئوية الكتلية و الحجمية لمحلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O05",
+       "text": "أن يعرف الطالب المولارية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O06",
+       "text": "أن يحسب الطالب مولارية محلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O07",
+       "text": "أن يعرف الطالب المحلول القياسي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O08",
+       "text": "أن يحسب الطالب حجم محلول قياسي بمعلومية مولاريته",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O09",
+       "text": "أن يعرف الطالب المولالية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O10",
+       "text": "أن يحسب الطالب مولالية محلول",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O11",
+       "text": "أن يعرف الطالب الكسر المولي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O12",
+       "text": "أن يحسب الطالب الكسر المولي",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L2-O13",
+       "text": "أن يصف الطالب خطوات تحضير محلول قياسي معلوم المولارية باستعمال الدورق الحجمي، بدءًا بحساب كتلة المذاب اللازمة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "العوامل المؤثرة في الذوبان",
+     "objectives": [
+      {
+       "id": "K3-C1-L3-O01",
+       "text": "أن يعرف الطالب الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O02",
+       "text": "أن يفسر الطالب سبب ذوبان المركبات الايونية في الماء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O03",
+       "text": "أن يفسر الطالب سبب ذوبان المركبات الجزيئية في الماء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O04",
+       "text": "أن يوضح الطالب أثر التحريك في سرعة الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O05",
+       "text": "أن يوضح الطالب أثر مساحة السطح في سرعة الذوبان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O06",
+       "text": "أن يعرف الطالب قانون هنري",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O07",
+       "text": "أن يفسر الطالب سبب اندفاع غاز ثاني اكسيد الكربون من علبة المشروب الغازي عند فتحها.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O08",
+       "text": "أن يحسب الطالب ذائبية غاز في سائل",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O09",
+       "text": "أن يعرف الطالب المحلول غير المشبع",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L3-O10",
+       "text": "أن يفسّر الطالب كون عملية الذوبان طاردة للطاقة أو ماصة لها اعتمادًا على مفهوم حرارة الذوبان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O11",
+       "text": "أن يتنبأ الطالب بإمكانية ذوبان مادة في مذيب معين بتطبيق قاعدة «المذيب يذيب شبيهه» اعتمادًا على القطبية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O12",
+       "text": "أن يوضّح الطالب أثر درجة حرارة المذيب في سرعة الذوبان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O13",
+       "text": "أن يعرّف الطالب الذائبية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O14",
+       "text": "أن يعرّف الطالب المحلول المشبع مفسّرًا حالة الاتزان الديناميكي بين الذوبان والتبلور فيه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O15",
+       "text": "أن يعرّف الطالب المحلول فوق المشبع.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O16",
+       "text": "أن يصف الطالب طريقة تحضير محلول فوق مشبع، ويفسّر ما يحدث عند إضافة نواة تبلور إليه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O17",
+       "text": "أن يستعمل الطالب منحنيات الذائبية وجداولها لتحديد ذائبية مادة عند درجة حرارة معينة ومقارنة أثر الحرارة في ذائبية المواد المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L3-O18",
+       "text": "أن يفسّر الطالب نقصان ذائبية الغازات في السوائل بارتفاع درجة الحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "الخواص الجامعة للمحاليل",
+     "objectives": [
+      {
+       "id": "K3-C1-L4-O01",
+       "text": "أن يعرف الطالب الخواص الجامعة للمحاليل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O02",
+       "text": "أن يعدد الطالب الخواص الجامعة للمحاليل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O03",
+       "text": "أن يوضح الطالب أثر التركيز على درجة الغليان",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O04",
+       "text": "أن يفسر الطالب درجة غليان المحلول أعلى من درجة غليان المذيب النقي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O05",
+       "text": "أن يحسب الطالب درجة الغليان ودرجة تجمد محلول في مذيب",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O06",
+       "text": "أن يعرف الطالب الضغط الأسموزي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C1-L4-O07",
+       "text": "أن يميّز الطالب بين المواد المتأينة القوية والمواد المتأينة الضعيفة والمواد غير المتأينة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L4-O08",
+       "text": "أن يحدّد الطالب عدد مولات جسيمات المذاب الناتجة عن إذابة مادة متأينة، ويتنبأ بأثرها النسبي في الخواص الجامعة مقارنة بالمواد غير المتأينة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L4-O09",
+       "text": "أن يفسّر الطالب الانخفاض في الضغط البخاري للمحلول المحتوي على مذاب غير متطاير مقارنة بالمذيب النقي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L4-O10",
+       "text": "أن يفسّر الطالب انخفاض درجة تجمد المحلول عن درجة تجمد المذيب النقي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L4-O11",
+       "text": "أن يذكر الطالب تطبيقات حياتية للانخفاض في درجة التجمد.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C1-L4-O12",
+       "text": "أن يفسّر الطالب الخاصية الأسموزية موضحًا اتجاه انتقال جزيئات المذيب عبر الغشاء شبه المنفذ.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "الأحماض والقواعد",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "مقدمة في الأحماض والقواعد",
+     "objectives": [
+      {
+       "id": "K3-C2-L1-O01",
+       "text": "أن يعدد الطالب خواص الاحماض الفيزيائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O02",
+       "text": "أن يعدد الطالب خواص الاحماض الكيميائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O03",
+       "text": "أن يفسر الطالب محلول حمض الكلور موصل جيد للكهرباء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O04",
+       "text": "أن يفسر الطالب محلول هيدروكسيد الصوديوم موصل جيد للكهرباء",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O05",
+       "text": "أن يعرف الطالب المحلول الحمضي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O06",
+       "text": "أن يعرف الطالب الحمض حسب نموذج أرهينيوس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O07",
+       "text": "أن يعدد الطالب قصور نموذج أرهينيوس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O08",
+       "text": "أن يعرف الطالب الحمض حسب نظرية لوري – برونشتد",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O09",
+       "text": "أن يحدد الطالب القاعدة المقترنة للحمض",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O10",
+       "text": "أن يحدد الطالب الحمض المقترن للقاعدة.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O11",
+       "text": "أن يعرف الطالب الحمض حسب نظرية لويس",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O12",
+       "text": "أن يصنف الطالب المواد إلى حمض وقاعدة بموجب نظرية لويس",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O13",
+       "text": "أن يعرف الطالب المواد المترددة ( أمفوتيرية )",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O14",
+       "text": "أن يعرف الطالب أحماض أحادية البروتون",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O15",
+       "text": "ان يذكر الطالب أمثلة على أحماض أحادية البروتون",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O16",
+       "text": "ان يذكر الطالب أمثلة على الاحماض متعددة البروتونات",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O17",
+       "text": "أن يعرف الطالب أنهيدريد حمضي مع ذكر مثال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O18",
+       "text": "أن يعرف الطالب أنهيدريد قاعدي مع ذكر مثال",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O19",
+       "text": "أن يعرف الطالب ملح إبسوم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O20",
+       "text": "أن يوضح الطالب تكوين ملح إبسوم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L1-O21",
+       "text": "أن يميّز الطالب بين المحلول الحمضي والمحلول القاعدي والمحلول المتعادل بمقارنة تراكيز أيونات الهيدروجين H⁺ وأيونات الهيدروكسيد OH⁻.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L1-O22",
+       "text": "أن يفسّر الطالب قابلية ذرة الهيدروجين للتأين في الحمض عندما ترتبط بذرة عالية الكهروسالبية برابطة قطبية، وعدم تأين ذرات الهيدروجين المرتبطة بذرة الكربون.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L1-O23",
+       "text": "أن يقارن الطالب بين نظريات أرهينيوس وبرونستد – لوري ولويس في تعريف الحمض والقاعدة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "قوة الأحماض والقواعد",
+     "objectives": [
+      {
+       "id": "K3-C2-L2-O01",
+       "text": "أن يعرف الطالب الاحماض القوية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O02",
+       "text": "أن يقارن الطالب بين الحموض الضعيفة من خلال معرفة قيم Ka",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O03",
+       "text": "أن يكتب الطالب معادلات التأين القواعد الضعيفة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O04",
+       "text": "أن يكتب الطالب معادلات التأين الاحماض الضعيفة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L2-O05",
+       "text": "أن يفسّر الطالب اختلاف قوة الأحماض باستعمال نظرية برونستد – لوري، مبيّنًا أن الحمض القوي تكون قاعدته المرافقة ضعيفة وأن الحمض الضعيف تكون قاعدته المرافقة قوية نسبيًا.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L2-O06",
+       "text": "أن يميّز الطالب بين القواعد القوية والقواعد الضعيفة من حيث درجة تأينها في المحاليل المائية المخففة، مع ذكر أمثلة على كل منهما.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L2-O07",
+       "text": "أن يفسّر الطالب عدّ هيدروكسيد الكالسيوم Ca(OH)2 قاعدة قوية على الرغم من انخفاض ذائبيته في الماء.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L2-O08",
+       "text": "أن يقارن الطالب بين قوى القواعد الضعيفة باستعمال قيم ثابت تأين القاعدة Kb.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "أيونات الهيدروجين والرقم الهيدروجيني",
+     "objectives": [
+      {
+       "id": "K3-C2-L3-O01",
+       "text": "أن يرسم الطالب مدرج الحموضة بدلالة pH",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O02",
+       "text": "أن يحسب الطالب قيمة كل من [OH⁻] و pH و pOH بمعرفة تركيز أيون [H⁺]",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O03",
+       "text": "أن يحسب الطالب قيمة [OH⁻] بمعرفة [H⁺]",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O04",
+       "text": "أن يحسب الطالب قيمة كل من pOH و [H⁺] و [OH⁻] بمعرفة قيمة pH",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L3-O05",
+       "text": "أن يعرّف الطالب ثابت تأين الماء Kw بوصفه ثابت الاتزان للتأين الذاتي للماء.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L3-O06",
+       "text": "أن يفسّر الطالب العلاقة العكسية بين تركيز أيونات الهيدروجين وتركيز أيونات الهيدروكسيد في المحاليل المائية باستعمال مبدأ لوتشاتلييه وثبات قيمة Kw.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L3-O07",
+       "text": "أن يعرّف الطالب الرقم الهيدروجيني pH والرقم الهيدروكسيدي pOH.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L3-O08",
+       "text": "أن يحسب الطالب قيمتي pH وpOH لمحاليل الأحماض القوية والقواعد القوية بمعلومية مولاريتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L3-O09",
+       "text": "أن يحسب الطالب ثابت تأين الحمض الضعيف Ka بمعلومية قيمة pH لمحلوله وتركيزه الابتدائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L3-O10",
+       "text": "أن يقارن الطالب بين قياس الرقم الهيدروجيني pH باستعمال ورق الكاشف وباستعمال مقياس pH الرقمي من حيث طريقة القياس ودقته.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "التعادل",
+     "objectives": [
+      {
+       "id": "K3-C2-L4-O01",
+       "text": "أن يعرف الطالب المحلول التعادل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O02",
+       "text": "أن يعرف الطالب الأدلة ( الكواشف)",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O03",
+       "text": "أن يحسب الطالب مولارية محلول من بيانات المعايرة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O04",
+       "text": "أن يعرف الطالب تمية الأملاح",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O05",
+       "text": "أن يصنف الطالب الاملاح إلى حمضية أو قاعدية أو متعادلة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O06",
+       "text": "أن يعرف الطالب المحلول المنظم",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O07",
+       "text": "أن يكتب الطالب مكونات المحلول المنظم",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O08",
+       "text": "أن يعدد الطالب مجالات استخدام المحاليل المنظمة في الحياة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C2-L4-O09",
+       "text": "أن يكتب الطالب المعادلة الكيميائية والمعادلة الأيونية الكاملة والمعادلة الأيونية النهائية لتفاعل تعادل حمض مع قاعدة، محدّدًا الأيونات المتفرجة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O10",
+       "text": "أن يصف الطالب خطوات معايرة حمض بقاعدة باستعمال محلول قياسي معلوم التركيز.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O11",
+       "text": "أن يميّز الطالب بين نقطة التكافؤ ونقطة النهاية في المعايرة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O12",
+       "text": "أن يحلّل الطالب منحنيات المعايرة لتحديد موقع نقطة التكافؤ في معايرة حمض قوي وحمض ضعيف بقاعدة قوية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O13",
+       "text": "أن يختار الطالب الكاشف المناسب لمعايرة معيّنة بالاعتماد على مدى pH الذي يتغير عنده لون الكاشف وقيمة pH عند نقطة التكافؤ.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O14",
+       "text": "أن يقارن الطالب بين سلوك المحلول المنظم والمحلول غير المنظم عند إضافة كميات محدودة من حمض أو قاعدة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O15",
+       "text": "أن يعرّف الطالب سعة المحلول المنظم.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C2-L4-O16",
+       "text": "أن يختار الطالب المحلول المنظم المناسب للمحافظة على قيمة pH معيّنة باستعمال قيم Ka للأزواج المترافقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "تفاعلات الأكسدة والاختزال",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الأكسدة والاختزال",
+     "objectives": [
+      {
+       "id": "K3-C3-L1-O01",
+       "text": "أن يعرف الطالب عملية الأكسدة و لاختزال قديما.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O02",
+       "text": "أن يحدد الطالب لعامل المؤكسد والعامل المختزل في المعادلة الكيميائية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O03",
+       "text": "أن يقارن الطالب ين العامل المؤكسد والعامل المختزل.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O04",
+       "text": "أن يعرف الطالب عدد التأكسد",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O05",
+       "text": "أن يحسب الطالب عدد الأكسدة لعنصر ما في مركب أو أيون.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O06",
+       "text": "ان يوضح الطالب علاقة تفاعلات الاكسدة والاختزال بالكهروسالبية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L1-O07",
+       "text": "أن يحدد الطالب المادة التي تأكسدت والمادة التي اختُزلت في تفاعل أكسدة واختزال بتتبّع التغير في أعداد التأكسد، مستنتجًا أن الأكسدة يصاحبها زيادة في عدد التأكسد والاختزال يصاحبه نقصان فيه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L1-O08",
+       "text": "أن يفسر الطالب لماذا تحدث عمليتا الأكسدة والاختزال معًا دائمًا، في ضوء تساوي عدد الإلكترونات المفقودة والمكتسبة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L1-O09",
+       "text": "أن يذكر الطالب أمثلة على تفاعلات الأكسدة والاختزال وتطبيقاتها في الحياة اليومية، مثل صدأ الحديد وطرائق حمايته، وعمل مبيض الغسيل عاملًا مؤكسدًا، وإزالة الشوائب من الفلزات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "وزن معادلات الأكسدة والاختزال",
+     "objectives": [
+      {
+       "id": "K3-C3-L2-O01",
+       "text": "أن يزن الطالب تفاعل أكسدة واختزال في وسط حامضي و قاعدي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C3-L2-O02",
+       "text": "أن يفسر الطالب الأساس الذي تقوم عليه طريقة عدد التأكسد (تساوي مجموع الزيادة في أعداد التأكسد مع مجموع النقصان فيها)، ويرتّب خطواتها الخمس ويطبقها في وزن معادلة أكسدة واختزال جزيئية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L2-O03",
+       "text": "أن يكتب الطالب المعادلة الأيونية الكلية لتفاعل أكسدة واختزال من معادلته الكيميائية الكاملة، محددًا الأيونات المتفرجة وحاذفًا إياها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L2-O04",
+       "text": "أن يكمل الطالب وزن معادلة أكسدة واختزال أيونية كلية بإضافة العدد الكافي من أيونات H⁺ وجزيئات H₂O في الوسط الحمضي، أو أيونات OH⁻ وجزيئات H₂O في الوسط القاعدي، متحققًا من تساوي عدد الذرات والشحنة الكلية في طرفي المعادلة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L2-O05",
+       "text": "أن يعرّف الطالب نصف التفاعل، ويكتب نصف تفاعل الأكسدة ونصف تفاعل الاختزال لتفاعل أكسدة واختزال معطى.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L2-O06",
+       "text": "أن يطبق الطالب خطوات طريقة نصف التفاعل في وزن معادلة أكسدة واختزال: وزن الذرات والشحنات في كل نصف، ومساواة عدد الإلكترونات المفقودة بالمكتسبة باستعمال المضاعف المشترك الأصغر، ثم جمع النصفين وتبسيط الناتج وإعادة الأيونات المتفرجة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C3-L2-O07",
+       "text": "أن يختار الطالب الطريقة المناسبة لوزن معادلة أكسدة واختزال (عدد التأكسد أو نصف التفاعل) بعد تحليل المعادلة: تحديد المواد المتأكسدة والمختزلة، وتكرار ظهورها في طرفي المعادلة، ونوع الوسط حمضيًّا أم قاعديًّا.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "الكيمياء الكهربائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الخلايا الجلفانية",
+     "objectives": [
+      {
+       "id": "K3-C4-L1-O01",
+       "text": "ان يعرف الطالب الكيمياء الكهربائية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O02",
+       "text": "ان يعرف الطالب الخلية الجلفانية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O03",
+       "text": "أن يكتب الطالب رمز الخلية الجلفانية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O04",
+       "text": "ان يعدد الطالب فوائد القنطرة الملحية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O05",
+       "text": "ان يفسر الطالب سبب اختيار العلماء لقطب الهيدروجين القياسي عند قياس جهود الأقطاب الغير معلومة.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O06",
+       "text": "ان يحسب الطالب جهد القياسي بعد تحديد التفاعل الكلي للخلية ثم كتابة رمز الخلية مع الرسم.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O07",
+       "text": "ان يوضح الطالب استعمال جهود الاختزال القياسية.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L1-O08",
+       "text": "أن يعرّف الطالب كلًّا من: الخلية الكهروكيميائية، ونصف الخلية، والأنود (المصعد)، والكاثود (المهبط).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L1-O09",
+       "text": "أن يفسر الطالب جهد الخلية بوصفه فرقًا في طاقة الوضع الكهربائية بين القطبين يدفع الإلكترونات من الأنود إلى الكاثود، ويحدد وحدة قياسه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L1-O10",
+       "text": "أن يعرّف الطالب جهد الاختزال وجهد الاختزال القياسي E°، محددًا الظروف القياسية التي يُقاس عندها (تركيز 1M، و25°C، و1atm).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L1-O11",
+       "text": "أن يفسر الطالب دلالة إشارة جهد الاختزال القياسي لقطب ما (موجبة أو سالبة) عند قياسه مقابل قطب الهيدروجين القياسي، مستعملًا قطبي النحاس والخارصين مثالين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "البطاريات",
+     "objectives": [
+      {
+       "id": "K3-C4-L2-O01",
+       "text": "ان يميز الطالب بين البطاريات الأولية والثانوية وتعطي مثالين على كل نوع.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O02",
+       "text": "ان يفسر الطالب تركيب خلية الوقود ( الهيدروجين – الاكسجين ) وعملها.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O03",
+       "text": "ان يعرف الطالب التآكل.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O04",
+       "text": "ان يصف الطالب عملية تآكل الحديد وطرائق حمايته من التآكل",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O05",
+       "text": "ان يتعرف الطالب على الاقطاب في البطاريات المختلفة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O06",
+       "text": "ان يتعرف الطالب على الالكتروليتات في البطاريات المختلفة",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O07",
+       "text": "ان يعلل الطالب تفضيل البطارية القلوية على خلية الكربون الخارصين",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O08",
+       "text": "ان يعلل الطالب خلية الروقود لاتنفذ مثل سائر البطاريات",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L2-O09",
+       "text": "أن يعرّف الطالب كلًّا من البطارية والخلية الجافة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L2-O10",
+       "text": "أن يكتب الطالب نصفي تفاعل الأنود والكاثود في كل من: خلية الخارصين والكربون الجافة، والبطارية القلوية، وبطارية الفضة، وبطارية NiCad، وبطارية المركم الرصاصي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L2-O11",
+       "text": "أن يوضح الطالب دور كل من عمود الكربون (الكاثود غير الفعال) والفواصل المسامية في خلية الخارصين والكربون الجافة، وسبب انخفاض جهدها عند نفادها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L2-O12",
+       "text": "أن يصف الطالب ما يحدث في بطارية المركم الرصاصي عند توليد التيار وعند إعادة الشحن، محددًا المواد التي تتأكسد والتي تُختزل في كل حالة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L2-O13",
+       "text": "أن يعلل الطالب اختيار الليثيوم لصناعة البطاريات، ويذكر مزايا بطاريات الليثيوم.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "التحليل الكهربائي",
+     "objectives": [
+      {
+       "id": "K3-C4-L3-O01",
+       "text": "أن يصف الطالب كيف يمكن عكس تفاعل الاكسدة والاختزال التلقائي في الخلية الكهروكيميائية",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O02",
+       "text": "أن يقارن الطالب التفاعلات المرتبطة مع التحليل الكهربائي لمصهور كلوريد الصوديوم بالتفاعلات المرتبطة مع التحليل الكهربائي لماء البحر.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O03",
+       "text": "ان يقارن الطالب بين الخلية الجلفانية والتحليل الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O04",
+       "text": "ان يعلل الطالب عدم انتاج الصوديوم من التحليل الكهربائي لماء البحر",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O05",
+       "text": "ان يعلل الطالب سبب توصيل محلول و او مصهور ملح الطعام للتيار الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K3-C4-L3-O06",
+       "text": "أن يعرّف الطالب التحليل الكهربائي وخلية التحليل الكهربائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O07",
+       "text": "أن يكتب الطالب المعادلة الكلية للتحليل الكهربائي للماء، ويبين علاقته بتفاعل خلية الوقود وأهميته في إنتاج الهيدروجين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O08",
+       "text": "أن يذكر الطالب استعمالات نواتج التحليل الكهربائي لمصهور كلوريد الصوديوم (خلية داون) ولماء البحر.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O09",
+       "text": "أن يصف الطالب إنتاج الألومنيوم بطريقة هول–هيروليت، محددًا مكونات الخلية وتفاعلي الأنود والكاثود.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O10",
+       "text": "أن يعلل الطالب أهمية إعادة تدوير الألومنيوم بالرجوع إلى استهلاك عملية هول–هيروليت للطاقة الكهربائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O11",
+       "text": "أن يصف الطالب تنقية النحاس بالتحليل الكهربائي، محددًا الأنود والكاثود والمحلول والتفاعل عند كل قطب ومصير الشوائب.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K3-C4-L3-O12",
+       "text": "أن يصف الطالب الطلاء الكهربائي لجسم بفلز (مثل الفضة)، محددًا الأنود والكاثود ونصفي التفاعل عندهما.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-16)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
