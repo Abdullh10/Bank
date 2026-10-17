@@ -10,7 +10,8 @@ import { autoCheck } from '../server/validate.js';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const base = process.argv[2];
 if (!base) { console.error('الاستعمال: node scripts/build-chem3-patch.js <commit> [out.sql]'); process.exit(1); }
-const out = process.argv[3] || path.join(root, 'supabase', `chem3-patch-${new Date().toISOString().slice(0, 10)}.sql`);
+const compact = process.argv.includes('--compact');
+const out = process.argv.filter(a => !a.startsWith('--'))[3] || path.join(root, 'supabase', `chem3-patch-${new Date().toISOString().slice(0, 10)}.sql`);
 const dir = 'data/chem3/questions';
 const lit = v => v === null || v === undefined ? 'null' : typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`;
 const js = v => v === null || v === undefined ? 'null' : `${lit(JSON.stringify(v))}::jsonb`;
@@ -29,6 +30,15 @@ for (const f of fs.readdirSync(path.join(root, dir)).filter(f => f.endsWith('.js
       const ac = autoCheck({ ...q, type, id: -1 }, all.map((s, j) => ({ id: j, stem: s.stem })).filter(s => s.stem !== q.stem));
       const obj = `(select id from public.objectives where code = ${lit(now.objective)})`;
       const qid = `(select id from public.questions where objective_id = ${obj} and type = ${lit(type)} and number = ${i + 1})`;
+      if (compact) {
+        const o = oldList[i], col = { stem: lit, stimulus: js, options: js, thinking_level: lit, question_kind: lit, difficulty: lit, source_ref: lit };
+        const acol = { correct_index: v => v ?? 'null', explanation: v => lit(v ?? null), distractor_notes: js, model_answer: v => lit(v ?? null), answer_elements: js, solution_steps: js, marks: js, rubric: js, common_errors: js };
+        const diff = (cols) => Object.entries(cols).filter(([k]) => JSON.stringify(q[k] ?? null) !== JSON.stringify(o[k] ?? null)).map(([k, fn]) => `${k} = ${fn(q[k] ?? null)}`);
+        const qs = diff(col), as = diff(acol);
+        if (qs.length) stmts.push(`update public.questions set ${qs.join(', ')}, updated_at = now() where id = ${qid};`);
+        if (as.length) stmts.push(`update public.question_answers set ${as.join(', ')} where question_id = ${qid};`);
+        return;
+      }
       stmts.push(`update public.questions set stem = ${lit(q.stem)}, stimulus = ${js(q.stimulus || null)}, options = ${js(q.options || null)},
   thinking_level = ${lit(q.thinking_level)}, question_kind = ${lit(q.question_kind)}, difficulty = ${lit(q.difficulty)}, source_ref = ${lit(q.source_ref)}, updated_at = now()
 where id = ${qid};
