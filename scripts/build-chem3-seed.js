@@ -90,12 +90,12 @@ for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(f => f.endsWit
   }
   const obj = `(select id from public.objectives where code = ${lit(set.objective)})`;
   statements.push(`insert into public.questions (objective_id, type, number, stem, stimulus, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-select ${obj}, v.type, v.number, v.stem, v.stimulus, v.options, v.tl, v.qk, v.diff, v.src, 'generated', 'ai_generated'
+select ${obj}, v.type, v.number, v.stem, v.stimulus::jsonb, v.options::jsonb, v.tl, v.qk, v.diff, v.src, 'generated', 'ai_generated'
 from (values\n${rows.map(({ type, n, q }) => `(${[lit(type), n, lit(q.stem), js(q.stimulus || null), js(q.options || null), lit(q.thinking_level), lit(q.question_kind), lit(q.difficulty), lit(q.source_ref)].join(', ')})`).join(',\n')}
 ) as v(type, number, stem, stimulus, options, tl, qk, diff, src)
 where not exists (select 1 from public.questions x where x.objective_id = ${obj} and x.type = v.type and x.number = v.number);
 insert into public.question_answers (question_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, auto_check)
-select x.id, v.ci, v.ex, v.dn, v.ma, v.ae, v.ss, v.mk, v.rb, v.ce, v.ac
+select x.id, v.ci::int, v.ex::text, v.dn::jsonb, v.ma::text, v.ae::jsonb, v.ss::jsonb, v.mk::jsonb, v.rb::jsonb, v.ce::jsonb, v.ac::jsonb
 from (values\n${rows.map(({ type, n, q, ac }) => `(${[lit(type), n, q.correct_index ?? 'null::int', lit(q.explanation ?? null), js(q.distractor_notes || null), lit(q.model_answer ?? null),
     js(q.answer_elements || null), js(q.solution_steps || null), js(q.marks || null), js(q.rubric || null), js(q.common_errors || null), js(ac)].join(', ')})`).join(',\n')}
 ) as v(type, number, ci, ex, dn, ma, ae, ss, mk, rb, ce, ac)
