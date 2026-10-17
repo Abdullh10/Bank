@@ -9,6 +9,7 @@ import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
 import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
+import { startBidi } from './bidi.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set(), courses: null, course: null };
@@ -1042,3 +1043,6 @@ document.addEventListener('visibilitychange', async () => {
   document.body.classList.toggle('locked', state.user.role === 'pending');
   document.body.classList.remove('booting');
 });
+
+// عرض الأرقام والوحدات والصيغ داخل النص العربي بترتيبها الصحيح (عرض فقط؛ لا يُكتب في البيانات)
+startBidi(document.body);
