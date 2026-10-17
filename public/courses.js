@@ -37,7 +37,7 @@ export function pageCourses(ctx) {
   };
   $app.innerHTML = `
     <div class="hero banner courses-hero">
-      <div class="hero-ic"><img class="banner-mark" src="assets/itqan-mark.png" alt="" width="74" height="74">
+      <div class="hero-ic"><img class="banner-mark" src="assets/itqan-mark.svg" alt="" width="74" height="74">
         <div><span class="eyebrow">${icon('spark', 18)} إتقان · منصة بنك الأسئلة والتدريب في الكيمياء</span><h1>مقررات الكيمياء</h1>
           <p class="muted">اختر المقرر لتصفح أهدافه وبنك أسئلته وإنشاء اختباراته.</p></div></div>
       ${current?.status === 'ready' || (current && isOwner) ? `<div class="actions no-print"><button type="button" class="primary" data-course="${current.id}">${line('next', 17)}متابعة ${esc(current.code)}</button></div>` : ''}

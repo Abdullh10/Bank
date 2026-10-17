@@ -220,7 +220,7 @@ async function pageHome() {
   $app.innerHTML = `
     <div class="hero banner">
       <div class="hero-ic">
-        <img class="banner-mark" src="assets/itqan-mark.png" alt="" width="74" height="74">
+        <img class="banner-mark" src="assets/itqan-mark.svg" alt="" width="74" height="74">
         <div>
           <span class="eyebrow">${icon('spark', 18)} إتقان · منصة بنك الأسئلة والتدريب في الكيمياء</span>
           <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
@@ -877,7 +877,7 @@ async function pageReports() {
 }
 
 // ---------- تسجيل الدخول ----------
-const LOGO = '<img class="login-logo logo-light" src="assets/itqan-logo.png" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517"><img class="login-logo logo-dark" src="assets/itqan-logo-dark.png" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517">';
+const LOGO = '<img class="login-logo logo-light" src="assets/itqan-logo.svg" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517"><img class="login-logo logo-dark" src="assets/itqan-logo-dark.svg" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517">';
 
 function pageLogin() {
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
