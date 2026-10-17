@@ -3,17 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>إتقان · بنك أسئلة الكيمياء</title>
-  <meta name="description" content="إتقان: بنك أسئلة ومنصة تدريب لمقررات الكيمياء في المرحلة الثانوية">
+  <title>إتقان · منصة بنك الأسئلة والتدريب في الكيمياء</title>
+  <meta name="description" content="إتقان · منصة بنك الأسئلة والتدريب في الكيمياء: بنك أسئلة وتدريب لمقررات الكيمياء في المرحلة الثانوية">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#12305a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#081322" media="(prefers-color-scheme: dark)">
   <!-- version:start (يُولَّد بـ scripts/stamp-version.js؛ لا تعدّله يدويًا) -->
-  <meta name="itqan-version" content="95816937a9">
-  <script type="importmap">{"imports":{"./app.js":"./app.js?v=95816937a9","./bidi.js":"./bidi.js?v=95816937a9","./config.js":"./config.js?v=95816937a9","./courses.js":"./courses.js?v=95816937a9","./dashboard.js":"./dashboard.js?v=95816937a9","./exam-docx.js":"./exam-docx.js?v=95816937a9","./exam.js":"./exam.js?v=95816937a9","./icons.js":"./icons.js?v=95816937a9","./notes.js":"./notes.js?v=95816937a9","./roles.js":"./roles.js?v=95816937a9","./staff.js":"./staff.js?v=95816937a9","./student.js":"./student.js?v=95816937a9","./supa.js":"./supa.js?v=95816937a9","./validate.js":"./validate.js?v=95816937a9"}}</script>
-  <link rel="stylesheet" href="styles.css?v=95816937a9">
-  <script type="module" src="app.js?v=95816937a9"></script>
+  <meta name="itqan-version" content="cbfa2c648e">
+  <script type="importmap">{"imports":{"./app.js":"./app.js?v=cbfa2c648e","./bidi.js":"./bidi.js?v=cbfa2c648e","./config.js":"./config.js?v=cbfa2c648e","./courses.js":"./courses.js?v=cbfa2c648e","./dashboard.js":"./dashboard.js?v=cbfa2c648e","./exam-docx.js":"./exam-docx.js?v=cbfa2c648e","./exam.js":"./exam.js?v=cbfa2c648e","./icons.js":"./icons.js?v=cbfa2c648e","./notes.js":"./notes.js?v=cbfa2c648e","./roles.js":"./roles.js?v=cbfa2c648e","./staff.js":"./staff.js?v=cbfa2c648e","./student.js":"./student.js?v=cbfa2c648e","./supa.js":"./supa.js?v=cbfa2c648e","./validate.js":"./validate.js?v=cbfa2c648e"}}</script>
+  <link rel="stylesheet" href="styles.css?v=cbfa2c648e">
+  <script type="module" src="app.js?v=cbfa2c648e"></script>
   <!-- version:end -->
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
 </head>
@@ -21,8 +25,8 @@
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#/">
-        <img src="assets/itqan-mark.png" alt="" width="44" height="44">
-        <span>إتقان <em>بنك أسئلة الكيمياء</em><small id="brand-sub">مقررات الكيمياء · المرحلة الثانوية</small></span>
+        <img class="logo-light" src="assets/itqan-mark.png" alt="" width="44" height="44"><img class="logo-dark" src="assets/itqan-mark-dark.png" alt="" width="44" height="44">
+        <span>إتقان <em>منصة بنك الأسئلة والتدريب في الكيمياء</em><small id="brand-sub">مقررات الكيمياء · المرحلة الثانوية</small></span>
       </a>
       <nav class="nav" aria-label="القائمة الرئيسية">
         <a href="#/" data-nav="home" data-perm="staff"><i data-icon="home"></i><span>المقررات</span></a>
@@ -39,7 +43,7 @@
       <div class="userbox" id="userbox"></div>
     </div>
   </header>
-  <div class="boot-splash" role="status" aria-label="جارٍ التحميل"><img src="assets/itqan-mark.png" alt="" width="72" height="72"><span class="boot-spin" aria-hidden="true"></span></div>
+  <div class="boot-splash" role="status" aria-label="جارٍ التحميل"><img class="logo-fixed" src="assets/itqan-mark.png" alt="" width="72" height="72"><span class="boot-spin" aria-hidden="true"></span></div>
   <main id="app" tabindex="-1"></main>
   <footer class="footer">جميع الحقوق محفوظة © 2026 · برمجة وتطوير الأستاذ عبدالله حمدي</footer>
   <dialog id="dlg"></dialog>

@@ -29,7 +29,7 @@ let session = null; // { id, questions, idx, answers: {qid: result}, order: {qid
 export function pageStudentConfirm(ctx) {
   const { state, esc, $app, api, fail, toast } = ctx;
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
-    <img class="login-logo" src="assets/itqan-logo.png" alt="إتقان" width="520" height="513">
+    <img class="login-logo logo-light" src="assets/itqan-logo.png" alt="إتقان" width="520" height="517"><img class="login-logo logo-dark" src="assets/itqan-logo-dark.png" alt="إتقان" width="520" height="517">
     <h1>${icon('spark', 28)}<span>مرحبًا بك في إتقان</span></h1>
     <p class="muted small">تأكد من اسمك وشعبتك. تُثبَّت مرة واحدة، ويعدّلها المشرف فقط.</p>
     <form id="c-form" novalidate>
