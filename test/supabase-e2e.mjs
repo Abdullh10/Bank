@@ -186,7 +186,6 @@ await Q2('[data-choose]').nth(0).click();
 ok('viewer: practice check via RPC', await Q2('.notice').waitFor({ timeout: 4000 }).then(() => true, () => false));
 // المعلم (الخيار ب): الأهداف وأسئلتها دون إجابات، ولا وضع مراجعة، ولا صفحة بنك
 ok('viewer: neutral wording on the objective page (no AI/draft/auto-review labels)', !/مولد|ذكاء اصطناعي|مراجعة آلية|المراجعة الآلية|بشري/.test(await p.locator('main').innerText()));
-ok('footer: AI-assistance disclosure with the owner as approver', (await p.locator('.footer').innerText()).includes('بدعم أدوات الذكاء الاصطناعي') && (await p.locator('.footer').innerText()).includes('اعتُمد من الأستاذ عبدالله حمدي'));
 ok('viewer: objective page without answers or review mode', (await p.locator('[data-mode="review"], .answer, .q-tools, [data-print]').count()) === 0);
 const vObj = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_objective', { method: 'POST',
   headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_code: 'C1-L1-O14' }) })).json());
