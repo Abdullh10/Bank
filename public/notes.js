@@ -1,8 +1,9 @@
 // ملاحظات المراجعة: يكتبها المراجع (ومالك المشروع) على هدف أو سؤال أو محتوى مكمّل دون تعديل المحتوى نفسه،
 // ويطّلع عليها مالك المشروع في صفحة «الملاحظات»، فينفذها ثم يغلقها مع رد اختياري.
 import { icon, line } from './icons.js';
+import { hijri } from './dates.js';
 
-const dateFmt = d => new Date(d).toLocaleDateString('ar-SA-u-nu-latn', { year: 'numeric', month: 'short', day: 'numeric' });
+const dateFmt = d => hijri(d);
 const qLabel = n => `${n.questionType === 'essay' ? 'سؤال مقالي' : 'سؤال اختيار'} ${n.questionNumber ?? ''}`;
 const target = n => (n.entity === 'question' ? qLabel(n) : n.entity === 'supplement' ? 'المحتوى المكمّل' : 'الهدف');
 

@@ -3,6 +3,7 @@
 // تغذية راجعة فورية تبدأ بسبب خطأ البديل المختار، ومؤقت اختياري لا يقفل الجلسة، ثم «أعد الأخطاء» بأسئلة من الهدف نفسه.
 
 import { icon, line, CHAPTER_ICONS } from './icons.js';
+import { hijri } from './dates.js';
 
 const LETTERS = ['أ', 'ب', 'ج', 'د'];
 const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
@@ -278,7 +279,7 @@ export async function pageStudentHistory(ctx) {
       </section>
       <section class="card">${ttl('history', 'آخر الجلسات')}
         ${hist.length ? `<table class="list"><thead><tr><th>التاريخ</th><th>النتيجة</th><th></th></tr></thead><tbody>
-          ${hist.map(h => `<tr><td class="ltr">${esc(new Date(h.createdAt).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }))}</td>
+          ${hist.map(h => `<tr><td class="small">${esc(hijri(h.createdAt, true))}</td>
             <td>${h.score}/${h.total} (${pct(h.score, h.total)}%)</td>
             <td>${h.wrong ? `<button type="button" data-retry="${h.id}">أعد أخطاءها</button>` : ''}</td></tr>`).join('')}</tbody></table>`
           : '<div class="empty">لا توجد جلسات بعد.</div>'}
