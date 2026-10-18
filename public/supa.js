@@ -211,6 +211,10 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   // ---------- حسابات الفريق ----------
   if (p === '/admin/team') return rpc('admin_list_staff');
   if (p === '/admin/team/create') return adminUsers({ action: 'create', role: body.role, students: [{ name: body.name, username: body.username, password: body.password || '' }] });
+  if (p === '/admin/team/teacher') {
+    if (method === 'GET') return rpc('admin_get_teacher', { p_id: f.id });
+    return rpc('admin_set_teacher', { p_id: body.id, p_courses: body.courses || [], p_students: body.students || [] });
+  }
   if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
   // ---------- الملاحظات ولوحة المؤشرات ----------
   if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });
