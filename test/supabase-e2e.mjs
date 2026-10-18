@@ -448,6 +448,7 @@ await p.click('#logout'); await p.waitForSelector('#l-user');
 // المعلم يرى التقدم
 await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
+ok('teacher: last activity in hijri order (day month yearهـ)', /\d{1,2} \S+( \S+)? \d{4}هـ/.test(await p.locator('main tbody').first().innerText()));
 ok('teacher: training-quality column on the progress page', (await p.locator('main').innerText()).includes('جودة التدريب'));
 ok('teacher: progress lists only the assigned student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي') && !(await p.locator('main').innerText()).includes('طالب أول تجريبي'));
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));

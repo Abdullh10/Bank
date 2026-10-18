@@ -2,6 +2,7 @@
 import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
+import { hijri } from './dates.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
@@ -12,19 +13,19 @@ export async function pageTeacherProgress(ctx, section = '') {
   const d = await api('/teacher/progress' + (section ? '?section=' + encodeURIComponent(section) : ''));
   // جودة التدريب (قراءة فقط): تُحذف الأعمدة بصمت إن لم تتوفر الدالة بعد في قاعدة البيانات
   const quality = Object.fromEntries(((await api('/teacher/quality').catch(() => [])) || []).map(q => [q.username, q]));
-  const QUALITY = { serious: ['متدرب جيد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['لم يكتمل التقييم', ''] };
+  const QUALITY = { serious: ['متدرب جيد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['تدريب قليل', ''] };
   const qCell = u => { const q = quality[u]; if (!q) return '<td>—</td>'; const [t, k] = QUALITY[q.quality] || ['—', '']; return `<td><span class="badge ${k}">${t}</span> <span class="small muted">${q.score} نقطة</span></td>`; };
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('progress', 52)}<div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div></div>
       <div class="actions"><label for="tp-sec" class="small">الشعبة</label>
         <select id="tp-sec"><option value="">كل الشعب</option>${d.sections.map(s => `<option ${s === section ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div></section>
     <section class="card">${ttl('students', 'الطلاب')}
-      ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>الإجابات الصحيحة</th><th>جودة التدريب</th><th>آخر نشاط</th></tr></thead><tbody>
+      ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>نسبة الصحة</th><th>جودة التدريب</th><th>آخر نشاط</th></tr></thead><tbody>
         ${d.students.map(s => `<tr><td>${esc(s.name)} <span class="small muted ltr">${esc(s.username)}</span></td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td>
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
-          ${qCell(s.username)}<td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
+          ${qCell(s.username)}<td class="small">${esc(hijri(s.lastActive))}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «متدرب جيد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «لم يكتمل التقييم» أقل من 30 إجابة في 3 أيام.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
+      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «متدرب جيد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «تدريب قليل» أقل من 30 إجابة محتسبة بعد.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
     </section>
     <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
@@ -241,10 +242,10 @@ export async function pageAdminStudents(ctx) {
     [['أحمد محمد علي', 'ثاني ثانوي', '1', '', ''], ['سعد خالد العتيبي', 'ثاني ثانوي', '2', 'saad22', '']]);
   document.getElementById('as-export').onclick = () => downloadXlsx('itqan-students-list', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'الحالة', 'الجلسات', 'الأسئلة', 'نسبة الصحيح', 'آخر نشاط'],
     list.map(s => [s.name, s.username, s.grade || '', s.section || '', ROLE[s.role], s.sessions, s.answered, s.answered ? pct(s.correct, s.answered) + '%' : '',
-      s.lastActive ? new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn') : '']));
+      s.lastActive ? hijri(s.lastActive) : '']));
   const refilter = () => pageAdminStudents(ctx).catch(fail);
   if (ctx.state?.supabase) {
-    const fmtD = d => (d ? new Date(d).toLocaleDateString('ar-SA-u-nu-latn', { dateStyle: 'long' }) : '—');
+    const fmtD = d => hijri(d);
     const info = document.getElementById('rank-term-info');
     api('/admin/rank/term').then(t => { info.textContent = `الفصل الحالي بدأ احتساب نقاطه في ${fmtD(t.startedAt)}.`; }).catch(() => { info.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
     document.getElementById('rank-new-term').onclick = async e => {
@@ -345,7 +346,7 @@ export async function pageAdminTeam(ctx) {
   const all = await api('/admin/team');
   const roleOpts = (cur, withPending = true) => [...STAFF_ROLES.map(([v, t]) => [v, t]), ...(withPending ? [['pending', 'موقوف']] : [])]
     .map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('');
-  const fmt = d => (d ? new Date(d).toLocaleDateString('ar-SA-u-nu-latn') : '—');
+  const fmt = d => hijri(d);
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('team', 52)}<div><h1>حسابات الفريق</h1><p class="muted">حسابات للمراجعة والاطلاع بأدوار محددة. كل دور يرى ما يخصه فقط، وقاعدة البيانات ترفض ما سواه.</p></div></div>
       ${accountTabs('team', ctx)}</section>

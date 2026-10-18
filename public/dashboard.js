@@ -1,6 +1,7 @@
 // لوحة المؤشرات: أرقام مجمّعة من قاعدة البيانات (لا أسماء طلاب) لكل حسابات الفريق، ومنها مدير المدرسة والمشرف التربوي.
 // الرسوم من HTML وCSS فقط: سلسلة واحدة بلون المنصة، وقيمة مكتوبة على كل عمود، وتلميح عند المرور أو التركيز.
 import { icon, line } from './icons.js';
+import { hijri } from './dates.js';
 
 const pct = (a, b) => (b ? Math.round((100 * (a || 0)) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -145,7 +146,7 @@ export async function pageDashboard(ctx) {
       const rows = await api('/revisions?limit=30');
       const el = document.getElementById('revs');
       if (el) el.innerHTML = rows.length ? `<table class="list"><thead><tr><th>التاريخ</th><th>المستخدم</th><th>العنصر</th><th>الإجراء</th><th>ملاحظة</th></tr></thead>
-        <tbody>${rows.map(r => `<tr><td class="ltr small">${esc(new Date(r.at).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'short', timeStyle: 'short' }))}</td><td>${esc(r.user || '')}</td>
+        <tbody>${rows.map(r => `<tr><td class="small">${esc(hijri(r.at, true))}</td><td>${esc(r.user || '')}</td>
         <td>${esc(ENT[r.entity] || r.entity)} #${r.entity_id}</td><td>${esc(NAMES[r.action] || r.action)}</td><td>${esc(r.note || '')}</td></tr>`).join('')}</tbody></table>`
         : '<div class="empty">لا توجد تعديلات بعد.</div>';
     } catch (e) { if (!e?.stale) ctx.fail(e); }

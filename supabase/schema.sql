@@ -1820,7 +1820,7 @@ begin
       -- يحتاج متابعة: إجابات سريعة جدًا، أو نسبة صحة قريبة من التخمين (≤ 30% مع بدائل أربعة)
       'quality', case when r.attempts >= 10 and 100.0 * r.rushed / r.attempts > 40 then 'watch'
                       when r.valid >= 30 and 100.0 * r.correct / r.valid <= 30 then 'watch'
-                      when r.valid >= 30 and r.days_any >= 3 then 'serious' else 'low' end)), '[]')
+                      when r.valid >= 30 then 'serious' else 'low' end)), '[]')
     from public._rank_rows(v_course, coalesce(v_ids, '{}')) r join auth.users u on u.id = r.user_id);
 end $$;
 
