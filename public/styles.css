@@ -972,3 +972,14 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .as-filters { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-bottom: .5rem; }
 .as-filters select, .as-filters input { width: auto; min-width: 8rem; }
 .tm-pick { max-height: 18rem; overflow: auto; display: grid; gap: .05rem; }
+
+/* التميّز (ترتيب المتدربين في الشعبة) */
+.rank-me { display: flex; gap: 1rem; align-items: center; }
+.rank-big { flex: none; display: grid; place-items: center; min-width: 4.2rem; height: 4.2rem; padding: 0 .6rem; border-radius: 1.1rem; font-size: 2rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--brand-2), var(--brand-3)); }
+.rank-big.small-band { font-size: 1rem; height: 3.2rem; }
+.rank-top { list-style: none; margin: 0 0 .6rem; padding: 0; display: grid; gap: .4rem; }
+.rank-top li { display: flex; align-items: center; gap: .6rem; padding: .5rem .7rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--surface-2); }
+.rank-top li.me { border-color: var(--brand-3); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-3) 25%, transparent); }
+.rank-medal { flex: none; width: 1.8rem; text-align: center; font-size: 1.3rem; }
+.rank-name { flex: 1; font-weight: 600; }
+.rank-rules { display: grid; gap: .45rem; margin: 0; padding-inline-start: 1.2rem; }

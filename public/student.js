@@ -260,7 +260,7 @@ export async function pageStudentHistory(ctx) {
   const [hist, catalog] = await Promise.all([api('/student/history'), api('/student/catalog')]);
   const lessons = catalog.flatMap(c => c.lessons.filter(l => l.answered).map(l => ({ ...l, chapter: c.number })));
   $app.innerHTML = `
-    <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك بياناتك.</p></div></div></section>
+    <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك تفاصيل تدريبك؛ يظهر اسمك الأول والثاني ونقاطك فقط إن دخلت قائمة التميّز.</p></div></div></section>
     <div class="grid2">
       <section class="card">${ttl('progress', 'تقدّمك في الدروس')}
         ${lessons.length ? table(lessons.map(l => [`${l.chapter}. ${l.title}`, l.correct, l.answered]), esc) : '<div class="empty">لم تبدأ التدريب بعد.</div>'}
@@ -275,6 +275,59 @@ export async function pageStudentHistory(ctx) {
       </section>
     </div>`;
   $app.querySelectorAll('[data-retry]').forEach(b => b.onclick = () => startSession(ctx, { retry: Number(b.dataset.retry) }));
+}
+
+// ---------- التميّز: ترتيب المتدربين في الشعبة ----------
+const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
+const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
+export async function pageStudentRank(ctx) {
+  const { esc, $app, api } = ctx;
+  const d = await api('/student/rank');
+  const hero = `<section class="hero"><div class="hero-ic">${icon('trophy', 52)}<div><h1>التميّز</h1>
+    <p class="muted">ترتيب المتدربين في شعبتك خلال هذا الفصل الدراسي. النقاط تكافئ التدريب الجاد والمنتظم، لا التخمين ولا السرعة.</p></div></div></section>`;
+  if (!d.available) {
+    $app.innerHTML = `${hero}<section class="card"><div class="empty">${d.reason === 'section' ? 'لم تُحدَّد شعبتك بعد؛ راجع معلمك ليظهر لك الترتيب.' : 'لم يُسند لك مقرر جاهز بعد.'}</div></section>`;
+    return;
+  }
+  const m = d.me, r = d.rules;
+  const bandText = { q3: 'الربع الثالث', q4: 'الربع الرابع' };
+  let mine;
+  if (m.eligible && m.rank) {
+    mine = `<div class="rank-me"><div class="rank-big" aria-label="ترتيبك">${num(m.rank)}</div>
+      <div><strong>ترتيبك في شعبتك</strong> <span class="small muted">(الشعبة ${esc(d.section)})</span><div class="muted">من ${num(d.n)} طالبًا دخلوا الترتيب · نقاطك ${num(m.score)}</div>
+      <div class="small muted">${m.rank <= 3 ? 'أداء متميز، حافظ على انتظامك.' : 'أنت في النصف الأول من شعبتك؛ واصل التدريب المنتظم.'}</div></div></div>`;
+  } else if (m.eligible) {
+    mine = `<div class="rank-me"><div class="rank-big small-band">${bandText[m.band]}</div>
+      <div><strong>أنت في ${bandText[m.band]} من شعبتك</strong><div class="muted">نقاطك ${num(m.score)}${m.pointsToMedian ? ` · تحتاج ${num(m.pointsToMedian)} نقطة لتبلغ منتصف الترتيب` : ''}</div>
+      <div class="small muted">كل يوم تدريب جاد يضيف ${r.dayBonus} نقاط، وتصحيح أخطائك السابقة يضيف نقطة لكل سؤال. تقدّمك مستمر، واصل.</div></div></div>`;
+  } else {
+    const bar = (v, t, label) => `<div class="small">${label}: ${num(Math.min(v, t))} من ${num(t)}</div><div class="bar ${v >= t ? 'ok' : ''}"><span style="width:${Math.min(100, Math.round(100 * v / t))}%"></span></div>`;
+    mine = `<div><strong>لم تدخل الترتيب بعد</strong>
+      <p class="muted">لتظهر في الترتيب تحتاج ${num(r.minValid)} إجابة محتسبة على الأقل في ${num(r.minDays)} أيام مختلفة.</p>
+      ${bar(m.valid, r.minValid, 'إجاباتك المحتسبة')}${bar(m.activeDays, r.minDays, 'أيام تدريبك')}
+      ${m.fast ? `<p class="notice warn small">بعض إجاباتك أسرع من ${num(r.rushSecs)} ثوانٍ ولا تُحتسب. اقرأ السؤال ثم الإجابة ثم التفسير، ففهم الخطأ أهم من السرعة.</p>` : ''}</div>`;
+  }
+  $app.innerHTML = `${hero}
+    <div class="grid2">
+      <section class="card">${ttl('trophy', 'ترتيبك')}${mine}</section>
+      <section class="card">${ttl('trophy', 'أفضل 5 في شعبتك')}
+        ${d.top.length ? `<ol class="rank-top">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span class="rank-medal" aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span>
+          <span class="rank-name">${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</span><span class="ltr small muted">${num(t.score)}</span></li>`).join('')}</ol>`
+          : '<div class="empty">لم يدخل أحد الترتيب بعد؛ كن أول من يدخله بتدريب جاد ومنتظم.</div>'}
+        <p class="small muted">يظهر لزملاء شعبتك اسمك الأول والثاني ونقاطك فقط إن دخلت أفضل 5.</p>
+      </section>
+    </div>
+    <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
+      <ul class="rank-rules">
+        <li><b>الصافي:</b> +1 لكل إجابة صحيحة، و−⅓ لكل إجابة خاطئة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</li>
+        <li><b>الإجابات السريعة:</b> الإجابة الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</li>
+        <li><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</li>
+        <li><b>الانتظام:</b> +${num(r.dayBonus)} نقاط عن كل يوم تدريب فيه ${num(r.dayMin)} إجابات صالحة فأكثر (حتى ${num(r.dayCap)} يومًا).</li>
+        <li><b>تصحيح الأخطاء:</b> +1 عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</li>
+        <li><b>شروط الدخول:</b> ${num(r.minValid)} إجابة محتسبة في ${num(r.minDays)} أيام على الأقل، وألا تزيد إجاباتك السريعة جدًا على ${num(r.rushMaxPct)}%.</li>
+        <li>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</li>
+      </ul>
+    </section>`;
 }
 
 export const resetStudentSession = () => { stopTimer(); session = null; };

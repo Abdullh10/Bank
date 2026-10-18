@@ -329,6 +329,7 @@ await p.screenshot({ path: `${OUT}/team.png`, fullPage: true });
 await p.goto(BASE + '#/students'); await p.waitForSelector('#as-file');
 ok('owner: team accounts not listed as students', !(await p.locator('.as-table').count()) || !(await p.locator('.as-table').innerText()).includes('مدير المدرسة التجريبي'));
 await p.goto(BASE + '#/students'); await p.waitForSelector('#as-file');
+ok('owner: new-term card on the students page shows when the term started', await p.locator('#rank-term-info', { hasText: 'بدأ احتساب' }).waitFor({ timeout: 5000 }).then(() => true, () => false) && await p.locator('#rank-new-term').isVisible());
 // ملف Excel حقيقي بعناوين عربية
 const XL = createRequire(process.env.XLSX_MODULE + '/')('xlsx');
 const wb = XL.utils.book_new();
@@ -422,6 +423,13 @@ if (await p.locator('#st-retry').count()) {
 await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
 await p.waitForTimeout(500);
 ok('student: history lists sessions', (await p.locator('main').innerText()).includes('آخر الجلسات') && (await p.locator('main tbody tr').count()) >= 1);
+ok('student: «التميّز» in the menu', await p.locator('[data-nav="rank"]').isVisible());
+await p.goto(BASE + '#/rank'); await p.waitForSelector('.rank-rules');
+ok('student: rank page explains the points and the entry conditions', (await p.locator('main').innerText()).includes('كيف تُحسب نقاطي؟') && (await p.locator('main').innerText()).includes('لم تدخل الترتيب بعد'));
+ok('student: rank page shows progress toward the 30 answers / 3 days', (await p.locator('.bar').count()) === 2);
+await p.screenshot({ path: `${OUT}/student-rank.png`, fullPage: true });
+const rk = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/student_leaderboard', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
+ok('student: leaderboard RPC exposes no other student details', rk.data && !JSON.stringify(rk.data).includes('username') && rk.data.top.every(t => Object.keys(t).sort().join() === 'me,name,rank,score'), JSON.stringify(Object.keys(rk.data || {})));
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
@@ -440,6 +448,7 @@ await p.click('#logout'); await p.waitForSelector('#l-user');
 // المعلم يرى التقدم
 await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
+ok('teacher: training-quality column on the progress page', (await p.locator('main').innerText()).includes('جودة التدريب'));
 ok('teacher: progress lists only the assigned student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي') && !(await p.locator('main').innerText()).includes('طالب أول تجريبي'));
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
 // مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
