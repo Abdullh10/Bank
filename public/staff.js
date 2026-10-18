@@ -12,7 +12,7 @@ export async function pageTeacherProgress(ctx, section = '') {
   const d = await api('/teacher/progress' + (section ? '?section=' + encodeURIComponent(section) : ''));
   // جودة التدريب (قراءة فقط): تُحذف الأعمدة بصمت إن لم تتوفر الدالة بعد في قاعدة البيانات
   const quality = Object.fromEntries(((await api('/teacher/quality').catch(() => [])) || []).map(q => [q.username, q]));
-  const QUALITY = { serious: ['جاد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['لم يكتمل التقييم', ''] };
+  const QUALITY = { serious: ['متدرب جيد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['لم يكتمل التقييم', ''] };
   const qCell = u => { const q = quality[u]; if (!q) return '<td>—</td>'; const [t, k] = QUALITY[q.quality] || ['—', '']; return `<td><span class="badge ${k}">${t}</span> <span class="small muted">${q.score} نقطة</span></td>`; };
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('progress', 52)}<div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div></div>
@@ -24,7 +24,7 @@ export async function pageTeacherProgress(ctx, section = '') {
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
           ${qCell(s.username)}<td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «جاد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «لم يكتمل التقييم» أقل من 30 إجابة في 3 أيام.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
+      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «متدرب جيد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «لم يكتمل التقييم» أقل من 30 إجابة في 3 أيام.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
     </section>
     <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
