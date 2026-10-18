@@ -1332,8 +1332,9 @@ revoke execute on function public._restricted() from authenticated;
 
 -- =====================================================================
 -- 2026-10-18: نطاق المعلم — يرى مقرراته الجاهزة وطلابه المسندين له فقط
---   المعلم (دور viewer): المقررات التي يسندها له مالك المشروع (الجاهزة فقط)، وتقدم طلابه المسندين وحدهم.
---   المشرف التربوي والمدير: المقررات الجاهزة فقط. المالك والمراجع: كل شيء.
+--   المعلم (دور viewer) وحده يتقيّد: المقررات التي يسندها له مالك المشروع (الجاهزة فقط)، وتقدم طلابه المسندين وحدهم.
+--   كل الأدوار الأخرى (المالك، المراجع، المشرف التربوي، المدير، الطالب) لا يتغير شيء في ما ترى ولا في سلوكها.
+--   لا يُحذف ولا يُعدَّل أي شيء من جلسات التدريب وإجابات الطلاب ونتائجهم؛ كل الإضافات قراءة وتقييد فقط.
 --   الإغلاق في قاعدة البيانات نفسها (السياسات والدوال) لا في الواجهة فقط.
 -- =====================================================================
 create table if not exists public.teacher_courses (
@@ -1357,35 +1358,34 @@ revoke all on public.teacher_courses, public.teacher_students from anon, authent
 create table if not exists public.schema_flags (key text primary key, at timestamptz not null default now());
 alter table public.schema_flags enable row level security;
 revoke all on public.schema_flags from anon, authenticated;
--- مرة واحدة: المعلمون الحاليون يبقون على كيمياء 2-1 وطلابها كما كانوا قبل التقييد (يضيّق المالك الإسناد لاحقًا من «حسابات الفريق»)
+-- مرة واحدة: كل معلم حالي يبقى يرى ما كان يراه قبل التقييد تمامًا (كل المقررات الجاهزة وكل الطلاب المسجلين في أي مقرر)،
+-- فلا يتغير شيء عليه حتى يضيّق المالك الإسناد من «حسابات الفريق». المعلم الجديد لاحقًا يبدأ بلا إسناد.
 do $$ begin
   if not exists (select 1 from public.schema_flags where key = 'teacher_scope_2026_10_18') then
     insert into public.teacher_courses (teacher_id, course_id)
-      select p.user_id, 1 from public.profiles p where p.role = 'viewer' and exists (select 1 from public.courses where id = 1) on conflict do nothing;
+      select p.user_id, c.id from public.profiles p cross join public.courses c where p.role = 'viewer' and c.status = 'ready' on conflict do nothing;
     insert into public.teacher_students (teacher_id, student_id)
-      select t.user_id, e.user_id from public.profiles t join public.course_enrollments e on e.course_id = 1
-        join public.profiles s on s.user_id = e.user_id and s.role = 'student'
-       where t.role = 'viewer' on conflict do nothing;
+      select t.user_id, s.user_id from public.profiles t cross join public.profiles s
+       where t.role = 'viewer' and s.role = 'student'
+         and exists (select 1 from public.course_enrollments e where e.user_id = s.user_id) on conflict do nothing;
     insert into public.schema_flags (key) values ('teacher_scope_2026_10_18');
   end if;
 end $$;
 
--- هل يستطيع الحساب الحالي قراءة هذا المقرر؟
+-- هل يستطيع الحساب الحالي قراءة هذا المقرر؟ المعلم وحده مقيّد بما أُسند له (الجاهز فقط)؛ غيره كما كان.
 create or replace function public._course_ok(p_course bigint) returns boolean
 language sql stable security definer set search_path = public, pg_temp as $$
-  select case (select role from public.profiles where user_id = auth.uid())
-    when 'admin' then true
-    when 'reviewer' then true
-    when 'viewer' then exists (select 1 from public.teacher_courses t join public.courses c on c.id = t.course_id
-                               where t.teacher_id = auth.uid() and t.course_id = p_course and c.status = 'ready')
-    when 'supervisor' then exists (select 1 from public.courses where id = p_course and status = 'ready')
-    when 'principal' then exists (select 1 from public.courses where id = p_course and status = 'ready')
-    else false end
+  select case when (select role from public.profiles where user_id = auth.uid()) = 'viewer'
+    then exists (select 1 from public.teacher_courses t join public.courses c on c.id = t.course_id
+                 where t.teacher_id = auth.uid() and t.course_id = p_course and c.status = 'ready')
+    else true end
 $$;
 create or replace function public._require_course(p_course bigint) returns void
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
-  if p_course is null or not public._course_ok(p_course) then raise exception 'هذا المقرر غير متاح لحسابك' using errcode = '42501'; end if;
+  if public.my_role() = 'viewer' and (p_course is null or not public._course_ok(p_course)) then
+    raise exception 'هذا المقرر غير متاح لحسابك' using errcode = '42501';
+  end if;
 end $$;
 -- المقرر الافتراضي لكل حساب: أول مقرر متاح له (الجاهز أولًا)؛ لا شيء إن لم يُسند له مقرر
 create or replace function public._default_course() returns bigint
@@ -1417,7 +1417,7 @@ $$;
 -- سياسات القراءة المباشرة للجداول: تُقيَّد بالمقررات المتاحة للحساب
 drop policy if exists courses_read on public.courses;
 create policy courses_read on public.courses for select to authenticated
-  using (public.is_member() and (public.my_role() in ('supervisor', 'principal') or public._course_ok(id)));
+  using (public.is_member() and public._course_ok(id));
 drop policy if exists chapters_read on public.chapters;
 create policy chapters_read on public.chapters for select to authenticated using (public.is_member() and public._course_ok(course_id));
 drop policy if exists lessons_read on public.lessons;
@@ -1448,7 +1448,7 @@ begin
       'students', (select count(*) from course_enrollments e join profiles p on p.user_id = e.user_id
                     where e.course_id = c.id and p.role = 'student' and public._visible_student(e.user_id)))
     order by c.sort_order, c.id), '[]')
-    from courses c where public.my_role() in ('supervisor', 'principal') or public._course_ok(c.id));
+    from courses c where public._course_ok(c.id));
 end $$;
 
 create or replace function public.get_stats(p_course bigint default null) returns jsonb
