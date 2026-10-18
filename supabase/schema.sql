@@ -1761,7 +1761,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
   from agg
 $$;
 
--- قائمة التميّز للطالب: أفضل 5 في شعبته وترتيبه هو (الاسم الأول والثاني فقط للمعروضين)
+-- قائمة التميّز للطالب: أفضل 5 في شعبته (بالاسم كاملًا) وترتيبه هو
 create or replace function public.student_leaderboard(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare me public.profiles; v_course bigint; v_ids uuid[]; v_res jsonb;
@@ -1798,7 +1798,7 @@ begin
       'pointsToMedian', (select case when band in ('q3', 'q4') then greatest(0.1, round((select score from med) - mine.score + 0.1, 1)) end from mine)),
     'top', (select coalesce(jsonb_agg(jsonb_build_object('rank', t.rnk, 'name', t.nm, 'score', t.score, 'me', t.user_id = auth.uid()) order by t.rnk), '[]')
       from (select x.rnk, x.score, x.user_id,
-              trim(coalesce((regexp_match(trim(x.nm), '^(\S+)(?:\s+(\S+))?'))[1], '') || ' ' || coalesce((regexp_match(trim(x.nm), '^(\S+)(?:\s+(\S+))?'))[2], '')) nm
+              trim(regexp_replace(x.nm, '\s+', ' ', 'g')) nm
             from ranked x where x.elig and x.rnk <= 5) t))
   into v_res;
   return v_res;

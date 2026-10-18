@@ -983,3 +983,9 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .rank-medal { flex: none; width: 1.8rem; text-align: center; font-size: 1.3rem; }
 .rank-name { flex: 1; font-weight: 600; }
 .rank-rules { display: grid; gap: .45rem; margin: 0; padding-inline-start: 1.2rem; }
+
+.st-top5 { margin-bottom: 1rem; }
+.st-top5-head { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; }
+.st-top5-list { list-style: none; margin: .6rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.st-top5-list li { padding: .35rem .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); font-weight: 600; }
+.st-top5-list li.me { border-color: var(--brand-3); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-3) 25%, transparent); }
