@@ -2,7 +2,7 @@
 import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { similarPairs } from './validate.js';
-import { pageStudentHome, pageStudentHistory, pageStudentConfirm, resetStudentSession } from './student.js';
+import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentConfirm, resetStudentSession } from './student.js';
 import { pageTeacherProgress, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
 import { pageDashboard } from './dashboard.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
@@ -956,13 +956,14 @@ async function route() {
   const role = state.user.role, isStudent = role === 'student';
   document.querySelectorAll('[data-perm]').forEach(a => {
     const p = a.dataset.perm;
-    a.hidden = !(p === 'student' ? isStudent : p === 'staff' ? !isStudent : can(p) && (state.supabase || !SUPABASE_ONLY.includes(p)));
+    a.hidden = !(p === 'student' ? isStudent && (a.dataset.nav !== 'rank' || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !SUPABASE_ONLY.includes(p)));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
     try {
       if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
       else if (page === 'history') await pageStudentHistory(ctx);
+      else if (page === 'rank' && state.supabase) await pageStudentRank(ctx);
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
     } catch (e) {
       if (e?.status === 401) return fail(e);

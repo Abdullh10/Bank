@@ -10,16 +10,21 @@ const ROLE = { student: 'نشط', pending: 'موقوف' };
 export async function pageTeacherProgress(ctx, section = '') {
   const { esc, $app, api } = ctx;
   const d = await api('/teacher/progress' + (section ? '?section=' + encodeURIComponent(section) : ''));
+  // جودة التدريب (قراءة فقط): تُحذف الأعمدة بصمت إن لم تتوفر الدالة بعد في قاعدة البيانات
+  const quality = Object.fromEntries(((await api('/teacher/quality').catch(() => [])) || []).map(q => [q.username, q]));
+  const QUALITY = { serious: ['جاد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['لم يكتمل التقييم', ''] };
+  const qCell = u => { const q = quality[u]; if (!q) return '<td>—</td>'; const [t, k] = QUALITY[q.quality] || ['—', '']; return `<td><span class="badge ${k}">${t}</span> <span class="small muted">${q.score} نقطة</span></td>`; };
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('progress', 52)}<div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div></div>
       <div class="actions"><label for="tp-sec" class="small">الشعبة</label>
         <select id="tp-sec"><option value="">كل الشعب</option>${d.sections.map(s => `<option ${s === section ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div></section>
     <section class="card">${ttl('students', 'الطلاب')}
-      ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>الإجابات الصحيحة</th><th>آخر نشاط</th></tr></thead><tbody>
+      ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>الإجابات الصحيحة</th><th>جودة التدريب</th><th>آخر نشاط</th></tr></thead><tbody>
         ${d.students.map(s => `<tr><td>${esc(s.name)} <span class="small muted ltr">${esc(s.username)}</span></td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td>
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
-          <td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
-      </tbody></table></div>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
+          ${qCell(s.username)}<td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «جاد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «لم يكتمل التقييم» أقل من 30 إجابة في 3 أيام.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
     </section>
     <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
@@ -136,6 +141,10 @@ export async function pageAdminStudents(ctx) {
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('students', 52)}<div><h1>حسابات الطلاب</h1><p class="muted">الطالب يرى صفحة التدريب فقط: لا إجابات جماعية ولا مراجعة ولا منشئ اختبارات.</p></div></div>
       ${accountTabs('students', ctx)}</section>
+    ${ctx.state?.supabase ? `<section class="card" id="rank-term-card">${ttl('trophy', 'الفصل الدراسي ونقاط التميّز', 'h2', 30)}
+      <p class="small muted">قائمة التميّز تحسب نقاط الطلاب من بداية الفصل الحالي. عند انتهاء الفصل ابدأ فصلًا جديدًا لتُصفَّر النقاط؛ سجل التدريب نفسه لا يُمسّ. وتُصفَّر نقاط الطالب تلقائيًا عند نقله إلى صف آخر.</p>
+      <p id="rank-term-info" class="small">جارٍ التحميل…</p>
+      <div class="actions"><button type="button" id="rank-new-term" class="danger">بدء فصل دراسي جديد (تصفير نقاط التميّز)</button></div></section>` : ''}
     <section class="card">${ttl('students', 'إضافة طلاب', 'h2', 30)}
       <div class="as-add">
         <div>
@@ -234,6 +243,16 @@ export async function pageAdminStudents(ctx) {
     list.map(s => [s.name, s.username, s.grade || '', s.section || '', ROLE[s.role], s.sessions, s.answered, s.answered ? pct(s.correct, s.answered) + '%' : '',
       s.lastActive ? new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn') : '']));
   const refilter = () => pageAdminStudents(ctx).catch(fail);
+  if (ctx.state?.supabase) {
+    const fmtD = d => (d ? new Date(d).toLocaleDateString('ar-SA-u-nu-latn', { dateStyle: 'long' }) : '—');
+    const info = document.getElementById('rank-term-info');
+    api('/admin/rank/term').then(t => { info.textContent = `الفصل الحالي بدأ احتساب نقاطه في ${fmtD(t.startedAt)}.`; }).catch(() => { info.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
+    document.getElementById('rank-new-term').onclick = async e => {
+      if (!confirm('ستُصفَّر نقاط التميّز لكل الطلاب ويبدأ احتسابها من الآن. لا يُحذف أي سجل تدريب. هل تريد المتابعة؟')) return;
+      const b = e.currentTarget; b.disabled = true;
+      try { const t = await api('/admin/rank/term', { method: 'POST', body: {} }); info.textContent = `بدأ فصل جديد في ${fmtD(t.startedAt)}.`; toast('بدأ فصل دراسي جديد'); } catch (err) { fail(err); } finally { b.disabled = false; }
+    };
+  }
   document.getElementById('af-grade').onchange = e => { adminFilter.grade = e.target.value; adminFilter.section = ''; refilter(); };
   document.getElementById('af-sec').onchange = e => { adminFilter.section = e.target.value; refilter(); };
   document.getElementById('af-q').onchange = e => { adminFilter.q = e.target.value.trim(); refilter(); };

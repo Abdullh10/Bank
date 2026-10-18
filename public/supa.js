@@ -194,8 +194,11 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/answer') return rpc('student_answer', { p_session: body.session, p_question: body.question, p_choice: body.choice });
   if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
   if (p === '/student/history') return rpc('student_history');
+  if (p === '/student/rank') return rpc('student_leaderboard', { p_course: f.course ? Number(f.course) : null });
   // ---------- المعلم والمشرف ----------
   if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null, p_course: course });
+  if (p === '/teacher/quality') return rpc('teacher_training_quality', { p_course: course });
+  if (p === '/admin/rank/term') return method === 'GET' ? rpc('admin_get_rank_term') : rpc('admin_start_new_term', { p_note: body.note ?? null });
   if (p === '/admin/students') return rpc('admin_list_students');
   if (p === '/admin/students/update') {
     await rpc('admin_update_student', { p_id: body.id, p_name: body.name, p_section: body.section, p_role: body.role, p_grade: body.grade ?? null });
