@@ -1329,3 +1329,376 @@ revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.get_exam_answers(bigint[]) to authenticated;
 revoke execute on function public._restricted() from authenticated;
+
+-- =====================================================================
+-- 2026-10-18: نطاق المعلم — يرى مقرراته الجاهزة وطلابه المسندين له فقط
+--   المعلم (دور viewer) وحده يتقيّد: المقررات التي يسندها له مالك المشروع (الجاهزة فقط)، وتقدم طلابه المسندين وحدهم.
+--   كل الأدوار الأخرى (المالك، المراجع، المشرف التربوي، المدير، الطالب) لا يتغير شيء في ما ترى ولا في سلوكها.
+--   لا يُحذف ولا يُعدَّل أي شيء من جلسات التدريب وإجابات الطلاب ونتائجهم؛ كل الإضافات قراءة وتقييد فقط.
+--   الإغلاق في قاعدة البيانات نفسها (السياسات والدوال) لا في الواجهة فقط.
+-- =====================================================================
+create table if not exists public.teacher_courses (
+  teacher_id uuid not null references public.profiles(user_id) on delete cascade,
+  course_id bigint not null references public.courses(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (teacher_id, course_id)
+);
+create table if not exists public.teacher_students (
+  teacher_id uuid not null references public.profiles(user_id) on delete cascade,
+  student_id uuid not null references public.profiles(user_id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (teacher_id, student_id)
+);
+create index if not exists idx_teacher_students_student on public.teacher_students(student_id);
+alter table public.teacher_courses enable row level security;
+alter table public.teacher_students enable row level security;
+revoke all on public.teacher_courses, public.teacher_students from anon, authenticated;
+
+-- علامات التنفيذ لمرة واحدة (تبقى الترقية آمنة عند إعادة تنفيذ schema.sql)
+create table if not exists public.schema_flags (key text primary key, at timestamptz not null default now());
+alter table public.schema_flags enable row level security;
+revoke all on public.schema_flags from anon, authenticated;
+-- مرة واحدة: كل معلم حالي يبقى يرى ما كان يراه قبل التقييد تمامًا (كل المقررات الجاهزة وكل الطلاب المسجلين في أي مقرر)،
+-- فلا يتغير شيء عليه حتى يضيّق المالك الإسناد من «حسابات الفريق». المعلم الجديد لاحقًا يبدأ بلا إسناد.
+do $$ begin
+  if not exists (select 1 from public.schema_flags where key = 'teacher_scope_2026_10_18') then
+    insert into public.teacher_courses (teacher_id, course_id)
+      select p.user_id, c.id from public.profiles p cross join public.courses c where p.role = 'viewer' and c.status = 'ready' on conflict do nothing;
+    insert into public.teacher_students (teacher_id, student_id)
+      select t.user_id, s.user_id from public.profiles t cross join public.profiles s
+       where t.role = 'viewer' and s.role = 'student'
+         and exists (select 1 from public.course_enrollments e where e.user_id = s.user_id) on conflict do nothing;
+    insert into public.schema_flags (key) values ('teacher_scope_2026_10_18');
+  end if;
+end $$;
+
+-- هل يستطيع الحساب الحالي قراءة هذا المقرر؟ المعلم وحده مقيّد بما أُسند له (الجاهز فقط)؛ غيره كما كان.
+create or replace function public._course_ok(p_course bigint) returns boolean
+language sql stable security definer set search_path = public, pg_temp as $$
+  select case when (select role from public.profiles where user_id = auth.uid()) = 'viewer'
+    then exists (select 1 from public.teacher_courses t join public.courses c on c.id = t.course_id
+                 where t.teacher_id = auth.uid() and t.course_id = p_course and c.status = 'ready')
+    else true end
+$$;
+create or replace function public._require_course(p_course bigint) returns void
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  if public.my_role() = 'viewer' and (p_course is null or not public._course_ok(p_course)) then
+    raise exception 'هذا المقرر غير متاح لحسابك' using errcode = '42501';
+  end if;
+end $$;
+-- المقرر الافتراضي لكل حساب: أول مقرر متاح له (الجاهز أولًا)؛ لا شيء إن لم يُسند له مقرر
+create or replace function public._default_course() returns bigint
+language sql stable security definer set search_path = public, pg_temp as $$
+  select c.id from public.courses c where public._course_ok(c.id) order by (c.status = 'ready') desc, c.sort_order, c.id limit 1
+$$;
+-- مقرر الصف/الهدف/السؤال (للسياسات)
+create or replace function public._course_of_lesson(p_lesson bigint) returns bigint
+language sql stable security definer set search_path = public, pg_temp as $$
+  select c.course_id from public.lessons l join public.chapters c on c.id = l.chapter_id where l.id = p_lesson
+$$;
+create or replace function public._course_of_objective(p_obj bigint) returns bigint
+language sql stable security definer set search_path = public, pg_temp as $$
+  select c.course_id from public.objectives o join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where o.id = p_obj
+$$;
+create or replace function public._course_of_question(p_q bigint) returns bigint
+language sql stable security definer set search_path = public, pg_temp as $$
+  select c.course_id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
+    join public.chapters c on c.id = l.chapter_id where q.id = p_q
+$$;
+-- الطلاب الذين يراهم الحساب الحالي: المعلم طلابه المسندون فقط، وغيره من الطاقم كل الطلاب
+create or replace function public._visible_student(p_student uuid) returns boolean
+language sql stable security definer set search_path = public, pg_temp as $$
+  select case when (select role from public.profiles where user_id = auth.uid()) = 'viewer'
+    then exists (select 1 from public.teacher_students ts where ts.teacher_id = auth.uid() and ts.student_id = p_student)
+    else true end
+$$;
+
+-- سياسات القراءة المباشرة للجداول: تُقيَّد بالمقررات المتاحة للحساب
+drop policy if exists courses_read on public.courses;
+create policy courses_read on public.courses for select to authenticated
+  using (public.is_member() and public._course_ok(id));
+drop policy if exists chapters_read on public.chapters;
+create policy chapters_read on public.chapters for select to authenticated using (public.is_member() and public._course_ok(course_id));
+drop policy if exists lessons_read on public.lessons;
+create policy lessons_read on public.lessons for select to authenticated using (public.is_member() and public._course_ok(public._course_of_lesson(id)));
+drop policy if exists objectives_read on public.objectives;
+create policy objectives_read on public.objectives for select to authenticated using (public.is_member() and public._course_ok(public._course_of_lesson(lesson_id)));
+drop policy if exists supplements_read on public.supplements;
+create policy supplements_read on public.supplements for select to authenticated using (public.is_member() and public._course_ok(public._course_of_objective(objective_id)));
+drop policy if exists questions_read on public.questions;
+create policy questions_read on public.questions for select to authenticated
+  using (public.is_member() and (not excluded or public.is_reviewer()) and public._course_ok(public._course_of_objective(objective_id)));
+drop policy if exists answers_read on public.question_answers;
+create policy answers_read on public.question_answers for select to authenticated using (public.is_member() and public._course_ok(public._course_of_question(question_id)));
+
+-- المقررات في الصفحة الأولى: المعلم يرى مقرراته المسندة فقط، وأعداد طلابه هو
+create or replace function public.get_courses() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_member();
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'code', c.code, 'title', c.title, 'grade', c.grade, 'term', c.term,
+      'status', c.status, 'eta', c.eta, 'sortOrder', c.sort_order,
+      'chapters', (select count(*) from chapters ch where ch.course_id = c.id),
+      'objectives', (select count(*) from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id where ch.course_id = c.id),
+      'questions', (select count(*) from questions q join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
+                    where ch.course_id = c.id and not q.excluded),
+      'approved', (select count(*) from questions q join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
+                    where ch.course_id = c.id and not q.excluded and q.status = 'approved'),
+      'students', (select count(*) from course_enrollments e join profiles p on p.user_id = e.user_id
+                    where e.course_id = c.id and p.role = 'student' and public._visible_student(e.user_id)))
+    order by c.sort_order, c.id), '[]')
+    from courses c where public._course_ok(c.id));
+end $$;
+
+create or replace function public.get_stats(p_course bigint default null) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_course bigint := coalesce(p_course, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  return public._stats_data(v_course);
+end $$;
+
+create or replace function public.get_chapters(p_course bigint default null) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_course bigint := coalesce(p_course, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  return public._chapters_data(v_course);
+end $$;
+
+create or replace function public.get_chapter(p_number int, p_course bigint default null) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare c public.chapters; v_course bigint := coalesce(p_course, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  select * into c from chapters where number = p_number and course_id = v_course;
+  if not found then raise exception 'الفصل غير موجود' using errcode = 'P0002'; end if;
+  return to_jsonb(c) || jsonb_build_object('lessons', (select coalesce(jsonb_agg(to_jsonb(l) || jsonb_build_object('objectives',
+    (select coalesce(jsonb_agg(public._objective_json(o) || jsonb_build_object(
+        'mcq', (select count(*) from questions q where q.objective_id = o.id and q.type = 'mcq' and not q.excluded),
+        'essay', (select count(*) from questions q where q.objective_id = o.id and q.type = 'essay' and not q.excluded)) order by o.number), '[]')
+     from objectives o where o.lesson_id = l.id)) order by l.number), '[]') from lessons l where l.chapter_id = c.id));
+end $$;
+
+create or replace function public.get_objective(p_code text) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+-- المعلم لا يرى الإجابات في صفحة الهدف؛ يصله مفتاح الإجابة مع الاختبار الذي ينشئه (get_exam_answers)
+declare o public.objectives; l public.lessons; c public.chapters; s public.supplements;
+  v_ans boolean := public.is_member() and coalesce(public.my_role(), '') <> 'viewer'; v_rev boolean := public.is_reviewer();
+begin
+  perform public._require_member();
+  select * into o from objectives where code = p_code;
+  if not found then raise exception 'الهدف غير موجود' using errcode = 'P0002'; end if;
+  select * into l from lessons where id = o.lesson_id;
+  select * into c from chapters where id = l.chapter_id;
+  if not public._course_ok(c.course_id) then raise exception 'الهدف غير موجود' using errcode = 'P0002'; end if;
+  select * into s from supplements where objective_id = o.id;
+  return jsonb_build_object(
+    'objective', public._objective_json(o) || jsonb_build_object('lesson', jsonb_build_object('number', l.number, 'title', l.title),
+       'chapter', jsonb_build_object('number', c.number, 'title', c.title), 'courseId', c.course_id),
+    'supplement', case when s.objective_id is null then null else jsonb_build_object('memoBasis', s.memo_basis, 'supplement', s.supplement,
+       'keyPoints', s.key_points, 'misconceptions', s.misconceptions, 'scientificNotes', s.scientific_notes,
+       'confidence', s.confidence, 'origin', s.origin, 'reviewStatus', s.review_status) end,
+    'questions', (select coalesce(jsonb_agg(public._q_public(q, a, v_ans) order by q.type desc, q.number), '[]')
+       from questions q left join question_answers a on a.question_id = q.id where q.objective_id = o.id and (v_rev or not q.excluded)),
+    'lessonNav', (select jsonb_agg(code order by number) from objectives where lesson_id = o.lesson_id),
+    'answersIncluded', v_ans);
+end $$;
+
+create or replace function public.get_bank(f jsonb default '{}') returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_ans boolean := public.is_member() and not public._restricted(); v_rev boolean := public.is_reviewer();
+  v_course bigint := coalesce((f->>'course')::bigint, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  -- البنك كاملًا بإجاباته لمالك المشروع والمراجع فقط؛ غيرهما يستلم الأسئلة دون إجابات
+  return (select coalesce(jsonb_agg(public._q_public(q, a, v_ans) || jsonb_build_object('objectiveCode', o.code,
+      'objectiveText', coalesce(o.approved_text, o.original_text),
+      'lesson', jsonb_build_object('number', l.number, 'title', l.title),
+      'chapter', jsonb_build_object('number', c.number, 'title', c.title))
+      order by c.number, l.number, o.number, q.type desc, q.number), '[]')
+    from questions q left join question_answers a on a.question_id = q.id
+      join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id join chapters c on c.id = l.chapter_id
+    where c.course_id = v_course
+      and (f->>'chapter' is null or c.number = (f->>'chapter')::int)
+      and (f->>'lesson' is null or l.number = (f->>'lesson')::int)
+      and (f->>'objective' is null or o.code = f->>'objective')
+      and (f->>'type' is null or q.type = f->>'type')
+      and (f->>'level' is null or q.thinking_level = f->>'level')
+      and (f->>'difficulty' is null or q.difficulty = f->>'difficulty')
+      and (f->>'status' is null or q.status = f->>'status')
+      and (f->>'q' is null or position(f->>'q' in q.stem) > 0 or position(f->>'q' in coalesce(q.options::text, '')) > 0)
+      and (not q.excluded or (v_rev and f->>'excluded' = '1')));
+end $$;
+
+create or replace function public.get_exam_answers(p_ids bigint[]) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_ids bigint[];
+begin
+  perform public._require_member();
+  if public.my_role() = 'principal' then raise exception 'منشئ الاختبارات غير متاح لهذا الحساب' using errcode = '42501'; end if;
+  select coalesce(array_agg(distinct x), '{}') into v_ids from unnest(p_ids) x;
+  if cardinality(v_ids) > 100 then raise exception 'الاختبار الواحد 100 سؤال كحد أقصى'; end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', q.id, 'correctIndex', a.correct_index, 'explanation', a.explanation,
+      'distractorNotes', coalesce(a.distractor_notes, '[]'), 'modelAnswer', a.model_answer, 'answerElements', coalesce(a.answer_elements, '[]'),
+      'solutionSteps', coalesce(a.solution_steps, '[]'), 'marks', coalesce(a.marks, '[]'), 'rubric', coalesce(a.rubric, '[]'),
+      'commonErrors', coalesce(a.common_errors, '[]'))), '[]')
+    from questions q join question_answers a on a.question_id = q.id
+    where q.id = any(v_ids) and not q.excluded and public._course_ok(public._course_of_objective(q.objective_id)));
+end $$;
+
+create or replace function public.check_answer(p_question bigint, p_choice int) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare r record;
+begin
+  perform public._require_member();
+  if p_choice is null or p_choice < 0 or p_choice > 3 then raise exception 'اختيار غير صالح'; end if;
+  select q.id, a.correct_index, a.explanation, a.distractor_notes into r
+    from public.questions q join public.question_answers a on a.question_id = q.id
+    where q.id = p_question and q.type = 'mcq' and not q.excluded and p_choice < jsonb_array_length(q.options)
+      and public._course_ok(public._course_of_objective(q.objective_id));
+  if not found then raise exception 'السؤال غير موجود أو الاختيار غير صالح'; end if;
+  return jsonb_build_object('correct', p_choice = r.correct_index, 'correctIndex', r.correct_index,
+    'explanation', r.explanation, 'distractorNote', nullif(r.distractor_notes->>p_choice, ''));
+end $$;
+
+-- تقدم الطلاب: المعلم يرى طلابه المسندين فقط وعلى مقرر متاح له
+create or replace function public.teacher_progress(p_section text default null, p_course bigint default null) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_course bigint := coalesce(p_course, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  if public.my_role() not in ('admin', 'viewer', 'reviewer') then raise exception 'تقدم الطلاب بالأسماء للمعلم ومالك المشروع؛ المؤشرات العامة في «لوحة المؤشرات»' using errcode = '42501'; end if;
+  -- طلاب المقرر المختار، وإجاباتهم على أسئلة هذا المقرر فقط
+  return (with en as (select e.user_id from course_enrollments e where e.course_id = v_course and public._visible_student(e.user_id)),
+    cq as (select q.id, q.objective_id from questions q join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id
+           join chapters c on c.id = l.chapter_id where c.course_id = v_course),
+    ans as (select ps.user_id, ps.id session_id, ps.created_at, a.question_id, a.correct, cq.objective_id
+            from practice_sessions ps join practice_answers a on a.session_id = ps.id join cq on cq.id = a.question_id)
+  select jsonb_build_object(
+    'sections', (select coalesce(jsonb_agg(distinct p.section), '[]') from profiles p join en on en.user_id = p.user_id where p.role = 'student' and p.section is not null),
+    'students', (with st as (
+        select user_id, count(distinct session_id) sessions, count(*) answered, count(*) filter (where correct) correct, max(created_at) last_active
+        from ans group by user_id)
+      select coalesce(jsonb_agg(jsonb_build_object('name', pr.display_name, 'username', split_part(u.email, '@', 1), 'section', pr.section, 'grade', pr.grade,
+        'sessions', coalesce(st.sessions, 0), 'answered', coalesce(st.answered, 0), 'correct', coalesce(st.correct, 0), 'lastActive', st.last_active)
+        order by pr.section, pr.display_name), '[]')
+      from profiles pr join en on en.user_id = pr.user_id join auth.users u on u.id = pr.user_id left join st on st.user_id = pr.user_id
+      where pr.role = 'student' and (p_section is null or pr.section = p_section)),
+    -- الأهداف الأضعف في الشعبة (5 إجابات على الأقل لكل هدف) — تكشف المفاهيم البديلة
+    'weakObjectives', (select coalesce(jsonb_agg(jsonb_build_object('code', o.code, 'text', coalesce(o.approved_text, o.original_text), 'lesson', l.title,
+        'n', t.n, 'pct', t.pct) order by t.pct, t.n desc), '[]')
+      from (select ans.objective_id, count(*) n, round(100.0 * count(*) filter (where ans.correct) / count(*)) pct
+            from ans join profiles pr on pr.user_id = ans.user_id join en on en.user_id = ans.user_id
+            where pr.role = 'student' and (p_section is null or pr.section = p_section)
+            group by ans.objective_id having count(*) >= 5 order by 3, 2 desc limit 15) t
+      join objectives o on o.id = t.objective_id join lessons l on l.id = o.lesson_id)));
+end $$;
+
+-- لوحة المؤشرات: مقرر متاح للحساب، وطلاب المعلم المسندون فقط في الأرقام
+create or replace function public.get_dashboard(p_course bigint default null) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_now timestamptz := now(); v_course bigint := coalesce(p_course, public._default_course());
+begin
+  perform public._require_member();
+  perform public._require_course(v_course);
+  -- كل الأرقام للمقرر المختار: طلابه المسندون، وإجاباتهم على أسئلته
+  return (with cq as (select q.id, q.thinking_level, l.chapter_id from questions q join objectives o on o.id = q.objective_id
+              join lessons l on l.id = o.lesson_id join chapters c on c.id = l.chapter_id where c.course_id = v_course),
+    stu as (select p.* from profiles p join course_enrollments e on e.user_id = p.user_id and e.course_id = v_course where p.role = 'student' and public._visible_student(p.user_id)),
+    ans as (select s.user_id, s.id session_id, s.created_at, a.answered_at, a.correct, cq.thinking_level, cq.chapter_id
+            from practice_answers a join practice_sessions s on s.id = a.session_id join cq on cq.id = a.question_id
+            where s.user_id in (select user_id from stu))
+  select jsonb_build_object(
+    'generatedAt', v_now,
+    'bank', public._stats_data(v_course),
+    'questionLevels', (select coalesce(jsonb_agg(jsonb_build_object('group', g, 'n', n)), '[]') from
+       (select public._level_group(q.thinking_level) g, count(*) n from questions q join cq on cq.id = q.id where not q.excluded group by 1) t),
+    'students', (select jsonb_build_object('n', count(*), 'confirmed', count(*) filter (where profile_confirmed),
+       'active', count(*) filter (where exists (select 1 from ans where ans.user_id = stu.user_id)),
+       'active7', count(*) filter (where exists (select 1 from ans where ans.user_id = stu.user_id and ans.answered_at > v_now - interval '7 days')))
+       from stu),
+    'practice', (select jsonb_build_object('sessions', count(distinct session_id), 'answers', count(*), 'correct', count(*) filter (where correct),
+       'answers7', count(*) filter (where answered_at > v_now - interval '7 days')) from ans),
+    'bySection', (select coalesce(jsonb_agg(jsonb_build_object('section', t.section, 'students', t.students, 'active', t.active,
+         'active7', t.active7, 'answers', t.answers, 'correct', t.correct) order by t.section), '[]') from (
+       select coalesce(stu.section, 'بدون شعبة') section, count(distinct stu.user_id) students,
+         count(distinct ans.user_id) active,
+         count(distinct ans.user_id) filter (where ans.answered_at > v_now - interval '7 days') active7,
+         count(ans.user_id) answers, count(ans.user_id) filter (where ans.correct) correct
+       from stu left join ans on ans.user_id = stu.user_id group by 1) t),
+    -- آخر 8 أسابيع (بتوقيت الرياض): عدد الإجابات والطلاب النشطين
+    'weekly', (select coalesce(jsonb_agg(jsonb_build_object('week', to_char(w.wk, 'YYYY-MM-DD'), 'answers', coalesce(x.answers, 0),
+         'students', coalesce(x.students, 0), 'correct', coalesce(x.correct, 0)) order by w.wk), '[]')
+       from generate_series(date_trunc('week', (v_now at time zone 'Asia/Riyadh')) - interval '7 weeks',
+                            date_trunc('week', (v_now at time zone 'Asia/Riyadh')), interval '1 week') w(wk)
+       left join (select date_trunc('week', answered_at at time zone 'Asia/Riyadh') wk, count(*) answers,
+                    count(*) filter (where correct) correct, count(distinct user_id) students
+                  from ans where answered_at > v_now - interval '9 weeks' group by 1) x on x.wk = w.wk),
+    'byChapter', (select coalesce(jsonb_agg(jsonb_build_object('number', c.number, 'title', c.title, 'answers', coalesce(x.n, 0), 'correct', coalesce(x.c, 0)) order by c.number), '[]')
+       from chapters c left join (select chapter_id, count(*) n, count(*) filter (where correct) c from ans group by chapter_id) x on x.chapter_id = c.id
+       where c.course_id = v_course),
+    'byGroup', (select coalesce(jsonb_agg(jsonb_build_object('group', g, 'answers', n, 'correct', c)), '[]') from
+       (select public._level_group(thinking_level) g, count(*) n, count(*) filter (where correct) c from ans group by 1) t),
+    'notes', case when public.is_reviewer() then (select jsonb_build_object('open', count(*) filter (where n.resolved_at is null), 'n', count(*))
+       from review_notes n join objectives o on o.id = n.objective_id join lessons l on l.id = o.lesson_id join chapters c on c.id = l.chapter_id
+       where c.course_id = v_course) end
+  ));
+end $$;
+
+-- ---------- إسناد المقررات والطلاب للمعلم (لمالك المشروع) ----------
+create or replace function public.admin_list_staff() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', pr.user_id, 'username', split_part(u.email, '@', 1), 'name', pr.display_name,
+      'role', pr.role, 'createdAt', pr.created_at, 'lastSignIn', u.last_sign_in_at, 'self', pr.user_id = auth.uid(),
+      'assignedCourses', case when pr.role = 'viewer' then (select count(*) from teacher_courses t where t.teacher_id = pr.user_id) end,
+      'assignedStudents', case when pr.role = 'viewer' then (select count(*) from teacher_students t where t.teacher_id = pr.user_id) end)
+      order by case pr.role when 'admin' then 0 when 'reviewer' then 1 when 'supervisor' then 2 when 'principal' then 3 when 'viewer' then 4 else 5 end, pr.display_name), '[]')
+    from profiles pr join auth.users u on u.id = pr.user_id
+    where pr.role in ('admin', 'reviewer', 'viewer', 'supervisor', 'principal') or (pr.role = 'pending' and (pr.staff or not pr.managed)));
+end $$;
+
+create or replace function public.admin_get_teacher(p_id uuid) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_admin();
+  if not exists (select 1 from profiles where user_id = p_id and role = 'viewer') then raise exception 'الحساب ليس حساب معلم'; end if;
+  return jsonb_build_object(
+    'courses', (select coalesce(jsonb_agg(course_id order by course_id), '[]') from teacher_courses where teacher_id = p_id),
+    'students', (select coalesce(jsonb_agg(student_id), '[]') from teacher_students where teacher_id = p_id));
+end $$;
+
+-- يستبدل إسناد المعلم كاملًا: المقررات والطلاب. الطلاب المسندون حسابات طلاب مُدارة فقط.
+create or replace function public.admin_set_teacher(p_id uuid, p_courses bigint[], p_students uuid[]) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_c int; v_s int;
+begin
+  perform public._require_admin();
+  if not exists (select 1 from profiles where user_id = p_id and role = 'viewer') then raise exception 'الحساب ليس حساب معلم'; end if;
+  p_courses := coalesce(p_courses, '{}'); p_students := coalesce(p_students, '{}');
+  if cardinality(p_students) > 2000 then raise exception 'عدد الطلاب كبير'; end if;
+  delete from teacher_courses where teacher_id = p_id;
+  insert into teacher_courses (teacher_id, course_id) select p_id, c.id from courses c where c.id = any(p_courses);
+  get diagnostics v_c = row_count;
+  delete from teacher_students where teacher_id = p_id;
+  insert into teacher_students (teacher_id, student_id)
+    select p_id, p.user_id from profiles p where p.user_id = any(p_students) and p.role = 'student' and p.managed and not p.staff;
+  get diagnostics v_s = row_count;
+  return jsonb_build_object('courses', v_c, 'students', v_s);
+end $$;
+
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.admin_get_teacher(uuid), public.admin_set_teacher(uuid, bigint[], uuid[]), public.admin_list_staff() to authenticated;
+-- سياسات RLS تستدعي هذه الدوال بدور المستخدم: تُمنح للمستخدم المسجل (تكشف له فقط أن المقرر متاح أم لا ورقم مقرر السؤال)
+grant execute on function public._course_ok(bigint), public._course_of_lesson(bigint), public._course_of_objective(bigint), public._course_of_question(bigint) to authenticated;
+-- الدوال الداخلية الأخرى لا تُستدعى من الواجهة
+revoke execute on function public._require_course(bigint), public._default_course(), public._visible_student(uuid) from authenticated;

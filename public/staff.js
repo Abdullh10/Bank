@@ -19,7 +19,7 @@ export async function pageTeacherProgress(ctx, section = '') {
         ${d.students.map(s => `<tr><td>${esc(s.name)} <span class="small muted ltr">${esc(s.username)}</span></td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td>
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
           <td class="ltr small">${s.lastActive ? esc(new Date(s.lastActive).toLocaleDateString('ar-SA-u-nu-latn')) : '—'}</td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="empty">لا يوجد طلاب بعد.</div>'}
+      </tbody></table></div>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
     </section>
     <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
@@ -349,11 +349,11 @@ export async function pageAdminTeam(ctx) {
       <div class="table-wrap"><table class="list"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>آخر دخول</th><th></th></tr></thead><tbody>
       ${all.map(u => (u.role === 'admin' || u.self) ? `<tr><td>${esc(u.name)}</td><td class="ltr">${esc(u.username)}</td><td>${esc(ROLE_NAMES[u.role])}</td><td class="small">${fmt(u.lastSignIn)}</td><td class="small muted">${u.self ? 'حسابك' : ''}</td></tr>`
         : `<tr data-id="${u.id}" data-user="${esc(u.username)}">
-          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم"></td>
+          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم">${u.role === 'viewer' ? `<div class="small muted tm-sum">${u.assignedCourses || 0} مقرر · ${u.assignedStudents || 0} طالب مسند</div>` : ''}</td>
           <td><input class="tm-u ltr" value="${esc(u.username)}" aria-label="اسم المستخدم" style="max-width:10rem"></td>
           <td><select class="tm-r" aria-label="الدور">${roleOpts(u.role)}</select></td>
           <td class="small">${fmt(u.lastSignIn)}</td>
-          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button><button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
+          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button>${u.role === 'viewer' ? '<button type="button" class="tm-assign-btn" aria-expanded="false">الإسناد</button>' : ''}<button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
       </tbody></table></div>
       <p class="small muted">«موقوف» يمنع الحساب من رؤية أي محتوى دون حذفه. لا يمكن منح دور «مالك المشروع» من هنا.</p></section>`;
   const reload = () => pageAdminTeam(ctx).catch(fail);
@@ -377,6 +377,67 @@ export async function pageAdminTeam(ctx) {
         <div class="small">احفظ كلمة المرور الآن؛ لا تظهر مرة أخرى.</div></div>`;
     } catch (err) { fail(err); btn.disabled = false; }
   };
+  // إسناد المعلم: المقررات التي يراها وطلابه الذين يتابع تقدمهم (يستبدل الإسناد السابق كاملًا)
+  async function openAssign(tr, id, btn) {
+    const next = tr.nextElementSibling;
+    if (next?.classList.contains('tm-assign')) { next.remove(); btn.setAttribute('aria-expanded', 'false'); return; }
+    btn.disabled = true;
+    let cur, courses, students;
+    try { [cur, courses, students] = await Promise.all([api('/admin/team/teacher?id=' + encodeURIComponent(id)), api('/courses'), api('/admin/students')]); }
+    finally { btn.disabled = false; }
+    students = students.filter(x => x.role === 'student');
+    const selC = new Set(cur.courses), selS = new Set(cur.students);
+    const grades = [...new Set(students.map(x => x.grade).filter(Boolean))].sort(), sections = [...new Set(students.map(x => x.section).filter(Boolean))].sort();
+    const row = document.createElement('tr'); row.className = 'tm-assign';
+    row.innerHTML = `<td colspan="5"><div class="tm-assign-box">
+      <h3>إسناد «${esc(tr.querySelector('.tm-n').value)}»</h3>
+      <fieldset class="tm-courses"><legend>المقررات التي يراها المعلم</legend>
+        ${courses.map(c => `<label class="tm-chk"><input type="checkbox" class="tm-c" value="${c.id}" ${selC.has(c.id) ? 'checked' : ''}> ${esc(c.code)}${c.status === 'ready' ? '' : ' <span class="small muted">(قيد الإعداد: لا يظهر له حتى يصير متاحًا)</span>'}</label>`).join('')}
+      </fieldset>
+      <fieldset class="tm-studs"><legend>الطلاب الذين يتابع تقدمهم (<span class="tm-count">0</span> مسندًا)</legend>
+        <div class="as-filters">
+          <select class="tm-fg" aria-label="الصف"><option value="">كل الصفوف</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select>
+          <select class="tm-fs" aria-label="الشعبة"><option value="">كل الشعب</option>${sections.map(g => `<option>${esc(g)}</option>`).join('')}</select>
+          <select class="tm-fc" aria-label="المقرر"><option value="">كل المقررات</option>${courses.map(c => `<option value="${c.id}">${esc(c.code)}</option>`).join('')}</select>
+          <input class="tm-fq" type="search" placeholder="بحث بالاسم أو اسم المستخدم" aria-label="بحث">
+          <button type="button" class="tm-all">تحديد المعروض</button><button type="button" class="tm-none">إلغاء تحديد المعروض</button></div>
+        <div class="tm-pick" role="group" aria-label="الطلاب"></div>
+      </fieldset>
+      <div class="actions"><button type="button" class="primary tm-asave">حفظ الإسناد</button><button type="button" class="tm-acancel">إغلاق</button></div>
+      <p class="small muted">المعلم يرى مقرراته الجاهزة فقط، وتقدم طلابه المسندين له على تلك المقررات فقط. التغيير يسري عند دخوله التالي.</p></div></td>`;
+    tr.after(row); btn.setAttribute('aria-expanded', 'true');
+    const $ = q => row.querySelector(q);
+    const shown = () => {
+      const g = $('.tm-fg').value, sec = $('.tm-fs').value, c = Number($('.tm-fc').value) || 0, q = $('.tm-fq').value.trim().toLowerCase();
+      return students.filter(x => (!g || x.grade === g) && (!sec || x.section === sec) && (!c || (x.courses || []).includes(c))
+        && (!q || x.name.toLowerCase().includes(q) || x.username.toLowerCase().includes(q)));
+    };
+    const draw = () => {
+      const list = shown();
+      $('.tm-pick').innerHTML = list.length ? list.map(x => `<label class="tm-chk"><input type="checkbox" class="tm-s" value="${x.id}" ${selS.has(x.id) ? 'checked' : ''}>
+        ${esc(x.name)} <span class="small muted">${esc([x.grade, x.section].filter(Boolean).join(' · '))}</span> <span class="small muted ltr">${esc(x.username)}</span></label>`).join('')
+        : '<div class="empty">لا يوجد طلاب مطابقون.</div>';
+      $('.tm-count').textContent = selS.size;
+    };
+    row.addEventListener('change', e => {
+      if (e.target.classList.contains('tm-s')) { e.target.checked ? selS.add(e.target.value) : selS.delete(e.target.value); $('.tm-count').textContent = selS.size; }
+      else if (e.target.classList.contains('tm-c')) { const v = Number(e.target.value); e.target.checked ? selC.add(v) : selC.delete(v); }
+      else if (e.target.matches('.tm-fg, .tm-fs, .tm-fc')) draw();
+    });
+    $('.tm-fq').oninput = draw;
+    $('.tm-all').onclick = () => { shown().forEach(x => selS.add(x.id)); draw(); };
+    $('.tm-none').onclick = () => { shown().forEach(x => selS.delete(x.id)); draw(); };
+    $('.tm-acancel').onclick = () => { row.remove(); btn.setAttribute('aria-expanded', 'false'); };
+    $('.tm-asave').onclick = async e => {
+      const b = e.currentTarget; if (b.disabled) return; b.disabled = true;
+      try {
+        const r = await api('/admin/team/teacher', { method: 'POST', body: { id, courses: [...selC], students: [...selS] } });
+        tr.querySelector('.tm-sum').textContent = `${r.courses} مقرر · ${r.students} طالب مسند`;
+        toast('تم حفظ الإسناد'); row.remove(); btn.setAttribute('aria-expanded', 'false');
+      } catch (err) { fail(err); b.disabled = false; }
+    };
+    draw();
+  }
   $app.querySelectorAll('tr[data-id]').forEach(tr => {
     const id = tr.dataset.id;
     tr.querySelector('.tm-save').onclick = async e => {
@@ -391,6 +452,7 @@ export async function pageAdminTeam(ctx) {
         toast('تم الحفظ');
       } catch (err) { fail(err); } finally { btn.disabled = false; }
     };
+    tr.querySelector('.tm-assign-btn')?.addEventListener('click', e => openAssign(tr, id, e.currentTarget).catch(fail));
     tr.querySelector('.tm-reset').onclick = async () => {
       const pw = prompt('اكتب كلمة المرور الجديدة (8 أحرف على الأقل)، أو اتركها فارغة لتوليدها تلقائيًا:', '');
       if (pw === null) return;
