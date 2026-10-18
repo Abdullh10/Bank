@@ -409,6 +409,20 @@ export async function pageExam(ctx) {
     const cs = getComputedStyle(paper);
     return (paper.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) / PAGE_PX;
   };
+  // سطر واحد: يصغّر الخط تدريجيًا حتى يتسع النص في عرضه (لا يقل عن min نقطة). يعيد true إن اتسع.
+  const fitLine = (el, min = 8) => {
+    el.style.fontSize = ''; el.style.whiteSpace = 'nowrap';
+    if (!el.clientWidth) return true; // مخفي (نسخة غير مطبوعة الآن)
+    let px = parseFloat(getComputedStyle(el).fontSize); const floor = (min * 96) / 72;
+    while (el.scrollWidth > el.clientWidth + 0.5 && px > floor) { px -= 0.5; el.style.fontSize = px + 'px'; }
+    return el.scrollWidth <= el.clientWidth + 0.5;
+  };
+  // الترويسة وتعليمات الاختبار في سطر واحد قدر الإمكان (بدل ترحيل «اختبار الفصل الدراسي الأول» إلى سطر ثانٍ وترك فراغ فوق «المملكة العربية السعودية»)
+  const fitLines = papers => papers.forEach(p => {
+    p.querySelectorAll('.ph-right > div, .ph-left > div').forEach(el => fitLine(el, 8));
+    const ins = p.querySelector('.paper-instr');
+    if (ins && !fitLine(ins, 9)) { ins.style.whiteSpace = ''; ins.style.fontSize = '10pt'; }
+  });
   const fitPapers = async out => {
     if (document.fonts?.ready) await document.fonts.ready.catch(() => {});
     const papers = [...out.querySelectorAll('.paper')];
@@ -423,6 +437,7 @@ export async function pageExam(ctx) {
       level = fit ? fit.lv : tries.reduce((a, b) => (b.pages < a.pages ? b : a)).lv;
     }
     setLevel(level);
+    fitLines(papers);
     const n = Math.max(1, Math.ceil(maxPages()));
     const st = $app.querySelector('#x-status');
     if (st && !st.textContent.includes('الطباعة:')) st.textContent += ` · الطباعة: ${n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتان' : n + ' صفحات'} لكل نموذج${level ? ' (تنسيق مضغوط)' : ''}`;

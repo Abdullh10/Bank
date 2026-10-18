@@ -13,6 +13,7 @@ const b = await chromium.launch(); const res = []; const errs = [];
 const ok = (n, v) => res.push((v ? 'PASS ' : 'FAIL ') + n);
 for (const vp of [{ width: 1280, height: 1100 }, { width: 390, height: 844 }]) {
   const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message));
+  await p.addInitScript(() => { window.__ITQAN_NO_BIDI = true; }); // عزل الاتجاه يضيف علامات غير مرئية والاختبار يقارن النص حرفيًا
   await login(p); await p.goto(BASE + '/#/exam'); await p.waitForSelector('#x-build');
   await p.selectOption('[data-hsel="title"]', 'اختبار منتصف الفصل الدراسي');
   await p.selectOption('[data-hsel="duration"]', 'ساعة ونصف');
