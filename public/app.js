@@ -968,10 +968,6 @@ async function route() {
   try {
     await ensureCourses();
     if (seq !== routeSeq) return;
-    if (!state.course && state.supabase && page !== 'login') {
-      $app.innerHTML = `<div class="empty"><h2>لا يوجد مقرر مسند لحسابك بعد</h2><p>يسند مالك المشروع المقررات والطلاب للمعلم من «حسابات الفريق»؛ تواصل معه ثم أعد فتح الصفحة.</p></div>`;
-      return;
-    }
     if (!page) pageCourses({ esc, $app, courses: state.courses, current: state.course, isOwner: can('edit'), select: setCourse });
     else if (page === 'course') await pageHome();
     else if (page === 'chapters') await pageChapters();

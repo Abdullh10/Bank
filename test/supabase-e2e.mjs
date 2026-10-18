@@ -43,8 +43,6 @@ const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 await pool.query(`insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111','rev@x.com'),('22222222-2222-2222-2222-222222222222','view@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='reviewer', display_name='عبدالله حمدي' where email='rev@x.com'`);
 await pool.query(`update public.profiles set role='viewer' where email='view@chem21.local'`);
-await pool.query(`delete from public.teacher_courses; delete from public.teacher_students`);
-await pool.query(`insert into public.teacher_courses (teacher_id, course_id) select user_id, 1 from public.profiles where email='view@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
 await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local' or email like 'bulk_@chem21.local'`);
@@ -165,7 +163,7 @@ await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('bu
 await p.waitForSelector('.course-card');
 ok('viewer: header visible after login', await p.locator('.topbar').isVisible());
 const courseCards = await p.$$eval('.course-card', cs => cs.map(c => c.querySelector('h2').textContent + ':' + (c.classList.contains('preparing') ? 'p' : 'r') + ':' + (c.querySelector('[data-course]') ? 'open' : 'locked')));
-ok('courses: scoped teacher sees only the assigned ready course (2-1)', JSON.stringify(courseCards) === JSON.stringify(['كيمياء 2-1:r:open']), JSON.stringify(courseCards));
+ok('courses: 4 cards in order, only 2-1 ready, preparing locked for teacher', JSON.stringify(courseCards) === JSON.stringify(['كيمياء 1:p:locked', 'كيمياء 2-1:r:open', 'كيمياء 2-2:p:locked', 'كيمياء 3:p:locked']), JSON.stringify(courseCards));
 ok('courses: header line shows chosen course', (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-1 · الصف الثاني الثانوي · الفصل الدراسي الأول'));
 await p.screenshot({ path: `${OUT}/courses.png`, fullPage: true });
 await p.locator('.course-card [data-course="1"]').first().click();
@@ -195,12 +193,6 @@ ok('viewer: bank page unavailable', (await p.locator('main').innerText()).includ
 const vBank = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST',
   headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('viewer: database returns the bank without answers', vBank.data?.length === 2580 && !vBank.data.some(q => 'correctIndex' in q || 'modelAnswer' in q));
-{ const call = (fn, body) => p.evaluate(async ([fn, body]) => (await fetch(location.origin + '/mock/rpc/' + fn, { method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify(body) })).json(), [fn, body]);
-  const [c4, b4, o4, s4] = [await call('get_chapters', { p_course: 4 }), await call('get_bank', { f: { course: 4 } }), await call('get_objective', { p_code: 'K3-C1-L1-O01' }), await call('get_stats', { p_course: 4 })];
-  ok('scoped teacher: database refuses other courses (chapters, bank, objective, stats)', [c4, b4, s4].every(r => r.error && /غير متاح/.test(r.error.message)) && !!o4.error, JSON.stringify([c4.error?.code, b4.error?.code, o4.error?.code, s4.error?.code]));
-  const crs = await call('get_courses', {});
-  ok('scoped teacher: get_courses lists only the assigned course', crs.data?.length === 1 && crs.data[0].id === 1, JSON.stringify(crs.data?.map(c => c.id))); }
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
 await p.click('#x-build'); await p.waitForSelector('.paper');
 { const opts = await p.$$eval('#x-setup select, select', ss => ss.flatMap(s => [...s.options].map(o => o.textContent)));
@@ -422,24 +414,10 @@ await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
 await p.waitForTimeout(500);
 ok('student: history lists sessions', (await p.locator('main').innerText()).includes('آخر الجلسات') && (await p.locator('main tbody tr').count()) >= 1);
 await p.click('#logout'); await p.waitForSelector('#l-user');
-// مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
-await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
-await p.goto(BASE + '#/team'); await p.waitForSelector('tr[data-user="view"] .tm-assign-btn');
-ok('team: teacher row shows assignment summary', (await p.locator('tr[data-user="view"] .tm-sum').innerText()).includes('1 مقرر · 0 طالب'));
-await p.locator('tr[data-user="view"] .tm-assign-btn').click(); await p.waitForSelector('.tm-assign .tm-pick .tm-chk');
-ok('team: assign panel lists courses (2-1 checked) and students unchecked', (await p.locator('.tm-assign .tm-c:checked').count()) === 1 && (await p.locator('.tm-assign .tm-s').count()) >= 2 && (await p.locator('.tm-assign .tm-s:checked').count()) === 0);
-await p.fill('.tm-assign .tm-fq', 'ثان تجريبي');
-ok('team: student search narrows the list', (await p.locator('.tm-assign .tm-s').count()) === 1);
-await p.click('.tm-assign .tm-all');
-ok('team: select shown sets the counter', (await p.locator('.tm-assign .tm-count').innerText()).trim() === '1');
-await p.screenshot({ path: `${OUT}/team-assign.png`, fullPage: true });
-await p.click('.tm-asave'); await p.waitForSelector('.tm-assign', { state: 'detached' });
-ok('team: assignment saved and summary updated', (await p.locator('tr[data-user="view"] .tm-sum').innerText()).includes('1 مقرر · 1 طالب'));
-await p.click('#logout'); await p.waitForSelector('#l-user');
 // المعلم يرى التقدم
 await p.fill('#l-user', 'view'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
-ok('teacher: progress lists only the assigned student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي') && !(await p.locator('main').innerText()).includes('طالب أول تجريبي'));
+ok('teacher: progress lists student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي'));
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
 // مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
 await p.click('#logout'); await p.waitForSelector('#l-user');
