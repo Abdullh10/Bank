@@ -14,7 +14,14 @@ export async function pageTeacherProgress(ctx, section = '') {
   // جودة التدريب (قراءة فقط): تُحذف الأعمدة بصمت إن لم تتوفر الدالة بعد في قاعدة البيانات
   const quality = Object.fromEntries(((await api('/teacher/quality').catch(() => [])) || []).map(q => [q.username, q]));
   const QUALITY = { serious: ['متدرب جيد', 'ok'], watch: ['يحتاج متابعة', 'warn'], low: ['تدريب قليل', ''] };
-  const qCell = u => { const q = quality[u]; if (!q) return '<td>—</td>'; const [t, k] = QUALITY[q.quality] || ['—', '']; return `<td><span class="badge ${k}">${t}</span> <span class="small muted">${q.score} نقطة</span></td>`; };
+  // من لم يجب عن أي سؤال: «لم يبدأ التدريب»؛ ومن أجاب أقل من 30 إجابة محتسبة: «تدريب قليل»
+  const qCell = st => {
+    const q = quality[st.username];
+    if (!q) return '<td>—</td>';
+    if (!(q.attempts > 0) && !(st.answered > 0)) return '<td><span class="badge">لم يبدأ التدريب</span></td>';
+    const [t, k] = QUALITY[q.quality] || ['—', ''];
+    return `<td><span class="badge ${k}">${t}</span> <span class="small muted">${q.score} نقطة</span></td>`;
+  };
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('progress', 52)}<div><h1>تقدم الطلاب</h1><p class="muted">نتائج التدريب الذاتي (لا تدخل في الدرجات).</p></div></div>
       <div class="actions"><label for="tp-sec" class="small">الشعبة</label>
@@ -23,9 +30,9 @@ export async function pageTeacherProgress(ctx, section = '') {
       ${d.students.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>الجلسات</th><th>الأسئلة</th><th>نسبة الصحة</th><th>جودة التدريب</th><th>آخر نشاط</th></tr></thead><tbody>
         ${d.students.map(s => `<tr><td>${esc(s.name)} <span class="small muted ltr">${esc(s.username)}</span></td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td>
           <td>${s.sessions}</td><td>${s.answered}</td><td>${s.answered ? pct(s.correct, s.answered) + '%' : '—'}</td>
-          ${qCell(s.username)}<td class="small">${esc(hijri(s.lastActive))}</td></tr>`).join('')}
+          ${qCell(s)}<td class="small">${esc(hijri(s.lastActive))}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «متدرب جيد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «تدريب قليل» أقل من 30 إجابة محتسبة بعد.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
+      <p class="small muted">«جودة التدريب» تقرأ سرعة الإجابات وانتظامها: «متدرب جيد» تدريب منتظم بإجابات متأنية، «يحتاج متابعة» إجابات سريعة جدًا أو نسبة قريبة من التخمين (30% فأقل)، «تدريب قليل» أجاب أقل من 30 إجابة محتسبة، و«لم يبدأ التدريب» لم يجب عن أي سؤال بعد.</p>` : `<div class="empty">${ctx.state?.user?.role === 'viewer' ? 'لا يوجد طلاب مسندون لك على هذا المقرر بعد؛ يسندهم لك مالك المشروع.' : 'لا يوجد طلاب بعد.'}</div>`}
     </section>
     <section class="card">${ttl('objectives', 'الأهداف الأضعف')}
       <p class="small muted">أهداف أُجيب عن 5 أسئلة منها على الأقل، مرتبة من الأقل نسبة صحيحة.</p>
