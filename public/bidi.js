@@ -4,16 +4,21 @@
 // في عُقد النص المعروضة فقط؛ لا يُكتب شيء في قاعدة البيانات ولا يتأثر ما يكتبه المستخدم في الحقول.
 const LRI = '⁦', PDI = '⁩';
 // بداية المقطع: حرف لاتيني أو إغريقي أو رقم؛ داخله رموز الصيغ والأس والرمز السفلي والفراغ؛ نهايته حرف أو رقم أو ° أو % أو شحنة أو قوس.
-const IN = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉.,×·()\\[\\]/%°+\\-−=→⇌↔<>≈≥≤±⁺⁻ ';
-const END = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉°%⁺⁻)\\]';
+const IN = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉.,×·÷()\\[\\]/%°+\\-−=→⇌↔←⇒⇐↑↓⇅<>≈≠≡∝≥≤±⁺⁻₊₋₌√^_|½ ';
+const END = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉°%⁺⁻)\\]↑↓⇅|½';
 const START = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉°';
-const RUN = new RegExp(`[${START}][${IN}]*[${END}]|[${START}%]`, 'g');
+// قد يبدأ المقطع الطويل أيضًا بقوس أو جذر أو خط (مثل «(105 ÷ 300)» و«√(4 ÷ 28)» و«[↑↓] 2s»)، لكن المقطع المفرد لا يشمل هذه الرموز.
+const START_LONG = `${START}\\[(√|↑↓⇅½`;
+const RUN = new RegExp(`[${START_LONG}][${IN}]*[${END}]|[${START}%]`, 'g');
 const SKIP = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION', 'SCRIPT', 'STYLE', 'CODE', 'PRE', 'NOSCRIPT']);
 const HAS_RTL = /[֐-ࣿ]/;
+const LATIN = /[A-Za-z0-9\u0370-\u03FF]/, SYMBOL = /[^A-Za-z0-9\u0370-\u03FF\s]|\s\S/;
 
 // نص واحد: يلفّ المقاطع التي تجاور حروفًا عربية فقط (النص اللاتيني الخالص يبقى كما هو).
 export function isolate(text) {
-  if (!text || text.includes(LRI) || !HAS_RTL.test(text)) return text;
+  if (!text || text.includes(LRI)) return text;
+  // عقدة لاتينية خالصة داخل صفحة من اليمين لليسار (مثل خيار «1s [↑↓]  2s [↑]»): يعكس المتصفح ترتيب أجزائها؛ تُعزل كلها وحدة واحدة من اليسار.
+  if (!HAS_RTL.test(text)) return LATIN.test(text) && SYMBOL.test(text) ? text.replace(/^(\s*)([\s\S]*?)(\s*)$/, (_, a, b, c) => a + LRI + b + PDI + c) : text;
   return text.replace(RUN, m => LRI + m + PDI);
 }
 
@@ -22,7 +27,7 @@ function walk(root) {
     acceptNode(n) {
       const p = n.parentElement;
       if (!p || SKIP.has(p.tagName) || p.isContentEditable || p.closest('[dir="ltr"], .ltr, [contenteditable="true"]')) return NodeFilter.FILTER_REJECT;
-      return n.data.includes(LRI) || !HAS_RTL.test(n.data) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+      return n.data.includes(LRI) || !(HAS_RTL.test(n.data) || LATIN.test(n.data)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
     },
   });
   const nodes = [];
