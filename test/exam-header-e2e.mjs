@@ -21,7 +21,7 @@ for (const vp of [{ width: 1280, height: 1100 }, { width: 390, height: 844 }]) {
   ok(`${vp.width} other input shown`, await p.locator('[data-hother="grade"]').isVisible());
   await p.fill('[data-hother="grade"]', 'الثاني الثانوي – علمي');
   await p.click('#h-today');
-  ok(`${vp.width} today preview`, (await p.locator('#h-date-preview').innerText()).includes('1448هـ'));
+  ok(`${vp.width} today preview (year/month/day then هـ)`, /1448\/\d+\/\d+هـ/.test(await p.locator('#h-date-preview').innerText()));
   await p.selectOption('[data-hd="dateFormat"]', 'name');
   const prev = await p.locator('#h-date-preview').innerText();
   ok(`${vp.width} month name preview`, /ربيع|جمادى|محرم|صفر|رجب|شعبان|رمضان|شوال|ذو/.test(prev));

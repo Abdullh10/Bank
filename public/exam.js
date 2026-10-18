@@ -35,7 +35,8 @@ const CHOICES = {
 function dateText(h) {
   const d = h.dateDay ? String(h.dateDay) : '....', m = h.dateMonth ? String(h.dateMonth) : '....';
   if (h.dateFormat === 'name' && h.dateDay && h.dateMonth) return `${h.dateDay} ${HIJRI_MONTHS[h.dateMonth - 1]} ${h.dateYear}`;
-  return `${d}/${m}/${h.dateYear}`;
+  // بالأرقام: السنة/الشهر/اليوم ثم «هـ» (الترتيب المعتمد في المخاطبات الرسمية: 1448/5/7هـ)
+  return `${String(h.dateYear).replace(/\D/g, '') || '....'}/${m}/${d}هـ`;
 }
 
 const DEFAULT_HEADER = {
@@ -48,7 +49,7 @@ const DEFAULT_HEADER = {
   subject: 'الكيمياء 2-1',
   grade: 'الثاني الثانوي',
   duration: 'ساعتان ونصف',
-  date: '..../..../1448هـ',
+  date: `${HIJRI_NOW.y}/..../....هـ`,
   dateDay: '',
   dateMonth: '',
   dateYear: `${HIJRI_NOW.y}هـ`,
