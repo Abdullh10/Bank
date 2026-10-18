@@ -183,8 +183,12 @@ const AI_STATUS_KIND = {
 };
 const COVERAGE_KIND = { 'مغطى': 'ok', 'جزئي': 'warn', 'غير موجود': 'bad' };
 const badge = (text, kind = '') => `<span class="badge ${kind}">${esc(text)}</span>`;
-const objBadge = s => badge(...OBJ_STATUS[s] || [s]);
-const qBadge = s => badge(...Q_STATUS[s] || [s]);
+// المعلم والمشرف والمدير يرون حالتين فقط (قيد الاعتماد / معتمد)؛ تفاصيل سير العمل الداخلي لمالك المشروع والمراجع.
+const EXT_OBJ_STATUS = { pending: ['قيد الاعتماد', ''], approved: ['معتمد', 'ok'], returned: ['قيد الاعتماد', ''] };
+const EXT_Q_STATUS = { generated: ['قيد الاعتماد', 'info'], in_review: ['قيد الاعتماد', 'info'], needs_revision: ['قيد الاعتماد', 'info'], approved: ['معتمد', 'ok'] };
+const internalView = () => can('review') || can('edit');
+const objBadge = s => badge(...(internalView() ? OBJ_STATUS : EXT_OBJ_STATUS)[s] || [s]);
+const qBadge = s => badge(...(internalView() ? Q_STATUS : EXT_Q_STATUS)[s] || [s]);
 
 function bar(value, total, cls = '') {
   return `<div class="bar ${cls}" role="progressbar" aria-valuenow="${pct(value, total)}" aria-valuemin="0" aria-valuemax="100">
@@ -248,7 +252,7 @@ async function pageHome() {
           ${progress('الأسئلة التي روجعت', q.reviewed, q.n)}
           ${progress('الأسئلة المعتمدة', q.approved, q.n, 'ok')}
         </div>
-        <p class="small muted" style="margin-top:.6rem">تُحسب المؤشرات مباشرة من قاعدة البيانات، ولا يدخل في مؤشرات الاعتماد إلا ما اعتمده مراجع بشري.</p>
+        <p class="small muted" style="margin-top:.6rem">تُحسب المؤشرات مباشرة من قاعدة البيانات، ولا يدخل في مؤشرات الاعتماد إلا ما اعتمده ${internalView() ? 'مراجع بشري' : 'مالك المشروع'}.</p>
       </div>
       <div class="card">
         ${ttl('pie', 'التغطية التقويمية')}
@@ -349,16 +353,16 @@ async function pageObjective(code) {
     <section class="card no-print">
       ${ttl('objectives', 'معلومات الهدف')}
       <div class="text-compare">
-        <div class="text-box"><h4>نص الهدف الأصلي (من ملف الأهداف)</h4>${esc(o.originalText)}</div>
+        ${internalView() ? `<div class="text-box"><h4>نص الهدف الأصلي (من ملف الأهداف)</h4>${esc(o.originalText)}</div>
         <div class="text-box"><h4>الصياغة المقترحة (مراجعة آلية — غير معتمدة)</h4>${esc(o.proposedText || '—')}
-          ${o.splitInto.length ? `<div class="small" style="margin-top:.35rem"><strong>أهداف مقترحة بالفصل:</strong>${list(o.splitInto)}</div>` : ''}</div>
-        <div class="text-box"><h4>الصياغة المعتمدة</h4>${o.approvedText ? esc(o.approvedText) : '<span class="muted">لم تُعتمد بعد</span>'}</div>
+          ${o.splitInto.length ? `<div class="small" style="margin-top:.35rem"><strong>أهداف مقترحة بالفصل:</strong>${list(o.splitInto)}</div>` : ''}</div>` : ''}
+        <div class="text-box"><h4>${internalView() ? 'الصياغة المعتمدة' : 'نص الهدف'}</h4>${o.approvedText ? esc(o.approvedText) : `<span class="muted">${internalView() ? 'لم تُعتمد بعد' : 'قيد الاعتماد'}</span>`}</div>
       </div>
       <dl class="kv" style="margin-top:.85rem">
         <dt>الفصل والدرس</dt><dd>${esc(o.chapter.title)} ‹ ${esc(o.lesson.title)}</dd>
-        <dt>حالة المراجعة الآلية</dt><dd>${o.aiReviewStatus ? badge(o.aiReviewStatus, AI_STATUS_KIND[o.aiReviewStatus]) : '—'}
+        ${internalView() ? `<dt>حالة المراجعة الآلية</dt><dd>${o.aiReviewStatus ? badge(o.aiReviewStatus, AI_STATUS_KIND[o.aiReviewStatus]) : '—'}
           ${o.revisionType ? `<span class="small muted"> · نوع التعديل: ${esc(o.revisionType)}</span>` : ''}</dd>
-        ${o.revisionReason ? `<dt>سبب التعديل</dt><dd>${esc(o.revisionReason)}</dd>` : ''}
+        ${o.revisionReason ? `<dt>سبب التعديل</dt><dd>${esc(o.revisionReason)}</dd>` : ''}` : ''}
         <dt>مستوى التفكير</dt><dd>${esc(o.thinkingLevel || '—')}</dd>
         <dt>نوع المعرفة</dt><dd>${esc(o.knowledgeType || '—')}</dd>
         <dt>المفاهيم المرتبطة</dt><dd>${o.concepts.map(c => badge(c)).join(' ') || '—'}</dd>
@@ -432,8 +436,10 @@ function reviewPanel(o) {
 function supplementCard(s) {
   return `<section class="card no-print">
     <div class="section-title" style="margin-top:0">${ttl('spark', 'المحتوى العلمي المكمّل')}
-      <span class="meta-row">${objBadge(s.reviewStatus)}${badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn')}</span></div>
-    <p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>
+      <span class="meta-row">${objBadge(s.reviewStatus)}${internalView() ? badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn') : ''}</span></div>
+    ${internalView()
+      ? '<p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>'
+      : '<p class="notice">محتوى مكمّل لما لم يتناوله الكتاب المدرسي بما يكفي؛ <strong>ليس من نص الكتاب المدرسي</strong>.</p>'}
     ${s.memoBasis ? `<p><strong>ما يقدمه الكتاب المدرسي:</strong> ${esc(cleanRef(s.memoBasis))}</p>` : ''}
     <p id="sup-text">${esc(cleanRef(s.supplement))}</p>
     ${s.keyPoints.length ? `<h3>نقاط أساسية</h3>${list(s.keyPoints)}` : ''}
@@ -744,7 +750,7 @@ async function pageBank() {
         ${f('type', 'نوع السؤال', [['mcq', 'اختيار من متعدد'], ['essay', 'مقالي']])}
         ${f('level', 'مستوى التفكير', LEVEL_OPTS.map(l => [l, l]))}
         ${f('difficulty', 'الصعوبة', [['سهل', 'سهل'], ['متوسط', 'متوسط'], ['صعب', 'صعب']])}
-        ${f('status', 'حالة المراجعة', Object.entries(Q_STATUS).map(([k, [t]]) => [k, t]))}
+        ${f('status', internalView() ? 'حالة المراجعة' : 'حالة الاعتماد', internalView() ? Object.entries(Q_STATUS).map(([k, [t]]) => [k, t]) : [['approved', 'معتمد'], ['generated', 'قيد الاعتماد']])}
         <div><label for="f-q">بحث بالكلمات</label><input id="f-q" value="${esc(bankFilter.q || '')}" placeholder="مثال: الفوتون"></div>
         <div class="actions"><button type="button" class="primary" id="f-apply">${line('search', 17)}بحث</button><button type="button" id="f-clear">مسح</button></div>
       </div>
