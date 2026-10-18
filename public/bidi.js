@@ -19,7 +19,22 @@ export function isolate(text) {
   if (!text || text.includes(LRI)) return text;
   // عقدة لاتينية خالصة داخل صفحة من اليمين لليسار (مثل خيار «1s [↑↓]  2s [↑]»): يعكس المتصفح ترتيب أجزائها؛ تُعزل كلها وحدة واحدة من اليسار.
   if (!HAS_RTL.test(text)) return LATIN.test(text) && SYMBOL.test(text) ? text.replace(/^(\s*)([\s\S]*?)(\s*)$/, (_, a, b, c) => a + LRI + b + PDI + c) : text;
-  return text.replace(RUN, m => LRI + m + PDI);
+  return text.replace(RUN, m => wrapRun(m));
+}
+
+// قوس فتح أو إغلاق بلا نظيره داخل المقطع (مثل «(20» من «(20 درجة)») يبقى خارج العزل ليُقابَل بنظيره في النص العربي ويُعكس شكله صحيحًا.
+function wrapRun(m) {
+  const n = (str, ch) => str.split(ch).length - 1;
+  let pre = '', post = '', core = m;
+  for (let go = true; go;) {
+    go = false;
+    const a = core[0], z = core[core.length - 1];
+    if ((a === '(' && n(core, '(') > n(core, ')')) || (a === '[' && n(core, '[') > n(core, ']'))) { pre += a; core = core.slice(1); go = true; }
+    else if ((z === ')' && n(core, ')') > n(core, '(')) || (z === ']' && n(core, ']') > n(core, '['))) { post = z + post; core = core.slice(0, -1); go = true; }
+    else if (/^\s/.test(core)) { pre += core[0]; core = core.slice(1); go = true; }
+    else if (/\s$/.test(core)) { post = core[core.length - 1] + post; core = core.slice(0, -1); go = true; }
+  }
+  return core && (LATIN.test(core) || /[↑↓⇅]/.test(core)) ? pre + LRI + core + PDI + post : m;
 }
 
 function walk(root) {

@@ -13,6 +13,7 @@ const b = await chromium.launch(); const res = []; const errs = [];
 const ok = (n, v) => res.push((v ? 'PASS ' : 'FAIL ') + n);
 for (const vp of [{ width: 1280, height: 1100 }, { width: 390, height: 844 }]) {
   const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message));
+  await p.addInitScript(() => { window.__ITQAN_NO_BIDI = true; }); // عزل الاتجاه يضيف علامات غير مرئية والاختبار يقارن النص حرفيًا
   await login(p); await p.goto(BASE + '/#/exam'); await p.waitForSelector('#x-build');
   await p.selectOption('[data-hsel="title"]', 'اختبار منتصف الفصل الدراسي');
   await p.selectOption('[data-hsel="duration"]', 'ساعة ونصف');
@@ -20,7 +21,7 @@ for (const vp of [{ width: 1280, height: 1100 }, { width: 390, height: 844 }]) {
   ok(`${vp.width} other input shown`, await p.locator('[data-hother="grade"]').isVisible());
   await p.fill('[data-hother="grade"]', 'الثاني الثانوي – علمي');
   await p.click('#h-today');
-  ok(`${vp.width} today preview`, (await p.locator('#h-date-preview').innerText()).includes('1448هـ'));
+  ok(`${vp.width} today preview (year/month/day then هـ)`, /1448\/\d+\/\d+هـ/.test(await p.locator('#h-date-preview').innerText()));
   await p.selectOption('[data-hd="dateFormat"]', 'name');
   const prev = await p.locator('#h-date-preview').innerText();
   ok(`${vp.width} month name preview`, /ربيع|جمادى|محرم|صفر|رجب|شعبان|رمضان|شوال|ذو/.test(prev));

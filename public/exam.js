@@ -35,7 +35,8 @@ const CHOICES = {
 function dateText(h) {
   const d = h.dateDay ? String(h.dateDay) : '....', m = h.dateMonth ? String(h.dateMonth) : '....';
   if (h.dateFormat === 'name' && h.dateDay && h.dateMonth) return `${h.dateDay} ${HIJRI_MONTHS[h.dateMonth - 1]} ${h.dateYear}`;
-  return `${d}/${m}/${h.dateYear}`;
+  // بالأرقام: السنة/الشهر/اليوم ثم «هـ» (الترتيب المعتمد في المخاطبات الرسمية: 1448/5/7هـ)
+  return `${String(h.dateYear).replace(/\D/g, '') || '....'}/${m}/${d}هـ`;
 }
 
 const DEFAULT_HEADER = {
@@ -48,7 +49,7 @@ const DEFAULT_HEADER = {
   subject: 'الكيمياء 2-1',
   grade: 'الثاني الثانوي',
   duration: 'ساعتان ونصف',
-  date: '..../..../1448هـ',
+  date: `${HIJRI_NOW.y}/..../....هـ`,
   dateDay: '',
   dateMonth: '',
   dateYear: `${HIJRI_NOW.y}هـ`,
@@ -409,6 +410,20 @@ export async function pageExam(ctx) {
     const cs = getComputedStyle(paper);
     return (paper.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) / PAGE_PX;
   };
+  // سطر واحد: يصغّر الخط تدريجيًا حتى يتسع النص في عرضه (لا يقل عن min نقطة). يعيد true إن اتسع.
+  const fitLine = (el, min = 8) => {
+    el.style.fontSize = ''; el.style.whiteSpace = 'nowrap';
+    if (!el.clientWidth) return true; // مخفي (نسخة غير مطبوعة الآن)
+    let px = parseFloat(getComputedStyle(el).fontSize); const floor = (min * 96) / 72;
+    while (el.scrollWidth > el.clientWidth + 0.5 && px > floor) { px -= 0.5; el.style.fontSize = px + 'px'; }
+    return el.scrollWidth <= el.clientWidth + 0.5;
+  };
+  // الترويسة وتعليمات الاختبار في سطر واحد قدر الإمكان (بدل ترحيل «اختبار الفصل الدراسي الأول» إلى سطر ثانٍ وترك فراغ فوق «المملكة العربية السعودية»)
+  const fitLines = papers => papers.forEach(p => {
+    p.querySelectorAll('.ph-right > div, .ph-left > div').forEach(el => fitLine(el, 8));
+    const ins = p.querySelector('.paper-instr');
+    if (ins && !fitLine(ins, 9)) { ins.style.whiteSpace = ''; ins.style.fontSize = '10pt'; }
+  });
   const fitPapers = async out => {
     if (document.fonts?.ready) await document.fonts.ready.catch(() => {});
     const papers = [...out.querySelectorAll('.paper')];
@@ -423,6 +438,7 @@ export async function pageExam(ctx) {
       level = fit ? fit.lv : tries.reduce((a, b) => (b.pages < a.pages ? b : a)).lv;
     }
     setLevel(level);
+    fitLines(papers);
     const n = Math.max(1, Math.ceil(maxPages()));
     const st = $app.querySelector('#x-status');
     if (st && !st.textContent.includes('الطباعة:')) st.textContent += ` · الطباعة: ${n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتان' : n + ' صفحات'} لكل نموذج${level ? ' (تنسيق مضغوط)' : ''}`;
