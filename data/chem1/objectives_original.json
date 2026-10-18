@@ -1,0 +1,1281 @@
+{
+ "course": {
+  "subject": "الكيمياء",
+  "code": "كيمياء 1",
+  "grade": "الأول الثانوي",
+  "term": "الأول",
+  "country": "السعودية"
+ },
+ "source": {
+  "file": "تحليل محتوى مادة أهداف كيمياء 1 (ملف PDF من 6 صفحات؛ الصفحة 4 تكرار للصفحة 1)",
+  "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-10-17)",
+  "content_basis": "الكتاب المدرسي — كيمياء 1 (طبعة 1447)",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية ومواضع الصياغة غير النمطية؛ الصياغة المصححة تأتي في مرحلة مراجعة الأهداف. الملف لا يتضمن عمود مستوى التفكير فحقل thinking_level_source فارغ. أسماء الدروس كما وردت في الملف. | قرار المالك 2026-10-17: حُذف درسا «الصيغة الأولية والصيغة الجزيئية» و«صيغ الأملاح المائية» من وحدة المول (10 أهداف) لعدم ورودهما في الكتاب.",
+  "option_count": 4,
+  "added_objectives": 64
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "مقدمة في علم الكيمياء",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "قصة مادتين",
+     "objectives": [
+      {
+       "id": "K1-C1-L1-O01",
+       "text": "أن يعرف الطالب الكيمياء",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O02",
+       "text": "أن يعرف الطالب المادة الكيميائية .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O03",
+       "text": "أن يذكر الطالب أضرار الأشعة فوق البنفسجية UVB .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O04",
+       "text": "أن يوضح الطالب كيف يتكون الأوزون و أهميته و تركيبه و مكان تواجده .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O05",
+       "text": "أن يذكر الطالب قياس كمية الأوزون في الغلاف الجوي .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O06",
+       "text": "أن يوضح الطالب سبب تقلص طبقة الأوزون في الغلاف الجوي .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O07",
+       "text": "أن يفسر الطالب سبب استخدام مركبات الكلوروفلوروكربون للتبريد",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O08",
+       "text": "أن يوضح الطالب الهدف من اجتماع الزعماء في مونتريال .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O09",
+       "text": "أن يوضح الطالب العوامل التي تستثير تكون الأوزون فوق القارة القطبية الجنوبية .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O10",
+       "text": "أن تعلل الطالب سبب تكون غاز الاوزون فوق خط الاستواء",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O11",
+       "text": "أن يعدد الطالب اجهزة قياس ثقب الاوزون",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L1-O12",
+       "text": "أن يذكر الطالب العناصر المكوّنة لمركبات الكلوروفلوروكربون ومجالات استخدامها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L1-O13",
+       "text": "أن يفسر الطالب رسومًا بيانية تمثّل تركيز CFCs وكمية غاز الأوزون عبر الزمن.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L1-O14",
+       "text": "أن يحسب الطالب عدد جزيئات الأوزون الناتجة عن عدد معلوم من ذرات الأكسجين، ويربط بين عدد الذرات وعدد الجزيئات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الكيمياء و المادة",
+     "objectives": [
+      {
+       "id": "K1-C1-L2-O01",
+       "text": "أن يفسر الطالب سبب وجود عدة فروع لعلم الكيمياء.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L2-O02",
+       "text": "أن يقارن الطالب بين الكتلة و الوزن .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L2-O03",
+       "text": "ان يفسر الطالب سبب اهتمام الكيميائيين بالوصف تحت المجهري للمادة",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L2-O04",
+       "text": "ان يحدد الطالب المجالات التي يدرسها كل فرع من فروع الكيمياء .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L2-O05",
+       "text": "أن يعرّف الطالب المادة، ويميّز بين ما يُعدّ مادة وما لا يُعدّ مادة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L2-O06",
+       "text": "أن يعرّف الطالب النموذج، ويذكر أمثلة على النماذج التي يستعملها العلماء وفائدتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "الطرائق العلمية",
+     "objectives": [
+      {
+       "id": "K1-C1-L3-O01",
+       "text": "ان يعرف الطالب الطريقة العلمية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L3-O02",
+       "text": "أن يقارن الطالب بين أنواع البيانات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L3-O03",
+       "text": "أن يصف الطالب الفرق بين الفرضية و النظرية و القانون العلمي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L3-O04",
+       "text": "ان يحدد الطالب أنواع المتغيرات و الفرق بينهم.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L3-O05",
+       "text": "أن يوضح الطالب الهدف من النتائج في التجربة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L3-O06",
+       "text": "أن يحدد الطالب خطوات الطريقة العلمية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L3-O07",
+       "text": "أن يفسر الطالب سبب عدم استعمال العلماء مجموعة محددة من الخطوات بالترتيب نفسه في كل بحث.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L3-O08",
+       "text": "أن يوضح الطالب دور الضابط في التجربة، ويحدده في تجربة معطاة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L3-O09",
+       "text": "أن يقوّم الطالب مدى دعم البيانات التجريبية للفرضية، ويحدد ما يُفعل عند عدم دعمها لها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L3-O10",
+       "text": "أن يوضح الطالب كيف يُستعمل النموذج العلمي في إجراء توقعات يمكن اختبارها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "البحث العلمي",
+     "objectives": [
+      {
+       "id": "K1-C1-L4-O01",
+       "text": "ان يقارن الطالب بين البحث النظري و البحث التطبيقي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L4-O02",
+       "text": "أن يطبق الطالب تعليمات السلامة في المختبر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L4-O03",
+       "text": "أن يذكر الطالب فوائد الكيمياء",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L4-O04",
+       "text": "أن يعرف الطالب الاكتشافات غير المقصودة،ويعطي أمثلة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C1-L4-O05",
+       "text": "أن يعرّف الطالب التقنية، ويذكر أمثلة على منتجات تقنية حسّنت حياتنا.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C1-L4-O06",
+       "text": "أن يصنّف الطالب عينة ماء (يسر، متوسط، عسر، عسر جدًا) بحساب تركيز الكالسيوم أو الماغنسيوم بوحدة mg/L.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "المادة – الخواص و التغيرات",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "خواص المادة",
+     "objectives": [
+      {
+       "id": "K1-C2-L1-O01",
+       "text": "أن يقارن الطالب بين الماء النقي وماء البحر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O02",
+       "text": "أن يعرف الطالب حالات المادة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O03",
+       "text": "أن يقارن الطالب بين الحالة الصلبة للمادة و السائلة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O04",
+       "text": "أن يقارن الطالب بين الغاز و البخار.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O05",
+       "text": "أن يعرف الطالب الخواص الفيزيائية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O06",
+       "text": "أن يقارن الطالب بين الخواص الفيزيائية المميزة وغير المميزة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O07",
+       "text": "أن يعرف الطالب الخواص الكيميائية ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O08",
+       "text": "أن يوضح الطالب تأثير العوامل الخارجية على حالات المادة .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L1-O09",
+       "text": "أن يعرّف الطالب المادة الكيميائية النقية ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L1-O10",
+       "text": "أن يصف الطالب البلازما بوصفها حالة رابعة للمادة ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L1-O11",
+       "text": "أن يستعمل الطالب الخواص الفيزيائية المميزة (الكثافة ودرجتي الانصهار والغليان) في تعرّف المواد المجهولة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L1-O12",
+       "text": "أن يصنف الطالب خواص معطاة للمادة إلى فيزيائية وكيميائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تغيرات المادة",
+     "objectives": [
+      {
+       "id": "K1-C2-L2-O01",
+       "text": "أن يحل الطالب مسائل حسابية على قانون حفظ الكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L2-O02",
+       "text": "أن يعدد الطالب أدلة حدوث التفاعل الكيميائي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L2-O03",
+       "text": "أن يعرف الطالب التغير الفيزيائي و يعطي أمثلة",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L2-O04",
+       "text": "أن يعرف الطالب التغير الكيميائي و يعطي أمثلة",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L2-O05",
+       "text": "أن يذكر الطالب أمثلة على تغيرات الحالة (الانصهار والتجمد والتبخر والتكثف والغليان) ويصنفها تغيرات فيزيائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L2-O06",
+       "text": "أن يصنف الطالب تغيرات معطاة إلى فيزيائية وكيميائية مع التعليل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L2-O07",
+       "text": "أن يحدد الطالب المتفاعلات والنواتج في تفاعل كيميائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L2-O08",
+       "text": "أن ينص الطالب على قانون حفظ الكتلة ويفسر انطباقه على أمثلة من الحياة (كاحتراق الشمعة).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "المخاليط",
+     "objectives": [
+      {
+       "id": "K1-C2-L3-O01",
+       "text": "أن يعرف الطالب المخاليط.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L3-O02",
+       "text": "أن يقارن الطالب بين المخاليط المتجانسة وغير المتجانسة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L3-O03",
+       "text": "أن يميز الطالب طرائق فصل المخاليط.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L3-O04",
+       "text": "أن يصنف الطالب أنواع المحاليل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L3-O05",
+       "text": "أن يقارن الطالب بين المخلوط والمادة النقية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L3-O06",
+       "text": "أن يصنف الطالب مواد معطاة إلى مخاليط متجانسة أو غير متجانسة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L3-O07",
+       "text": "أن يشرح الطالب مبدأ عمل الكروماتوجرافيا في فصل مكونات مخلوط.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L3-O08",
+       "text": "أن يعرّف الطالب السبيكة ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "العناصر و المركبات",
+     "objectives": [
+      {
+       "id": "K1-C2-L4-O01",
+       "text": "أن يصف الطالب ترتيب العناصر في الجدول الدوري.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O02",
+       "text": "أن يشرح الطالب سلوك المركبات وفق قانون النسب المتضاعفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O03",
+       "text": "أن يقارن الطالب بين العنصر والمركب مع ذكر أمثلة",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O04",
+       "text": "أن يذكر الطالب الاسم العلمي لملح الطعام وصيغته",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O05",
+       "text": "أن يشرح الطالب طريقة فصل الماء.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O06",
+       "text": "أن يحل الطالب مسائل حسابية على قانون النسبة المئوية بالكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C2-L4-O07",
+       "text": "أن ينص الطالب على قانون النسب الثابتة ويفسر انطباقه على المركبات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L4-O08",
+       "text": "أن يستنتج الطالب العناصر المكونة للمركب وأعداد ذراتها من صيغته الكيميائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L4-O09",
+       "text": "أن يحدد الطالب، بحساب النسب المئوية بالكتلة، ما إذا كانت عينتان من المركب نفسه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L4-O10",
+       "text": "أن يطبق الطالب قانون النسب المتضاعفة لحساب نسبة كتل عنصر متحد مع كتلة ثابتة من عنصر آخر في مركبين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L4-O11",
+       "text": "أن يفسر الطالب اختلاف خواص المركب عن خواص العناصر المكونة له.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C2-L4-O12",
+       "text": "أن يصنف الطالب مواد معطاة إلى عنصر أو مركب أو مخلوط متجانس أو مخلوط غير متجانس.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "تركيب الذرة",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الأفكار القديمة للمادة",
+     "objectives": [
+      {
+       "id": "K1-C3-L1-O01",
+       "text": "أن يوضح الطالب أول من اهتم بدراسة المادة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L1-O02",
+       "text": "تقارن بين النماذج الذرية لديمقريطس و أرسطو و جون دالتون.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L1-O03",
+       "text": "أن يفهم الطالب كيف فسرت نظرية دالتون قانون حفظ الكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L1-O04",
+       "text": "أن يفسر الطالب سبب رفض أرسطو لفكرة الذرات وسبب عجز ديموقريطوس عن إثبات أفكاره.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L1-O05",
+       "text": "أن يذكر الطالب الفرضيات الرئيسة لنظرية دالتون الذرية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L1-O06",
+       "text": "أن يبيّن الطالب جوانب الخطأ في نظرية دالتون الذرية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تعريف الذرة",
+     "objectives": [
+      {
+       "id": "K1-C3-L2-O01",
+       "text": "أن يعرف الطالب الذرة .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O02",
+       "text": "أن يذكر الطالب مكونات الذرة .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O03",
+       "text": "أن يوضح الطالب أهمية استخدام جهاز STM.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O04",
+       "text": "أن يشرح الطالب كيف تم اكتشاف الإلكترون داخل الذرة ؟",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O05",
+       "text": "أن يشرح الطالب كيف تم حساب مقدار كتلة الإلكترون و شحنته.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O06",
+       "text": "أن يقارن الطالب بين نموذج طومسون و نموذج رذرفورد للذرة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O07",
+       "text": "أن يشرح الطالب تجربة رذرفورد.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O08",
+       "text": "أن يذكر الطالب اسم العالم الذي قام باكتشاف النيوترون و شحنة النيوترون",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L2-O09",
+       "text": "أن يصف الطالب خصائص أشعة المهبط.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L2-O10",
+       "text": "أن يفسر الطالب سبب كون الذرة متعادلة كهربائيًا.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L2-O11",
+       "text": "أن يقارن الطالب بين الإلكترون والبروتون والنيوترون من حيث الشحنة النسبية والكتلة والموقع في الذرة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L2-O12",
+       "text": "أن يفسر الطالب كون معظم حجم الذرة فراغًا وكون النواة شديدة الكثافة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "كيف تختلف الذرات ؟",
+     "objectives": [
+      {
+       "id": "K1-C3-L3-O01",
+       "text": "أن يعرف الطالب العدد الذري.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O02",
+       "text": "أن يوجد الطالب قيمة العدد الذري و البروتونات و الإلكترونات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O03",
+       "text": "أن يعرف الطالب النظائر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O04",
+       "text": "أن يطبق الطالب مسائل حسابية على قانون العدد الكتلي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O05",
+       "text": "أن يعرف الطالب الكتلة الذرية والوحدة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O06",
+       "text": "أن يحل الطالب مسائل حسابية على نسبة النظائر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O07",
+       "text": "أن يفسر الطالب سبب أن الكتل الذرية ليست اعداد صحيحة",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L3-O08",
+       "text": "أن يكتب الطالب رمز النظير واسمه مستعملًا العدد الذري والعدد الكتلي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L3-O09",
+       "text": "أن يحدد الطالب النظير الأكثر وجودًا في الطبيعة اعتمادًا على الكتلة الذرية المتوسطة ونسب الوجود.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L3-O10",
+       "text": "أن يفسر الطالب سبب تشابه نظائر العنصر في سلوكها الكيميائي رغم اختلافها في الكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L3-O11",
+       "text": "أن يذكر الطالب مساهمة هنري موزلي في فهم الذرة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "الأنوية غير المستقرة والتحلل الإشعاعي",
+     "objectives": [
+      {
+       "id": "K1-C3-L4-O01",
+       "text": "أن يقارن الطالب بين التفاعل الكيميائي والتفاعل النووي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L4-O02",
+       "text": "أن يفسر الطالب العلاقة بين الأنوية غير المستقرة والتحلل الإشعاعي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L4-O03",
+       "text": "أن يقارن الطالب بين أشعة ألفا وبيتا و جاما.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C3-L4-O04",
+       "text": "أن يعرّف الطالب النشاط الإشعاعي والإشعاع.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L4-O05",
+       "text": "أن يحدد الطالب العامل الرئيس في استقرار نواة الذرة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L4-O06",
+       "text": "أن يحدد الطالب تأثير إصدار جسيم ألفا وجسيم بيتا وأشعة جاما في العدد الذري والعدد الكتلي للذرة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C3-L4-O07",
+       "text": "أن يكتب الطالب معادلة نووية موزونة لتحلل إشعاعي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "التفاعلات الكيميائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "التفاعلات و المعادلات",
+     "objectives": [
+      {
+       "id": "K1-C4-L1-O01",
+       "text": "أن يعرف الطالب التفاعل الكيميائي",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O02",
+       "text": "أن يتعرف الطالب على مؤشرات حدوث تفاعل كيميائي",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O03",
+       "text": "أن يحسب الطالب عدد الإلكترونات التي تستوعبها المستويات(١,٢,٣,٤ )الرئيسية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O04",
+       "text": "أن يعدد الطالب مستويات الطاقة الثانوية في مستوى الطاقة الرئيس",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O05",
+       "text": "أن يذكر الطالب عدد الإلكترونات في كل مستوى ثانوي",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O06",
+       "text": "أن يكتب الطالب التوزيع الإلكتروني لبعض ذرات العناصر",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O07",
+       "text": "أن يذكر الطالب عدد التأكسد لبعض العناصر و الأيونات",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O08",
+       "text": "أن يتعرف الطالب على بعض الأيونات العديدة الذرات",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O09",
+       "text": "ان يذكر الطالب الرموز المستخدمة في المعادلات الكيميائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O10",
+       "text": "أن يكتب الطالب الصيغ الكيميائية لبعض المركبات الأيونية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O11",
+       "text": "أن يسمي الطالب المركبات الأيونية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O12",
+       "text": "أن يمثل الطالب التفاعلات الكيميائية بمعادلات لفظية .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O13",
+       "text": "أن يزن الطالب المعادلات الكيميائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O14",
+       "text": "أن يمثل الطالب التفاعلات الكيميائية بمعادلات رمزية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L1-O15",
+       "text": "أن يفسر الطالب أهمية وزن المعادلات الكيميائية في ضوء قانون حفظ الكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L1-O16",
+       "text": "أن يميز الطالب بين المعامل والرقم السفلي في الصيغة الكيميائية، موضحًا أن وزن المعادلة يتم بتغيير المعاملات فقط.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L1-O17",
+       "text": "أن يكتب الطالب التوزيع الإلكتروني لبعض الأيونات الموجبة والسالبة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L1-O18",
+       "text": "أن يرتب الطالب مستويات الطاقة الثانوية تصاعديًا بحسب طاقتها عند كتابة التوزيع الإلكتروني.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L1-O19",
+       "text": "أن يميز الطالب بين المتفاعلات والنواتج في المعادلة الكيميائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تصنيف التفاعلات الكيميائية",
+     "objectives": [
+      {
+       "id": "K1-C4-L2-O01",
+       "text": "أن يصنف الطالب التفاعلات الكيميائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L2-O02",
+       "text": "أن يقارن الطالب بين تفاعلات الإحلال",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L2-O03",
+       "text": "أن يستخدم الطالب سلسلة النشاط الكيميائي في توقع حدوث تفاعلات الإحلال البسيط",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L2-O04",
+       "text": "أن يستخدم الطالب سلسلة النشاط الكيميائي في المقارنة بين نشاط العناصر",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L2-O05",
+       "text": "أن يكتب الطالب معادلات كيميائية موزونة لتفاعلات الإحلال المزدوج",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L2-O06",
+       "text": "أن يكتب الطالب معادلات رمزية موزونة لتفاعلات التكوين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L2-O07",
+       "text": "أن يكتب الطالب معادلات رمزية موزونة لتفاعلات الاحتراق.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L2-O08",
+       "text": "أن يكتب الطالب معادلات رمزية موزونة لتفاعلات التفكك.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L2-O09",
+       "text": "أن يميز الطالب بين الأنواع الثلاثة لتفاعلات الإحلال البسيط (فلز يحل محل الهيدروجين، وفلز يحل محل فلز، ولافلز يحل محل لافلز).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C4-L2-O10",
+       "text": "أن يرتب الطالب مجموعة من الفلزات بحسب نشاطها اعتمادًا على نتائج تفاعلها مع محاليل أملاح فلزات أخرى.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "التفاعلات في المحاليل المائية",
+     "objectives": [
+      {
+       "id": "K1-C4-L3-O01",
+       "text": "ان يصف الطالب المحاليل المائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O02",
+       "text": "أن يصف الطالب ما يحدث للمركبات الجزيئية و الأيونية عندما تذوب في الماء",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O03",
+       "text": "أن يقارن الطالب بين المعادلات الأيونية الكاملة و المعادلات الأيونية النهائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O04",
+       "text": "أن يكتب الطالب معادلات أيونية كاملة و معادلات أيونية نهائية للتفاعلات في المحاليل المائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O05",
+       "text": "أن يتوقع الطالب ما إذاكانت التفاعلات في المحاليل المائية ستؤدي إلى راسب أو ماء أو غاز",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O06",
+       "text": "أن يحدد الطالب الأيونات المتفرجة في المعادلة الكيميائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C4-L3-O07",
+       "text": "أن يوضح الطالب تكوّن غاز ثاني أكسيد الكربون من تفاعل حمض مع بيكربونات الصوديوم الهيدروجينية بوصفه إحلالًا مزدوجًا يتبعه تفكك.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "title": "المول",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "قياس المادة",
+     "objectives": [
+      {
+       "id": "K1-C5-L1-O01",
+       "text": "أن يعرف الطالب المول",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L1-O02",
+       "text": "أن يذكر الطالب أمثلة لمبدأ المول في التعاملات اليومية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L1-O03",
+       "text": "أن يعرف الطالب عدد أفوجادرو",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L1-O04",
+       "text": "أن يحل الطالب مسائل على تحويل المولات إلى جسيمات والعكس",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L1-O05",
+       "text": "أن يحدد الطالب الجسيم الممثل (ذرة، جزيء، أيون، وحدة صيغة) في مادة ما.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C5-L1-O06",
+       "text": "أن يفسّر الطالب سبب استخدام الكيميائيين وحدة المول في عدّ جسيمات المادة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الكتلة و المول",
+     "objectives": [
+      {
+       "id": "K1-C5-L2-O01",
+       "text": "أن يعرف الطالب الكتلة المولية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L2-O02",
+       "text": "أن يحل الطالب مسائل على تحويل المولات إلى كتلة والعكس",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L2-O03",
+       "text": "أن يحل الطالب مسائل على تحويل الجسيمات إلى الكتلة والعكس",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L2-O04",
+       "text": "أن يميز الطالب بين الكتلة الذرية (amu) والكتلة المولية (g/mol) للعنصر.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C5-L2-O05",
+       "text": "أن يقارن الطالب بين مولات مواد مختلفة من حيث عدد الجسيمات والكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C5-L2-O06",
+       "text": "أن يقدّر الطالب أعدادًا كبيرة من الجسيمات (كعدد جزيئات الماء في كأس) باستخدام التحويلات المولية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "مولات المركبات",
+     "objectives": [
+      {
+       "id": "K1-C5-L3-O01",
+       "text": "أن يحل الطالب مسائل على علاقات المول المرتبطة بالصيغة الكيميائية",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L3-O02",
+       "text": "أن يحسب الطالب الكتلة المولية لمركب",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L3-O03",
+       "text": "أن يحل الطالب مسائل على تحويل كتلة مركب إلى عدد جسيمات",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K1-C5-L3-O04",
+       "text": "أن يحل الطالب مسائل على تحويل مولات المركب إلى كتلة وتحويل كتلة المركب إلى مولات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C5-L3-O05",
+       "text": "أن يصنف الطالب المركب إلى جزيئي أو أيوني قبل حساب كتلته المولية أو عدد جسيماته.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      },
+      {
+       "id": "K1-C5-L3-O06",
+       "text": "أن يفسّر الطالب كون الكتلة المولية للمركب مجموع الكتل المولية لعناصره بدلالة قانون حفظ الكتلة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true,
+       "note": "هدف مضاف من الكتاب المدرسي بطلب مالك المشروع (2026-10-17)؛ لا يرد في ملف الأهداف الرسمي"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
