@@ -5,6 +5,7 @@
 import { icon, line, CHAPTER_ICONS } from './icons.js';
 
 const LETTERS = ['أ', 'ب', 'ج', 'د'];
+const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const GROUPS = { basic: 'أساسي (تذكر وفهم)', apply: 'تطبيق', higher: 'تفكير عليا' };
 const LEVEL_CHOICES = [['graded', 'متدرّج (مستحسن)'], ['basic', GROUPS.basic], ['apply', GROUPS.apply], ['higher', GROUPS.higher]];
@@ -71,6 +72,7 @@ export async function pageStudentHome(ctx) {
       <span class="eyebrow">${icon('spark', 18)} تدريب ذاتي لا يدخل في الدرجات</span>
       <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
       <p class="muted">اختر الدروس وعدد الأسئلة والمستوى. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
+    <section class="card st-top5" id="st-top5" hidden></section>
     <div class="grid2 st-setup">
       <section class="card">${ttl('lessons', 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
@@ -95,6 +97,14 @@ export async function pageStudentHome(ctx) {
         <p class="small muted">الأسئلة والبدائل تُخلط في كل جلسة.</p>
       </section>
     </div>`;
+  // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
+  api('/student/rank').then(d => {
+    const box = document.getElementById('st-top5');
+    if (!box || !d?.available || !d.top?.length) return;
+    box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
+      <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
+    box.hidden = false;
+  }).catch(() => {});
   document.getElementById('s-start').onclick = async () => {
     const lessons = [...$app.querySelectorAll('[data-lesson]:checked')].map(i => Number(i.dataset.lesson));
     const p = { lessons, count: Number(document.getElementById('s-count').value),
@@ -260,7 +270,7 @@ export async function pageStudentHistory(ctx) {
   const [hist, catalog] = await Promise.all([api('/student/history'), api('/student/catalog')]);
   const lessons = catalog.flatMap(c => c.lessons.filter(l => l.answered).map(l => ({ ...l, chapter: c.number })));
   $app.innerHTML = `
-    <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك تفاصيل تدريبك؛ يظهر اسمك الأول والثاني ونقاطك فقط إن دخلت قائمة التميّز.</p></div></div></section>
+    <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك تفاصيل تدريبك؛ يظهر اسمك ونقاطك فقط إن دخلت قائمة التميّز.</p></div></div></section>
     <div class="grid2">
       <section class="card">${ttl('progress', 'تقدّمك في الدروس')}
         ${lessons.length ? table(lessons.map(l => [`${l.chapter}. ${l.title}`, l.correct, l.answered]), esc) : '<div class="empty">لم تبدأ التدريب بعد.</div>'}
@@ -278,7 +288,6 @@ export async function pageStudentHistory(ctx) {
 }
 
 // ---------- التميّز: ترتيب المتدربين في الشعبة ----------
-const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
 export async function pageStudentRank(ctx) {
   const { esc, $app, api } = ctx;
@@ -314,7 +323,7 @@ export async function pageStudentRank(ctx) {
         ${d.top.length ? `<ol class="rank-top">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span class="rank-medal" aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span>
           <span class="rank-name">${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</span><span class="ltr small muted">${num(t.score)}</span></li>`).join('')}</ol>`
           : '<div class="empty">لم يدخل أحد الترتيب بعد؛ كن أول من يدخله بتدريب جاد ومنتظم.</div>'}
-        <p class="small muted">يظهر لزملاء شعبتك اسمك الأول والثاني ونقاطك فقط إن دخلت أفضل 5.</p>
+        <p class="small muted">يظهر لزملاء شعبتك اسمك ونقاطك إن دخلت أفضل 5.</p>
       </section>
     </div>
     <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
