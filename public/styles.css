@@ -1110,3 +1110,10 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
   .st-stem { font-size: 1.1rem; }
   .earn-v { min-width: 3.2rem; }
 }
+
+/* ألوان أيقونات الأوسمة */
+:root { --ic-bronze-1: #efbf94; --ic-bronze-2: #9a5a2a; --ic-silver-1: #eef2f6; --ic-silver-2: #7d8ea3; --ic-gilt-1: #ffe38e; --ic-gilt-2: #c58a10; }
+.bal-badges li .ic { width: 2.4rem; height: 2.4rem; }
+.ic-bronze-1 { stop-color: var(--ic-bronze-1); } .ic-bronze-2 { stop-color: var(--ic-bronze-2); }
+.ic-silver-1 { stop-color: var(--ic-silver-1); } .ic-silver-2 { stop-color: var(--ic-silver-2); }
+.ic-gilt-1 { stop-color: var(--ic-gilt-1); } .ic-gilt-2 { stop-color: var(--ic-gilt-2); }
