@@ -47,7 +47,7 @@ await pool.query(`delete from public.teacher_courses; delete from public.teacher
 await pool.query(`insert into public.teacher_courses (teacher_id, course_id) select user_id, 1 from public.profiles where email='view@chem21.local'`);
 await pool.query(`insert into auth.users (id, email) values ('55555555-5555-5555-5555-555555555555','owner@chem21.local') on conflict do nothing`);
 await pool.query(`update public.profiles set role='admin', display_name='مالك المشروع' where email='owner@chem21.local'`);
-await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local' or email like 'bulk_@chem21.local'`);
+await pool.query(`delete from auth.users where email in ('st2test@chem21.local', 'deltest@chem21.local', 'deltest2@chem21.local') or email like 'st_____@chem21.local' or email like 'bulk_@chem21.local' or email like 'big___@chem21.local'`);
 await pool.query('delete from public.review_notes');
 await pool.query(`insert into auth.users (id, email) values ('33333333-3333-3333-3333-333333333333','new@x.com') on conflict do nothing`);
 
@@ -382,6 +382,13 @@ await p.check('#as-all');
 ok('bulk: select all shows count', (await p.locator('#as-del-many').innerText()).includes('(3)'));
 p.on('dialog', d => d.accept());
 await p.click('#as-del-many'); await p.waitForTimeout(1500);
+await p.fill('#as-lines', Array.from({ length: 251 }, (_, i) => `طالب كبير ${i + 1}، دفعة كبيرة، 8، big${String(i + 1).padStart(3, '0')}`).join('\n'));
+await p.click('#as-read-lines'); await p.click('#as-create');
+ok('bulk: 251 names refused (limit 250)', await p.locator('.toast', { hasText: 'الحد الأقصى 250' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
+await p.fill('#as-lines', Array.from({ length: 130 }, (_, i) => `طالب كبير ${i + 1}، دفعة كبيرة، 8، big${String(i + 1).padStart(3, '0')}`).join('\n'));
+await p.click('#as-read-lines'); await p.click('#as-create'); await p.waitForSelector('#as-cards', { timeout: 60000 });
+ok('bulk: 130 accounts created in one go (chunks of 50)', (await p.locator('#as-cards tbody tr').count()) === 130 && (await pool.query("select count(*)::int n from auth.users where email like 'big___@chem21.local'")).rows[0].n === 130);
+await pool.query("delete from auth.users where email like 'big___@chem21.local'");
 ok('bulk: batch deleted in one go', (await pool.query("select count(*)::int n from auth.users where email like 'bulk_@chem21.local'")).rows[0].n === 0);
 p.removeAllListeners('dialog');
 await p.selectOption('#af-grade', ''); await p.waitForTimeout(400);

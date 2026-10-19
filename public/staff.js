@@ -8,6 +8,9 @@ const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const ROLE = { student: 'نشط', pending: 'موقوف' };
 
+const MAX_CREATE = 250; // الحد الأقصى للدفعة الواحدة من الأسماء
+const CHUNK = 50; // حجم الجزء المرسل في كل طلب
+
 export async function pageTeacherProgress(ctx, section = '') {
   const { esc, $app, api } = ctx;
   const d = await api('/teacher/progress' + (section ? '?section=' + encodeURIComponent(section) : ''));
@@ -257,10 +260,21 @@ export async function pageAdminStudents(ctx) {
     document.getElementById('as-create').onclick = e => createAll(e.target);
   };
   const createAll = async btn => {
-    if (pending.length > 100) return fail(new Error('الحد الأقصى 100 طالب في المرة الواحدة؛ قسّم الملف'));
+    if (pending.length > MAX_CREATE) return fail(new Error(`الحد الأقصى ${MAX_CREATE} طالب في المرة الواحدة؛ قسّم الملف`));
     btn.disabled = true; btn.textContent = 'جارٍ الإنشاء…';
     try {
-      const { results } = await api('/admin/students/create', { method: 'POST', body: { students: pending } });
+      // تُرسل الدفعة على أجزاء من 50 حتى لا تتجاوز مهلة الدالة، ويُجمع الناتج في جدول واحد
+      const results = [];
+      try {
+        for (let i = 0; i < pending.length; i += CHUNK) {
+          btn.textContent = `جارٍ الإنشاء… ${Math.min(i + CHUNK, pending.length)} من ${pending.length}`;
+          results.push(...(await api('/admin/students/create', { method: 'POST', body: { students: pending.slice(i, i + CHUNK) } })).results);
+        }
+      } catch (err) {
+        if (!results.length) throw err;
+        pending.slice(results.length).forEach(s => results.push({ name: s.name, ok: false, error: 'لم يُنشأ بسبب انقطاع الطلب؛ أعد رفع هذه الأسماء' }));
+        toast('انقطع الإنشاء في المنتصف: ' + err.message, true);
+      }
       const ok = results.filter(r => r.ok);
       const newCourse = Number(document.getElementById('as-new-course')?.value) || null;
       if (newCourse && ok.length) {

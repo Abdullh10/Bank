@@ -38,7 +38,7 @@ export async function handle(body, jwt, deps) {
     if (staffRole && !STAFF_ROLES.includes(staffRole)) return { status: 400, body: { error: 'الدور غير صالح' } };
     const list = Array.isArray(body.students) ? body.students : [];
     if (!list.length) return { status: 400, body: { error: staffRole ? 'لا توجد بيانات الحساب' : 'لا توجد بيانات طلاب' } };
-    if (list.length > 100) return { status: 400, body: { error: 'الحد الأقصى 100 طالب في المرة الواحدة' } };
+    if (list.length > 250) return { status: 400, body: { error: 'الحد الأقصى 250 طالب في المرة الواحدة' } };
     const results = [];
     for (const s of list) {
       if (!s || typeof s !== 'object') { results.push({ name: '', ok: false, error: 'سطر غير صالح' }); continue; }
