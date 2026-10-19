@@ -67,6 +67,7 @@ export async function pageTeacherGrades(ctx) {
       </tbody></table></div>` : '<div class="empty">لم يستبدل أي من طلابك نقاطه بعد.</div>'}
     </section>`;
   const run = async (fn, msg) => { try { await fn(); toast(msg); await pageTeacherGrades(ctx); } catch (e) { fail(e); } };
+  if (canWrite) couponsCard(ctx);
   document.getElementById('tg-all')?.addEventListener('click', () => {
     if (confirm(`ستُعلَّم ${pendingAll} درجة كمرصودة لكل طلابك. هل رصدتها فعلًا؟`)) run(() => api('/teacher/grades/record', { method: 'POST', body: {} }), 'سُجّل رصد الدرجات');
   });
@@ -78,6 +79,42 @@ export async function pageTeacherGrades(ctx) {
   });
   document.getElementById('tg-export')?.addEventListener('click', () => downloadXlsx('itqan-grades-balance', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'بانتظار الرصد', 'المرصودة'],
     d.map(x => [x.name, x.username, x.grade || '', x.section || '', x.pending, x.recorded])));
+}
+
+// كوبونات النقاط: يصدرها المعلم أو المالك فيدخلها الطالب في «الرصيد» (مرة واحدة، ولا تدخل الترتيب)
+async function couponsCard(ctx, fresh = null) {
+  const { esc, $app, api, fail, toast } = ctx;
+  let d;
+  try { d = await api('/staff/coupons'); } catch { return; }
+  if (!$app.isConnected) return;
+  let box = document.getElementById('cp-card');
+  if (!box) { box = document.createElement('section'); box.className = 'card'; box.id = 'cp-card'; $app.append(box); }
+  const ST = { active: ['فعّال', 'ok'], redeemed: ['استُخدم', 'brand'], expired: ['منتهي', ''], cancelled: ['ملغى', ''] };
+  box.innerHTML = `${ttl('coin', 'كوبونات النقاط')}
+    <p class="small muted">أصدر كودًا بقيمة نقاط يعطيه الطالب لنفسه من «الرصيد». الكود لمرة واحدة، يستخدمه أي طالب من طلابك المسندين، ولا يدخل نقاطه في الترتيب. الحد الأقصى للكوبون <b>${d.max}</b> نقطة${d.quota != null ? `، واستخدمت <b>${d.used}</b> من حصتك الأسبوعية <b>${d.quota}</b>` : ''}.</p>
+    <div class="cp-form"><label>النقاط <input type="number" id="cp-pts" min="1" max="${d.max}" value="${Math.min(50, d.max)}"></label>
+      <label>سبب المكافأة (يراه الطالب) <input id="cp-note" maxlength="120" placeholder="مثال: مشاركة متميزة في الحصة"></label>
+      <label>الصلاحية <select id="cp-days"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يومًا</option><option value="30">30 يومًا</option></select></label>
+      <button type="button" class="primary" id="cp-make">إصدار كوبون</button></div>
+    ${fresh ? `<div class="notice ok" id="cp-fresh"><b>تم الإصدار:</b> <span class="cp-code ltr">${esc(fresh.code)}</span> · ${fresh.points} نقطة
+      <button type="button" id="cp-copy">نسخ الكود</button></div>` : ''}
+    ${d.items.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الكود</th><th>النقاط</th><th>السبب</th><th>الحالة</th><th>ينتهي</th><th></th></tr></thead><tbody>
+      ${d.items.map(c => { const [t, k] = ST[c.status] || ['—', '']; return `<tr><td class="cp-code ltr">${esc(c.code)}</td><td>${c.points}</td><td>${esc(c.note || '')}</td>
+        <td><span class="badge ${k}">${t}</span>${c.redeemedBy ? ` <span class="small muted">${esc(c.redeemedBy)} · ${esc(hijri(c.redeemedAt))}</span>` : ''}</td>
+        <td class="small">${esc(hijri(c.expiresAt))}</td><td>${c.status === 'active' ? `<button type="button" class="danger" data-cpcancel="${c.id}">إلغاء</button>` : ''}</td></tr>`; }).join('')}
+    </tbody></table></div>` : '<div class="empty">لم تُصدر كوبونات بعد.</div>'}`;
+  document.getElementById('cp-make').onclick = async e => {
+    const b = e.currentTarget; b.disabled = true;
+    try {
+      const c = await api('/staff/coupons', { method: 'POST', body: { points: document.getElementById('cp-pts').value, note: document.getElementById('cp-note').value, days: document.getElementById('cp-days').value } });
+      toast('صدر الكوبون'); await couponsCard(ctx, c);
+    } catch (err) { fail(err); b.disabled = false; }
+  };
+  document.getElementById('cp-copy')?.addEventListener('click', () => { navigator.clipboard?.writeText(fresh.code).then(() => toast('نُسخ الكود'), () => {}); });
+  box.querySelectorAll('[data-cpcancel]').forEach(b => b.onclick = async () => {
+    if (!confirm('إلغاء هذا الكوبون؟ لن يعمل بعد الآن.')) return;
+    try { await api('/staff/coupons/cancel', { method: 'POST', body: { id: Number(b.dataset.cpcancel) } }); toast('أُلغي الكوبون'); await couponsCard(ctx); } catch (err) { fail(err); }
+  });
 }
 
 // ---------- Excel ----------
@@ -194,6 +231,8 @@ export async function pageAdminStudents(ctx) {
       <p class="small muted">يستبدل الطالب نقاط التميّز بدرجات يرصدها المعلم. غيّر القيم هنا متى شئت؛ التغيير يسري على الاستبدالات القادمة فقط.</p>
       <div class="gs-form"><label>نقاط الدرجة الواحدة <input type="number" id="gs-rate" min="1" max="10000"></label>
         <label>السقف الأسبوعي (درجات) <input type="number" id="gs-weekly" min="0" max="50"></label>
+        <label>أقصى كوبون للمعلم (نقطة) <input type="number" id="gs-cmax" min="1" max="500"></label>
+        <label>حصة المعلم الأسبوعية (نقطة) <input type="number" id="gs-cquota" min="0"></label>
         <label class="st-radio"><input type="checkbox" id="gs-on"> الاستبدال مفعّل</label>
         <label>سبب الإيقاف (يراه الطلاب) <input id="gs-reason" maxlength="120" placeholder="مثال: فترة الاختبارات"></label>
         <button type="button" class="primary" id="gs-save">حفظ</button></div><p id="gs-info" class="small"></p></section>` : ''}
@@ -299,14 +338,15 @@ export async function pageAdminStudents(ctx) {
     const fmtD = d => hijri(d);
     const info = document.getElementById('rank-term-info');
     api('/admin/rank/term').then(t => { info.textContent = `الفصل الحالي بدأ احتساب نقاطه في ${fmtD(t.startedAt)}.`; }).catch(() => { info.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
-    const gi = document.getElementById('gs-info'), gv = x => { document.getElementById('gs-rate').value = x.rate; document.getElementById('gs-weekly').value = x.weeklyCap;
+    const gi = document.getElementById('gs-info'), gv = x => { document.getElementById('gs-rate').value = x.rate; document.getElementById('gs-weekly').value = x.weeklyCap; document.getElementById('gs-cmax').value = x.couponMax; document.getElementById('gs-cquota').value = x.couponQuota;
       document.getElementById('gs-on').checked = x.enabled; document.getElementById('gs-reason').value = x.reason || ''; };
     api('/admin/grades/settings').then(gv).catch(() => { gi.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
     document.getElementById('gs-save').onclick = async e => {
       const b = e.currentTarget; b.disabled = true;
       try {
         gv(await api('/admin/grades/settings', { method: 'POST', body: { rate: document.getElementById('gs-rate').value, weekly: document.getElementById('gs-weekly').value,
-          enabled: document.getElementById('gs-on').checked, reason: document.getElementById('gs-reason').value } }));
+          enabled: document.getElementById('gs-on').checked, reason: document.getElementById('gs-reason').value,
+          couponMax: document.getElementById('gs-cmax').value, couponQuota: document.getElementById('gs-cquota').value } }));
         toast('حُفظت إعدادات الرصيد'); gi.textContent = '';
       } catch (err) { fail(err); } finally { b.disabled = false; }
     };
