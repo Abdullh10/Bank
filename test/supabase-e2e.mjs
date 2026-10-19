@@ -404,6 +404,22 @@ await p.selectOption('#s-count', '5'); await p.check('#s-timed');
 await p.click('#s-start'); await p.waitForSelector('.st-opt');
 ok('student: session started with timer', (await p.locator('.st-top').innerText()).includes('سؤال 1 من 5') && await p.locator('#st-timer').isVisible());
 ok('student: no answer marked before answering', (await p.locator('.st-opt.ok, .st-opt.bad').count()) === 0);
+ok('student: report-a-problem button on the question', await p.locator('#st-report').isVisible());
+await p.click('#st-report'); await p.waitForSelector('dialog.bal-dlg[open]');
+await p.screenshot({ path: `${OUT}/student-report.png` });
+await p.check('input[name=rr][value=other]'); await p.click('#rr-send');
+ok('student: «other» requires a description', await p.locator('#rr-err').isVisible());
+await p.check('input[name=rr][value=answer]'); await p.fill('#rr-body', 'أظن أن البديل ب صحيح أيضًا'); await p.click('#rr-send');
+await p.waitForSelector('dialog.bal-dlg', { state: 'detached' });
+const rep = await pool.query("select body, author_name, source from public.review_notes where source = 'student'");
+ok('student: report saved as a student note without the student name', rep.rowCount === 1 && rep.rows[0].author_name === 'طالب' && rep.rows[0].body.includes('أظن أن البديل ب'));
+await p.click('#st-report'); await p.waitForSelector('dialog.bal-dlg[open]'); await p.click('#rr-send'); await p.locator('#rr-err').waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+ok('student: second open report on the same question refused', (await p.locator('#rr-err').innerText()).includes('سبق أن أبلغت'));
+await p.click('dialog.bal-dlg button[value="no"]'); await p.waitForSelector('dialog.bal-dlg', { state: 'detached' });
+const stId = (await pool.query("select id from auth.users where email = 'st2test@chem21.local'")).rows[0].id;
+ok('student: cannot read the notes list', !!(await asRole(stId, "select to_jsonb(public.get_notes(null, 'open')) r")).error);
+ok('reviewer: sees the student report (source student, no student name)', (await asRole('11111111-1111-1111-1111-111111111111', "select to_jsonb(public.get_notes(null, 'open')) r")).data.some(n => n.source === 'student' && n.author === 'طالب'));
+ok('teacher: cannot read the notes', !!(await asRole('22222222-2222-2222-2222-222222222222', "select to_jsonb(public.get_notes(null, 'open')) r")).error);
 for (let i = 0; i < 5; i++) {
   await p.locator('.st-opt').first().click(); await p.waitForSelector('.st-fb');
   if (i === 0) { ok('student: immediate feedback with explanation', (await p.locator('.st-fb').innerText()).includes('التفسير')); await p.locator('.toast').first().waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
@@ -473,6 +489,11 @@ ok('database: one pending redemption, practice answers untouched', dbBal.rows[0]
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
+await p.goto(BASE + '#/notes'); await p.waitForSelector('.notes .note');
+ok('owner: student report shown in notes with its badge and resolve/delete tools', (await p.locator('.notes .note', { hasText: 'بلاغ طالب' }).count()) === 1 && await p.locator('.notes .note [data-nresolve]').first().isVisible() && await p.locator('.notes .note [data-ndel]').first().isVisible());
+const repId = (await pool.query("select id from public.review_notes where source = 'student'")).rows[0].id;
+const delRes = await asRole('11111111-1111-1111-1111-111111111111', 'select public.delete_note($1) r', [repId]);
+ok('reviewer: can delete a wrong student report', !delRes.error && (await pool.query("select 1 from public.review_notes where source = 'student'")).rowCount === 0, JSON.stringify(delRes));
 await p.goto(BASE + '#/team'); await p.waitForSelector('tr[data-user="view"] .tm-assign-btn');
 ok('team: teacher row shows assignment summary', (await p.locator('tr[data-user="view"] .tm-sum').innerText()).includes('1 مقرر · 0 طالب'));
 await p.locator('tr[data-user="view"] .tm-assign-btn').click(); await p.waitForSelector('.tm-assign .tm-pick .tm-chk');

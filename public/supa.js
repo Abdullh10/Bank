@@ -195,6 +195,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
   if (p === '/student/history') return rpc('student_history');
   if (p === '/student/rank') return rpc('student_leaderboard', { p_course: f.course ? Number(f.course) : null });
+  if (p === '/student/report') { await rpc('student_report_question', { p_question: body.question, p_reason: body.reason, p_body: body.body ?? null }); return { ok: true }; }
   if (p === '/student/balance') return rpc('student_balance', { p_course: f.course ? Number(f.course) : null });
   if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------

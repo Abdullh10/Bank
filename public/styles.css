@@ -1117,3 +1117,10 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .ic-bronze-1 { stop-color: var(--ic-bronze-1); } .ic-bronze-2 { stop-color: var(--ic-bronze-2); }
 .ic-silver-1 { stop-color: var(--ic-silver-1); } .ic-silver-2 { stop-color: var(--ic-silver-2); }
 .ic-gilt-1 { stop-color: var(--ic-gilt-1); } .ic-gilt-2 { stop-color: var(--ic-gilt-2); }
+
+/* الإبلاغ عن مشكلة في سؤال */
+.st-qhead { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: center; justify-content: space-between; }
+.st-report { display: inline-flex; align-items: center; gap: .3rem; min-height: 2.2rem; padding: .2rem .7rem; font-size: .85rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); color: var(--muted, inherit); cursor: pointer; }
+.st-report:hover { border-color: var(--brand-3); }
+.st-rep-opts { border: 0; margin: .6rem 0; padding: 0; display: grid; gap: .4rem; }
+.bal-dlg textarea { width: 100%; }
