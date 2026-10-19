@@ -1725,8 +1725,9 @@ insert into public.rank_terms (started_at, note)
   where not exists (select 1 from public.rank_terms);
 
 -- نقاط كل طالب في المقرر (داخلية): تُستدعى من الدوال المحمية أدناه فقط
+drop function if exists public._rank_rows(bigint, uuid[]);
 create or replace function public._rank_rows(p_course bigint, p_ids uuid[])
-returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, retry_fixes int, net numeric, score numeric)
+returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, retry_fixes int, net numeric, score numeric, weeks_kept int)
 language sql stable security definer set search_path = public, pg_temp as $$
   with term as (select max(started_at) s from public.rank_terms),
   cq as (select q.id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
@@ -1745,8 +1746,11 @@ language sql stable security definer set search_path = public, pg_temp as $$
             from first f where f.secs >= 3),
   fix as (select f.user_id, count(*)::int n from first f where not f.correct
           and exists (select 1 from ranked r where r.user_id = f.user_id and r.question_id = f.question_id and r.rn > 1 and r.correct) group by 1),
+  wk as (select v.user_id, (date_trunc('week', v.d + 1) - interval '1 day')::date w, count(*) n, count(distinct v.d) dys, count(*) filter (where v.correct) c
+         from valid v group by 1, 2),
   agg as (
     select u.user_id,
+      (select count(*) from wk where wk.user_id = u.user_id and wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > 30)::int weeks_kept,
       (select count(*) from first f where f.user_id = u.user_id)::int attempts,
       (select count(*) from valid v where v.user_id = u.user_id)::int valid,
       (select count(*) from valid v where v.user_id = u.user_id and v.correct)::int correct,
@@ -1757,7 +1761,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
       coalesce((select sum(case when v.correct then 1 else -1.0 / 3 end) from valid v where v.user_id = u.user_id and v.dn <= 50), 0) net
     from unnest(p_ids) as u(user_id))
   select user_id, attempts, valid, correct, rushed, days_any, days_active, retry_fixes, round(net, 1),
-    round(greatest(net + 3 * least(days_active, 20) + least(retry_fixes, 30), 0), 1)
+    round(greatest(net + 3 * least(days_active, 20) + least(retry_fixes, 30) + 2 * weeks_kept, 0), 1), weeks_kept
   from agg
 $$;
 
@@ -1765,7 +1769,7 @@ $$;
 create or replace function public.student_leaderboard(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare me public.profiles; v_course bigint; v_ids uuid[]; v_res jsonb;
-  v_rules jsonb := jsonb_build_object('minValid', 30, 'minDays', 3, 'rushSecs', 3, 'dailyCap', 50, 'dayBonus', 3, 'dayCap', 20, 'dayMin', 10, 'dayAcc', 50, 'fixCap', 30, 'rushMaxPct', 40);
+  v_rules jsonb := jsonb_build_object('minValid', 30, 'minDays', 3, 'rushSecs', 3, 'dailyCap', 50, 'dayBonus', 3, 'dayCap', 20, 'dayMin', 10, 'dayAcc', 50, 'weekBonus', 2, 'weekValid', 30, 'weekDays', 3, 'fixCap', 30, 'rushMaxPct', 40);
 begin
   perform public._require_student();
   select * into me from profiles where user_id = auth.uid();
@@ -1861,7 +1865,7 @@ revoke execute on function public._rank_rows(bigint, uuid[]) from authenticated;
 -- 2026-10-19: الرصيد — استبدال نقاط التميّز بدرجات
 --   كل 50 نقطة (يضبطها المالك) = درجة تُضاف إلى رصيد الطالب ويرصدها المعلم.
 --   نقاط الترتيب لا تنقص أبدًا: «المتاح» = نقاط الفصل − ما استُبدل منها في الفصل نفسه.
---   شروط: دخول الترتيب، وألا يكون «يحتاج متابعة»، وسقف أسبوعي (افتراضيًا درجتان)، ومفتاح إيقاف بسبب.
+--   شروط: ألا يكون «يحتاج متابعة»، وسقف أسبوعي (افتراضيًا درجتان)، ومفتاح إيقاف بسبب.
 --   مكافأة «يوم تدريب جاد» (+3) تشترط الآن صحة 50% فأكثر في ذلك اليوم حتى لا تُنال بالتخمين.
 --   إضافات فقط: لا تعدّل ولا تحذف شيئًا من جلسات التدريب وإجابات الطلاب.
 -- =====================================================================
@@ -1912,8 +1916,9 @@ language sql stable security definer set search_path = public, pg_temp as $$
 $$;
 
 -- حالة رصيد الطالب (داخلية)
+drop function if exists public._grade_state(uuid, bigint);
 create or replace function public._grade_state(p_user uuid, p_course bigint)
-returns table (score numeric, valid int, attempts int, correct int, rushed int, days_any int, elig boolean, watch boolean, spent int, week_used int)
+returns table (score numeric, valid int, attempts int, correct int, rushed int, days_any int, elig boolean, watch boolean, spent int, week_used int, weeks_kept int)
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare r record; v_since timestamptz; v_week timestamptz;
 begin
@@ -1921,7 +1926,7 @@ begin
   select greatest((select max(started_at) from rank_terms), coalesce(p.rank_since, '-infinity'::timestamptz)) into v_since from profiles p where p.user_id = p_user;
   v_week := (date_trunc('week', (now() at time zone 'Asia/Riyadh') + interval '1 day') - interval '1 day') at time zone 'Asia/Riyadh';
   score := coalesce(r.score, 0); valid := coalesce(r.valid, 0); attempts := coalesce(r.attempts, 0); correct := coalesce(r.correct, 0);
-  rushed := coalesce(r.rushed, 0); days_any := coalesce(r.days_any, 0);
+  rushed := coalesce(r.rushed, 0); days_any := coalesce(r.days_any, 0); weeks_kept := coalesce(r.weeks_kept, 0);
   elig := valid >= 30 and days_any >= 3 and (attempts = 0 or 100.0 * rushed / attempts <= 40);
   watch := (attempts >= 10 and 100.0 * rushed / attempts > 40) or (valid >= 30 and 100.0 * correct / valid <= 30);
   select coalesce(sum(g.points), 0)::int into spent from grade_redemptions g
@@ -1941,7 +1946,7 @@ $$;
 create or replace function public.student_balance(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare v_course bigint; s record; g public.grade_settings; v_pending int; v_recorded int; v_streak int := 0;
-  v_today date := (now() at time zone 'Asia/Riyadh')::date; v_tv int := 0; v_tc int := 0; v_avail numeric; v_blocked text; v_ready int; v_left int;
+  v_today date := (now() at time zone 'Asia/Riyadh')::date; v_wstart date; v_wv int := 0; v_wd int := 0; v_wc int := 0; v_tv int := 0; v_tc int := 0; v_avail numeric; v_blocked text; v_ready int; v_left int;
 begin
   perform public._require_student();
   v_course := public._student_course(p_course);
@@ -1951,11 +1956,13 @@ begin
   v_avail := greatest(s.score - s.spent, 0);
   v_ready := floor(v_avail / g.points_per_grade)::int;
   v_left := greatest(g.weekly_cap - s.week_used, 0);
-  v_blocked := case when not g.enabled then 'disabled' when not s.elig then 'notEligible' when s.watch then 'watch'
+  v_blocked := case when not g.enabled then 'disabled' when s.watch then 'watch'
     when v_left = 0 then 'weeklyCap' when v_ready < 1 then 'insufficient' end;
   select coalesce(sum(grades) filter (where status = 'pending'), 0), coalesce(sum(grades) filter (where status = 'recorded'), 0)
     into v_pending, v_recorded from grade_redemptions where user_id = auth.uid() and course_id = v_course;
+  v_wstart := (date_trunc('week', v_today + 1) - interval '1 day')::date;
   select coalesce(sum(valid), 0), coalesce(sum(correct), 0) into v_tv, v_tc from public._rank_days(v_course, auth.uid()) where d = v_today;
+  select coalesce(sum(valid), 0), count(*), coalesce(sum(correct), 0) into v_wv, v_wd, v_wc from public._rank_days(v_course, auth.uid()) where d >= v_wstart;
   select coalesce(max(n) filter (where last_d >= v_today - 1), 0) into v_streak from (
     select max(d) last_d, count(*)::int n from (
       select d, d - (row_number() over (order by d))::int grp from public._rank_days(v_course, auth.uid()) where valid >= 10 and 2 * correct >= valid) z group by grp) y;
@@ -1965,7 +1972,8 @@ begin
     'toNext', round(g.points_per_grade - (v_avail - v_ready * g.points_per_grade), 1),
     'pending', v_pending, 'recorded', v_recorded, 'weekUsed', s.week_used, 'weekLeft', v_left,
     'eligible', s.elig, 'blocked', v_blocked, 'needValid', greatest(0, 30 - s.valid), 'needDays', greatest(0, 3 - s.days_any),
-    'streak', v_streak, 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
+    'streak', v_streak, 'weeksKept', s.weeks_kept,
+    'week', jsonb_build_object('valid', v_wv, 'days', v_wd, 'kept', v_wv >= 30 and v_wd >= 3 and coalesce(100.0 * v_wc / nullif(v_wv, 0) > 30, false)), 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
     'history', (select coalesce(jsonb_agg(jsonb_build_object('id', h.id, 'grades', h.grades, 'points', h.points, 'status', h.status, 'at', h.created_at,
         'recordedAt', h.recorded_at, 'reason', h.cancel_reason) order by h.created_at desc), '[]')
       from (select * from grade_redemptions where user_id = auth.uid() order by created_at desc limit 30) h));
@@ -1984,7 +1992,6 @@ begin
   select * into g from grade_settings where id = 1;
   if not g.enabled then raise exception 'الاستبدال متوقف مؤقتًا%', case when coalesce(g.disabled_reason, '') <> '' then ': ' || g.disabled_reason else '' end; end if;
   select * into s from public._grade_state(auth.uid(), v_course);
-  if not s.elig then raise exception 'ادخل قائمة التميّز أولًا (30 إجابة محتسبة في 3 أيام على الأقل) ثم استبدل نقاطك'; end if;
   if s.watch then raise exception 'تدريبك يحتاج متابعة؛ تأنَّ في الإجابة ثم عاود الاستبدال'; end if;
   if s.week_used + p_grades > g.weekly_cap then raise exception 'سقف الاستبدال هذا الأسبوع % درجات (استبدلت %)', g.weekly_cap, s.week_used; end if;
   v_cost := p_grades * g.points_per_grade;

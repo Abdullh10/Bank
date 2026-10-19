@@ -345,6 +345,7 @@ export async function pageStudentRank(ctx) {
         <li><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</li>
         <li><b>الانتظام:</b> +${num(r.dayBonus)} نقاط عن كل يوم تدريب فيه ${num(r.dayMin)} إجابات صالحة فأكثر (حتى ${num(r.dayCap)} يومًا).</li>
         <li><b>تصحيح الأخطاء:</b> +1 عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</li>
+        <li><b>المحافظة على التميّز:</b> +${num(r.weekBonus)} نقطة عن كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق 30%.</li>
         <li><b>شروط الدخول:</b> ${num(r.minValid)} إجابة محتسبة في ${num(r.minDays)} أيام على الأقل، وألا تزيد إجاباتك السريعة جدًا على ${num(r.rushMaxPct)}%.</li>
         <li>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</li>
       </ul>
@@ -356,7 +357,6 @@ export async function pageStudentRank(ctx) {
 const BADGES = [[1, 'برونزي', 'أول درجة تكسبها بتدريبك'], [3, 'فضي', '3 درجات من تدريب جاد'], [6, 'ذهبي', '6 درجات: مثابرة تستحق التقدير']];
 const BLOCK_TEXT = {
   disabled: d => `الاستبدال متوقف مؤقتًا${d.settings.reason ? `: ${d.settings.reason}` : ''}.`,
-  notEligible: d => `ادخل قائمة التميّز أولًا لتستبدل نقاطك: ${d.needValid ? `تبقى ${num(d.needValid)} إجابة محتسبة` : ''}${d.needValid && d.needDays ? ' و' : ''}${d.needDays ? `${num(d.needDays)} أيام تدريب` : ''}.`,
   watch: () => 'تدريبك يحتاج متابعة: تأنَّ في قراءة السؤال ثم الإجابة، ويعود الاستبدال حين يتحسن تدريبك.',
   weeklyCap: d => `بلغت سقف الاستبدال لهذا الأسبوع (${num(d.settings.weeklyCap)} درجات). يتجدد السقف يوم الأحد.`,
 };
@@ -409,6 +409,8 @@ export async function pageStudentBalance(ctx) {
              <div class="small">اليوم: ${num(d.today.valid)} من ${num(10)} إجابات</div><div class="bar"><span style="width:${Math.min(100, d.today.valid * 10)}%"></span></div>
              ${d.today.valid >= 10 ? '<p class="small muted">أتممت العدد، لكن الصحة أقل من 50%؛ راجع تفسير الأخطاء وأجب عن أسئلة إضافية.</p>' : ''}
              <a class="btn primary" href="#/">ابدأ التدريب</a>`}
+        <div class="bal-week ${d.week.kept ? 'ok' : ''}"><b>${d.week.kept ? '✅ حافظت على تميّزك هذا الأسبوع (+2 نقطة)' : '⭐ حافظ على تميّزك هذا الأسبوع تكسب +2 نقطة'}</b>
+          <span class="small muted">${num(Math.min(d.week.valid, 30))} من 30 إجابة محتسبة · ${num(Math.min(d.week.days, 3))} من 3 أيام تدريب (الأسبوع من الأحد)${d.weeksKept ? ` · أسابيع التميّز: ${num(d.weeksKept)}` : ''}</span></div>
         <div class="bal-stats">
           <div><b>${d.streak ? '🔥 ' : ''}${num(d.streak)}</b><span class="small muted">أيام جادة متتالية</span></div>
           <div><b>${num(d.weekUsed)}/${num(d.settings.weeklyCap)}</b><span class="small muted">درجات هذا الأسبوع</span></div>
@@ -433,7 +435,8 @@ export async function pageStudentBalance(ctx) {
         <li>كل <b>${num(rate)}</b> نقطة من نقاط التميّز تُستبدل بدرجة تُضاف إلى رصيدك، ويرصدها لك معلمك.</li>
         <li>تُخصم النقاط المستبدلة من «نقاطك المتاحة» فقط، وترتيبك في التميّز لا ينقص.</li>
         <li>الحد الأقصى <b>${num(d.settings.weeklyCap)}</b> درجات في الأسبوع، يتجدد يوم الأحد.</li>
-        <li>يشترط دخولك قائمة التميّز وألا يكون تدريبك «يحتاج متابعة» (إجابات سريعة جدًا أو قريبة من التخمين).</li>
+        <li>يكفي أن تبلغ النقاط المطلوبة لتستبدل، دون اشتراط دخول قائمة التميّز؛ بشرط ألا يكون تدريبك «يحتاج متابعة» (إجابات سريعة جدًا أو قريبة من التخمين).</li>
+        <li><b>مكافأة التميّز:</b> +2 نقطة عن كل أسبوع تجيب فيه 30 إجابة محتسبة على الأقل في 3 أيام مختلفة وبصحة فوق 30%.</li>
         <li>للمعلم أن يُلغي استبدالًا لم يرصده بسبب مكتوب، وتعود نقاطك إليك.</li>
         <li>مع بدء فصل دراسي جديد تبدأ النقاط من الصفر، أما الدرجات التي استبدلتها فتبقى لك.</li>
       </ul></section>`;
