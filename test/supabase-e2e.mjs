@@ -433,7 +433,7 @@ ok('student: leaderboard RPC exposes no other student details', rk.data && !JSON
 // الرصيد: غير مؤهل أولًا، ثم نمنحه تدريبًا جادًا (بيانات تجريبية تُحذف بعد اختبار المعلم) ويستبدل نقاطه بدرجة
 ok('student: «الرصيد» in the menu', await p.locator('[data-nav="balance"]').isVisible());
 await p.goto(BASE + '#/balance'); await p.waitForSelector('.bal-main');
-ok('student: balance page explains how to enter before redeeming', (await p.locator('main').innerText()).includes('ادخل قائمة التميّز أولًا') && !(await p.locator('[data-redeem]').count()));
+ok('student: balance page shows no redeem button before enough points, and the weekly keep-up bonus', (await p.locator('main').innerText()).includes('حافظ على تميّزك') && !(await p.locator('[data-redeem]').count()));
 const sid = (await pool.query("select id from auth.users where email = 'st2test@chem21.local'")).rows[0].id;
 await pool.query(`update public.rank_terms set started_at = now() - interval '30 days'`);
 await pool.query(`do $$ declare sid2 bigint; qq record; n int; k int; t timestamptz; begin
@@ -451,6 +451,7 @@ await p.goto(BASE + '#/'); await p.waitForSelector('#st-bal:not([hidden])');
 ok('student: home shows the balance strip', (await p.locator('#st-bal').innerText()).includes('درجة جاهزة'));
 await p.goto(BASE + '#/balance'); await p.waitForSelector('[data-redeem]');
 ok('student: balance shows a ready grade, streak and the mission done', (await p.locator('main').innerText()).includes('درجة جاهزة للاستبدال') && (await p.locator('.bal-mission.ok').count()) === 1);
+ok('student: weekly keep-up status shown', (await p.locator('.bal-week').count()) === 1);
 await p.screenshot({ path: `${OUT}/student-balance.png`, fullPage: true });
 await p.locator('[data-redeem="1"]').click(); await p.waitForSelector('dialog.bal-dlg[open]');
 ok('student: confirmation says how many points remain', (await p.locator('dialog.bal-dlg').innerText()).includes('ويبقى لك'));
