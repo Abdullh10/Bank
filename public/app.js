@@ -2,8 +2,8 @@
 import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { similarPairs } from './validate.js';
-import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentConfirm, resetStudentSession } from './student.js';
-import { pageTeacherProgress, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
+import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentConfirm, resetStudentSession } from './student.js';
+import { pageTeacherProgress, pageTeacherGrades, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
 import { pageDashboard } from './dashboard.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
@@ -956,7 +956,7 @@ async function route() {
   const role = state.user.role, isStudent = role === 'student';
   document.querySelectorAll('[data-perm]').forEach(a => {
     const p = a.dataset.perm;
-    a.hidden = !(p === 'student' ? isStudent && (a.dataset.nav !== 'rank' || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !SUPABASE_ONLY.includes(p)));
+    a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance'].includes(a.dataset.nav) || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || a.dataset.nav === 'grades')));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
@@ -964,6 +964,7 @@ async function route() {
       if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
       else if (page === 'history') await pageStudentHistory(ctx);
       else if (page === 'rank' && state.supabase) await pageStudentRank(ctx);
+      else if (page === 'balance' && state.supabase) await pageStudentBalance(ctx);
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
     } catch (e) {
       if (e?.status === 401) return fail(e);
@@ -988,6 +989,7 @@ async function route() {
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
     else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
+    else if (page === 'grades' && can('progress') && state.supabase) await pageTeacherGrades(ctx);
     else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
     else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);
     else if (page === 'team' && can('accounts') && state.supabase) await pageAdminTeam(ctx);

@@ -195,7 +195,14 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
   if (p === '/student/history') return rpc('student_history');
   if (p === '/student/rank') return rpc('student_leaderboard', { p_course: f.course ? Number(f.course) : null });
+  if (p === '/student/balance') return rpc('student_balance', { p_course: f.course ? Number(f.course) : null });
+  if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------
+  if (p === '/teacher/grades') return rpc('teacher_grade_balances', { p_course: course });
+  if (p === '/teacher/grades/record') return rpc('teacher_record_grades', { p_user: body.user || null, p_course: course });
+  if (p === '/teacher/grades/cancel') { await rpc('teacher_cancel_redemption', { p_id: body.id, p_reason: body.reason }); return { ok: true }; }
+  if (p === '/admin/grades/settings') return method === 'GET' ? rpc('admin_get_grade_settings')
+    : rpc('admin_set_grade_settings', { p_rate: Number(body.rate), p_weekly: Number(body.weekly), p_enabled: !!body.enabled, p_reason: body.reason ?? null });
   if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null, p_course: course });
   if (p === '/teacher/quality') return rpc('teacher_training_quality', { p_course: course });
   if (p === '/admin/rank/term') return method === 'GET' ? rpc('admin_get_rank_term') : rpc('admin_start_new_term', { p_note: body.note ?? null });
