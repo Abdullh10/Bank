@@ -74,6 +74,7 @@ export async function pageStudentHome(ctx) {
       <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
       <p class="muted">اختر الدروس وعدد الأسئلة والمستوى. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
     <section class="card st-top5" id="st-top5" hidden></section>
+    <section class="card st-bal" id="st-bal" hidden></section>
     <div class="grid2 st-setup">
       <section class="card">${ttl('lessons', 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
@@ -104,6 +105,16 @@ export async function pageStudentHome(ctx) {
     if (!box || !d?.available || !d.top?.length) return;
     box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
       <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
+    box.hidden = false;
+  }).catch(() => {});
+  // شريط الرصيد: نقاطك المتاحة وما بقي للدرجة القادمة
+  api('/student/balance').then(d => {
+    const box = document.getElementById('st-bal');
+    if (!box || !d?.available) return;
+    const rate = d.settings.rate;
+    box.innerHTML = `<div class="st-top5-head">${ttl('coin', 'رصيدك', 'h2', 30)}<a class="btn" href="#/balance">${d.ready ? 'استبدل نقاطك بدرجة ←' : 'فتح الرصيد ←'}</a></div>
+      <p class="bal-ready">${d.ready ? `لديك <b>${num(d.ready)}</b> ${d.ready === 1 ? 'درجة جاهزة' : 'درجات جاهزة'} للاستبدال!` : `نقاطك المتاحة <b>${num(d.points)}</b>، وباقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة.`}</p>
+      <div class="bar"><span style="width:${d.ready ? 100 : Math.round(100 * Math.min(1, (d.points - d.ready * rate) / rate))}%"></span></div>`;
     box.hidden = false;
   }).catch(() => {});
   document.getElementById('s-start').onclick = async () => {
@@ -338,6 +349,114 @@ export async function pageStudentRank(ctx) {
         <li>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</li>
       </ul>
     </section>`;
+}
+
+
+// ---------- الرصيد: استبدال نقاط التميّز بدرجات ----------
+const BADGES = [[1, 'برونزي', 'أول درجة تكسبها بتدريبك'], [3, 'فضي', '3 درجات من تدريب جاد'], [6, 'ذهبي', '6 درجات: مثابرة تستحق التقدير']];
+const BLOCK_TEXT = {
+  disabled: d => `الاستبدال متوقف مؤقتًا${d.settings.reason ? `: ${d.settings.reason}` : ''}.`,
+  notEligible: d => `ادخل قائمة التميّز أولًا لتستبدل نقاطك: ${d.needValid ? `تبقى ${num(d.needValid)} إجابة محتسبة` : ''}${d.needValid && d.needDays ? ' و' : ''}${d.needDays ? `${num(d.needDays)} أيام تدريب` : ''}.`,
+  watch: () => 'تدريبك يحتاج متابعة: تأنَّ في قراءة السؤال ثم الإجابة، ويعود الاستبدال حين يتحسن تدريبك.',
+  weeklyCap: d => `بلغت سقف الاستبدال لهذا الأسبوع (${num(d.settings.weeklyCap)} درجات). يتجدد السقف يوم الأحد.`,
+};
+const RING = 2 * Math.PI * 52;
+const ring = (frac, inner) => `<div class="bal-ring" role="img" aria-label="تقدمك نحو الدرجة القادمة"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="bal-track"/>
+  <circle cx="60" cy="60" r="52" class="bal-fill" style="stroke-dasharray:${RING.toFixed(1)};stroke-dashoffset:${(RING * (1 - Math.min(1, Math.max(0, frac)))).toFixed(1)}"/></svg><div class="bal-ring-in">${inner}</div></div>`;
+
+function celebrate(grades, left) {
+  const o = document.createElement('div');
+  o.className = 'bal-cele';
+  o.setAttribute('role', 'status');
+  o.innerHTML = `<div class="bal-cele-card"><div class="bal-coin" aria-hidden="true">${icon('coin', 84)}</div>
+    <h2>مبروك! أضفت ${grades === 1 ? 'درجة' : num(grades) + ' درجات'} إلى رصيدك</h2><p class="muted">سيرصدها لك معلمك. بقي لك ${num(left)} نقطة، فواصل التدريب لتكسب الدرجة القادمة.</p>
+    <button type="button" class="primary">رائع</button></div>${'<i></i>'.repeat(14)}`;
+  document.body.append(o);
+  const close = () => o.remove();
+  o.querySelector('button').onclick = close;
+  o.addEventListener('click', e => { if (e.target === o) close(); });
+  setTimeout(close, 6000);
+}
+
+export async function pageStudentBalance(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const d = await api('/student/balance');
+  const hero = `<section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>الرصيد</h1>
+    <p class="muted">حوّل نقاط تدريبك إلى درجات: كل ${num(d.settings?.rate || 50)} نقطة تكسبها بتدريب جاد تُستبدل بدرجة تضاف إلى رصيدك ويرصدها لك معلمك.</p></div></div></section>`;
+  if (!d.available) { $app.innerHTML = `${hero}<section class="card"><div class="empty">لم يُسند لك مقرر جاهز بعد.</div></section>`; return; }
+  const rate = d.settings.rate, inRing = d.points - d.ready * rate;
+  const maxNow = Math.min(d.ready, d.weekLeft, 10);
+  const blocked = d.blocked && d.blocked !== 'insufficient' ? BLOCK_TEXT[d.blocked](d) : '';
+  const total = d.pending + d.recorded;
+  const buy = [1, ...(maxNow > 1 ? [maxNow] : [])];
+  const status = { pending: ['بانتظار رصد المعلم', 'warn'], recorded: ['تم رصدها', 'ok'], cancelled: ['أُلغيت وعادت النقاط', ''] };
+  $app.innerHTML = `${hero}
+    <div class="grid2">
+      <section class="card bal-main">${ttl('coin', 'رصيد نقاطك')}
+        <div class="bal-top">${ring(maxNow ? 1 : inRing / rate, `<b>${num(d.points)}</b><span class="small muted">نقطة متاحة</span>`)}
+          <div class="bal-info">
+            ${maxNow ? `<p class="bal-ready"><b>${num(maxNow)}</b> ${maxNow === 1 ? 'درجة جاهزة' : 'درجات جاهزة'} للاستبدال</p>
+              <div class="actions">${buy.map(k => `<button type="button" class="primary" data-redeem="${k}">استبدل ${num(k * rate)} نقطة بـ ${k === 1 ? 'درجة' : num(k) + ' درجات'}</button>`).join('')}</div>`
+            : `<p class="bal-ready">${d.blocked === 'insufficient' ? `باقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة` : 'نقاطك تتجمع باستمرار'}</p>
+              <div class="bar"><span style="width:${Math.round(100 * Math.min(1, inRing / rate))}%"></span></div>`}
+            ${blocked ? `<p class="notice warn small">${esc(blocked)}</p>` : ''}
+            <p class="small muted">نقاطك في قائمة التميّز ${num(d.score)}؛ ما تستبدله لا ينقص ترتيبك.</p>
+          </div></div>
+      </section>
+      <section class="card">${ttl('spark', 'مهمتك اليوم')}
+        ${d.today.done ? `<p class="bal-mission ok"><b>أنجزتها!</b> أجبت ${num(d.today.valid)} سؤالًا بتأنٍّ وصحتك ${num(pct(d.today.correct, d.today.valid))}%؛ كسبت +3 نقاط ليوم تدريب جاد.</p>`
+          : `<p class="bal-mission">أجب ${num(10)} أسئلة بتأنٍّ وبصحة ${num(50)}% فأكثر تكسب +3 نقاط إضافية.</p>
+             <div class="small">اليوم: ${num(d.today.valid)} من ${num(10)} إجابات</div><div class="bar"><span style="width:${Math.min(100, d.today.valid * 10)}%"></span></div>
+             ${d.today.valid >= 10 ? '<p class="small muted">أتممت العدد، لكن الصحة أقل من 50%؛ راجع تفسير الأخطاء وأجب عن أسئلة إضافية.</p>' : ''}
+             <a class="btn primary" href="#/">ابدأ التدريب</a>`}
+        <div class="bal-stats">
+          <div><b>${d.streak ? '🔥 ' : ''}${num(d.streak)}</b><span class="small muted">أيام جادة متتالية</span></div>
+          <div><b>${num(d.weekUsed)}/${num(d.settings.weeklyCap)}</b><span class="small muted">درجات هذا الأسبوع</span></div>
+        </div>
+      </section>
+    </div>
+    <section class="card">${ttl('trophy', 'درجاتك')}
+      <div class="bal-grades">
+        <div class="bal-gbox"><b>${num(d.pending)}</b><span class="small muted">بانتظار رصد المعلم</span></div>
+        <div class="bal-gbox ok"><b>${num(d.recorded)}</b><span class="small muted">تم رصدها</span></div>
+      </div>
+      <ul class="bal-badges">${BADGES.map(([n, t, tip]) => `<li class="${total >= n ? 'on' : ''}"><span aria-hidden="true">${total >= n ? '🏅' : '🔒'}</span><b>${t}</b><span class="small muted">${tip}</span></li>`).join('')}</ul>
+    </section>
+    <section class="card">${ttl('history', 'سجل الاستبدال')}
+      ${d.history.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>التاريخ</th><th>الدرجات</th><th>النقاط</th><th>الحالة</th></tr></thead><tbody>
+        ${d.history.map(h => { const [t, k] = status[h.status] || ['—', '']; return `<tr><td class="small">${esc(hijri(h.at, true))}</td><td>${num(h.grades)}</td><td>${num(h.points)}</td>
+          <td><span class="badge ${k}">${t}</span>${h.status === 'cancelled' && h.reason ? ` <span class="small muted">${esc(h.reason)}</span>` : ''}</td></tr>`; }).join('')}
+      </tbody></table></div>` : '<div class="empty">لم تستبدل نقاطًا بعد. حين تبلغ ' + num(rate) + ' نقطة تظهر لك درجتك الأولى هنا.</div>'}
+    </section>
+    <section class="card">${ttl('spark', 'كيف يعمل الرصيد؟')}
+      <ul class="rank-rules">
+        <li>كل <b>${num(rate)}</b> نقطة من نقاط التميّز تُستبدل بدرجة تُضاف إلى رصيدك، ويرصدها لك معلمك.</li>
+        <li>تُخصم النقاط المستبدلة من «نقاطك المتاحة» فقط، وترتيبك في التميّز لا ينقص.</li>
+        <li>الحد الأقصى <b>${num(d.settings.weeklyCap)}</b> درجات في الأسبوع، يتجدد يوم الأحد.</li>
+        <li>يشترط دخولك قائمة التميّز وألا يكون تدريبك «يحتاج متابعة» (إجابات سريعة جدًا أو قريبة من التخمين).</li>
+        <li>للمعلم أن يُلغي استبدالًا لم يرصده بسبب مكتوب، وتعود نقاطك إليك.</li>
+        <li>مع بدء فصل دراسي جديد تبدأ النقاط من الصفر، أما الدرجات التي استبدلتها فتبقى لك.</li>
+      </ul></section>`;
+  $app.querySelectorAll('[data-redeem]').forEach(b => b.onclick = () => {
+    const k = Number(b.dataset.redeem), cost = k * rate;
+    const dlg = document.createElement('dialog');
+    dlg.className = 'bal-dlg';
+    dlg.innerHTML = `<form method="dialog"><h2>تأكيد الاستبدال</h2>
+      <p>ستستبدل <b>${num(cost)}</b> نقطة بـ <b>${k === 1 ? 'درجة واحدة' : num(k) + ' درجات'}</b>، ويبقى لك <b>${num(Math.round((d.points - cost) * 10) / 10)}</b> نقطة.</p>
+      <p class="small muted">تُخصم النقاط فورًا ويرصد المعلم الدرجة، وله أن يُلغيها بسبب فتعود نقاطك.</p>
+      <div class="actions"><button class="primary" value="ok">استبدل الآن</button><button value="no">إلغاء</button></div></form>`;
+    document.body.append(dlg);
+    dlg.addEventListener('close', async () => {
+      const ok = dlg.returnValue === 'ok'; dlg.remove();
+      if (!ok) return;
+      try {
+        const r = await api('/student/redeem', { method: 'POST', body: { grades: k } });
+        celebrate(k, r.points);
+        pageStudentBalance(ctx).catch(fail);
+      } catch (e) { fail(e); }
+    });
+    dlg.showModal();
+  });
 }
 
 export const resetStudentSession = () => { stopTimer(); session = null; };

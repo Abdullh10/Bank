@@ -25,6 +25,7 @@ const GLYPHS = {
   pie: `<circle cx="24" cy="23.5" r="10"/><path d="M24 23.5v-10a10 10 0 0 1 9.6 7.2z" fill="{a}" stroke="none"/>`,
   sliders: `<path d="M14 17h20M14 24h20M14 31h20" stroke-width="2.6"/><circle cx="19" cy="17" r="2.8" fill="{a}" stroke="none"/><circle cx="29" cy="24" r="2.8" fill="{a}" stroke="none"/><circle cx="22" cy="31" r="2.8" fill="{a}" stroke="none"/>`,
   trophy: `<path d="M17.5 14h13v6.2a6.5 6.5 0 0 1-13 0z"/><path d="M17.5 16.2h-3v1.6a4 4 0 0 0 4 4M30.5 16.2h3v1.6a4 4 0 0 1-4 4"/><path d="M24 26.8v4"/><path d="M19.5 34h9M21 30.8h6" stroke="{a}"/>`,
+  coin: `<circle cx="24" cy="24" r="10.5"/><path d="M24 17.5v13" stroke="{a}"/><path d="M27.4 20.4c-.6-1.2-1.9-1.9-3.4-1.9-2 0-3.5 1-3.5 2.5s1.4 2.1 3.5 2.5 3.5 1 3.5 2.6-1.5 2.6-3.5 2.6c-1.6 0-2.9-.8-3.5-2"/>`,
   spark: `<path d="M22 13.5c.9 5.4 2.6 7.1 8 8-5.4.9-7.1 2.6-8 8-.9-5.4-2.6-7.1-8-8 5.4-.9 7.1-2.6 8-8z"/><path d="M31.5 25.5c.5 2.6 1.3 3.4 3.9 3.9-2.6.5-3.4 1.3-3.9 3.9-.5-2.6-1.3-3.4-3.9-3.9 2.6-.5 3.4-1.3 3.9-3.9z" fill="{a}" stroke="none"/>`,
   check: `<path d="m16 24 5.5 5.5L32.5 18" stroke-width="3.6"/>`,
   cross: `<path d="m17.5 17 13 13M30.5 17l-13 13" stroke-width="3.6"/>`,
@@ -45,7 +46,7 @@ const GLYPHS = {
 export const CHAPTER_ICONS = { 1: 'atom', 2: 'periodic', 3: 'crystal', 4: 'molecule', 5: 'calc', 6: 'drop', 7: 'bubbles' };
 
 // لون البلاطة الافتراضي لكل رمز
-const TONE = { notes: 'gold', team: 'teal', trophy: 'gold', check: 'green', cross: 'rose', spark: 'teal', practice: 'teal', history: 'gold', pie: 'teal', shield: 'green', essay: 'gold', mcq: 'teal' };
+const TONE = { notes: 'gold', team: 'teal', trophy: 'gold', coin: 'gold', check: 'green', cross: 'rose', spark: 'teal', practice: 'teal', history: 'gold', pie: 'teal', shield: 'green', essay: 'gold', mcq: 'teal' };
 const TONES = ['navy', 'teal', 'gold', 'green', 'rose'];
 
 let sprite = null;

@@ -418,7 +418,7 @@ await p.screenshot({ path: `${OUT}/student-result.png`, fullPage: true });
 if (await p.locator('#st-retry').count()) {
   await p.click('#st-retry'); await p.waitForSelector('.st-opt');
   ok('student: retry mistakes session', (await p.locator('.st-top').innerText()).includes('إعادة الأخطاء'));
-  await p.click('#st-end'); p.once('dialog', d => d.accept());
+  p.once('dialog', d => d.accept()); await p.click('#st-end'); await p.waitForTimeout(500);
 }
 await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
 await p.waitForTimeout(500);
@@ -430,6 +430,39 @@ ok('student: rank page shows progress toward the 30 answers / 3 days', (await p.
 await p.screenshot({ path: `${OUT}/student-rank.png`, fullPage: true });
 const rk = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/student_leaderboard', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('student: leaderboard RPC exposes no other student details', rk.data && !JSON.stringify(rk.data).includes('username') && rk.data.top.every(t => Object.keys(t).sort().join() === 'me,name,rank,score'), JSON.stringify(Object.keys(rk.data || {})));
+// الرصيد: غير مؤهل أولًا، ثم نمنحه تدريبًا جادًا (بيانات تجريبية تُحذف بعد اختبار المعلم) ويستبدل نقاطه بدرجة
+ok('student: «الرصيد» in the menu', await p.locator('[data-nav="balance"]').isVisible());
+await p.goto(BASE + '#/balance'); await p.waitForSelector('.bal-main');
+ok('student: balance page explains how to enter before redeeming', (await p.locator('main').innerText()).includes('ادخل قائمة التميّز أولًا') && !(await p.locator('[data-redeem]').count()));
+const sid = (await pool.query("select id from auth.users where email = 'st2test@chem21.local'")).rows[0].id;
+await pool.query(`update public.rank_terms set started_at = now() - interval '30 days'`);
+await pool.query(`do $$ declare sid2 bigint; qq record; n int; k int; t timestamptz; begin
+  for n in 1..5 loop
+    t := date_trunc('day', now()) - ((n - 1) || ' days')::interval + interval '3 hours';
+    insert into public.practice_sessions (user_id, settings, question_ids, total, score, finished_at, created_at) values ('${sid}', '{"e2e":true}', '{}', 12, 0, t, t) returning id into sid2;
+    k := 0;
+    for qq in select q.id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id
+              where q.type = 'mcq' and c.course_id = 1 order by q.id offset 100 + n * 12 limit 12 loop
+      k := k + 1;
+      insert into public.practice_answers (session_id, question_id, choice, correct, answered_at) values (sid2, qq.id, 0, k <> 3, t + (k * 10 || ' seconds')::interval);
+    end loop;
+  end loop; end $$`);
+await p.goto(BASE + '#/'); await p.waitForSelector('#st-bal:not([hidden])');
+ok('student: home shows the balance strip', (await p.locator('#st-bal').innerText()).includes('درجة جاهزة'));
+await p.goto(BASE + '#/balance'); await p.waitForSelector('[data-redeem]');
+ok('student: balance shows a ready grade, streak and the mission done', (await p.locator('main').innerText()).includes('درجة جاهزة للاستبدال') && (await p.locator('.bal-mission.ok').count()) === 1);
+await p.screenshot({ path: `${OUT}/student-balance.png`, fullPage: true });
+await p.locator('[data-redeem="1"]').click(); await p.waitForSelector('dialog.bal-dlg[open]');
+ok('student: confirmation says how many points remain', (await p.locator('dialog.bal-dlg').innerText()).includes('ويبقى لك'));
+await p.locator('dialog.bal-dlg button[value="ok"]').click(); await p.waitForSelector('.bal-cele');
+ok('student: celebration after the exchange', (await p.locator('.bal-cele').innerText()).includes('مبروك'));
+await p.screenshot({ path: `${OUT}/student-balance-cele.png` });
+await p.locator('.bal-cele button').click();
+await p.waitForSelector('.bal-gbox b');
+ok('student: grade pending the teacher, points deducted, ranking score untouched', (await p.locator('.bal-gbox b').first().innerText()).trim() === '1' && (await p.locator('main tbody tr').count()) === 1
+  && (await p.locator('main').innerText()).includes('بانتظار رصد المعلم'));
+const dbBal = await pool.query(`select (select count(*) from public.grade_redemptions where user_id = '${sid}' and status = 'pending')::int pend, (select count(*) from public.practice_answers a join public.practice_sessions s on s.id = a.session_id where s.user_id = '${sid}' and s.settings @> '{"e2e":true}')::int ans`);
+ok('database: one pending redemption, practice answers untouched', dbBal.rows[0].pend === 1 && dbBal.rows[0].ans === 60);
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
@@ -451,6 +484,13 @@ await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
 ok('teacher: last activity in hijri order (day month yearهـ)', /\d{1,2} \S+( \S+)? \d{4}هـ/.test(await p.locator('main tbody').first().innerText()));
 ok('teacher: training-quality column on the progress page', (await p.locator('main').innerText()).includes('جودة التدريب'));
 ok('teacher: progress lists only the assigned student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي') && !(await p.locator('main').innerText()).includes('طالب أول تجريبي'));
+ok('teacher: «رصيد الدرجات» in the menu', await p.locator('[data-nav="grades"]').isVisible());
+await p.goto(BASE + '#/grades'); await p.waitForSelector('tr[data-id]');
+ok('teacher: grade balance lists the assigned student with 1 pending', (await p.locator('tr[data-id]').first().innerText()).includes('طالب ثان تجريبي') && (await p.locator('.hero .badge.warn').innerText()).includes('1 درجة'));
+await p.screenshot({ path: `${OUT}/teacher-grades.png`, fullPage: true });
+await p.locator('[data-rec]').first().click(); await p.waitForFunction(() => !document.querySelector('[data-rec]'), null, { timeout: 8000 });
+ok('teacher: recorded — nothing pending', (await pool.query("select count(*)::int n from public.grade_redemptions where status = 'recorded'")).rows[0].n === 1);
+await pool.query(`delete from public.grade_redemptions; delete from public.practice_sessions where settings @> '{"e2e":true}'`);
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
 // مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
 await p.click('#logout'); await p.waitForSelector('#l-user');

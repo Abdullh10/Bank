@@ -989,3 +989,45 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .st-top5-list { list-style: none; margin: .6rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
 .st-top5-list li { padding: .35rem .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); font-weight: 600; }
 .st-top5-list li.me { border-color: var(--brand-3); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-3) 25%, transparent); }
+
+/* الرصيد */
+.bal-top { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
+.bal-info { flex: 1; min-width: 14rem; display: grid; gap: .6rem; }
+.bal-ring { position: relative; width: 9.5rem; height: 9.5rem; flex: none; }
+.bal-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.bal-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
+.bal-fill { fill: none; stroke: var(--brand-3); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s var(--ease); }
+.bal-ring-in { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.bal-ring-in b { font-size: 2rem; line-height: 1.1; }
+.bal-ready { margin: 0; font-size: 1.1rem; }
+.bal-mission.ok { color: var(--ok); }
+.bal-stats { display: flex; gap: 1.5rem; margin-top: .8rem; }
+.bal-stats > div { display: grid; }
+.bal-stats b { font-size: 1.4rem; }
+.bal-grades { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: .8rem; }
+.bal-gbox { flex: 1; min-width: 8rem; display: grid; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: .9rem; background: var(--surface-2); }
+.bal-gbox b { font-size: 1.8rem; }
+.bal-gbox.ok { border-color: var(--ok); }
+.bal-badges { list-style: none; margin: 0; padding: 0; display: flex; gap: .6rem; flex-wrap: wrap; }
+.bal-badges li { display: grid; gap: .1rem; padding: .6rem .9rem; border: 1px dashed var(--line); border-radius: .8rem; opacity: .6; }
+.bal-badges li.on { opacity: 1; border-style: solid; border-color: var(--brand-3); background: var(--surface-2); }
+.st-bal { margin-bottom: 1rem; }
+.bal-dlg { max-width: 24rem; border: 0; border-radius: 1rem; padding: 1.2rem 1.4rem; }
+.bal-cele { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(8, 14, 32, .55); overflow: hidden; }
+.bal-cele-card { position: relative; z-index: 1; max-width: 22rem; padding: 1.6rem; border-radius: 1.2rem; background: var(--surface); text-align: center; display: grid; gap: .6rem; animation: pop .25s var(--ease); }
+.bal-coin { animation: bal-spin 1.2s var(--ease); }
+.bal-cele > i { position: absolute; top: -1rem; width: .6rem; height: 1rem; border-radius: 2px; background: var(--brand-3); animation: bal-fall 2.4s linear infinite; }
+.bal-cele > i:nth-child(3n) { background: #e6b422; }
+.bal-cele > i:nth-child(3n + 1) { background: var(--ok); }
+.bal-cele > i:nth-child(n) { inset-inline-start: calc(var(--n, 0) * 7%); }
+.bal-cele > i:nth-child(2) { --n: 1; animation-delay: .2s; } .bal-cele > i:nth-child(3) { --n: 2; animation-delay: .5s; } .bal-cele > i:nth-child(4) { --n: 3; animation-delay: .1s; }
+.bal-cele > i:nth-child(5) { --n: 4; animation-delay: .7s; } .bal-cele > i:nth-child(6) { --n: 5; animation-delay: .3s; } .bal-cele > i:nth-child(7) { --n: 6; animation-delay: .9s; }
+.bal-cele > i:nth-child(8) { --n: 7; animation-delay: .4s; } .bal-cele > i:nth-child(9) { --n: 8; animation-delay: 1s; } .bal-cele > i:nth-child(10) { --n: 9; animation-delay: .6s; }
+.bal-cele > i:nth-child(11) { --n: 10; animation-delay: .15s; } .bal-cele > i:nth-child(12) { --n: 11; animation-delay: .8s; } .bal-cele > i:nth-child(13) { --n: 12; animation-delay: .35s; } .bal-cele > i:nth-child(14) { --n: 13; animation-delay: .55s; }
+@keyframes bal-fall { to { transform: translateY(110vh) rotate(540deg); } }
+@keyframes bal-spin { from { transform: rotateY(0); } to { transform: rotateY(720deg); } }
+@media (prefers-reduced-motion: reduce) { .bal-cele > i, .bal-coin { animation: none; } .bal-cele > i { display: none; } .bal-fill { transition: none; } }
+.gs-form { display: flex; flex-wrap: wrap; gap: .8rem 1rem; align-items: end; }
+.gs-form label { display: grid; gap: .25rem; font-size: .9rem; }
+.gs-form input[type=number] { max-width: 8rem; }
+.tg-items { margin: .4rem 0 0; padding-inline-start: 1rem; display: grid; gap: .3rem; }

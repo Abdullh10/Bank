@@ -43,6 +43,43 @@ export async function pageTeacherProgress(ctx, section = '') {
   document.getElementById('tp-sec').onchange = e => pageTeacherProgress(ctx, e.target.value).catch(ctx.fail);
 }
 
+// رصيد الدرجات: ما استبدله طلاب المعلم المسندون من نقاط التميّز، ليرصدها لهم
+export async function pageTeacherGrades(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const d = await api('/teacher/grades');
+  const canWrite = ['admin', 'viewer'].includes(ctx.state?.user?.role);
+  const pendingAll = d.reduce((a, x) => a + x.pending, 0);
+  const ST = { pending: ['بانتظار الرصد', 'warn'], recorded: ['مرصودة', 'ok'], cancelled: ['ملغاة', ''] };
+  $app.innerHTML = `
+    <section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>رصيد الدرجات</h1>
+      <p class="muted">درجات استبدلها طلابك من نقاط التميّز (كل درجة تقابل تدريبًا جادًا منتظمًا). ارصدها في نظام الدرجات ثم اضغط «تم الرصد». يمكنك إلغاء درجة لم تُرصد بعد بسبب مكتوب فتعود نقاط الطالب إليه.</p></div></div>
+      <div class="actions"><span class="badge ${pendingAll ? 'warn' : 'ok'}">${pendingAll ? `${pendingAll} درجة بانتظار الرصد` : 'لا درجات بانتظار الرصد'}</span>
+        ${canWrite && pendingAll ? '<button type="button" class="primary" id="tg-all">تم رصد الكل</button>' : ''}
+        ${d.length ? `<button type="button" id="tg-export">${line('download', 17)}تصدير Excel</button>` : ''}</div></section>
+    <section class="card">${ttl('students', 'الطلاب')}
+      ${d.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>بانتظار الرصد</th><th>المرصودة</th><th></th></tr></thead><tbody>
+        ${d.map(x => `<tr data-id="${x.userId}"><td>${esc(x.name)} <span class="small muted ltr">${esc(x.username)}</span></td><td>${esc(x.grade || '—')}</td><td>${esc(x.section || '—')}</td>
+          <td>${x.pending ? `<span class="badge warn">${x.pending}</span>` : '0'}</td><td>${x.recorded}</td>
+          <td class="actions">${canWrite && x.pending ? `<button type="button" class="primary" data-rec="${x.userId}">تم الرصد</button>` : ''}
+            <details class="small"><summary>السجل</summary><ul class="tg-items">${x.items.map(i => { const [t, k] = ST[i.status] || ['—', '']; return `<li>${esc(hijri(i.at, true))} · ${i.grades} درجة (${i.points} نقطة)
+              <span class="badge ${k}">${t}</span>${i.reason ? ` <span class="muted">${esc(i.reason)}</span>` : ''}
+              ${canWrite && i.status === 'pending' ? `<button type="button" class="danger" data-cancel="${i.id}">إلغاء</button>` : ''}</li>`; }).join('')}</ul></details></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="empty">لم يستبدل أي من طلابك نقاطه بعد.</div>'}
+    </section>`;
+  const run = async (fn, msg) => { try { await fn(); toast(msg); await pageTeacherGrades(ctx); } catch (e) { fail(e); } };
+  document.getElementById('tg-all')?.addEventListener('click', () => {
+    if (confirm(`ستُعلَّم ${pendingAll} درجة كمرصودة لكل طلابك. هل رصدتها فعلًا؟`)) run(() => api('/teacher/grades/record', { method: 'POST', body: {} }), 'سُجّل رصد الدرجات');
+  });
+  $app.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => run(() => api('/teacher/grades/record', { method: 'POST', body: { user: b.dataset.rec } }), 'سُجّل الرصد'));
+  $app.querySelectorAll('[data-cancel]').forEach(b => b.onclick = () => {
+    const reason = prompt('سبب الإلغاء (يظهر للطالب):');
+    if (reason && reason.trim().length >= 3) run(() => api('/teacher/grades/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel), reason: reason.trim() } }), 'أُلغيت وعادت النقاط للطالب');
+    else if (reason !== null) fail(new Error('اكتب سببًا واضحًا للإلغاء'));
+  });
+  document.getElementById('tg-export')?.addEventListener('click', () => downloadXlsx('itqan-grades-balance', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'بانتظار الرصد', 'المرصودة'],
+    d.map(x => [x.name, x.username, x.grade || '', x.section || '', x.pending, x.recorded])));
+}
+
 // ---------- Excel ----------
 // SheetJS من cdnjs (إصدار مثبت)، يُحمَّل عند الحاجة فقط. ملفات CSV تُقرأ دونه.
 const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
@@ -153,6 +190,13 @@ export async function pageAdminStudents(ctx) {
       <p class="small muted">قائمة التميّز تحسب نقاط الطلاب من بداية الفصل الحالي. عند انتهاء الفصل ابدأ فصلًا جديدًا لتُصفَّر النقاط؛ سجل التدريب نفسه لا يُمسّ. وتُصفَّر نقاط الطالب تلقائيًا عند نقله إلى صف آخر.</p>
       <p id="rank-term-info" class="small">جارٍ التحميل…</p>
       <div class="actions"><button type="button" id="rank-new-term" class="danger">بدء فصل دراسي جديد (تصفير نقاط التميّز)</button></div></section>` : ''}
+    ${ctx.state?.supabase ? `<section class="card" id="grade-set-card">${ttl('coin', 'الرصيد: استبدال النقاط بدرجات', 'h2', 30)}
+      <p class="small muted">يستبدل الطالب نقاط التميّز بدرجات يرصدها المعلم. غيّر القيم هنا متى شئت؛ التغيير يسري على الاستبدالات القادمة فقط.</p>
+      <div class="gs-form"><label>نقاط الدرجة الواحدة <input type="number" id="gs-rate" min="1" max="10000"></label>
+        <label>السقف الأسبوعي (درجات) <input type="number" id="gs-weekly" min="0" max="50"></label>
+        <label class="st-radio"><input type="checkbox" id="gs-on"> الاستبدال مفعّل</label>
+        <label>سبب الإيقاف (يراه الطلاب) <input id="gs-reason" maxlength="120" placeholder="مثال: فترة الاختبارات"></label>
+        <button type="button" class="primary" id="gs-save">حفظ</button></div><p id="gs-info" class="small"></p></section>` : ''}
     <section class="card">${ttl('students', 'إضافة طلاب', 'h2', 30)}
       <div class="as-add">
         <div>
@@ -255,6 +299,17 @@ export async function pageAdminStudents(ctx) {
     const fmtD = d => hijri(d);
     const info = document.getElementById('rank-term-info');
     api('/admin/rank/term').then(t => { info.textContent = `الفصل الحالي بدأ احتساب نقاطه في ${fmtD(t.startedAt)}.`; }).catch(() => { info.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
+    const gi = document.getElementById('gs-info'), gv = x => { document.getElementById('gs-rate').value = x.rate; document.getElementById('gs-weekly').value = x.weeklyCap;
+      document.getElementById('gs-on').checked = x.enabled; document.getElementById('gs-reason').value = x.reason || ''; };
+    api('/admin/grades/settings').then(gv).catch(() => { gi.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
+    document.getElementById('gs-save').onclick = async e => {
+      const b = e.currentTarget; b.disabled = true;
+      try {
+        gv(await api('/admin/grades/settings', { method: 'POST', body: { rate: document.getElementById('gs-rate').value, weekly: document.getElementById('gs-weekly').value,
+          enabled: document.getElementById('gs-on').checked, reason: document.getElementById('gs-reason').value } }));
+        toast('حُفظت إعدادات الرصيد'); gi.textContent = '';
+      } catch (err) { fail(err); } finally { b.disabled = false; }
+    };
     document.getElementById('rank-new-term').onclick = async e => {
       if (!confirm('ستُصفَّر نقاط التميّز لكل الطلاب ويبدأ احتسابها من الآن. لا يُحذف أي سجل تدريب. هل تريد المتابعة؟')) return;
       const b = e.currentTarget; b.disabled = true;

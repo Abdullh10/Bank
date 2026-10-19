@@ -15,10 +15,10 @@
   <meta name="theme-color" content="#12305a" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#081322" media="(prefers-color-scheme: dark)">
   <!-- version:start (يُولَّد بـ scripts/stamp-version.js؛ لا تعدّله يدويًا) -->
-  <meta name="itqan-version" content="1bb33c236c">
-  <script type="importmap">{"imports":{"./app.js":"./app.js?v=1bb33c236c","./bidi.js":"./bidi.js?v=1bb33c236c","./config.js":"./config.js?v=1bb33c236c","./courses.js":"./courses.js?v=1bb33c236c","./dashboard.js":"./dashboard.js?v=1bb33c236c","./dates.js":"./dates.js?v=1bb33c236c","./exam-docx.js":"./exam-docx.js?v=1bb33c236c","./exam.js":"./exam.js?v=1bb33c236c","./icons.js":"./icons.js?v=1bb33c236c","./notes.js":"./notes.js?v=1bb33c236c","./roles.js":"./roles.js?v=1bb33c236c","./staff.js":"./staff.js?v=1bb33c236c","./student.js":"./student.js?v=1bb33c236c","./supa.js":"./supa.js?v=1bb33c236c","./validate.js":"./validate.js?v=1bb33c236c"}}</script>
-  <link rel="stylesheet" href="styles.css?v=1bb33c236c">
-  <script type="module" src="app.js?v=1bb33c236c"></script>
+  <meta name="itqan-version" content="1c436b50d6">
+  <script type="importmap">{"imports":{"./app.js":"./app.js?v=1c436b50d6","./bidi.js":"./bidi.js?v=1c436b50d6","./config.js":"./config.js?v=1c436b50d6","./courses.js":"./courses.js?v=1c436b50d6","./dashboard.js":"./dashboard.js?v=1c436b50d6","./dates.js":"./dates.js?v=1c436b50d6","./exam-docx.js":"./exam-docx.js?v=1c436b50d6","./exam.js":"./exam.js?v=1c436b50d6","./icons.js":"./icons.js?v=1c436b50d6","./notes.js":"./notes.js?v=1c436b50d6","./roles.js":"./roles.js?v=1c436b50d6","./staff.js":"./staff.js?v=1c436b50d6","./student.js":"./student.js?v=1c436b50d6","./supa.js":"./supa.js?v=1c436b50d6","./validate.js":"./validate.js?v=1c436b50d6"}}</script>
+  <link rel="stylesheet" href="styles.css?v=1c436b50d6">
+  <script type="module" src="app.js?v=1c436b50d6"></script>
   <!-- version:end -->
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
 </head>
@@ -36,11 +36,13 @@
         <a href="#/exam" data-nav="exam" data-perm="exam"><i data-icon="exam"></i><span>منشئ الاختبارات</span></a>
         <a href="#/reports" data-nav="reports" data-perm="dashboard"><i data-icon="reports"></i><span>لوحة المؤشرات</span></a>
         <a href="#/progress" data-nav="progress" data-perm="progress"><i data-icon="progress"></i><span>تقدم الطلاب</span></a>
+        <a href="#/grades" data-nav="grades" data-perm="progress"><i data-icon="coin"></i><span>رصيد الدرجات</span></a>
         <a href="#/notes" data-nav="notes" data-perm="notes"><i data-icon="notes"></i><span>الملاحظات</span></a>
         <a href="#/students" data-nav="students" data-perm="accounts"><i data-icon="students"></i><span>الحسابات</span></a>
         <a href="#/" data-nav="home" data-perm="student"><i data-icon="practice"></i><span>تدرّب</span></a>
         <a href="#/history" data-nav="history" data-perm="student"><i data-icon="history"></i><span>سجلي</span></a>
         <a href="#/rank" data-nav="rank" data-perm="student"><i data-icon="trophy"></i><span>التميّز</span></a>
+        <a href="#/balance" data-nav="balance" data-perm="student"><i data-icon="coin"></i><span>الرصيد</span></a>
       </nav>
       <div class="userbox" id="userbox"></div>
     </div>
