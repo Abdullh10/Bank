@@ -1973,7 +1973,7 @@ begin
     'pending', v_pending, 'recorded', v_recorded, 'weekUsed', s.week_used, 'weekLeft', v_left,
     'eligible', s.elig, 'blocked', v_blocked, 'needValid', greatest(0, 30 - s.valid), 'needDays', greatest(0, 3 - s.days_any),
     'streak', v_streak, 'weeksKept', s.weeks_kept,
-    'week', jsonb_build_object('valid', v_wv, 'days', v_wd, 'kept', v_wv >= 30 and v_wd >= 3 and coalesce(100.0 * v_wc / nullif(v_wv, 0) > 30, false)), 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
+    'week', jsonb_build_object('valid', v_wv, 'days', v_wd, 'accuracy', round(100.0 * v_wc / nullif(v_wv, 0)), 'kept', v_wv >= 30 and v_wd >= 3 and coalesce(100.0 * v_wc / nullif(v_wv, 0) > 30, false)), 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
     'history', (select coalesce(jsonb_agg(jsonb_build_object('id', h.id, 'grades', h.grades, 'points', h.points, 'status', h.status, 'at', h.created_at,
         'recordedAt', h.recorded_at, 'reason', h.cancel_reason) order by h.created_at desc), '[]')
       from (select * from grade_redemptions where user_id = auth.uid() order by created_at desc limit 30) h));

@@ -374,7 +374,7 @@ export async function pageStudentRank(ctx) {
 
 
 // ---------- الرصيد: استبدال نقاط التميّز بدرجات ----------
-const BADGES = [[1, 'برونزي', 'أول درجة تكسبها بتدريبك'], [3, 'فضي', '3 درجات من تدريب جاد'], [6, 'ذهبي', '6 درجات: مثابرة تستحق التقدير']];
+const BADGES = [[1, 'برونزي', 'أول درجة تكسبها بتدريبك', 'bronze'], [3, 'فضي', '3 درجات من تدريب جاد', 'silver'], [6, 'ذهبي', '6 درجات: مثابرة تستحق التقدير', 'gilt']];
 const BLOCK_TEXT = {
   disabled: d => `الاستبدال متوقف مؤقتًا${d.settings.reason ? `: ${d.settings.reason}` : ''}.`,
   watch: () => 'تدريبك يحتاج متابعة: تأنَّ في قراءة السؤال ثم الإجابة، ويعود الاستبدال حين يتحسن تدريبك.',
@@ -443,7 +443,7 @@ export async function pageStudentBalance(ctx) {
           ${chk([
             [d.week.valid >= 30 ? 'ok' : 'no', '30 إجابة محتسبة هذا الأسبوع', '', meter(d.week.valid, 30, `${num(Math.min(d.week.valid, 30))} من 30 إجابة`)],
             [d.week.days >= 3 ? 'ok' : 'no', 'في 3 أيام تدريب مختلفة', '', meter(d.week.days, 3, `${num(Math.min(d.week.days, 3))} من 3 أيام`)],
-            [d.week.kept ? 'ok' : (d.week.valid >= 30 && d.week.days >= 3 ? 'bad' : 'no'), 'صحة فوق 30%', 'الأسبوع يبدأ من الأحد.']])}
+            [d.week.valid === 0 ? 'no' : d.week.accuracy > 30 ? 'ok' : 'bad', 'صحة فوق 30%', d.week.valid ? `صحتك هذا الأسبوع ${num(d.week.accuracy)}%${d.week.accuracy > 30 ? '' : '؛ تأنَّ واقرأ التفسير لترفعها'}. الأسبوع يبدأ من الأحد.` : 'تُحسب بعد أن تبدأ الإجابة. الأسبوع يبدأ من الأحد.']])}
           ${d.weeksKept ? `<span class="small muted">أسابيع التميّز التي حافظت عليها: ${num(d.weeksKept)}</span>` : ''}</div>
         <div class="bal-stats">
           <div><b>${d.streak ? '🔥 ' : ''}${num(d.streak)}</b><span class="small muted">أيام جادة متتالية</span></div>
@@ -457,7 +457,7 @@ export async function pageStudentBalance(ctx) {
         <div class="bal-gbox ok"><b>${num(d.recorded)}</b><span class="small muted">تم رصدها</span></div>
       </div>
       ${nextBadge ? `<p class="small muted bal-next">باقي ${num(nextBadge[0] - total)} ${nextBadge[0] - total === 1 ? 'درجة' : 'درجات'} للوسام ال${nextBadge[1]}.</p>` : '<p class="small muted bal-next">حصلت على كل الأوسمة، مثابرة رائعة!</p>'}
-      <ul class="bal-badges">${BADGES.map(([n, t, tip]) => `<li class="${total >= n ? 'on' : ''}"><span aria-hidden="true">${total >= n ? '🏅' : '🔒'}</span><b>${t}</b><span class="small muted">${tip}</span></li>`).join('')}</ul>
+      <ul class="bal-badges">${BADGES.map(([n, t, tip, tone]) => `<li class="${total >= n ? 'on' : ''}"><span aria-hidden="true">${total >= n ? icon('medal', 44, tone) : icon('lock', 44, 'navy')}</span><b>${t}</b><span class="small muted">${tip}</span></li>`).join('')}</ul>
     </section>
     <section class="card">${ttl('history', 'سجل الاستبدال')}
       ${d.history.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>التاريخ</th><th>الدرجات</th><th>النقاط</th><th>الحالة</th></tr></thead><tbody>

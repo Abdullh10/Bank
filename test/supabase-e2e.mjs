@@ -455,7 +455,8 @@ await p.waitForTimeout(500); await p.screenshot({ path: `${OUT}/student-home.png
 ok('student: home shows the balance strip', (await p.locator('#st-bal').innerText()).includes('درجة جاهزة'));
 await p.goto(BASE + '#/balance'); await p.waitForSelector('[data-redeem]');
 ok('student: balance shows a ready grade, streak and the mission done', (await p.locator('main').innerText()).includes('درجة جاهزة للاستبدال') && (await p.locator('.bal-mission.ok').count()) === 1);
-ok('student: weekly keep-up status shown', (await p.locator('.bal-week').count()) === 1);
+ok('student: weekly keep-up status shows the real accuracy', (await p.locator('.bal-week').innerText()).includes('صحتك هذا الأسبوع'));
+ok('student: badges use icons, not emoji', (await p.locator('.bal-badges li svg').count()) === 3 && !(await p.locator('.bal-badges').innerText()).includes('🏅'));
 await p.screenshot({ path: `${OUT}/student-balance.png`, fullPage: true });
 await p.locator('[data-redeem="1"]').click(); await p.waitForSelector('dialog.bal-dlg[open]');
 ok('student: confirmation says how many points remain', (await p.locator('dialog.bal-dlg').innerText()).includes('ويبقى لك'));
@@ -464,6 +465,7 @@ ok('student: celebration after the exchange', (await p.locator('.bal-cele').inne
 await p.screenshot({ path: `${OUT}/student-balance-cele.png` });
 await p.locator('.bal-cele button').click();
 await p.waitForSelector('.bal-gbox b');
+await p.screenshot({ path: `${OUT}/student-balance-after.png`, fullPage: true });
 ok('student: grade pending the teacher, points deducted, ranking score untouched', (await p.locator('.bal-gbox b').first().innerText()).trim() === '1' && (await p.locator('main tbody tr').count()) === 1
   && (await p.locator('main').innerText()).includes('بانتظار رصد المعلم'));
 const dbBal = await pool.query(`select (select count(*) from public.grade_redemptions where user_id = '${sid}' and status = 'pending')::int pend, (select count(*) from public.practice_answers a join public.practice_sessions s on s.id = a.session_id where s.user_id = '${sid}' and s.settings @> '{"e2e":true}')::int ans`);
