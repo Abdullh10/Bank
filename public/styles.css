@@ -1034,3 +1034,79 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 
 .bal-week { display: grid; gap: .15rem; margin-top: .8rem; padding: .6rem .8rem; border: 1px dashed var(--line); border-radius: .8rem; }
 .bal-week.ok { border-style: solid; border-color: var(--ok); }
+
+/* ---------- تحسين شاشات الطالب: قوائم التحقق والحالة والتحفيز ---------- */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.chk { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .55rem; }
+.chk li { display: flex; gap: .7rem; align-items: flex-start; padding: .65rem .8rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); }
+.chk-mark { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-items: center; margin-top: .1rem; background: var(--surface-3); color: var(--ink-2); border: 1.5px solid var(--line-2); }
+.chk-body { flex: 1; min-width: 0; display: grid; gap: .25rem; font-size: .95rem; }
+.chk-body > .small { font-size: .9rem; line-height: 1.7; }
+.chk li.ok { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.chk li.ok .chk-mark { background: var(--ok); color: var(--on-ok); border-color: var(--ok); }
+.chk li.bad { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.chk li.bad .chk-mark { background: var(--bad); color: #fff; border-color: var(--bad); }
+.chk li.bad .chk-mark svg, .chk li.ok .chk-mark svg { stroke: currentColor; }
+.chk-meter { display: grid; gap: .25rem; margin-top: .1rem; }
+.chk-meter .bar { height: 10px; }
+.chk-meter > .small { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.st-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; margin: .8rem 0; }
+.st-chips.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-inline: auto; max-width: 26rem; }
+.st-chip { display: flex; align-items: center; gap: .6rem; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); min-width: 0; text-align: start; }
+.st-chip > div { display: grid; min-width: 0; }
+.st-chip b { font-size: 1.35rem; line-height: 1.2; color: var(--brand-2); font-variant-numeric: tabular-nums; }
+.st-chip .small { line-height: 1.4; }
+.st-bal .st-chips { margin: .7rem 0; }
+.st-bal .bal-ready { margin: 0 0 .5rem; }
+.st-steps { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0 0 1rem; padding: 0; }
+.st-steps li { display: inline-flex; align-items: center; gap: .45rem; font-size: .92rem; color: var(--ink-2); }
+.st-steps b { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--brand-soft); color: var(--brand-2); }
+.st-steps li:not(:last-child)::after { content: "‹"; margin-inline-start: .3rem; color: var(--ink-3); }
+.st-cta { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; gap: .8rem; margin: 1rem -16px 0; padding: .7rem 16px calc(.7rem + env(safe-area-inset-bottom)); background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+.st-cta .st-start { width: auto; flex: none; margin: 0; min-height: 50px; padding-inline: 1.6rem; display: inline-flex; align-items: center; gap: .4rem; }
+.st-sum { flex: 1; font-weight: 600; color: var(--ink); font-size: .95rem; min-width: 0; }
+.st-lesson { min-height: 44px; }
+.st-radio { min-height: 44px; }
+.st-empty { text-align: center; display: grid; justify-items: center; gap: .6rem; margin-bottom: 1rem; }
+.st-empty p { margin: 0; }
+.st-enc { margin: .6rem 0 0; padding: .6rem .9rem; border-radius: var(--radius-sm); background: var(--brand-soft); color: var(--ink); font-size: .98rem; line-height: 1.8; }
+.st-result .bal-ring { margin: .6rem auto .2rem; width: 9rem; height: 9rem; }
+.st-result .st-chips { margin-top: .4rem; }
+.st-result .st-enc { text-align: start; }
+.st-after .primary { flex: 1; }
+.earn { list-style: none; padding: 0; gap: .6rem; }
+.earn li { display: flex; gap: .75rem; align-items: flex-start; }
+.earn-v { flex: none; min-width: 3.6rem; padding: .15rem .5rem; text-align: center; border-radius: 999px; font-weight: 700; font-size: .92rem; background: var(--ok-soft); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent); direction: ltr; }
+.earn-v.off { background: var(--surface-3); color: var(--ink-2); border-color: var(--line-2); }
+.bal-cond { margin-top: 1.1rem; padding-top: .9rem; border-top: 1px dashed var(--line-2); }
+.bal-cond h3 { margin: 0 0 .2rem; font-size: 1.05rem; }
+.bal-why { margin-top: .8rem; padding: .8rem 1rem; border-radius: var(--radius-sm); background: var(--warn-soft); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent); border-inline-start: 4px solid var(--warn); }
+.bal-why h4 { margin: 0 0 .25rem; font-size: 1rem; }
+.bal-why p { margin: 0; color: var(--ink); line-height: 1.8; }
+.bal-why.ok { background: var(--ok-soft); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 30%, transparent); border-inline-start-color: var(--ok); }
+.bal-why.ok { margin-bottom: 0; }
+.bal-week > b { margin-bottom: .2rem; }
+.bal-next { margin: 0 0 .6rem; }
+.bal-badges li { min-width: 7.5rem; flex: 1; }
+.bal-top { justify-content: center; }
+.bal-info .actions button { min-height: 48px; }
+.bal-mission { margin: 0 0 .4rem; }
+.bal-stats > div { flex: 1; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); }
+.rank-me { flex-wrap: wrap; }
+.rank-big { animation: pop .35s var(--ease); }
+.st-top5-list li { min-height: 36px; display: inline-flex; align-items: center; gap: .3rem; }
+@media (max-width: 640px) {
+  .st-chips { gap: .45rem; }
+  .st-chip { flex-direction: column; align-items: flex-start; gap: .25rem; padding: .6rem; }
+  .st-chip .ic { width: 26px; height: 26px; }
+  .st-chip b { font-size: 1.2rem; }
+  .st-chips.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-chips.c2 .st-chip { flex-direction: row; align-items: center; }
+  .st-lesson { grid-template-columns: auto 1fr 52px 2.6rem; }
+  .st-cta .st-start { padding-inline: 1.1rem; }
+  .st-sum { font-size: .9rem; }
+  .st-after .btn, .st-after button { flex: 1 1 100%; }
+  .st-q { padding: 1rem; }
+  .st-stem { font-size: 1.1rem; }
+  .earn-v { min-width: 3.2rem; }
+}

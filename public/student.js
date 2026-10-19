@@ -15,6 +15,12 @@ const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const loadPrefs = () => { try { return JSON.parse(localStorage.getItem(PREFS_KEY)) || {}; } catch { return {}; } };
 const savePrefs = p => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch { /* التخزين غير متاح */ } };
 const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+// قائمة تحقق مرئية: كل بند حالته ok (✓) أو no (✗ محايد: لم يكتمل بعد) أو bad (✗ يمنع الآن) ومعه شرح قصير وعدّاد اختياري
+const CHK_TXT = { ok: 'تحقق', no: 'لم يتحقق بعد', bad: 'غير متحقق' };
+const chk = items => `<ul class="chk">${items.filter(Boolean).map(([st, title, hint, meter]) => `<li class="${st}"><span class="chk-mark" aria-hidden="true">${st === 'ok' ? line('check', 16) : line('cross', 16)}</span>
+  <div class="chk-body"><b>${title}</b><span class="sr">(${CHK_TXT[st]})</span>${hint ? `<span class="small muted">${hint}</span>` : ''}${meter || ''}</div></li>`).join('')}</ul>`;
+const meter = (v, t, label) => `<div class="chk-meter"><div class="bar ${v >= t ? 'ok' : ''}"><span style="width:${Math.min(100, pct(v, t))}%"></span></div><span class="small">${label}</span></div>`;
+const chip = (ic, val, label) => `<div class="st-chip">${icon(ic, 30)}<div><b>${val}</b><span class="small muted">${label}</span></div></div>`;
 const mmss = s => `${String(Math.floor(Math.max(0, s) / 60)).padStart(2, '0')}:${String(Math.max(0, s) % 60).padStart(2, '0')}`;
 
 // رسائل تمدح الجهد والاستراتيجية لا السرعة ولا المقارنة بالآخرين.
@@ -72,9 +78,9 @@ export async function pageStudentHome(ctx) {
     <section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
       <span class="eyebrow">${icon('spark', 18)} تدريب ذاتي لا يدخل في الدرجات</span>
       <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
-      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
-    <section class="card st-top5" id="st-top5" hidden></section>
+      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى، ثم ابدأ. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
     <section class="card st-bal" id="st-bal" hidden></section>
+    <ol class="st-steps"><li><b>١</b> اختر الدروس</li><li><b>٢</b> اضبط الجلسة</li><li><b>٣</b> ابدأ التدريب</li></ol>
     <div class="grid2 st-setup">
       <section class="card">${ttl('lessons', 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
@@ -95,10 +101,17 @@ export async function pageStudentHome(ctx) {
           ${LEVEL_CHOICES.map(([v, t]) => `<label class="st-radio"><input type="radio" name="s-level" value="${v}" ${v === prefs.levels ? 'checked' : ''}> ${t}</label>`).join('')}
           <p class="small muted">«متدرّج»: أسئلة أساسية ثم تطبيق ثم تفكير عليا، من الأسهل إلى الأصعب.</p></fieldset>
         <label class="st-radio"><input type="checkbox" id="s-timed" ${prefs.timed ? 'checked' : ''}> مؤقت للجلسة <span class="small muted">(اختياري: دقيقة لسؤال التذكر والفهم، ونحو دقيقتين لغيره، ولا تُقفل الجلسة بانتهائه)</span></label>
-        <button class="primary st-start" id="s-start" type="button">ابدأ التدريب</button>
         <p class="small muted">الأسئلة والبدائل تُخلط في كل جلسة.</p>
       </section>
-    </div>`;
+    </div>
+    <section class="card st-top5" id="st-top5" hidden></section>
+    <div class="st-cta"><span id="st-sum" class="st-sum" aria-live="polite"></span>
+      <button class="primary st-start" id="s-start" type="button">${line('next', 18)}ابدأ التدريب</button></div>`;
+  const sum = () => {
+    const n = $app.querySelectorAll('[data-lesson]:checked').length, c = document.getElementById('s-count').value;
+    document.getElementById('st-sum').textContent = n ? `${n === 1 ? 'درس واحد' : n + ' دروس'} · ${c} سؤالًا` : 'اختر درسًا واحدًا على الأقل';
+  };
+  $app.querySelectorAll('input, select').forEach(e => { e.onchange = sum; }); sum();
   // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
   api('/student/rank').then(d => {
     const box = document.getElementById('st-top5');
@@ -112,9 +125,11 @@ export async function pageStudentHome(ctx) {
     const box = document.getElementById('st-bal');
     if (!box || !d?.available) return;
     const rate = d.settings.rate;
-    box.innerHTML = `<div class="st-top5-head">${ttl('coin', 'رصيدك', 'h2', 30)}<a class="btn" href="#/balance">${d.ready ? 'استبدل نقاطك بدرجة ←' : 'فتح الرصيد ←'}</a></div>
-      <p class="bal-ready">${d.ready ? `لديك <b>${num(d.ready)}</b> ${d.ready === 1 ? 'درجة جاهزة' : 'درجات جاهزة'} للاستبدال!` : `نقاطك المتاحة <b>${num(d.points)}</b>، وباقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة.`}</p>
-      <div class="bar"><span style="width:${d.ready ? 100 : Math.round(100 * Math.min(1, (d.points - d.ready * rate) / rate))}%"></span></div>`;
+    const frac = d.ready ? 1 : Math.min(1, (d.points - d.ready * rate) / rate);
+    box.innerHTML = `<div class="st-top5-head">${ttl('coin', 'أين أنا؟', 'h2', 30)}<a class="btn" href="#/balance">${d.ready ? 'استبدل نقاطك بدرجة ←' : 'فتح الرصيد ←'}</a></div>
+      <div class="st-chips">${chip('coin', num(d.points), 'نقطة متاحة')}${chip('spark', `${d.streak ? '🔥 ' : ''}${num(d.streak)}`, 'أيام جادة متتالية')}${chip('trophy', num(d.pending + d.recorded), 'درجات استبدلتها')}</div>
+      <p class="bal-ready">${d.ready ? `لديك <b>${num(d.ready)}</b> ${d.ready === 1 ? 'درجة جاهزة' : 'درجات جاهزة'} للاستبدال!` : `باقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة.`}</p>
+      <div class="bar ${d.ready ? 'ok' : ''}"><span style="width:${Math.round(100 * frac)}%"></span></div>`;
     box.hidden = false;
   }).catch(() => {});
   document.getElementById('s-start').onclick = async () => {
@@ -248,10 +263,11 @@ function renderSummary(ctx) {
   const usedSec = Math.round((Date.now() - session.startedAt) / 1000);
   $app.innerHTML = `<div class="st-run">
     <section class="card st-result">
-      ${icon('trophy', 76)}
       <h1>نتيجة الجلسة</h1>
-      <div class="st-score"><b>${s.score}</b> من ${s.total} <span class="muted">(${pct(s.score, s.total)}%)</span></div>
-      <p>${encouragement(s.score, s.total)}</p>
+      ${ring(pct(s.score, s.total) / 100, `<b>${pct(s.score, s.total)}%</b><span class="small muted">نسبة الصحة</span>`, 'نسبة إجاباتك الصحيحة')}
+      <div class="st-score"><b>${s.score}</b> من ${s.total}</div>
+      <div class="st-chips c2">${chip('check', num(s.score), 'إجابة صحيحة')}${chip('cross', num(Math.max(0, s.answered - s.score)), 'إجابة خاطئة')}</div>
+      <p class="st-enc">${encouragement(s.score, s.total)}</p>
       ${session.timeLimit ? `<p class="small muted">الوقت المستغرق ${mmss(usedSec)} من ${mmss(session.timeLimit)} مقترحة.</p>` : ''}
       ${s.answered < s.total ? `<p class="small muted">أجبت عن ${s.answered} من ${s.total}.</p>` : ''}
     </section>
@@ -259,7 +275,7 @@ function renderSummary(ctx) {
       <section class="card">${ttl('lessons', 'حسب الدرس')}${table(s.byLesson.map(r => [r.lesson, r.correct, r.n]), esc)}</section>
       <section class="card">${ttl('reports', 'حسب المستوى')}${table(s.byGroup.map(r => [GROUPS[r.group], r.correct, r.n]), esc)}</section>
     </div>
-    <div class="actions st-nav">
+    <div class="actions st-nav st-after">
       ${s.wrong ? `<button type="button" class="primary" id="st-retry">${icon('history', 22, 'navy')}أعد الأخطاء</button>` : ''}
       <button type="button" id="st-new">${line('plus', 17)}جلسة جديدة</button>
       <a class="btn" href="#/history">${line('clock', 17)}سجلي</a>
@@ -281,8 +297,10 @@ export async function pageStudentHistory(ctx) {
   const { esc, $app, api } = ctx;
   const [hist, catalog] = await Promise.all([api('/student/history'), api('/student/catalog')]);
   const lessons = catalog.flatMap(c => c.lessons.filter(l => l.answered).map(l => ({ ...l, chapter: c.number })));
+  const tot = hist.reduce((a, h) => ({ s: a.s + h.score, t: a.t + h.total }), { s: 0, t: 0 });
   $app.innerHTML = `
     <section class="hero"><div class="hero-ic">${icon('history', 52)}<div><h1>سجلي</h1><p class="muted">تقدّمك في التدريب. لا يرى زملاؤك تفاصيل تدريبك؛ يظهر اسمك ونقاطك فقط إن دخلت قائمة التميّز.</p></div></div></section>
+    ${hist.length ? `<div class="st-chips">${chip('practice', num(hist.length), 'جلسة أخيرة')}${chip('check', `${num(pct(tot.s, tot.t))}%`, 'نسبة الصحة فيها')}${chip('lessons', num(lessons.length), 'دروس تدرّبت عليها')}</div>` : `<section class="card st-empty">${icon('practice', 56)}<p>لم تبدأ التدريب بعد. جلسة قصيرة من 10 أسئلة تكفي للبداية.</p><a class="btn primary" href="#/">ابدأ التدريب</a></section>`}
     <div class="grid2">
       <section class="card">${ttl('progress', 'تقدّمك في الدروس')}
         ${lessons.length ? table(lessons.map(l => [`${l.chapter}. ${l.title}`, l.correct, l.answered]), esc) : '<div class="empty">لم تبدأ التدريب بعد.</div>'}
@@ -322,11 +340,14 @@ export async function pageStudentRank(ctx) {
       <div><strong>أنت في ${bandText[m.band]} من شعبتك</strong><div class="muted">نقاطك ${num(m.score)}${m.pointsToMedian ? ` · تحتاج ${num(m.pointsToMedian)} نقطة لتبلغ منتصف الترتيب` : ''}</div>
       <div class="small muted">كل يوم تدريب جاد يضيف ${r.dayBonus} نقاط، وتصحيح أخطائك السابقة يضيف نقطة لكل سؤال. تقدّمك مستمر، واصل.</div></div></div>`;
   } else {
-    const bar = (v, t, label) => `<div class="small">${label}: ${num(Math.min(v, t))} من ${num(t)}</div><div class="bar ${v >= t ? 'ok' : ''}"><span style="width:${Math.min(100, Math.round(100 * v / t))}%"></span></div>`;
     mine = `<div><strong>لم تدخل الترتيب بعد</strong>
-      <p class="muted">لتظهر في الترتيب تحتاج ${num(r.minValid)} إجابة محتسبة على الأقل في ${num(r.minDays)} أيام مختلفة.</p>
-      ${bar(m.valid, r.minValid, 'إجاباتك المحتسبة')}${bar(m.activeDays, r.minDays, 'أيام تدريبك')}
-      ${m.fast ? `<p class="notice warn small">بعض إجاباتك أسرع من ${num(r.rushSecs)} ثوانٍ ولا تُحتسب. اقرأ السؤال ثم الإجابة ثم التفسير، ففهم الخطأ أهم من السرعة.</p>` : ''}</div>`;
+      <p class="muted">أكمل هذه الشروط الثلاثة لتظهر في الترتيب:</p>
+      ${chk([
+        [m.valid >= r.minValid ? 'ok' : 'no', `${num(r.minValid)} إجابة محتسبة`, 'المحتسبة: ما أجبت عنه بتأنٍّ، أي بعد قراءة السؤال.', meter(m.valid, r.minValid, `${num(Math.min(m.valid, r.minValid))} من ${num(r.minValid)} إجابة`)],
+        [m.activeDays >= r.minDays ? 'ok' : 'no', `${num(r.minDays)} أيام تدريب مختلفة`, 'الانتظام أهم من التدريب الكثيف في يوم واحد.', meter(m.activeDays, r.minDays, `${num(Math.min(m.activeDays, r.minDays))} من ${num(r.minDays)} أيام`)],
+        [m.fast ? 'bad' : 'ok', 'إجاباتك غير متسرّعة', `ألا تزيد الإجابات الأسرع من ${num(r.rushSecs)} ثوانٍ على ${num(r.rushMaxPct)}% من إجاباتك.`]])}
+      ${m.fast ? `<p class="notice warn small">بعض إجاباتك أسرع من ${num(r.rushSecs)} ثوانٍ ولا تُحتسب. اقرأ السؤال ثم الإجابة ثم التفسير، ففهم الخطأ أهم من السرعة.</p>` : ''}
+      <p class="st-enc">أنت في الطريق. كل جلسة جادة تقرّبك من الترتيب.</p></div>`;
   }
   $app.innerHTML = `${hero}
     <div class="grid2">
@@ -339,15 +360,14 @@ export async function pageStudentRank(ctx) {
       </section>
     </div>
     <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
-      <ul class="rank-rules">
-        <li><b>الصافي:</b> +1 لكل إجابة صحيحة، و−⅓ لكل إجابة خاطئة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</li>
-        <li><b>الإجابات السريعة:</b> الإجابة الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</li>
-        <li><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</li>
-        <li><b>الانتظام:</b> +${num(r.dayBonus)} نقاط عن كل يوم تدريب فيه ${num(r.dayMin)} إجابات صالحة فأكثر (حتى ${num(r.dayCap)} يومًا).</li>
-        <li><b>تصحيح الأخطاء:</b> +1 عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</li>
-        <li><b>المحافظة على التميّز:</b> +${num(r.weekBonus)} نقطة عن كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق 30%.</li>
-        <li><b>شروط الدخول:</b> ${num(r.minValid)} إجابة محتسبة في ${num(r.minDays)} أيام على الأقل، وألا تزيد إجاباتك السريعة جدًا على ${num(r.rushMaxPct)}%.</li>
-        <li>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</li>
+      <ul class="rank-rules earn">
+        <li><span class="earn-v">+1 / −⅓</span><span><b>الصافي:</b> +1 لكل إجابة صحيحة و−⅓ لكل خاطئة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</span></li>
+        <li><span class="earn-v off">⏱</span><span><b>الإجابات السريعة:</b> الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</span></li>
+        <li><span class="earn-v off">${num(r.dailyCap)}</span><span><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</span></li>
+        <li><span class="earn-v">+${num(r.dayBonus)}</span><span><b>يوم تدريب جاد:</b> ${num(r.dayMin)} إجابات صالحة فأكثر بصحة ${num(r.dayAcc)}% فأكثر (حتى ${num(r.dayCap)} يومًا).</span></li>
+        <li><span class="earn-v">+1</span><span><b>تصحيح الأخطاء:</b> عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</span></li>
+        <li><span class="earn-v">+${num(r.weekBonus)}</span><span><b>المحافظة على التميّز:</b> كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق 30%.</span></li>
+        <li><span class="earn-v off">↺</span><span>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</span></li>
       </ul>
     </section>`;
 }
@@ -361,7 +381,7 @@ const BLOCK_TEXT = {
   weeklyCap: d => `بلغت سقف الاستبدال لهذا الأسبوع (${num(d.settings.weeklyCap)} درجات). يتجدد السقف يوم الأحد.`,
 };
 const RING = 2 * Math.PI * 52;
-const ring = (frac, inner) => `<div class="bal-ring" role="img" aria-label="تقدمك نحو الدرجة القادمة"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="bal-track"/>
+const ring = (frac, inner, label = 'تقدمك نحو الدرجة القادمة') => `<div class="bal-ring" role="img" aria-label="${label}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="bal-track"/>
   <circle cx="60" cy="60" r="52" class="bal-fill" style="stroke-dasharray:${RING.toFixed(1)};stroke-dashoffset:${(RING * (1 - Math.min(1, Math.max(0, frac)))).toFixed(1)}"/></svg><div class="bal-ring-in">${inner}</div></div>`;
 
 function celebrate(grades, left) {
@@ -386,8 +406,9 @@ export async function pageStudentBalance(ctx) {
   if (!d.available) { $app.innerHTML = `${hero}<section class="card"><div class="empty">لم يُسند لك مقرر جاهز بعد.</div></section>`; return; }
   const rate = d.settings.rate, inRing = d.points - d.ready * rate;
   const maxNow = Math.min(d.ready, d.weekLeft, 10);
-  const blocked = d.blocked && d.blocked !== 'insufficient' ? BLOCK_TEXT[d.blocked](d) : '';
   const total = d.pending + d.recorded;
+  const why = d.blocked === 'insufficient' ? `تحتاج ${num(Math.max(0.1, d.toNext))} نقطة أخرى لتبلغ ${num(rate)} نقطة.` : (BLOCK_TEXT[d.blocked]?.(d) || '');
+  const nextBadge = BADGES.find(([n]) => total < n);
   const buy = [1, ...(maxNow > 1 ? [maxNow] : [])];
   const status = { pending: ['بانتظار رصد المعلم', 'warn'], recorded: ['تم رصدها', 'ok'], cancelled: ['أُلغيت وعادت النقاط', ''] };
   $app.innerHTML = `${hero}
@@ -399,18 +420,31 @@ export async function pageStudentBalance(ctx) {
               <div class="actions">${buy.map(k => `<button type="button" class="primary" data-redeem="${k}">استبدل ${num(k * rate)} نقطة بـ ${k === 1 ? 'درجة' : num(k) + ' درجات'}</button>`).join('')}</div>`
             : `<p class="bal-ready">${d.blocked === 'insufficient' ? `باقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة` : 'نقاطك تتجمع باستمرار'}</p>
               <div class="bar"><span style="width:${Math.round(100 * Math.min(1, inRing / rate))}%"></span></div>`}
-            ${blocked ? `<p class="notice warn small">${esc(blocked)}</p>` : ''}
             <p class="small muted">نقاطك في قائمة التميّز ${num(d.score)}؛ ما تستبدله لا ينقص ترتيبك.</p>
           </div></div>
+        <div class="bal-cond"><h3>شروط الاستبدال</h3>
+          ${chk([
+            [d.ready >= 1 ? 'ok' : 'no', `${num(rate)} نقطة متاحة على الأقل`, '', meter(Math.min(d.points, rate), rate, `${num(Math.min(d.points, rate))} من ${num(rate)} نقطة`)],
+            [d.blocked === 'watch' ? 'bad' : 'ok', 'تدريبك لا «يحتاج متابعة»', 'الإجابات السريعة جدًا أو القريبة من التخمين توقف الاستبدال مؤقتًا.'],
+            [d.weekLeft > 0 ? 'ok' : 'bad', 'لم تبلغ سقف الأسبوع', `استبدلت ${num(d.weekUsed)} من ${num(d.settings.weeklyCap)} درجات هذا الأسبوع، ويتجدد السقف يوم الأحد.`],
+            d.blocked === 'disabled' ? ['bad', 'الاستبدال متاح الآن', d.settings.reason || 'متوقف مؤقتًا من الإدارة.'] : null])}
+          ${maxNow ? '<p class="bal-why ok"><b>كل الشروط متحققة.</b> يمكنك الاستبدال الآن.</p>'
+            : `<div class="bal-why" role="note"><h4>لماذا لا أستطيع الاستبدال الآن؟</h4><p>${esc(why)}</p></div>`}
+        </div>
       </section>
       <section class="card">${ttl('spark', 'مهمتك اليوم')}
         ${d.today.done ? `<p class="bal-mission ok"><b>أنجزتها!</b> أجبت ${num(d.today.valid)} سؤالًا بتأنٍّ وصحتك ${num(pct(d.today.correct, d.today.valid))}%؛ كسبت +3 نقاط ليوم تدريب جاد.</p>`
           : `<p class="bal-mission">أجب ${num(10)} أسئلة بتأنٍّ وبصحة ${num(50)}% فأكثر تكسب +3 نقاط إضافية.</p>
-             <div class="small">اليوم: ${num(d.today.valid)} من ${num(10)} إجابات</div><div class="bar"><span style="width:${Math.min(100, d.today.valid * 10)}%"></span></div>
-             ${d.today.valid >= 10 ? '<p class="small muted">أتممت العدد، لكن الصحة أقل من 50%؛ راجع تفسير الأخطاء وأجب عن أسئلة إضافية.</p>' : ''}
+             ${chk([
+               [d.today.valid >= 10 ? 'ok' : 'no', '10 إجابات محتسبة اليوم', '', meter(d.today.valid, 10, `${num(Math.min(d.today.valid, 10))} من ${num(10)} إجابات`)],
+               [d.today.valid && 2 * d.today.correct >= d.today.valid ? 'ok' : (d.today.valid >= 10 ? 'bad' : 'no'), 'صحة 50% فأكثر', d.today.valid >= 10 && 2 * d.today.correct < d.today.valid ? 'أتممت العدد لكن الصحة أقل من 50%؛ راجع تفسير الأخطاء وأجب عن أسئلة إضافية.' : (d.today.valid ? `صحتك الآن ${num(pct(d.today.correct, d.today.valid))}%.` : 'تُحسب بعد أن تبدأ الإجابة.')]])}
              <a class="btn primary" href="#/">ابدأ التدريب</a>`}
         <div class="bal-week ${d.week.kept ? 'ok' : ''}"><b>${d.week.kept ? '✅ حافظت على تميّزك هذا الأسبوع (+2 نقطة)' : '⭐ حافظ على تميّزك هذا الأسبوع تكسب +2 نقطة'}</b>
-          <span class="small muted">${num(Math.min(d.week.valid, 30))} من 30 إجابة محتسبة · ${num(Math.min(d.week.days, 3))} من 3 أيام تدريب (الأسبوع من الأحد)${d.weeksKept ? ` · أسابيع التميّز: ${num(d.weeksKept)}` : ''}</span></div>
+          ${chk([
+            [d.week.valid >= 30 ? 'ok' : 'no', '30 إجابة محتسبة هذا الأسبوع', '', meter(d.week.valid, 30, `${num(Math.min(d.week.valid, 30))} من 30 إجابة`)],
+            [d.week.days >= 3 ? 'ok' : 'no', 'في 3 أيام تدريب مختلفة', '', meter(d.week.days, 3, `${num(Math.min(d.week.days, 3))} من 3 أيام`)],
+            [d.week.kept ? 'ok' : (d.week.valid >= 30 && d.week.days >= 3 ? 'bad' : 'no'), 'صحة فوق 30%', 'الأسبوع يبدأ من الأحد.']])}
+          ${d.weeksKept ? `<span class="small muted">أسابيع التميّز التي حافظت عليها: ${num(d.weeksKept)}</span>` : ''}</div>
         <div class="bal-stats">
           <div><b>${d.streak ? '🔥 ' : ''}${num(d.streak)}</b><span class="small muted">أيام جادة متتالية</span></div>
           <div><b>${num(d.weekUsed)}/${num(d.settings.weeklyCap)}</b><span class="small muted">درجات هذا الأسبوع</span></div>
@@ -422,6 +456,7 @@ export async function pageStudentBalance(ctx) {
         <div class="bal-gbox"><b>${num(d.pending)}</b><span class="small muted">بانتظار رصد المعلم</span></div>
         <div class="bal-gbox ok"><b>${num(d.recorded)}</b><span class="small muted">تم رصدها</span></div>
       </div>
+      ${nextBadge ? `<p class="small muted bal-next">باقي ${num(nextBadge[0] - total)} ${nextBadge[0] - total === 1 ? 'درجة' : 'درجات'} للوسام ال${nextBadge[1]}.</p>` : '<p class="small muted bal-next">حصلت على كل الأوسمة، مثابرة رائعة!</p>'}
       <ul class="bal-badges">${BADGES.map(([n, t, tip]) => `<li class="${total >= n ? 'on' : ''}"><span aria-hidden="true">${total >= n ? '🏅' : '🔒'}</span><b>${t}</b><span class="small muted">${tip}</span></li>`).join('')}</ul>
     </section>
     <section class="card">${ttl('history', 'سجل الاستبدال')}
@@ -433,10 +468,7 @@ export async function pageStudentBalance(ctx) {
     <section class="card">${ttl('spark', 'كيف يعمل الرصيد؟')}
       <ul class="rank-rules">
         <li>كل <b>${num(rate)}</b> نقطة من نقاط التميّز تُستبدل بدرجة تُضاف إلى رصيدك، ويرصدها لك معلمك.</li>
-        <li>تُخصم النقاط المستبدلة من «نقاطك المتاحة» فقط، وترتيبك في التميّز لا ينقص.</li>
-        <li>الحد الأقصى <b>${num(d.settings.weeklyCap)}</b> درجات في الأسبوع، يتجدد يوم الأحد.</li>
-        <li>يكفي أن تبلغ النقاط المطلوبة لتستبدل، دون اشتراط دخول قائمة التميّز؛ بشرط ألا يكون تدريبك «يحتاج متابعة» (إجابات سريعة جدًا أو قريبة من التخمين).</li>
-        <li><b>مكافأة التميّز:</b> +2 نقطة عن كل أسبوع تجيب فيه 30 إجابة محتسبة على الأقل في 3 أيام مختلفة وبصحة فوق 30%.</li>
+        <li>تُخصم النقاط المستبدلة من «نقاطك المتاحة» فقط، وترتيبك في التميّز لا ينقص. ولا يُشترط دخول قائمة التميّز.</li>
         <li>للمعلم أن يُلغي استبدالًا لم يرصده بسبب مكتوب، وتعود نقاطك إليك.</li>
         <li>مع بدء فصل دراسي جديد تبدأ النقاط من الصفر، أما الدرجات التي استبدلتها فتبقى لك.</li>
       </ul></section>`;

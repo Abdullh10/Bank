@@ -127,7 +127,7 @@ export function createClient() {
 const browser = await chromium.launch();
 const results = [], errors = [];
 const ok = (n, v, extra = '') => results.push(`${v ? 'PASS' : 'FAIL'} ${n} ${extra}`);
-const ctx = await browser.newContext({ viewport: { width: Number(process.env.E2E_WIDTH || 1280), height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1) });
+const ctx = await browser.newContext({ viewport: { width: Number(process.env.E2E_WIDTH || 1280), height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1), colorScheme: process.env.E2E_DARK ? 'dark' : 'light' });
 await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
 if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
@@ -422,6 +422,7 @@ if (await p.locator('#st-retry').count()) {
 }
 await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
 await p.waitForTimeout(500);
+await p.screenshot({ path: `${OUT}/student-history.png`, fullPage: true });
 ok('student: history lists sessions', (await p.locator('main').innerText()).includes('آخر الجلسات') && (await p.locator('main tbody tr').count()) >= 1);
 ok('student: «التميّز» in the menu', await p.locator('[data-nav="rank"]').isVisible());
 await p.goto(BASE + '#/rank'); await p.waitForSelector('.rank-rules');
@@ -433,6 +434,7 @@ ok('student: leaderboard RPC exposes no other student details', rk.data && !JSON
 // الرصيد: غير مؤهل أولًا، ثم نمنحه تدريبًا جادًا (بيانات تجريبية تُحذف بعد اختبار المعلم) ويستبدل نقاطه بدرجة
 ok('student: «الرصيد» in the menu', await p.locator('[data-nav="balance"]').isVisible());
 await p.goto(BASE + '#/balance'); await p.waitForSelector('.bal-main');
+await p.screenshot({ path: `${OUT}/student-balance-empty.png`, fullPage: true });
 ok('student: balance page shows no redeem button before enough points, and the weekly keep-up bonus', (await p.locator('main').innerText()).includes('حافظ على تميّزك') && !(await p.locator('[data-redeem]').count()));
 const sid = (await pool.query("select id from auth.users where email = 'st2test@chem21.local'")).rows[0].id;
 await pool.query(`update public.rank_terms set started_at = now() - interval '30 days'`);
@@ -447,7 +449,9 @@ await pool.query(`do $$ declare sid2 bigint; qq record; n int; k int; t timestam
       insert into public.practice_answers (session_id, question_id, choice, correct, answered_at) values (sid2, qq.id, 0, k <> 3, t + (k * 10 || ' seconds')::interval);
     end loop;
   end loop; end $$`);
+await p.goto(BASE + '#/rank'); await p.waitForSelector('.rank-rules'); await p.waitForTimeout(300); await p.screenshot({ path: `${OUT}/student-rank-eligible.png`, fullPage: true });
 await p.goto(BASE + '#/'); await p.waitForSelector('#st-bal:not([hidden])');
+await p.waitForTimeout(500); await p.screenshot({ path: `${OUT}/student-home.png`, fullPage: true });
 ok('student: home shows the balance strip', (await p.locator('#st-bal').innerText()).includes('درجة جاهزة'));
 await p.goto(BASE + '#/balance'); await p.waitForSelector('[data-redeem]');
 ok('student: balance shows a ready grade, streak and the mission done', (await p.locator('main').innerText()).includes('درجة جاهزة للاستبدال') && (await p.locator('.bal-mission.ok').count()) === 1);
