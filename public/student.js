@@ -412,12 +412,13 @@ const RING = 2 * Math.PI * 52;
 const ring = (frac, inner, label = 'تقدمك نحو الدرجة القادمة') => `<div class="bal-ring" role="img" aria-label="${label}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="bal-track"/>
   <circle cx="60" cy="60" r="52" class="bal-fill" style="stroke-dasharray:${RING.toFixed(1)};stroke-dashoffset:${(RING * (1 - Math.min(1, Math.max(0, frac)))).toFixed(1)}"/></svg><div class="bal-ring-in">${inner}</div></div>`;
 
-function celebrate(grades, left) {
+function celebrate(title, text) {
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   const o = document.createElement('div');
   o.className = 'bal-cele';
   o.setAttribute('role', 'status');
   o.innerHTML = `<div class="bal-cele-card"><div class="bal-coin" aria-hidden="true">${icon('coin', 84)}</div>
-    <h2>مبروك! أضفت ${grades === 1 ? 'درجة' : num(grades) + ' درجات'} إلى رصيدك</h2><p class="muted">سيرصدها لك معلمك. بقي لك ${num(left)} نقطة، فواصل التدريب لتكسب الدرجة القادمة.</p>
+    <h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>
     <button type="button" class="primary">رائع</button></div>${'<i></i>'.repeat(14)}`;
   document.body.append(o);
   const close = () => o.remove();
@@ -448,7 +449,7 @@ export async function pageStudentBalance(ctx) {
               <div class="actions">${buy.map(k => `<button type="button" class="primary" data-redeem="${k}">استبدل ${num(k * rate)} نقطة بـ ${k === 1 ? 'درجة' : num(k) + ' درجات'}</button>`).join('')}</div>`
             : `<p class="bal-ready">${d.blocked === 'insufficient' ? `باقي <b>${num(Math.max(0.1, d.toNext))}</b> نقطة على درجتك القادمة` : 'نقاطك تتجمع باستمرار'}</p>
               <div class="bar"><span style="width:${Math.round(100 * Math.min(1, inRing / rate))}%"></span></div>`}
-            <p class="small muted">نقاطك في قائمة التميّز ${num(d.score)}؛ ما تستبدله لا ينقص ترتيبك.</p>
+            <p class="small muted">نقاطك في قائمة التميّز ${num(d.score)}؛ ما تستبدله لا ينقص ترتيبك.${d.bonus ? ` ومعها ${num(d.bonus)} نقطة من كوبونات المكافأة (لا تدخل الترتيب).` : ''}</p>
           </div></div>
         <div class="bal-cond"><h3>شروط الاستبدال</h3>
           ${chk([
@@ -479,6 +480,12 @@ export async function pageStudentBalance(ctx) {
         </div>
       </section>
     </div>
+    <section class="card bal-coupon">${ttl('spark', 'لديك كود مكافأة؟')}
+      <p class="small muted">يعطيك معلمك كودًا مكافأةً على تميّزك، فتزيد نقاطك المتاحة للاستبدال. الكود يُستخدم مرة واحدة ولا يدخل في نقاط الترتيب.</p>
+      <div class="bal-coupon-row"><input id="cp-code" class="ltr" dir="ltr" maxlength="12" autocomplete="off" placeholder="XXXX-XXXX" aria-label="كود المكافأة">
+        <button type="button" class="primary" id="cp-go">تفعيل الكود</button></div>
+      <p class="notice bad small" id="cp-err" hidden></p>
+    </section>
     <section class="card">${ttl('trophy', 'درجاتك')}
       <div class="bal-grades">
         <div class="bal-gbox"><b>${num(d.pending)}</b><span class="small muted">بانتظار رصد المعلم</span></div>
@@ -500,6 +507,19 @@ export async function pageStudentBalance(ctx) {
         <li>للمعلم أن يُلغي استبدالًا لم يرصده بسبب مكتوب، وتعود نقاطك إليك.</li>
         <li>مع بدء فصل دراسي جديد تبدأ النقاط من الصفر، أما الدرجات التي استبدلتها فتبقى لك.</li>
       </ul></section>`;
+  const cpGo = document.getElementById('cp-go'), cpErr = document.getElementById('cp-err'), cpIn = document.getElementById('cp-code');
+  const useCoupon = async () => {
+    if (cpIn.value.trim().length < 8) { cpErr.textContent = 'اكتب الكود كاملًا (8 خانات)'; cpErr.hidden = false; return; }
+    cpGo.disabled = true; cpErr.hidden = true;
+    try {
+      const r = await api('/student/coupon', { method: 'POST', body: { code: cpIn.value } });
+      if (!r.ok) { cpErr.textContent = r.error; cpErr.hidden = false; cpGo.disabled = false; return; }
+      celebrate(`حصلت على ${num(r.points)} نقطة مكافأة!`, `${r.note ? r.note + ' · ' : ''}أصبحت نقاطك المتاحة ${num(r.balance.points)}.`);
+      pageStudentBalance(ctx).catch(fail);
+    } catch (e) { cpGo.disabled = false; fail(e); }
+  };
+  cpGo.onclick = useCoupon;
+  cpIn.onkeydown = e => { if (e.key === 'Enter') useCoupon(); };
   $app.querySelectorAll('[data-redeem]').forEach(b => b.onclick = () => {
     const k = Number(b.dataset.redeem), cost = k * rate;
     const dlg = document.createElement('dialog');
@@ -514,7 +534,7 @@ export async function pageStudentBalance(ctx) {
       if (!ok) return;
       try {
         const r = await api('/student/redeem', { method: 'POST', body: { grades: k } });
-        celebrate(k, r.points);
+        celebrate(`مبروك! أضفت ${k === 1 ? 'درجة' : num(k) + ' درجات'} إلى رصيدك`, `سيرصدها لك معلمك. بقي لك ${num(r.points)} نقطة، فواصل التدريب لتكسب الدرجة القادمة.`);
         pageStudentBalance(ctx).catch(fail);
       } catch (e) { fail(e); }
     });

@@ -486,6 +486,19 @@ ok('student: grade pending the teacher, points deducted, ranking score untouched
   && (await p.locator('main').innerText()).includes('بانتظار رصد المعلم'));
 const dbBal = await pool.query(`select (select count(*) from public.grade_redemptions where user_id = '${sid}' and status = 'pending')::int pend, (select count(*) from public.practice_answers a join public.practice_sessions s on s.id = a.session_id where s.user_id = '${sid}' and s.settings @> '{"e2e":true}')::int ans`);
 ok('database: one pending redemption, practice answers untouched', dbBal.rows[0].pend === 1 && dbBal.rows[0].ans === 60);
+const ownCoupon = (await asRole('55555555-5555-5555-5555-555555555555', "select to_jsonb(public.staff_create_coupon(40, 'جائزة اختبار', 7)) r")).data;
+ok('owner: coupon issued with an XXXX-XXXX code', /^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(ownCoupon?.code || ''), JSON.stringify(ownCoupon));
+const scoreBefore = (await asRole(sid, 'select to_jsonb(public.student_leaderboard()) r')).data.me.score;
+await p.goto(BASE + '#/balance'); await p.waitForSelector('#cp-code');
+await p.fill('#cp-code', 'AAAA-AAAA'); await p.click('#cp-go'); await p.locator('#cp-err').waitFor({ state: 'visible', timeout: 5000 });
+ok('student: wrong coupon code refused with a generic message', (await p.locator('#cp-err').innerText()).includes('غير صحيح'));
+await p.fill('#cp-code', ownCoupon.code.toLowerCase()); await p.click('#cp-go'); await p.waitForSelector('.bal-cele');
+ok('student: coupon redeemed with a celebration', (await p.locator('.bal-cele').innerText()).includes('40 نقطة'));
+await p.locator('.bal-cele button').click();
+const cpDb = await pool.query("select status from public.point_coupons where code = $1", [ownCoupon.code]);
+ok('database: coupon marked redeemed', cpDb.rows[0].status === 'redeemed');
+ok('coupon points do not enter the excellence score', (await asRole(sid, 'select to_jsonb(public.student_leaderboard()) r')).data.me.score === scoreBefore);
+ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_redeem_coupon($1)) r', [ownCoupon.code])).data.ok === false);
 await p.click('#logout'); await p.waitForSelector('#l-user');
 // مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
@@ -518,7 +531,16 @@ ok('teacher: grade balance lists the assigned student with 1 pending', (await p.
 await p.screenshot({ path: `${OUT}/teacher-grades.png`, fullPage: true });
 await p.locator('[data-rec]').first().click(); await p.waitForFunction(() => !document.querySelector('[data-rec]'), null, { timeout: 8000 });
 ok('teacher: recorded — nothing pending', (await pool.query("select count(*)::int n from public.grade_redemptions where status = 'recorded'")).rows[0].n === 1);
+await p.goto(BASE + '#/grades'); await p.waitForSelector('#cp-card #cp-make');
+await p.fill('#cp-pts', '500'); await p.fill('#cp-note', 'مبالغ فيه'); await p.click('#cp-make');
+ok('teacher: coupon above the teacher limit refused', await p.locator('.toast', { hasText: 'الحد الأقصى لكوبون المعلم' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
+await p.fill('#cp-pts', '50'); await p.fill('#cp-note', 'مشاركة متميزة'); await p.click('#cp-make'); await p.waitForSelector('#cp-fresh');
+const tCode = (await p.locator('#cp-fresh .cp-code').innerText()).trim();
+ok('teacher: coupon issued, code shown with a copy button', /^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(tCode) && await p.locator('#cp-copy').isVisible());
+await p.screenshot({ path: `${OUT}/teacher-coupons.png`, fullPage: true });
+ok('teacher coupon redeemable by the teacher\'s assigned student', (await asRole(sid, 'select to_jsonb(public.student_redeem_coupon($1)) r', [tCode])).data.ok === true);
 await pool.query(`delete from public.grade_redemptions; delete from public.practice_sessions where settings @> '{"e2e":true}'`);
+await pool.query('delete from public.point_coupons');
 ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
 // مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
 await p.click('#logout'); await p.waitForSelector('#l-user');

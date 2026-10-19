@@ -196,14 +196,18 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/history') return rpc('student_history');
   if (p === '/student/rank') return rpc('student_leaderboard', { p_course: f.course ? Number(f.course) : null });
   if (p === '/student/report') { await rpc('student_report_question', { p_question: body.question, p_reason: body.reason, p_body: body.body ?? null }); return { ok: true }; }
+  if (p === '/student/coupon') return rpc('student_redeem_coupon', { p_code: body.code, p_course: body.course ? Number(body.course) : null });
   if (p === '/student/balance') return rpc('student_balance', { p_course: f.course ? Number(f.course) : null });
   if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------
+  if (p === '/staff/coupons') return method === 'GET' ? rpc('staff_list_coupons') : rpc('staff_create_coupon', { p_points: Number(body.points), p_note: body.note, p_days: Number(body.days) || 7 });
+  if (p === '/staff/coupons/cancel') { await rpc('staff_cancel_coupon', { p_id: body.id }); return { ok: true }; }
   if (p === '/teacher/grades') return rpc('teacher_grade_balances', { p_course: course });
   if (p === '/teacher/grades/record') return rpc('teacher_record_grades', { p_user: body.user || null, p_course: course });
   if (p === '/teacher/grades/cancel') { await rpc('teacher_cancel_redemption', { p_id: body.id, p_reason: body.reason }); return { ok: true }; }
   if (p === '/admin/grades/settings') return method === 'GET' ? rpc('admin_get_grade_settings')
-    : rpc('admin_set_grade_settings', { p_rate: Number(body.rate), p_weekly: Number(body.weekly), p_enabled: !!body.enabled, p_reason: body.reason ?? null });
+    : rpc('admin_set_grade_settings', { p_rate: Number(body.rate), p_weekly: Number(body.weekly), p_enabled: !!body.enabled, p_reason: body.reason ?? null,
+      p_coupon_max: body.couponMax ? Number(body.couponMax) : null, p_coupon_quota: body.couponQuota !== undefined && body.couponQuota !== '' ? Number(body.couponQuota) : null });
   if (p === '/teacher/progress') return rpc('teacher_progress', { p_section: f.section || null, p_course: course });
   if (p === '/teacher/quality') return rpc('teacher_training_quality', { p_course: course });
   if (p === '/admin/rank/term') return method === 'GET' ? rpc('admin_get_rank_term') : rpc('admin_start_new_term', { p_note: body.note ?? null });
