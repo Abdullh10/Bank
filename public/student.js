@@ -389,6 +389,7 @@ export async function pageStudentRank(ctx) {
     <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
       <ul class="rank-rules earn">
         <li><span class="earn-v">+1 / −⅓</span><span><b>الصافي:</b> +1 لكل إجابة صحيحة و−⅓ لكل خاطئة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</span></li>
+        <li><span class="earn-v">×1.1 / ×1.2</span><span><b>مستوى السؤال:</b> الصافي يُضرب في 1.1 لأسئلة التطبيق وفي 1.2 لأسئلة التفكير العليا، مكافأةً للجهد الأكبر؛ والأساسي ×1.</span></li>
         <li><span class="earn-v off">⏱</span><span><b>الإجابات السريعة:</b> الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</span></li>
         <li><span class="earn-v off">${num(r.dailyCap)}</span><span><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</span></li>
         <li><span class="earn-v">+${num(r.dayBonus)}</span><span><b>يوم تدريب جاد:</b> ${num(r.dayMin)} إجابات صالحة فأكثر بصحة ${num(r.dayAcc)}% فأكثر (حتى ${num(r.dayCap)} يومًا).</span></li>

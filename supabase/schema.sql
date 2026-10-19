@@ -1707,7 +1707,7 @@ revoke execute on function public._require_course(bigint), public._default_cours
 
 -- =====================================================================
 -- 2026-10-18: قائمة التميّز — ترتيب المتدربين في الشعبة
---   النقاط تكافئ التدريب الجاد والمنتظم لا التخمين: صافي الإجابات (+1 صحيحة، −⅓ خاطئة لأن البدائل أربعة)،
+--   النقاط تكافئ التدريب الجاد والمنتظم لا التخمين: صافي الإجابات (+1 صحيحة، −⅓ خاطئة لأن البدائل أربعة، مضروبًا في معامل المستوى: أساسي ×1، تطبيق ×1.1، تفكير عليا ×1.2)،
 --   إجابات أسرع من 3 ثوانٍ لا تُحسب، وأول 50 إجابة صالحة في اليوم فقط، و+3 لكل يوم تدريب جاد (حتى 20)،
 --   و+1 لكل سؤال أخطأ فيه الطالب أولًا ثم أصاب لاحقًا (حتى 30). شرط دخول الترتيب: 30 إجابة صالحة في 3 أيام على الأقل.
 --   إضافات قراءة فقط: لا تعدّل ولا تحذف أي شيء من جلسات التدريب وإجابات الطلاب.
@@ -1732,13 +1732,13 @@ create or replace function public._rank_rows(p_course bigint, p_ids uuid[])
 returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, retry_fixes int, net numeric, score numeric, weeks_kept int)
 language sql stable security definer set search_path = public, pg_temp as $$
   with term as (select max(started_at) s from public.rank_terms),
-  cq as (select q.id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
+  cq as (select q.id, public._level_group(q.thinking_level) g from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
          join public.chapters c on c.id = l.chapter_id where c.course_id = p_course),
   raw as (
-    select s.user_id, a.session_id, a.question_id, a.correct, a.answered_at,
+    select s.user_id, a.session_id, a.question_id, a.correct, a.answered_at, cq.g,
       extract(epoch from (a.answered_at - coalesce(lag(a.answered_at) over (partition by a.session_id order by a.answered_at), s.created_at))) as secs
-    from public.practice_answers a join public.practice_sessions s on s.id = a.session_id
-    where s.user_id = any(p_ids) and a.question_id in (select id from cq)),
+    from public.practice_answers a join public.practice_sessions s on s.id = a.session_id join cq on cq.id = a.question_id
+    where s.user_id = any(p_ids)),
   win as (select r.* from raw r join public.profiles p on p.user_id = r.user_id
           where r.answered_at >= greatest((select s from term), coalesce(p.rank_since, '-infinity'::timestamptz))),
   ranked as (select w.*, row_number() over (partition by w.user_id, w.question_id order by w.answered_at) rn from win w),
@@ -1760,7 +1760,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
       (select count(distinct v.d) from valid v where v.user_id = u.user_id)::int days_any,
       (select count(*) from (select v.d from valid v where v.user_id = u.user_id group by v.d having count(*) >= 10 and 2 * count(*) filter (where v.correct) >= count(*)) z)::int days_active,
       coalesce((select n from fix where fix.user_id = u.user_id), 0) retry_fixes,
-      coalesce((select sum(case when v.correct then 1 else -1.0 / 3 end) from valid v where v.user_id = u.user_id and v.dn <= 50), 0) net
+      coalesce((select sum((case v.g when 'higher' then 1.2 when 'apply' then 1.1 else 1.0 end) * (case when v.correct then 1 else -1.0 / 3 end)) from valid v where v.user_id = u.user_id and v.dn <= 50), 0) net
     from unnest(p_ids) as u(user_id))
   select user_id, attempts, valid, correct, rushed, days_any, days_active, retry_fixes, round(net, 1),
     round(greatest(net + 3 * least(days_active, 20) + least(retry_fixes, 30) + 2 * weeks_kept, 0), 1), weeks_kept
