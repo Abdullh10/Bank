@@ -9,9 +9,9 @@ const target = n => (n.entity === 'question' ? qLabel(n) : n.entity === 'supplem
 
 function noteItem(ctx, n, { withObjective = false } = {}) {
   const { esc, can, badge } = ctx;
-  const canDelete = can('edit') || (n.mine && !n.resolvedAt);
+  const canDelete = can('edit') || (n.mine && !n.resolvedAt) || n.source === 'student';
   return `<li class="note ${n.resolvedAt ? 'done' : ''}" data-note="${n.id}">
-    <div class="note-head">${badge(target(n), n.entity === 'question' ? 'brand' : '')}
+    <div class="note-head">${n.source === 'student' ? badge('بلاغ طالب', 'warn') : ''}${badge(target(n), n.entity === 'question' ? 'brand' : '')}
       ${n.resolvedAt ? badge('نُفذت', 'ok') : badge('مفتوحة', 'warn')}
       ${withObjective ? `<a href="#/objective/${encodeURIComponent(n.objectiveCode)}" class="small">${esc(n.objectiveCode)}</a>` : ''}
       <span class="small muted">${esc(n.author || '')} · ${esc(dateFmt(n.createdAt))}</span></div>

@@ -124,6 +124,7 @@ const LINES = {
   close: '<path d="m7 7 10 10M17 7 7 17"/>',
   next: '<path d="m14.5 6-6 6 6 6"/>',
   prev: '<path d="m9.5 6 6 6-6 6"/>',
+  flag: '<path d="M6 21V4M6 5h11l-2.2 3.6L17 12H6"/>',
   download: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/>',
 };
 export function line(name, size = 18, cls = '') {

@@ -1056,6 +1056,8 @@ create table if not exists public.review_notes (
   resolved_by_name text,
   response text
 );
+-- source: staff = ملاحظة فريق، student = بلاغ طالب عن مشكلة في سؤال (لا يُعرض اسم الطالب)
+alter table public.review_notes add column if not exists source text not null default 'staff';
 create index if not exists idx_notes_obj on public.review_notes(objective_id);
 create index if not exists idx_notes_open on public.review_notes(created_at desc) where resolved_at is null;
 alter table public.review_notes enable row level security;
@@ -1064,7 +1066,7 @@ revoke all on public.review_notes from anon, authenticated;
 create or replace function public._note_json(n public.review_notes) returns jsonb
 language sql stable security definer set search_path = public, pg_temp as $$
   select jsonb_build_object('id', n.id, 'entity', n.entity, 'body', n.body, 'author', n.author_name, 'mine', n.author = auth.uid(),
-    'createdAt', n.created_at, 'resolvedAt', n.resolved_at, 'resolvedBy', n.resolved_by_name, 'response', n.response,
+    'source', n.source, 'createdAt', n.created_at, 'resolvedAt', n.resolved_at, 'resolvedBy', n.resolved_by_name, 'response', n.response,
     'objectiveCode', o.code, 'objectiveText', coalesce(o.approved_text, o.original_text),
     'questionId', n.question_id, 'questionType', q.type, 'questionNumber', q.number, 'questionStem', left(q.stem, 160))
   from public.objectives o left join public.questions q on q.id = n.question_id where o.id = n.objective_id
@@ -1116,12 +1118,12 @@ begin
   if not found then raise exception 'الملاحظة غير موجودة'; end if;
 end $$;
 
--- يحذف كاتب الملاحظة ملاحظته ما دامت مفتوحة، ومالك المشروع أي ملاحظة
+-- يحذف كاتب الملاحظة ملاحظته ما دامت مفتوحة، ومالك المشروع أي ملاحظة، والمراجع بلاغات الطلاب غير الصحيحة
 create or replace function public.delete_note(p_id bigint) returns void
 language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_reviewer();
-  delete from public.review_notes where id = p_id and (public.is_admin() or (author = auth.uid() and resolved_at is null));
+  delete from public.review_notes where id = p_id and (public.is_admin() or (author = auth.uid() and resolved_at is null) or source = 'student');
   if not found then raise exception 'لا يمكن حذف هذه الملاحظة' using errcode = '42501'; end if;
 end $$;
 
@@ -2077,3 +2079,38 @@ grant execute on function public.student_balance(bigint), public.student_redeem(
   public.teacher_record_grades(uuid, bigint), public.teacher_cancel_redemption(bigint, text),
   public.admin_get_grade_settings(), public.admin_set_grade_settings(int, int, boolean, text) to authenticated;
 revoke execute on function public._rank_days(bigint, uuid), public._grade_state(uuid, bigint), public._student_course(bigint), public._require_grade_staff(boolean) from authenticated;
+
+-- =====================================================================
+-- 2026-10-19: الإبلاغ عن مشكلة في سؤال (من الطالب إلى مالك المشروع والمراجع العلمي فقط)
+--   يصل البلاغ إلى «الملاحظات» (source = 'student') دون اسم الطالب. للمالك تعديل السؤال وإغلاق الملاحظة، وله وللمراجع حذف البلاغ الخاطئ.
+--   حماية: بلاغ واحد مفتوح لكل طالب على السؤال الواحد، و20 بلاغًا كحد أقصى في اليوم.
+-- =====================================================================
+create or replace function public.student_report_question(p_question bigint, p_reason text, p_body text default null) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare q public.questions; o public.objectives; v_label text; v_detail text := nullif(trim(coalesce(p_body, '')), '');
+begin
+  perform public._require_student();
+  v_label := case p_reason when 'answer' then 'الإجابة الصحيحة غير صحيحة' when 'wording' then 'خطأ في صياغة السؤال أو البدائل'
+    when 'figure' then 'خطأ في الجدول أو الشكل' when 'other' then 'مشكلة أخرى' end;
+  if v_label is null then raise exception 'اختر نوع المشكلة'; end if;
+  if v_detail is null and p_reason = 'other' then raise exception 'اكتب وصف المشكلة'; end if;
+  if length(coalesce(v_detail, '')) > 500 then raise exception 'الوصف طويل (500 حرف كحد أقصى)'; end if;
+  select * into q from questions where id = p_question;
+  if not found then raise exception 'السؤال غير موجود'; end if;
+  if not exists (select 1 from course_enrollments e where e.user_id = auth.uid() and e.course_id = public._course_of_question(p_question)) then
+    raise exception 'السؤال خارج مقرراتك';
+  end if;
+  if exists (select 1 from review_notes where author = auth.uid() and source = 'student' and question_id = p_question and resolved_at is null) then
+    raise exception 'سبق أن أبلغت عن هذا السؤال؛ شكرًا لك، وهو قيد المراجعة';
+  end if;
+  if (select count(*) from review_notes where author = auth.uid() and source = 'student' and created_at > now() - interval '1 day') >= 20 then
+    raise exception 'بلغت الحد اليومي للبلاغات';
+  end if;
+  select * into o from objectives where id = q.objective_id;
+  insert into review_notes (objective_id, question_id, entity, body, author, author_name, source)
+  values (o.id, q.id, 'question', 'بلاغ طالب: ' || v_label || coalesce(' — ' || v_detail, ''), auth.uid(), 'طالب', 'student');
+end $$;
+
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.student_report_question(bigint, text, text) to authenticated;

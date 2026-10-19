@@ -154,6 +154,32 @@ async function startSession(ctx, p) {
   } catch (e) { fail(e); if (btn) { btn.disabled = false; btn.textContent = 'ابدأ التدريب'; } }
 }
 
+// الإبلاغ عن مشكلة في السؤال: يصل البلاغ إلى المراجع العلمي ومالك المشروع دون اسم الطالب
+const REPORT_REASONS = [['answer', 'الإجابة الصحيحة المعتمدة غير صحيحة'], ['wording', 'خطأ في صياغة السؤال أو البدائل'], ['figure', 'خطأ في الجدول أو الشكل'], ['other', 'مشكلة أخرى']];
+function reportDialog(ctx, q) {
+  const { api, fail, toast } = ctx;
+  const dlg = document.createElement('dialog');
+  dlg.className = 'bal-dlg';
+  dlg.innerHTML = `<form method="dialog"><h2>الإبلاغ عن مشكلة في السؤال</h2>
+    <fieldset class="st-rep-opts"><legend class="small muted">ما المشكلة؟</legend>${REPORT_REASONS.map(([v, t], i) => `<label class="st-radio"><input type="radio" name="rr" value="${v}" ${i === 0 ? 'checked' : ''}> ${t}</label>`).join('')}</fieldset>
+    <label for="rr-body" class="small">تفاصيل (اختيارية، وإلزامية عند «مشكلة أخرى»)</label>
+    <textarea id="rr-body" dir="auto" maxlength="500" rows="3"></textarea>
+    <p class="small muted">سيصل بلاغك إلى المراجع العلمي ومالك المشروع للتحقق منه، ولا يظهر اسمك فيه. لن يتأثر تدريبك ولا نقاطك.</p>
+    <p class="notice bad small" id="rr-err" hidden></p>
+    <div class="actions"><button type="button" class="primary" id="rr-send">تأكيد الإرسال</button><button value="no">إلغاء</button></div></form>`;
+  document.body.append(dlg);
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.querySelector('#rr-send').onclick = async e => {
+    const reason = dlg.querySelector('[name=rr]:checked').value, body = dlg.querySelector('#rr-body').value.trim();
+    const err = dlg.querySelector('#rr-err');
+    if (reason === 'other' && body.length < 3) { err.textContent = 'اكتب وصف المشكلة'; err.hidden = false; return; }
+    const btn = e.currentTarget; btn.disabled = true;
+    try { await api('/student/report', { method: 'POST', body: { question: q.id, reason, body }, keep: true }); dlg.close(); toast('وصل بلاغك، شكرًا لك'); }
+    catch (x) { btn.disabled = false; err.textContent = x.message; err.hidden = false; }
+  };
+  dlg.showModal();
+}
+
 function stopTimer() { if (session?.timer) { clearInterval(session.timer); session.timer = null; } }
 
 function renderQuestion(ctx) {
@@ -171,7 +197,7 @@ function renderQuestion(ctx) {
     </div>
     <div class="bar"><span style="width:${pct(answeredCount, session.questions.length)}%"></span></div>
     <article class="card st-q">
-      <div class="st-meta">${esc(q.lesson)} · ${GROUPS[q.group]}</div>
+      <div class="st-qhead"><div class="st-meta">${esc(q.lesson)} · ${GROUPS[q.group]}</div><button type="button" class="st-report" id="st-report" title="الإبلاغ عن مشكلة في السؤال">${line('flag', 15)}الإبلاغ عن مشكلة في السؤال</button></div>
       <p class="st-stem">${esc(q.stem)}</p>
       ${q.stimulus ? `<div class="table-wrap"><table class="data-table"><thead><tr>${q.stimulus.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
         <tbody>${q.stimulus.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}
@@ -202,6 +228,7 @@ function renderQuestion(ctx) {
       if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx);
     } catch (e) { fail(e); if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx); }
   });
+  document.getElementById('st-report').onclick = () => reportDialog(ctx, q);
   const others = document.getElementById('st-others');
   if (others) others.onclick = () => { document.getElementById('st-others-list').hidden = false; others.remove(); };
   const next = document.getElementById('st-next');
