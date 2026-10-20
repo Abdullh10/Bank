@@ -2,8 +2,8 @@
 import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { similarPairs } from './validate.js';
-import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentConfirm, resetStudentSession } from './student.js';
-import { pageTeacherProgress, pageTeacherGrades, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
+import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentInbox, pageStudentConfirm, resetStudentSession } from './student.js';
+import { pageTeacherProgress, pageTeacherGrades, pageTeacherComms, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
 import { pageDashboard } from './dashboard.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
@@ -937,6 +937,14 @@ function pagePending() {
 }
 
 // ---------- الموجّه ----------
+// عدّاد الرسائل غير المقروءة في قائمة الطالب: استعلام خفيف واحد كل 45 ثانية على الأكثر
+let inboxAt = 0;
+function setInboxBadge(n) { const el = document.getElementById('nav-unread'); if (!el) return; el.textContent = n > 9 ? '9+' : String(n); el.hidden = !n; }
+async function refreshInboxBadge() {
+  if (Date.now() - inboxAt < 45000) return;
+  inboxAt = Date.now();
+  try { setInboxBadge((await supa.supaApi('/student/comms/summary')).unread || 0); } catch { /* العدّاد اختياري */ }
+}
 async function route() {
   const seq = ++routeSeq;
   // نافذة تحرير مفتوحة لا تبقى بعد الانتقال (مثل السحب للرجوع على الآيباد)
@@ -956,15 +964,17 @@ async function route() {
   const role = state.user.role, isStudent = role === 'student';
   document.querySelectorAll('[data-perm]').forEach(a => {
     const p = a.dataset.perm;
-    a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance'].includes(a.dataset.nav) || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || a.dataset.nav === 'grades')));
+    a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance', 'inbox'].includes(a.dataset.nav) || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || ['grades', 'comms'].includes(a.dataset.nav))) && (a.dataset.nav !== 'comms' || ['admin', 'viewer'].includes(role)));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
+    if (state.supabase && page !== 'inbox') refreshInboxBadge();
     try {
       if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
       else if (page === 'history') await pageStudentHistory(ctx);
       else if (page === 'rank' && state.supabase) await pageStudentRank(ctx);
       else if (page === 'balance' && state.supabase) await pageStudentBalance(ctx);
+      else if (page === 'inbox' && state.supabase) { await pageStudentInbox(ctx); setInboxBadge(0); inboxAt = Date.now(); }
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
     } catch (e) {
       if (e?.status === 401) return fail(e);
@@ -990,6 +1000,7 @@ async function route() {
     else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
     else if (page === 'grades' && can('progress') && state.supabase) await pageTeacherGrades(ctx);
+    else if (page === 'comms' && ['admin', 'viewer'].includes(role) && state.supabase) await pageTeacherComms(ctx);
     else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
     else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);
     else if (page === 'team' && can('accounts') && state.supabase) await pageAdminTeam(ctx);

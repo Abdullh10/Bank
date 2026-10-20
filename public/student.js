@@ -80,6 +80,7 @@ export async function pageStudentHome(ctx) {
       <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
       <p class="muted">اختر الدروس وعدد الأسئلة والمستوى، ثم ابدأ. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
     <section class="card st-bal" id="st-bal" hidden></section>
+    <section class="card st-task" id="st-task" hidden></section>
     <ol class="st-steps"><li><b>١</b> اختر الدروس</li><li><b>٢</b> اضبط الجلسة</li><li><b>٣</b> ابدأ التدريب</li></ol>
     <div class="grid2 st-setup">
       <section class="card">${ttl('lessons', 'الدروس')}
@@ -118,6 +119,15 @@ export async function pageStudentHome(ctx) {
     if (!box || !d?.available || !d.top?.length) return;
     box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
       <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
+    box.hidden = false;
+  }).catch(() => {});
+  // مهمتك الآن: أقرب مهمة مفتوحة من معلمك (استعلام خفيف)
+  cachedApi(api, '/student/comms/summary').then(d => {
+    const box = document.getElementById('st-task');
+    if (!box || (!d?.task && !d?.unread)) return;
+    const t = d.task;
+    box.innerHTML = `<div class="st-top5-head">${ttl('mail', t ? 'مهمتك الآن' : 'لديك رسائل من معلمك', 'h2', 30)}<a class="btn" href="#/inbox">${d.unread ? `صندوقي (${num(d.unread)} جديدة)` : 'صندوقي'} ←</a></div>
+      ${t ? `<p class="bal-ready"><b>${esc(t.title)}</b> · ${num(t.n)} سؤالًا قبل ${esc(hijri(t.dueAt))}</p>` : ''}`;
     box.hidden = false;
   }).catch(() => {});
   // شريط الرصيد: نقاطك المتاحة وما بقي للدرجة القادمة
@@ -549,6 +559,43 @@ export async function pageStudentBalance(ctx) {
       } catch (e) { fail(e); }
     });
     dlg.showModal();
+  });
+}
+
+// ---------- صندوقي: رسائل ومهام المعلم ----------
+export async function pageStudentInbox(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const d = await api('/student/inbox');
+  api('/student/comms/read', { method: 'POST', keep: true }).then(() => homeCache.clear()).catch(() => {});
+  const days = at => Math.ceil((new Date(at) - Date.now()) / 86400000);
+  const TS = { open: ['جارية', 'warn'], done: ['أنجزتها ✓', 'ok'], missed: ['انتهى الموعد', ''] };
+  const card = it => {
+    const t = it.task;
+    let inner;
+    if (t) {
+      const acc = t.valid ? Math.round(100 * t.correct / t.valid) : 0, left = Math.max(0, t.n - t.valid), [st, k] = TS[t.status] || ['—', ''];
+      inner = `<div class="in-task"><div class="small">الدرس: <b>${esc(t.lesson || '')}</b></div>
+        <div class="small">المطلوب: ${num(t.n)} سؤالًا${t.minAccuracy ? ` بصحة ${num(t.minAccuracy)}% فأكثر` : ''}</div>
+        <div class="bar ${t.status === 'done' ? 'ok' : ''}"><span style="width:${Math.min(100, Math.round(100 * t.valid / t.n))}%"></span></div>
+        <div class="small muted">${t.status === 'done' ? `أنجزت ${num(t.valid)} سؤالًا بصحة ${num(acc)}%` : t.status === 'missed' ? `أجبت ${num(t.valid)} من ${num(t.n)}${t.valid ? ` بصحة ${num(acc)}%` : ''}. ما زال بإمكانك التدرّب على الدرس.`
+          : `أجبت ${num(t.valid)} من ${num(t.n)}${t.valid ? ` · صحتك ${num(acc)}%` : ''} · باقي ${num(left)} سؤالًا · ${days(t.dueAt) > 0 ? `باقي ${num(days(t.dueAt))} ${days(t.dueAt) === 1 ? 'يوم' : 'أيام'}` : 'ينتهي اليوم'} (${esc(hijri(t.dueAt))})`}</div>
+        <span class="badge ${k}">${st}</span>
+        ${t.status !== 'done' ? `<button type="button" class="primary" data-go="${t.lessonId}">ابدأ التدريب على الدرس</button>` : ''}</div>`;
+    } else inner = `<p class="in-body">${esc(it.body || '')}</p>
+      <div class="actions in-reply">${it.reply ? `<span class="badge ${it.reply === 2 ? 'warn' : 'ok'}">${it.reply === 2 ? 'أخبرت معلمك أنك تحتاج مساعدة' : 'أخبرت معلمك أنك فهمت'}</span>`
+        : `<button type="button" data-reply="1:${it.id}">فهمت</button><button type="button" data-reply="2:${it.id}">أحتاج مساعدة</button>`}</div>`;
+    return `<li class="in-item ${it.read ? '' : 'new'} ${it.task ? 'is-task' : ''}"><div class="in-head"><b>${esc(it.title)}</b>${it.read ? '' : ' <span class="badge brand">جديدة</span>'}
+      <span class="small muted">${esc(it.sender || 'معلمك')} · ${esc(hijri(it.createdAt))}</span></div>${inner}</li>`;
+  };
+  $app.innerHTML = `<section class="hero"><div class="hero-ic">${icon('mail', 52)}<div><h1>صندوقي</h1>
+    <p class="muted">رسائل معلمك ومهامه لك. المهام تُحتسب تلقائيًا من تدريبك، فلا تحتاج لتسليم شيء.</p></div></div></section>
+    <section class="card">${d.items.length ? `<ul class="in-list">${d.items.map(card).join('')}</ul>` : '<div class="empty">لا توجد رسائل أو مهام الآن. حين يرسل لك معلمك شيئًا يظهر هنا.</div>'}</section>`;
+  $app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { savePrefs({ ...loadPrefs(), lessons: [Number(b.dataset.go)] }); location.hash = '#/'; });
+  $app.querySelectorAll('[data-reply]').forEach(b => b.onclick = async () => {
+    const [code, id] = b.dataset.reply.split(':').map(Number);
+    b.disabled = true;
+    try { await api('/student/comms/reply', { method: 'POST', body: { id, code } }); toast(code === 2 ? 'وصل طلبك لمعلمك' : 'وصل ردّك'); pageStudentInbox(ctx).catch(fail); }
+    catch (e) { b.disabled = false; fail(e); }
   });
 }
 

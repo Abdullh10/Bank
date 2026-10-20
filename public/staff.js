@@ -81,6 +81,83 @@ export async function pageTeacherGrades(ctx) {
     d.map(x => [x.name, x.username, x.grade || '', x.section || '', x.pending, x.recorded])));
 }
 
+// رسائل ومهام المعلم لطلابه: رسالة (قراءة فقط) أو مهمة تُحتسب تلقائيًا من تدريب الطالب
+const COMM_TEMPLATES = [
+  ['تذكير بالمراجعة', 'راجعوا الدرس قبل الحصة القادمة', 'حاولوا حل بعض أسئلة التدريب في المنصة قبل الحصة.'],
+  ['أحسنت', 'أحسنت، واصل تميّزك', 'لاحظت التزامك بالتدريب، استمر على هذا المستوى.'],
+  ['اختبار قريب', 'اختبار قريب', 'استعدوا للاختبار القادم بالتدريب على الدروس المقررة.'],
+  ['ابدأ هذا الدرس', 'ابدأ بهذا الدرس', 'ابدأ بالتدريب على الدرس الذي شرحناه اليوم.'],
+];
+export async function pageTeacherComms(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const [list, students, chapters] = await Promise.all([api('/staff/comms'), api('/staff/students'), api('/staff/lessons')]);
+  const sections = [...new Set(students.map(s => s.section).filter(Boolean))].sort();
+  const owner = ctx.state?.user?.role === 'admin';
+  const defDue = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  $app.innerHTML = `
+    <section class="hero"><div class="hero-ic">${icon('mail', 52)}<div><h1>رسائل ومهام</h1>
+      <p class="muted">أرسل لطلابك رسالة أو مهمة. المهمة تُحتسب تلقائيًا من تدريب الطالب (أول إجابة لكل سؤال في الدرس، والإجابة الأسرع من 3 ثوانٍ لا تُحتسب). الطالب يقرأ ويرد بزر «فهمت» أو «أحتاج مساعدة» فقط.${owner ? ' (أنت المالك: ترى رسائل كل المعلمين.)' : ' يطّلع مالك المشروع على الرسائل المرسلة.'}</p></div></div></section>
+    <section class="card">${ttl('mail', 'إرسال جديد')}
+      <div class="cm-form">
+        <div class="cm-row"><label class="st-radio"><input type="radio" name="cm-kind" value="message" checked> رسالة</label>
+          <label class="st-radio"><input type="radio" name="cm-kind" value="task"> مهمة (حل أسئلة في درس)</label></div>
+        <div class="cm-chips" id="cm-tpl"><span class="small muted">قوالب:</span>${COMM_TEMPLATES.map((t, i) => `<button type="button" data-tpl="${i}">${esc(t[0])}</button>`).join('')}</div>
+        <div class="field"><label for="cm-title">العنوان (80 حرفًا)</label><input id="cm-title" maxlength="80"></div>
+        <div class="field"><label for="cm-body">النص (اختياري، 500 حرف)</label><textarea id="cm-body" dir="auto" maxlength="500" rows="3"></textarea>
+          <span class="small muted">لا تكتب أسماء طلاب أو درجاتهم في النص؛ الرسالة تصل لكل المستلمين.</span></div>
+        <div class="cm-row" id="cm-task" hidden>
+          <label>الدرس <select id="cm-lesson">${chapters.map(c => `<optgroup label="${esc(c.number + '. ' + c.title)}">${c.lessons.map(l => `<option value="${l.id}">${esc(l.number + '. ' + l.title)}</option>`).join('')}</optgroup>`).join('')}</select></label>
+          <label>عدد الأسئلة <input type="number" id="cm-n" min="5" max="200" value="20" style="max-width:6rem"></label>
+          <label>نسبة الصحة المطلوبة % <input type="number" id="cm-acc" min="0" max="100" value="70" style="max-width:6rem"></label>
+          <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label></div>
+        <div class="cm-row"><label>إلى <select id="cm-mode"><option value="all">كل طلابي (${students.length})</option>${sections.length ? '<option value="section">شعبة</option>' : ''}<option value="students">طلاب محددين</option></select></label>
+          <label id="cm-sec-w" hidden>الشعبة <select id="cm-sec">${sections.map(s => `<option>${esc(s)}</option>`).join('')}</select></label></div>
+        <div class="cm-students" id="cm-stu" hidden>${students.map(s => `<label class="chk"><input type="checkbox" data-stu="${s.id}"> ${esc(s.name)} <span class="small muted">(${esc(s.section || '—')})</span></label>`).join('')}</div>
+        <div class="actions"><button type="button" class="primary" id="cm-send">إرسال</button></div>
+      </div></section>
+    <section class="card">${ttl('mail', 'المُرسَل')}
+      ${list.length ? `<ul class="cm-list">${list.map(c => {
+        const t = c.task, off = c.status === 'cancelled';
+        return `<li class="cm-item ${off ? 'off' : ''}" data-comm="${c.id}"><div class="in-head"><b>${esc(c.title)}</b>
+          <span class="badge ${c.kind === 'task' ? 'brand' : ''}">${c.kind === 'task' ? 'مهمة' : 'رسالة'}</span>${off ? '<span class="badge">ملغاة</span>' : ''}
+          <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
+          ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
+          <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
+          <div class="actions"><button type="button" data-detail="${c.id}">التفاصيل</button>${off ? '' : `<button type="button" class="danger" data-cancel="${c.id}">إلغاء</button>`}</div>
+          <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
+  const q = s => $app.querySelector(s);
+  const kind = () => $app.querySelector('[name=cm-kind]:checked').value;
+  $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => { q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; });
+  $app.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = COMM_TEMPLATES[Number(b.dataset.tpl)]; q('#cm-title').value = t[1]; q('#cm-body').value = t[2]; });
+  q('#cm-mode').onchange = e => { q('#cm-sec-w').hidden = e.target.value !== 'section'; q('#cm-stu').hidden = e.target.value !== 'students'; };
+  q('#cm-send').onclick = async e => {
+    const b = e.currentTarget, mode = q('#cm-mode').value;
+    const body = { kind: kind(), title: q('#cm-title').value, body: q('#cm-body').value,
+      target: { mode, section: mode === 'section' ? q('#cm-sec').value : null, students: mode === 'students' ? [...$app.querySelectorAll('[data-stu]:checked')].map(i => i.dataset.stu) : [] } };
+    if (body.kind === 'task') Object.assign(body, { lesson: q('#cm-lesson').value, n: q('#cm-n').value, minAccuracy: q('#cm-acc').value, due: `${q('#cm-due').value}T23:59:00+03:00` });
+    b.disabled = true;
+    try { const r = await api('/staff/comms', { method: 'POST', body }); toast(`أُرسلت إلى ${r.n} طالبًا`); await pageTeacherComms(ctx); }
+    catch (err) { b.disabled = false; fail(err); }
+  };
+  $app.querySelectorAll('[data-cancel]').forEach(b => b.onclick = async () => {
+    if (!confirm('إلغاء هذه الرسالة؟ ستختفي من صناديق الطلاب.')) return;
+    try { await api('/staff/comms/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel) } }); toast('أُلغيت'); await pageTeacherComms(ctx); } catch (err) { fail(err); }
+  });
+  const ST = { open: 'جارية', done: 'أنجز', missed: 'انتهى الموعد' };
+  $app.querySelectorAll('[data-detail]').forEach(b => b.onclick = async () => {
+    const box = document.getElementById('cmd-' + b.dataset.detail);
+    if (box.innerHTML) { box.innerHTML = ''; return; }
+    try {
+      const rows = await api('/staff/comms/detail?id=' + b.dataset.detail);
+      const isTask = list.find(c => String(c.id) === b.dataset.detail)?.kind === 'task';
+      box.innerHTML = `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>قرأها</th><th>رده</th>${isTask ? '<th>الحالة</th><th>التقدم</th>' : ''}</tr></thead><tbody>
+        ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td><td>${r.read ? '✓' : '—'}</td>
+          <td>${r.reply === 2 ? '<span class="badge warn">يحتاج مساعدة</span>' : r.reply === 1 ? 'فهمت' : '—'}</td>
+          ${isTask ? `<td>${ST[r.status]}</td><td>${r.valid} سؤالًا${r.valid ? ` · ${pct(r.correct, r.valid)}%` : ''}</td>` : ''}</tr>`).join('')}</tbody></table></div>`;
+    } catch (err) { fail(err); }
+  });
+}
+
 // كوبونات النقاط: يصدرها المعلم أو المالك فيدخلها الطالب في «الرصيد» (مرة واحدة، ولا تدخل الترتيب)
 async function couponsCard(ctx, fresh = null) {
   const { esc, $app, api, fail, toast } = ctx;
@@ -227,6 +304,12 @@ export async function pageAdminStudents(ctx) {
       <p class="small muted">قائمة التميّز تحسب نقاط الطلاب من بداية الفصل الحالي. عند انتهاء الفصل ابدأ فصلًا جديدًا لتُصفَّر النقاط؛ سجل التدريب نفسه لا يُمسّ. وتُصفَّر نقاط الطالب تلقائيًا عند نقله إلى صف آخر.</p>
       <p id="rank-term-info" class="small">جارٍ التحميل…</p>
       <div class="actions"><button type="button" id="rank-new-term" class="danger">بدء فصل دراسي جديد (تصفير نقاط التميّز)</button></div></section>` : ''}
+    ${ctx.state?.supabase ? `<section class="card" id="comm-set-card">${ttl('mail', 'رسائل ومهام المعلمين: الحدود', 'h2', 30)}
+      <p class="small muted">يرسل المعلمون لطلابهم المسندين رسائل ومهامًا من «رسائل ومهام». تضبط هنا حدودهم (لا تُطبَّق عليك أنت).</p>
+      <div class="gs-form"><label>الحد اليومي للمعلم (إرسالات) <input type="number" id="cs-daily" min="1" max="500"></label>
+        <label>أقصى مهام نشطة لكل طالب <input type="number" id="cs-active" min="1" max="20"></label>
+        <label>أقصى مستلمين في الإرسال الواحد <input type="number" id="cs-max" min="1" max="1000"></label>
+        <button type="button" class="primary" id="cs-save">حفظ</button></div></section>` : ''}
     ${ctx.state?.supabase ? `<section class="card" id="grade-set-card">${ttl('coin', 'الرصيد: استبدال النقاط بدرجات', 'h2', 30)}
       <p class="small muted">يستبدل الطالب نقاط التميّز بدرجات يرصدها المعلم. غيّر القيم هنا متى شئت؛ التغيير يسري على الاستبدالات القادمة فقط.</p>
       <div class="gs-form"><label>نقاط الدرجة الواحدة <input type="number" id="gs-rate" min="1" max="10000"></label>
@@ -338,6 +421,13 @@ export async function pageAdminStudents(ctx) {
     const fmtD = d => hijri(d);
     const info = document.getElementById('rank-term-info');
     api('/admin/rank/term').then(t => { info.textContent = `الفصل الحالي بدأ احتساب نقاطه في ${fmtD(t.startedAt)}.`; }).catch(() => { info.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
+    const csv = x => { document.getElementById('cs-daily').value = x.daily; document.getElementById('cs-active').value = x.activeTasks; document.getElementById('cs-max').value = x.maxRecipients; };
+    api('/admin/comms/settings').then(csv).catch(() => {});
+    document.getElementById('cs-save').onclick = async e => {
+      const b = e.currentTarget; b.disabled = true;
+      try { csv(await api('/admin/comms/settings', { method: 'POST', body: { daily: document.getElementById('cs-daily').value, activeTasks: document.getElementById('cs-active').value, maxRecipients: document.getElementById('cs-max').value } })); toast('حُفظت الحدود'); }
+      catch (err) { fail(err); } finally { b.disabled = false; }
+    };
     const gi = document.getElementById('gs-info'), gv = x => { document.getElementById('gs-rate').value = x.rate; document.getElementById('gs-weekly').value = x.weeklyCap; document.getElementById('gs-cmax').value = x.couponMax; document.getElementById('gs-cquota').value = x.couponQuota;
       document.getElementById('gs-on').checked = x.enabled; document.getElementById('gs-reason').value = x.reason || ''; };
     api('/admin/grades/settings').then(gv).catch(() => { gi.textContent = 'يتطلب تحديث قاعدة البيانات (schema.sql).'; });
