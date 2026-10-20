@@ -91,7 +91,7 @@ const COMM_TEMPLATES = [
 export async function pageTeacherComms(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const [list, students, chapters] = await Promise.all([api('/staff/comms'), api('/staff/students'), api('/staff/lessons')]);
-  const sections = [...new Set(students.map(s => s.section).filter(Boolean))].sort();
+  const grades = [...new Set(students.map(s => s.grade).filter(Boolean))].sort();
   const owner = ctx.state?.user?.role === 'admin';
   const defDue = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
   $app.innerHTML = `
@@ -110,9 +110,11 @@ export async function pageTeacherComms(ctx) {
           <label>عدد الأسئلة <input type="number" id="cm-n" min="5" max="200" value="20" style="max-width:6rem"></label>
           <label>نسبة الصحة المطلوبة % <input type="number" id="cm-acc" min="0" max="100" value="70" style="max-width:6rem"></label>
           <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label></div>
-        <div class="cm-row"><label>إلى <select id="cm-mode"><option value="all">كل طلابي (${students.length})</option>${sections.length ? '<option value="section">شعبة</option>' : ''}<option value="students">طلاب محددين</option></select></label>
-          <label id="cm-sec-w" hidden>الشعبة <select id="cm-sec">${sections.map(s => `<option>${esc(s)}</option>`).join('')}</select></label></div>
-        <div class="cm-students" id="cm-stu" hidden>${students.map(s => `<label class="chk"><input type="checkbox" data-stu="${s.id}"> ${esc(s.name)} <span class="small muted">(${esc(s.section || '—')})</span></label>`).join('')}</div>
+        <div class="cm-row"><label>المرحلة (الصف) <select id="cm-grade"><option value="">كل المراحل</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select></label>
+          <label>الشعبة <select id="cm-sec"><option value="">كل الشعب</option></select></label>
+          <label>إلى <select id="cm-mode"><option value="all"></option><option value="students">طلاب محددين من القائمة</option></select></label></div>
+        <div class="cm-students" id="cm-stu" hidden>${students.length ? '' : `<p class="notice warn small">${owner ? 'لا توجد حسابات طلاب بعد.' : 'لا يوجد طلاب مسندون لك بعد؛ يسندهم لك مالك المشروع من «حسابات الفريق».'}</p>`}
+          <label class="chk" id="cm-stu-all-w"><input type="checkbox" id="cm-stu-all"> <b>تحديد كل المعروضين</b></label>${students.map(s => `<label class="chk" data-row="${esc(s.grade || '')}|${esc(s.section || '')}"><input type="checkbox" data-stu="${s.id}"> ${esc(s.name)} <span class="small muted">(${esc(s.grade || '—')} · ${esc(s.section || '—')})</span></label>`).join('')}</div>
         <div class="actions"><button type="button" class="primary" id="cm-send">إرسال</button></div>
       </div></section>
     <section class="card">${ttl('mail', 'المُرسَل')}
@@ -129,11 +131,26 @@ export async function pageTeacherComms(ctx) {
   const kind = () => $app.querySelector('[name=cm-kind]:checked').value;
   $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => { q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; });
   $app.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = COMM_TEMPLATES[Number(b.dataset.tpl)]; q('#cm-title').value = t[1]; q('#cm-body').value = t[2]; });
-  q('#cm-mode').onchange = e => { q('#cm-sec-w').hidden = e.target.value !== 'section'; q('#cm-stu').hidden = e.target.value !== 'students'; };
+  // التصفية: المرحلة ثم الشعبة (الشعب المعروضة تتبع المرحلة)، وتنطبق على «الكل» وعلى قائمة الطلاب المحددين
+  const matching = () => students.filter(s => (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
+  const refreshFilter = () => {
+    const g = q('#cm-grade').value, cur = q('#cm-sec').value;
+    const secs = [...new Set(students.filter(s => !g || s.grade === g).map(s => s.section).filter(Boolean))].sort();
+    q('#cm-sec').innerHTML = `<option value="">كل الشعب</option>${secs.map(x => `<option ${x === cur ? 'selected' : ''}>${esc(x)}</option>`).join('')}`;
+    const m = matching();
+    q('#cm-mode').options[0].textContent = `${owner ? 'كل الطلاب' : 'كل طلابي'} حسب التصفية (${m.length})`;
+    const ids = new Set(m.map(s => s.id));
+    $app.querySelectorAll('[data-stu]').forEach(b => { const row = b.closest('label'); row.hidden = !ids.has(b.dataset.stu); if (row.hidden) b.checked = false; });
+    q('#cm-stu-all-w').hidden = !m.length;
+  };
+  q('#cm-grade').onchange = refreshFilter; q('#cm-sec').onchange = refreshFilter;
+  q('#cm-stu-all').onchange = e => { $app.querySelectorAll('[data-stu]').forEach(b => { if (!b.closest('label').hidden) b.checked = e.target.checked; }); };
+  q('#cm-mode').onchange = e => { q('#cm-stu').hidden = e.target.value !== 'students'; };
+  refreshFilter();
   q('#cm-send').onclick = async e => {
     const b = e.currentTarget, mode = q('#cm-mode').value;
     const body = { kind: kind(), title: q('#cm-title').value, body: q('#cm-body').value,
-      target: { mode, section: mode === 'section' ? q('#cm-sec').value : null, students: mode === 'students' ? [...$app.querySelectorAll('[data-stu]:checked')].map(i => i.dataset.stu) : [] } };
+      target: { mode, grade: q('#cm-grade').value || null, section: q('#cm-sec').value || null, students: mode === 'students' ? [...$app.querySelectorAll('[data-stu]:checked')].map(i => i.dataset.stu) : [] } };
     if (body.kind === 'task') Object.assign(body, { lesson: q('#cm-lesson').value, n: q('#cm-n').value, minAccuracy: q('#cm-acc').value, due: `${q('#cm-due').value}T23:59:00+03:00` });
     b.disabled = true;
     try { const r = await api('/staff/comms', { method: 'POST', body }); toast(`أُرسلت إلى ${r.n} طالبًا`); await pageTeacherComms(ctx); }
