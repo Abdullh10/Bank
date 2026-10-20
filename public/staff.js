@@ -110,9 +110,9 @@ export async function pageTeacherComms(ctx) {
           <label>عدد الأسئلة <input type="number" id="cm-n" min="5" max="200" value="20" style="max-width:6rem"></label>
           <label>نسبة الصحة المطلوبة % <input type="number" id="cm-acc" min="0" max="100" value="70" style="max-width:6rem"></label>
           <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label></div>
-        <div class="cm-row"><label>إلى <select id="cm-mode"><option value="all">كل طلابي (${students.length})</option>${sections.length ? '<option value="section">شعبة</option>' : ''}<option value="students">طلاب محددين</option></select></label>
+        <div class="cm-row"><label>إلى <select id="cm-mode"><option value="all">${owner ? 'كل الطلاب' : 'كل طلابي'} (${students.length})</option>${sections.length ? '<option value="section">شعبة</option>' : ''}<option value="students">طلاب محددين</option></select></label>
           <label id="cm-sec-w" hidden>الشعبة <select id="cm-sec">${sections.map(s => `<option>${esc(s)}</option>`).join('')}</select></label></div>
-        <div class="cm-students" id="cm-stu" hidden>${students.map(s => `<label class="chk"><input type="checkbox" data-stu="${s.id}"> ${esc(s.name)} <span class="small muted">(${esc(s.section || '—')})</span></label>`).join('')}</div>
+        <div class="cm-students" id="cm-stu" hidden>${students.length ? '' : `<p class="notice warn small">${owner ? 'لا توجد حسابات طلاب بعد.' : 'لا يوجد طلاب مسندون لك بعد؛ يسندهم لك مالك المشروع من «حسابات الفريق».'}</p>`}${students.map(s => `<label class="chk"><input type="checkbox" data-stu="${s.id}"> ${esc(s.name)} <span class="small muted">(${esc(s.section || '—')})</span></label>`).join('')}</div>
         <div class="actions"><button type="button" class="primary" id="cm-send">إرسال</button></div>
       </div></section>
     <section class="card">${ttl('mail', 'المُرسَل')}

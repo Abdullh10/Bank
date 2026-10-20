@@ -2411,9 +2411,10 @@ language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare v_course bigint := coalesce(p_course, public._default_course());
 begin
   perform public._require_comm_staff();
-  perform public._require_course(v_course);
-  return (select coalesce(jsonb_agg(jsonb_build_object('id', p.user_id, 'name', p.display_name, 'section', p.section, 'grade', p.grade) order by p.section, p.display_name), '[]')
-    from profiles p join course_enrollments e on e.user_id = p.user_id and e.course_id = v_course
+  -- الرسائل لا ترتبط بمقرر: كل طلاب المعلم المسندين (وللمالك كل الطلاب)؛ والمهمة وحدها تشترط تسجيل الطالب في مقرر الدرس
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', p.user_id, 'name', coalesce(nullif(trim(p.display_name), ''), split_part(u.email, '@', 1)), 'section', p.section, 'grade', p.grade,
+      'enrolled', exists (select 1 from course_enrollments e where e.user_id = p.user_id and e.course_id = v_course)) order by p.section, p.display_name), '[]')
+    from profiles p join auth.users u on u.id = p.user_id
     where p.role = 'student' and p.managed and public._visible_student(p.user_id));
 end $$;
 
@@ -2427,7 +2428,7 @@ declare g public.grade_settings; v_role text := public.my_role(); v_course bigin
   bad constant text := '[\x01-\x08\x0b\x0c\x0e-\x1f‪-‮⁦-⁩]';
 begin
   perform public._require_comm_staff();
-  perform public._require_course(v_course);
+  if v_kind = 'task' then perform public._require_course(v_course); else v_course := coalesce(v_course, 0); end if;
   select * into g from grade_settings where id = 1;
   if v_kind not in ('message', 'task') then raise exception 'نوع غير صالح'; end if;
   if length(v_title) < 2 or length(v_title) > 80 then raise exception 'العنوان بين 2 و80 حرفًا'; end if;
@@ -2444,12 +2445,13 @@ begin
     select coalesce(array_agg(x::uuid), '{}') into v_list from jsonb_array_elements_text(coalesce(p#>'{target,students}', '[]')) x;
     if cardinality(v_list) = 0 then raise exception 'اختر طالبًا واحدًا على الأقل'; end if;
   end if;
-  select array_agg(pr.user_id) into v_ids from profiles pr join course_enrollments e on e.user_id = pr.user_id and e.course_id = v_course
+  select array_agg(pr.user_id) into v_ids from profiles pr
     where pr.role = 'student' and pr.managed and public._visible_student(pr.user_id)
+      and (v_kind = 'message' or exists (select 1 from course_enrollments e where e.user_id = pr.user_id and e.course_id = v_course))
       and (v_mode = 'all' or (v_mode = 'section' and pr.section = v_section) or (v_mode = 'students' and pr.user_id = any(v_list)));
   v_n := coalesce(cardinality(v_ids), 0);
-  if v_n = 0 then raise exception 'لا يوجد طلاب مطابقون'; end if;
-  if v_mode = 'students' and v_n <> cardinality(v_list) then raise exception 'بعض الطلاب المحددين ليسوا من طلابك في هذا المقرر'; end if;
+  if v_n = 0 then raise exception '%', case when v_kind = 'task' then 'لا يوجد طلاب مطابقون مسجلون في مقرر هذا الدرس' else 'لا يوجد طلاب مطابقون؛ تأكد من إسناد الطلاب لك من «حسابات الفريق»' end; end if;
+  if v_mode = 'students' and v_n <> cardinality(v_list) then raise exception '%', case when v_kind = 'task' then 'بعض الطلاب المحددين ليسوا من طلابك أو غير مسجلين في مقرر هذا الدرس' else 'بعض الطلاب المحددين ليسوا من طلابك' end; end if;
   if v_n > v_max then raise exception 'عدد المستلمين % يتجاوز الحد (%)', v_n, v_max; end if;
   if v_kind = 'message' and v_body is null and length(v_title) < 3 then raise exception 'اكتب الرسالة'; end if;
   if v_kind = 'task' then
@@ -2477,10 +2479,9 @@ end $$;
 
 create or replace function public.staff_list_comms(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
-declare v_course bigint := coalesce(p_course, public._default_course()); v_role text := public.my_role();
+declare v_role text := public.my_role();
 begin
   perform public._require_comm_staff();
-  perform public._require_course(v_course);
   return (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'kind', c.kind, 'title', c.title, 'body', c.body, 'sender', c.sender_name, 'mine', c.sender_id = auth.uid(),
       'createdAt', c.created_at, 'status', c.status, 'n', c.n_recipients, 'audience', c.audience,
       'read', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.read_at is not null),
@@ -2491,7 +2492,7 @@ begin
          'open', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'open'),
          'missed', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'missed')) end)
     order by c.created_at desc), '[]')
-    from (select * from comms where course_id = v_course and (v_role = 'admin' or sender_id = auth.uid()) order by created_at desc limit 50) c);
+    from (select * from comms where (v_role = 'admin' or sender_id = auth.uid()) order by created_at desc limit 50) c);
 end $$;
 
 create or replace function public.staff_comm_detail(p_id bigint) returns jsonb
