@@ -67,6 +67,7 @@ async function asRole(uid, sql, params) {
 }
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const FAIL = {}; // حقن أخطاء مؤقتة (ازدحام) لاختبار أن الطالب لا يُخرَج
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   if (url.pathname.startsWith('/mock/')) {
@@ -84,7 +85,8 @@ const server = http.createServer(async (req, res) => {
         from public.questions q join public.objectives o on o.id = q.objective_id where q.id = $1`, [b.v]);
     } else {
       const fn = url.pathname.slice('/mock/rpc/'.length);
-      if (!/^[a-z_]+$/.test(fn) || fn.startsWith('_')) out = { error: { message: 'not found', code: '42883' } };
+      if (FAIL[fn] > 0) { FAIL[fn]--; out = { error: { message: 'canceling statement due to statement timeout', code: '57014' } }; }
+      else if (!/^[a-z_]+$/.test(fn) || fn.startsWith('_')) out = { error: { message: 'not found', code: '42883' } };
       else {
         const meta = await pool.query(`select unnest(proargnames) n, unnest(proargtypes::regtype[]::text[]) t from pg_proc where proname = $1 and pronamespace = 'public'::regnamespace`, [fn]);
         const names = Object.keys(b);
@@ -496,6 +498,12 @@ await p.fill('#cp-code', ownCoupon.code.toLowerCase()); await p.click('#cp-go');
 ok('student: coupon redeemed with a celebration', (await p.locator('.bal-cele').innerText()).includes('40 نقطة'));
 await p.locator('.bal-cele button').click();
 const cpDb = await pool.query("select status from public.point_coupons where code = $1", [ownCoupon.code]);
+FAIL.get_me = 2; await p.reload();
+ok('busy server at start: waits and retries, student stays signed in (no login page)', await p.waitForSelector('#logout', { timeout: 20000 }).then(() => true, () => false) && !(await p.locator('#l-user').count()));
+FAIL.get_me = 50; await p.reload();
+ok('persistent overload at start: «busy» screen with retry, not the login page', await p.waitForSelector('#busy-retry', { timeout: 30000 }).then(() => true, () => false) && !(await p.locator('#l-user').count()));
+FAIL.get_me = 0; await p.reload(); await p.waitForSelector('#logout', { timeout: 20000 });
+await p.goto(BASE + '#/balance'); await p.waitForSelector('#cp-code');
 ok('database: coupon marked redeemed', cpDb.rows[0].status === 'redeemed');
 ok('coupon points do not enter the excellence score', (await asRole(sid, 'select to_jsonb(public.student_leaderboard()) r')).data.me.score === scoreBefore);
 ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_redeem_coupon($1)) r', [ownCoupon.code])).data.ok === false);

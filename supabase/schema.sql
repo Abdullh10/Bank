@@ -1746,22 +1746,25 @@ language sql stable security definer set search_path = public, pg_temp as $$
   valid as (select f.*, (f.answered_at at time zone 'Asia/Riyadh')::date d,
               row_number() over (partition by f.user_id, (f.answered_at at time zone 'Asia/Riyadh')::date order by f.answered_at) dn
             from first f where f.secs >= 3),
-  fix as (select f.user_id, count(*)::int n from first f where not f.correct
-          and exists (select 1 from ranked r where r.user_id = f.user_id and r.question_id = f.question_id and r.rn > 1 and r.correct) group by 1),
+  fix as (select f.user_id, count(*)::int n from first f
+          join (select distinct r.user_id, r.question_id from ranked r where r.rn > 1 and r.correct) r2 on r2.user_id = f.user_id and r2.question_id = f.question_id
+          where not f.correct group by 1),
   wk as (select v.user_id, (date_trunc('week', v.d + 1) - interval '1 day')::date w, count(*) n, count(distinct v.d) dys, count(*) filter (where v.correct) c
          from valid v group by 1, 2),
+  -- تجميعات لكل طالب بمرور واحد على كل مجموعة (بدل استعلامات فرعية مترابطة لكل طالب فتتضاعف التكلفة مع عدد الطلاب)
+  fa as (select f.user_id, count(*)::int attempts, (count(*) filter (where f.secs < 3))::int rushed from first f group by 1),
+  va as (select v.user_id, count(*)::int valid, (count(*) filter (where v.correct))::int correct, count(distinct v.d)::int days_any,
+           coalesce(sum((case v.g when 'higher' then 1.2 when 'apply' then 1.1 else 1.0 end) * (case when v.correct then 1 else -1.0 / 3 end)) filter (where v.dn <= 50), 0) net
+         from valid v group by 1),
+  da as (select z.user_id, count(*)::int n from (select v.user_id, v.d from valid v group by v.user_id, v.d
+           having count(*) >= 10 and 2 * count(*) filter (where v.correct) >= count(*)) z group by 1),
+  wc as (select wk.user_id, count(*)::int n from wk where wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > 30 group by 1),
   agg as (
-    select u.user_id,
-      (select count(*) from wk where wk.user_id = u.user_id and wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > 30)::int weeks_kept,
-      (select count(*) from first f where f.user_id = u.user_id)::int attempts,
-      (select count(*) from valid v where v.user_id = u.user_id)::int valid,
-      (select count(*) from valid v where v.user_id = u.user_id and v.correct)::int correct,
-      (select count(*) from first f where f.user_id = u.user_id and f.secs < 3)::int rushed,
-      (select count(distinct v.d) from valid v where v.user_id = u.user_id)::int days_any,
-      (select count(*) from (select v.d from valid v where v.user_id = u.user_id group by v.d having count(*) >= 10 and 2 * count(*) filter (where v.correct) >= count(*)) z)::int days_active,
-      coalesce((select n from fix where fix.user_id = u.user_id), 0) retry_fixes,
-      coalesce((select sum((case v.g when 'higher' then 1.2 when 'apply' then 1.1 else 1.0 end) * (case when v.correct then 1 else -1.0 / 3 end)) from valid v where v.user_id = u.user_id and v.dn <= 50), 0) net
-    from unnest(p_ids) as u(user_id))
+    select u.user_id, coalesce(wc.n, 0) weeks_kept, coalesce(fa.attempts, 0) attempts, coalesce(va.valid, 0) valid, coalesce(va.correct, 0) correct,
+      coalesce(fa.rushed, 0) rushed, coalesce(va.days_any, 0) days_any, coalesce(da.n, 0) days_active, coalesce(fix.n, 0) retry_fixes, coalesce(va.net, 0) net
+    from unnest(p_ids) as u(user_id)
+      left join fa on fa.user_id = u.user_id left join va on va.user_id = u.user_id left join da on da.user_id = u.user_id
+      left join wc on wc.user_id = u.user_id left join fix on fix.user_id = u.user_id)
   select user_id, attempts, valid, correct, rushed, days_any, days_active, retry_fixes, round(net, 1),
     round(greatest(net + 3 * least(days_active, 20) + least(retry_fixes, 30) + 2 * weeks_kept, 0), 1), weeks_kept
   from agg
