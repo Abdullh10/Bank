@@ -21,8 +21,26 @@ export async function initSupabase(cfg) {
   return client;
 }
 
-async function rpc(fn, args = {}) {
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const BUSY = 'المنصة مشغولة الآن بكثرة المستخدمين؛ حاول بعد لحظات (لم يُسجَّل خروجك)';
+// أخطاء مؤقتة (ازدحام أو انقطاع شبكة أو تجاوز مهلة): لا تُعدّ انتهاء جلسة فلا يُخرَج الطالب بسببها
+const isTransient = e => ['57014', '53300', '53400', '08006', '08001', '08000'].includes(e?.code) || [0, 408, 429, 500, 502, 503, 504, 520, 522, 524].includes(e?.status)
+  || /Failed to fetch|NetworkError|Load failed|network|timeout|timed out|rate limit|statement timeout/i.test(e?.message || '');
+const isJwtExpired = e => e?.code === 'PGRST301' || /JWT expired|invalid JWT/i.test(e?.message || '');
+let refreshing = null;
+// تجديد واحد مشترك بين الطلبات المتزامنة (لا يُرسل كل طلب تجديدًا مستقلًا)
+const refreshOnce = () => (refreshing ||= Promise.resolve(client.auth.refreshSession?.() ?? { error: null, data: { session: true } })
+  .catch(error => ({ error })).finally(() => { refreshing = null; }));
+
+async function rpc(fn, args = {}, retried = false) {
   const { data, error } = await client.rpc(fn, args);
+  if (error && !retried && isJwtExpired(error)) {
+    // انتهى التوكن (مثل تبويب بقي في الخلفية): نجدده ونعيد الطلب مرة واحدة بدل إخراج الطالب
+    const r = await refreshOnce();
+    if (!r.error) return rpc(fn, args, true);
+    throw Object.assign(new Error(isTransient(r.error) ? BUSY : 'انتهت الجلسة؛ سجّل الدخول مرة أخرى'), { status: isTransient(r.error) ? 503 : 401 });
+  }
+  if (error && isTransient(error)) throw Object.assign(new Error(BUSY), { status: 503 });
   if (error) {
     const msg = error.message || 'تعذر تنفيذ الطلب';
     const status = error.code === '28000' || error.code === 'PGRST301' || /JWT expired|invalid JWT/i.test(msg) ? 401 : error.code === '42501' ? 403 : error.code === 'P0002' ? 404 : 400;
@@ -114,7 +132,15 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     // المعرّف بلا @ يُكمَّل بالنطاق الشكلي؛ ويبقى الدخول بالبريد الكامل ممكنًا.
     const id = String(body.username || '').trim().toLowerCase();
     const email = id.includes('@') || !loginDomain ? id : `${id}@${loginDomain}`;
-    const { error } = await client.auth.signInWithPassword({ email, password: body.password || '' });
+    // دخول عدد كبير من الطلاب معًا (من شبكة واحدة) قد يبلغ حد الدخول في Supabase: نعيد المحاولة بتأخير عشوائي
+    // ونفرّق بين «ازدحام» و«بيانات خاطئة» حتى لا يظن الطالب أن كلمته خطأ
+    let error = null;
+    for (let i = 0; i < 4; i++) {
+      ({ error } = await client.auth.signInWithPassword({ email, password: body.password || '' }));
+      if (!error || !isTransient(error)) break;
+      await sleep(1500 * (i + 1) + Math.random() * 2000);
+    }
+    if (error && isTransient(error)) throw Object.assign(new Error('المنصة مشغولة بكثرة الدخول الآن؛ انتظر دقيقة ثم أعد المحاولة'), { status: 503 });
     if (error) throw Object.assign(new Error('اسم المستخدم أو كلمة المرور غير صحيحة'), { status: 401 });
     const user = await rpc('get_me');
     if (!user) throw new Error('الحساب غير مرتبط بملف مستخدم؛ تواصل مع المشرف');

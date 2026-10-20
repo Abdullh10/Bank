@@ -104,7 +104,7 @@ async function apiRaw(path, opts = {}) {
   // لا يوجد خادم (مثل GitHub Pages): ننتقل إلى نسخة العرض الثابتة.
   if (data === null && path === '/me') {
     if (await useSupabase()) {
-      try { return await supa.supaApi(path, opts); } catch (e) { console.warn(e); state.supabase = false; }
+      try { return await supa.supaApi(path, opts); } catch (e) { if (e?.status === 503) { state.supabase = true; throw e; } console.warn(e); state.supabase = false; }
     }
     state.offline = true; return { user: null };
   }
@@ -1036,8 +1036,26 @@ async function reloadIfNewer() {
 (async () => {
   if (await reloadIfNewer()) return new Promise(() => {}); // تبقى شاشة الانتظار حتى يكتمل إعادة التحميل
   if (!LOCAL_HOST) await useSupabase();
-  return api('/me');
-})().then(r => { state.user = r.user; renderUserbox(); route(); }).catch(() => { renderUserbox(); route(); });
+  // عند الازدحام قد يتأخر التحقق من الحساب: نعيد المحاولة خلف شاشة الانتظار، ولا نعرض صفحة الدخول إلا إن لم تكن هناك جلسة فعلًا
+  for (let i = 0; ; i++) {
+    try { return await api('/me'); } catch (e) {
+      if (e?.status === 401 || !state.supabase || i >= 3) throw e;
+      await new Promise(r => setTimeout(r, 900 * 2 ** i + Math.random() * 600));
+    }
+  }
+})().then(r => { state.user = r.user; renderUserbox(); route(); }).catch(e => {
+  if (state.supabase && e?.status !== 401) return pageBusy();
+  renderUserbox(); route();
+});
+
+// الخادم مشغول ولم نتمكن من التحقق من الحساب: لا نعرض صفحة الدخول (الجلسة قائمة)، بل زر إعادة محاولة
+function pageBusy() {
+  document.body.classList.add('locked');
+  document.body.classList.remove('booting');
+  $app.innerHTML = `<div class="empty"><h2>المنصة مشغولة الآن</h2><p>كثرة المستخدمين في هذه اللحظة. لم يُسجَّل خروجك؛ اضغط للمحاولة مرة أخرى.</p>
+    <button type="button" class="primary" id="busy-retry">إعادة المحاولة</button></div>`;
+  document.getElementById('busy-retry').onclick = () => location.reload();
+}
 
 // الرجوع إلى تبويب بقي مفتوحًا طويلًا (مثل الآيباد): قد تكون الجلسة انتهت، فنتحقق منها خلف شاشة الانتظار
 // بدل عرض الصفحة القديمة ثم الانتقال فجأة إلى صفحة الدخول.

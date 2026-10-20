@@ -113,7 +113,7 @@ export async function pageStudentHome(ctx) {
   };
   $app.querySelectorAll('input, select').forEach(e => { e.onchange = sum; }); sum();
   // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
-  api('/student/rank').then(d => {
+  cachedApi(api, '/student/rank').then(d => {
     const box = document.getElementById('st-top5');
     if (!box || !d?.available || !d.top?.length) return;
     box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
@@ -121,7 +121,7 @@ export async function pageStudentHome(ctx) {
     box.hidden = false;
   }).catch(() => {});
   // شريط الرصيد: نقاطك المتاحة وما بقي للدرجة القادمة
-  api('/student/balance').then(d => {
+  cachedApi(api, '/student/balance').then(d => {
     const box = document.getElementById('st-bal');
     if (!box || !d?.available) return;
     const rate = d.settings.rate;
@@ -277,6 +277,7 @@ async function finishSession(ctx) {
   finishing = true;
   try {
     const sum = await api('/student/finish', { method: 'POST', body: { session: session.id }, keep: true });
+    homeCache.clear();
     stopTimer(); // يتوقف المؤقت بعد نجاح الإنهاء فقط
     if (!session) return;
     session.summary = sum;
@@ -345,6 +346,13 @@ export async function pageStudentHistory(ctx) {
 }
 
 // ---------- التميّز: ترتيب المتدربين في الشعبة ----------
+// نتائج شريطي الصفحة الرئيسية (المتميزون والرصيد) تُحفظ نصف دقيقة: العودة المتكررة للرئيسية لا تضاعف الحمل على قاعدة البيانات
+const homeCache = new Map();
+const cachedApi = (api, path, ttl = 30000) => {
+  const hit = homeCache.get(path);
+  if (hit && Date.now() - hit.at < ttl) return Promise.resolve(hit.data);
+  return api(path).then(data => { homeCache.set(path, { at: Date.now(), data }); return data; });
+};
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
 export async function pageStudentRank(ctx) {
   const { esc, $app, api } = ctx;
@@ -514,6 +522,7 @@ export async function pageStudentBalance(ctx) {
     try {
       const r = await api('/student/coupon', { method: 'POST', body: { code: cpIn.value } });
       if (!r.ok) { cpErr.textContent = r.error; cpErr.hidden = false; cpGo.disabled = false; return; }
+      homeCache.clear();
       celebrate(`حصلت على ${num(r.points)} نقطة مكافأة!`, `${r.note ? r.note + ' · ' : ''}أصبحت نقاطك المتاحة ${num(r.balance.points)}.`);
       pageStudentBalance(ctx).catch(fail);
     } catch (e) { cpGo.disabled = false; fail(e); }
@@ -534,6 +543,7 @@ export async function pageStudentBalance(ctx) {
       if (!ok) return;
       try {
         const r = await api('/student/redeem', { method: 'POST', body: { grades: k } });
+        homeCache.clear();
         celebrate(`مبروك! أضفت ${k === 1 ? 'درجة' : num(k) + ' درجات'} إلى رصيدك`, `سيرصدها لك معلمك. بقي لك ${num(r.points)} نقطة، فواصل التدريب لتكسب الدرجة القادمة.`);
         pageStudentBalance(ctx).catch(fail);
       } catch (e) { fail(e); }
@@ -542,4 +552,4 @@ export async function pageStudentBalance(ctx) {
   });
 }
 
-export const resetStudentSession = () => { stopTimer(); session = null; };
+export const resetStudentSession = () => { stopTimer(); session = null; homeCache.clear(); };
