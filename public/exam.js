@@ -159,13 +159,25 @@ export async function pageExam(ctx) {
     const byId = new Map(rows.map(r => [r.id, r]));
     for (const q of need) { const r = byId.get(q.id); if (r) Object.assign(q, r, { answersLoaded: true }); }
   };
+  // دروس كل فصل (من البنك): يختار المعلم الفصل كاملًا أو دروسًا منه
+  const lessonsByCh = new Map();
+  for (const q of all) {
+    if (q.excluded || !q.lesson) continue;
+    if (!lessonsByCh.has(q.chapter.number)) lessonsByCh.set(q.chapter.number, new Map());
+    const m = lessonsByCh.get(q.chapter.number);
+    if (!m.has(q.lesson.number)) m.set(q.lesson.number, { title: q.lesson.title, mcq: 0, essay: 0 });
+    m.get(q.lesson.number)[q.type === 'essay' ? 'essay' : 'mcq']++;
+  }
+  const lkey = (c, l) => `${c}:${l}`;
   state.opts = state.opts || {
     chapters: chapters.map(c => c.number), mcq: 20, essay: 4, levels: [...LEVELS], diffs: [...DIFFS],
     approvedOnly: true, models: 1, shuffleOptions: true, mcqMark: 1, essayMark: 0, answerGrid: true, density: 'auto', seed: Math.floor(Math.random() * 1e6),
   };
   state.opts.density ||= 'auto';
   const o = state.opts, h = state.header;
-  const poolFor = type => all.filter(q => q.type === type && !q.excluded && o.chapters.includes(q.chapter.number)
+  // الافتراضي: كل الدروس محددة (فصول كاملة)
+  o.lessons ||= new Set([...lessonsByCh].flatMap(([c, m]) => [...m.keys()].map(l => lkey(c, l))));
+  const poolFor = type => all.filter(q => q.type === type && !q.excluded && o.lessons.has(lkey(q.chapter.number, q.lesson?.number))
     && (!q.thinkingLevel || o.levels.includes(q.thinkingLevel)) && (!q.difficulty || o.diffs.includes(q.difficulty))
     && (!o.approvedOnly || q.status === 'approved'));
   const avail = { mcq: poolFor('mcq').length, essay: poolFor('essay').length };
@@ -195,11 +207,18 @@ export async function pageExam(ctx) {
     <div class="grid exam-setup no-print">
       <section class="card">
         ${ttl('chapters', 'محتوى الاختبار')}
-        <h3>الفصول</h3>
-        <div class="chk-grid">${chapters.map(c => chk('ch', c.number, o.chapters.includes(c.number), `${c.number}. ${c.title}`)).join('')}</div>
+        <h3>الفصول والدروس <span class="muted small">(حدّد الفصل كاملًا أو افتح الفصل لاختيار دروس منه)</span></h3>
+        <div class="ex-chs">${chapters.map(c => {
+          const ls = [...(lessonsByCh.get(c.number) || new Map())];
+          const on = ls.filter(([l]) => o.lessons.has(lkey(c.number, l))).length;
+          return `<details class="ex-ch" ${on && on < ls.length ? 'open' : ''}><summary><label class="chk"><input type="checkbox" data-ch="${c.number}" ${on === ls.length && on ? 'checked' : ''}> <b>${c.number}. ${esc(c.title)}</b></label>
+            <span class="small muted ex-ch-count">${on} من ${ls.length} دروس</span></summary>
+            <div class="ex-ls">${ls.map(([l, v]) => `<label class="chk"><input type="checkbox" data-ls="${lkey(c.number, l)}" ${o.lessons.has(lkey(c.number, l)) ? 'checked' : ''}> ${l}. ${esc(v.title)} <span class="small muted">(${v.mcq} اختيار${v.essay ? ` · ${v.essay} مقالي` : ''})</span></label>`).join('')}</div></details>`;
+        }).join('')}</div>
+        <div class="actions ex-quick"><button type="button" id="ex-all">تحديد الكل</button><button type="button" id="ex-none">إلغاء الكل</button></div>
         <div class="form-grid" style="margin-top:.75rem">
-          <div><label for="x-mcq">عدد أسئلة الاختيار من متعدد <span class="muted small">(المتاح ${avail.mcq})</span></label><input id="x-mcq" type="number" min="0" max="200" value="${o.mcq}"></div>
-          <div><label for="x-essay">عدد الأسئلة المقالية <span class="muted small">(المتاح ${avail.essay})</span></label><input id="x-essay" type="number" min="0" max="50" value="${o.essay}"></div>
+          <div><label for="x-mcq">عدد أسئلة الاختيار من متعدد <span class="muted small">(المتاح <span id="av-mcq">${avail.mcq}</span>)</span></label><input id="x-mcq" type="number" min="0" max="200" value="${o.mcq}"></div>
+          <div><label for="x-essay">عدد الأسئلة المقالية <span class="muted small">(المتاح <span id="av-essay">${avail.essay}</span>)</span></label><input id="x-essay" type="number" min="0" max="50" value="${o.essay}"></div>
         </div>
         <h3 style="margin-top:.75rem">مستوى التفكير</h3>
         <div class="chk-grid">${LEVELS.map(l => chk('lv', l, o.levels.includes(l), l)).join('')}</div>
@@ -237,7 +256,8 @@ export async function pageExam(ctx) {
     <div id="x-output"></div>`;
 
   const read = () => {
-    o.chapters = [...$app.querySelectorAll('[data-ch]:checked')].map(i => Number(i.dataset.ch));
+    o.lessons = new Set([...$app.querySelectorAll('[data-ls]:checked')].map(i => i.dataset.ls));
+    o.chapters = [...new Set([...o.lessons].map(k => Number(k.split(':')[0])))];
     o.levels = [...$app.querySelectorAll('[data-lv]:checked')].map(i => i.dataset.lv);
     o.diffs = [...$app.querySelectorAll('[data-df]:checked')].map(i => i.dataset.df);
     for (const i of $app.querySelectorAll('[data-opt]')) o[i.dataset.opt] = i.checked;
@@ -260,7 +280,7 @@ export async function pageExam(ctx) {
 
   const build = async () => {
     read();
-    if (!o.chapters.length) return toast('اختر فصلًا واحدًا على الأقل', true);
+    if (!o.lessons.size) return toast('اختر فصلًا أو درسًا واحدًا على الأقل', true);
     if (!o.mcq && !o.essay) return toast('حدد عدد الأسئلة', true);
     const rand = rng(o.seed);
     const mcqPool = poolFor('mcq'), essayPool = poolFor('essay');
@@ -487,6 +507,28 @@ export async function pageExam(ctx) {
     toast('تم استبدال السؤال في جميع النماذج');
   };
 
+  // اختيار الفصول والدروس: الفصل يحدّد كل دروسه، والدرس يحدّث حالة فصله (كامل/جزئي/لا شيء) وأعداد الأسئلة المتاحة
+  const syncCh = () => {
+    for (const d of $app.querySelectorAll('.ex-ch')) {
+      const boxes = [...d.querySelectorAll('[data-ls]')], on = boxes.filter(b => b.checked).length, cb = d.querySelector('[data-ch]');
+      cb.checked = !!on && on === boxes.length; cb.indeterminate = on > 0 && on < boxes.length;
+      d.querySelector('.ex-ch-count').textContent = `${on} من ${boxes.length} دروس`;
+    }
+    const keep = { ...o, lessons: new Set([...$app.querySelectorAll('[data-ls]:checked')].map(i => i.dataset.ls)),
+      levels: [...$app.querySelectorAll('[data-lv]:checked')].map(i => i.dataset.lv), diffs: [...$app.querySelectorAll('[data-df]:checked')].map(i => i.dataset.df),
+      approvedOnly: $app.querySelector('[data-opt="approvedOnly"]').checked };
+    const cnt = type => all.filter(q => q.type === type && !q.excluded && keep.lessons.has(lkey(q.chapter.number, q.lesson?.number))
+      && (!q.thinkingLevel || keep.levels.includes(q.thinkingLevel)) && (!q.difficulty || keep.diffs.includes(q.difficulty)) && (!keep.approvedOnly || q.status === 'approved')).length;
+    $app.querySelector('#av-mcq').textContent = cnt('mcq'); $app.querySelector('#av-essay').textContent = cnt('essay');
+  };
+  for (const cb of $app.querySelectorAll('[data-ch]')) {
+    cb.closest('label').onclick = e => e.stopPropagation(); // لا يفتح/يغلق الفصل عند تحديده
+    cb.onchange = () => { cb.closest('.ex-ch').querySelectorAll('[data-ls]').forEach(b => { b.checked = cb.checked; }); syncCh(); };
+  }
+  for (const b of $app.querySelectorAll('[data-ls], [data-lv], [data-df], [data-opt="approvedOnly"]')) b.onchange = syncCh;
+  document.getElementById('ex-all').onclick = () => { $app.querySelectorAll('[data-ls]').forEach(b => { b.checked = true; }); syncCh(); };
+  document.getElementById('ex-none').onclick = () => { $app.querySelectorAll('[data-ls]').forEach(b => { b.checked = false; }); syncCh(); };
+  syncCh();
   for (const i of $app.querySelectorAll('[data-hsel]')) i.onchange = () => {
     const box = $app.querySelector(`[data-hother="${i.dataset.hsel}"]`);
     box.hidden = i.value !== '__other';
