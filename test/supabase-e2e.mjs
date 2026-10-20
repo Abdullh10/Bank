@@ -520,7 +520,7 @@ await p.click('#ex-none');
 ok('exam builder: «clear all» empties the pool', (await p.locator('#av-mcq').innerText()) === '0');
 await p.click('#x-build');
 ok('exam builder: building with nothing selected is refused', await p.locator('.toast', { hasText: 'اختر فصلًا أو درسًا' }).waitFor({ timeout: 5000 }).then(() => true, () => false));
-await p.locator('.ex-ch').first().locator('summary').click();
+await p.locator('.ex-ch').first().locator('.ex-ch-count').click(); // العدّاد/السهم يفتح الفصل، واسم الفصل يحدّده
 await p.locator('.ex-ch').first().locator('[data-ls]').first().check();
 const oneLesson = Number(await p.locator('#av-mcq').innerText());
 ok('exam builder: one lesson narrows the available questions', oneLesson > 0 && oneLesson < totalMcq);
