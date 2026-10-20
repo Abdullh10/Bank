@@ -126,7 +126,7 @@ export async function pageStudentHome(ctx) {
     const box = document.getElementById('st-task');
     if (!box || (!d?.task && !d?.unread)) return;
     const t = d.task;
-    box.innerHTML = `<div class="st-top5-head">${ttl('mail', t ? 'مهمتك الآن' : 'لديك رسائل من معلمك', 'h2', 30)}<a class="btn" href="#/inbox">${d.unread ? `صندوقي (${num(d.unread)} جديدة)` : 'صندوقي'} ←</a></div>
+    box.innerHTML = `<div class="st-top5-head">${ttl('mail', t ? 'مهمتك الآن' : 'لديك رسائل من معلمك', 'h2', 30)}<a class="btn" href="#/inbox">${d.unread ? `رسائل معلمي (${num(d.unread)} جديدة)` : 'رسائل معلمي'} ←</a></div>
       ${t ? `<p class="bal-ready"><b>${esc(t.title)}</b> · ${num(t.n)} سؤالًا قبل ${esc(hijri(t.dueAt))}</p>` : ''}`;
     box.hidden = false;
   }).catch(() => {});
@@ -562,7 +562,7 @@ export async function pageStudentBalance(ctx) {
   });
 }
 
-// ---------- صندوقي: رسائل ومهام المعلم ----------
+// ---------- رسائل معلمي: رسائل ومهام المعلم ----------
 export async function pageStudentInbox(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const d = await api('/student/inbox');
@@ -587,7 +587,7 @@ export async function pageStudentInbox(ctx) {
     return `<li class="in-item ${it.read ? '' : 'new'} ${it.task ? 'is-task' : ''}"><div class="in-head"><b>${esc(it.title)}</b>${it.read ? '' : ' <span class="badge brand">جديدة</span>'}
       <span class="small muted">${esc(it.sender || 'معلمك')} · ${esc(hijri(it.createdAt))}</span></div>${inner}</li>`;
   };
-  $app.innerHTML = `<section class="hero"><div class="hero-ic">${icon('mail', 52)}<div><h1>صندوقي</h1>
+  $app.innerHTML = `<section class="hero"><div class="hero-ic">${icon('mail', 52)}<div><h1>رسائل معلمي</h1>
     <p class="muted">رسائل معلمك ومهامه لك. المهام تُحتسب تلقائيًا من تدريبك، فلا تحتاج لتسليم شيء.</p></div></div></section>
     <section class="card">${d.items.length ? `<ul class="in-list">${d.items.map(card).join('')}</ul>` : '<div class="empty">لا توجد رسائل أو مهام الآن. حين يرسل لك معلمك شيئًا يظهر هنا.</div>'}</section>`;
   $app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { savePrefs({ ...loadPrefs(), lessons: [Number(b.dataset.go)] }); location.hash = '#/'; });
