@@ -2423,7 +2423,7 @@ create or replace function public.staff_send_comm(p jsonb) returns jsonb
 language plpgsql security definer set search_path = public, pg_temp as $$
 declare g public.grade_settings; v_role text := public.my_role(); v_course bigint := coalesce(nullif(p->>'course', '')::bigint, public._default_course());
   v_kind text := p->>'kind'; v_title text := trim(coalesce(p->>'title', '')); v_body text := nullif(trim(coalesce(p->>'body', '')), '');
-  v_mode text := coalesce(p#>>'{target,mode}', 'all'); v_section text := nullif(trim(coalesce(p#>>'{target,section}', '')), '');
+  v_mode text := coalesce(p#>>'{target,mode}', 'all'); v_section text := nullif(trim(coalesce(p#>>'{target,section}', '')), ''); v_grade text := nullif(trim(coalesce(p#>>'{target,grade}', '')), '');
   v_list uuid[] := '{}'; v_ids uuid[]; v_n int; v_lesson bigint; v_nq int; v_acc int; v_due timestamptz; v_max int; v_today timestamptz; v_aud jsonb; v_busy int; v_id bigint;
   bad constant text := '[\x01-\x08\x0b\x0c\x0e-\x1f‪-‮⁦-⁩]';
 begin
@@ -2448,7 +2448,8 @@ begin
   select array_agg(pr.user_id) into v_ids from profiles pr
     where pr.role = 'student' and pr.managed and public._visible_student(pr.user_id)
       and (v_kind = 'message' or exists (select 1 from course_enrollments e where e.user_id = pr.user_id and e.course_id = v_course))
-      and (v_mode = 'all' or (v_mode = 'section' and pr.section = v_section) or (v_mode = 'students' and pr.user_id = any(v_list)));
+      and (v_grade is null or pr.grade = v_grade) and (v_section is null or pr.section = v_section)
+      and (v_mode in ('all', 'section') or (v_mode = 'students' and pr.user_id = any(v_list)));
   v_n := coalesce(cardinality(v_ids), 0);
   if v_n = 0 then raise exception '%', case when v_kind = 'task' then 'لا يوجد طلاب مطابقون مسجلون في مقرر هذا الدرس' else 'لا يوجد طلاب مطابقون؛ تأكد من إسناد الطلاب لك من «حسابات الفريق»' end; end if;
   if v_mode = 'students' and v_n <> cardinality(v_list) then raise exception '%', case when v_kind = 'task' then 'بعض الطلاب المحددين ليسوا من طلابك أو غير مسجلين في مقرر هذا الدرس' else 'بعض الطلاب المحددين ليسوا من طلابك' end; end if;
@@ -2464,7 +2465,7 @@ begin
       where cr.student_id = u.id and cr.status = 'open' and c.kind = 'task' and c.status = 'active' and c.due_at > now()) >= g.comm_active_tasks;
     if v_busy > 0 then raise exception 'لدى % من الطلاب % مهام نشطة بالفعل؛ انتظر إنجازها أو ألغِ مهمة', v_busy, g.comm_active_tasks; end if;
   end if;
-  v_aud := jsonb_build_object('mode', v_mode, 'section', v_section, 'n', v_n);
+  v_aud := jsonb_build_object('mode', v_mode, 'grade', v_grade, 'section', v_section, 'n', v_n);
   if exists (select 1 from comms where sender_id = auth.uid() and title = v_title and coalesce(body, '') = coalesce(v_body, '') and audience = v_aud
              and status = 'active' and created_at > now() - interval '1 hour') then
     raise exception 'أرسلت الرسالة نفسها للمستلمين أنفسهم قبل قليل';
