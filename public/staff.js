@@ -109,7 +109,9 @@ export async function pageTeacherComms(ctx) {
           <label>الدرس <select id="cm-lesson">${chapters.map(c => `<optgroup label="${esc(c.number + '. ' + c.title)}">${c.lessons.map(l => `<option value="${l.id}">${esc(l.number + '. ' + l.title)}</option>`).join('')}</optgroup>`).join('')}</select></label>
           <label>عدد الأسئلة <input type="number" id="cm-n" min="5" max="200" value="20" style="max-width:6rem"></label>
           <label>نسبة الصحة المطلوبة % <input type="number" id="cm-acc" min="0" max="100" value="70" style="max-width:6rem"></label>
-          <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label></div>
+          <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label>
+          <label>مكافأة الإنجاز (نقاط لكل طالب) <input type="number" id="cm-reward" min="0" max="500" value="0" style="max-width:6rem"></label>
+          <span class="small muted" style="flex-basis:100%">المكافأة اختيارية: تُضاف لرصيد من يُنجز المهمة قبل الموعد (لا تدخل نقاط الترتيب)، وتُخصم من حصتك الأسبوعية (النقاط × عدد الطلاب) وتعود حصة من لم ينجز. تتطلب 10 أسئلة على الأقل وصحة 50% فأكثر.</span></div>
         <div class="cm-row"><label>المرحلة (الصف) <select id="cm-grade"><option value="">كل المراحل</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select></label>
           <label>الشعبة <select id="cm-sec"><option value="">كل الشعب</option></select></label>
           <label>إلى <select id="cm-mode"><option value="all"></option><option value="students">طلاب محددين من القائمة</option></select></label></div>
@@ -124,7 +126,7 @@ export async function pageTeacherComms(ctx) {
           <span class="badge ${c.kind === 'task' ? 'brand' : ''}">${c.kind === 'task' ? 'مهمة' : 'رسالة'}</span>${off ? '<span class="badge">ملغاة</span>' : ''}
           <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
           ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
-          <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
+          <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''}${t.reward ? ` · مكافأة ${t.reward} نقطة` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
           <div class="actions"><button type="button" data-detail="${c.id}">التفاصيل</button>${off ? '' : `<button type="button" class="danger" data-cancel="${c.id}">إلغاء</button>`}</div>
           <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
   const q = s => $app.querySelector(s);
@@ -151,7 +153,7 @@ export async function pageTeacherComms(ctx) {
     const b = e.currentTarget, mode = q('#cm-mode').value;
     const body = { kind: kind(), title: q('#cm-title').value, body: q('#cm-body').value,
       target: { mode, grade: q('#cm-grade').value || null, section: q('#cm-sec').value || null, students: mode === 'students' ? [...$app.querySelectorAll('[data-stu]:checked')].map(i => i.dataset.stu) : [] } };
-    if (body.kind === 'task') Object.assign(body, { lesson: q('#cm-lesson').value, n: q('#cm-n').value, minAccuracy: q('#cm-acc').value, due: `${q('#cm-due').value}T23:59:00+03:00` });
+    if (body.kind === 'task') Object.assign(body, { lesson: q('#cm-lesson').value, n: q('#cm-n').value, minAccuracy: q('#cm-acc').value, reward: q('#cm-reward').value || 0, due: `${q('#cm-due').value}T23:59:00+03:00` });
     b.disabled = true;
     try { const r = await api('/staff/comms', { method: 'POST', body }); toast(`أُرسلت إلى ${r.n} طالبًا`); await pageTeacherComms(ctx); }
     catch (err) { b.disabled = false; fail(err); }

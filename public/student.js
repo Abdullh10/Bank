@@ -576,6 +576,7 @@ export async function pageStudentInbox(ctx) {
       const acc = t.valid ? Math.round(100 * t.correct / t.valid) : 0, left = Math.max(0, t.n - t.valid), [st, k] = TS[t.status] || ['—', ''];
       inner = `<div class="in-task"><div class="small">الدرس: <b>${esc(t.lesson || '')}</b></div>
         <div class="small">المطلوب: ${num(t.n)} سؤالًا${t.minAccuracy ? ` بصحة ${num(t.minAccuracy)}% فأكثر` : ''}</div>
+        ${t.reward ? `<div class="small in-reward ${t.rewardGot ? 'got' : ''}">${t.rewardGot ? `🎁 حصلت على ${num(t.rewardGot)} نقطة مكافأة، وهي في رصيدك` : t.status === 'missed' ? `كانت المكافأة ${num(t.reward)} نقطة لمن ينجز قبل الموعد` : `🎁 مكافأة ${num(t.reward)} نقطة لمن ينجزها قبل الموعد`}</div>` : ''}
         <div class="bar ${t.status === 'done' ? 'ok' : ''}"><span style="width:${Math.min(100, Math.round(100 * t.valid / t.n))}%"></span></div>
         <div class="small muted">${t.status === 'done' ? `أنجزت ${num(t.valid)} سؤالًا بصحة ${num(acc)}%` : t.status === 'missed' ? `أجبت ${num(t.valid)} من ${num(t.n)}${t.valid ? ` بصحة ${num(acc)}%` : ''}. ما زال بإمكانك التدرّب على الدرس.`
           : `أجبت ${num(t.valid)} من ${num(t.n)}${t.valid ? ` · صحتك ${num(acc)}%` : ''} · باقي ${num(left)} سؤالًا · ${days(t.dueAt) > 0 ? `باقي ${num(days(t.dueAt))} ${days(t.dueAt) === 1 ? 'يوم' : 'أيام'}` : 'ينتهي اليوم'} (${esc(hijri(t.dueAt))})`}</div>
