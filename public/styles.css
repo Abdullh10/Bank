@@ -1165,3 +1165,6 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .cm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
 .cm-item { border: 1px solid var(--line); border-radius: .9rem; padding: .7rem .9rem; background: var(--surface-2); display: grid; gap: .35rem; }
 .cm-item.off { opacity: .6; }
+
+.in-reward { color: var(--ink-2, inherit); }
+.in-reward.got { color: var(--ok); font-weight: 700; }
