@@ -44,41 +44,91 @@ export async function pageTeacherProgress(ctx, section = '') {
 }
 
 // رصيد الدرجات: ما استبدله طلاب المعلم المسندون من نقاط التميّز، ليرصدها لهم
+// حالة التصفية والفرز تبقى عند إعادة رسم الصفحة (بعد الرصد مثلًا)
+const gv = { status: 'pending', grade: '', section: '', q: '', key: 'pending', dir: -1, picked: new Set() };
+const SORTS = [['pending', 'الأكثر درجات بانتظار الرصد', -1], ['oldest', 'الأقدم انتظارًا للرصد', 1], ['last', 'آخر استبدال (الأحدث)', -1], ['name', 'الاسم (أبجديًا)', 1],
+  ['section', 'الشعبة ثم الاسم', 1], ['recorded', 'الأكثر درجات مرصودة', -1]];
 export async function pageTeacherGrades(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const d = await api('/teacher/grades');
   const canWrite = ['admin', 'viewer'].includes(ctx.state?.user?.role);
-  const pendingAll = d.reduce((a, x) => a + x.pending, 0);
+  const pendingAll = d.reduce((a, x) => a + x.pending, 0), pendingStudents = d.filter(x => x.pending).length, recordedAll = d.reduce((a, x) => a + x.recorded, 0);
+  if (!d.some(x => x.pending) && gv.status === 'pending') gv.status = 'all'; // لا شيء ينتظر الرصد: اعرض الكل
   const ST = { pending: ['بانتظار الرصد', 'warn'], recorded: ['مرصودة', 'ok'], cancelled: ['ملغاة', ''] };
-  $app.innerHTML = `
-    <section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>رصيد الدرجات</h1>
-      <p class="muted">درجات استبدلها طلابك من نقاط التميّز (كل درجة تقابل تدريبًا جادًا منتظمًا). ارصدها في نظام الدرجات ثم اضغط «تم الرصد». يمكنك إلغاء درجة لم تُرصد بعد بسبب مكتوب فتعود نقاط الطالب إليه.</p></div></div>
-      <div class="actions"><span class="badge ${pendingAll ? 'warn' : 'ok'}">${pendingAll ? `${pendingAll} درجة بانتظار الرصد` : 'لا درجات بانتظار الرصد'}</span>
-        ${canWrite && pendingAll ? '<button type="button" class="primary" id="tg-all">تم رصد الكل</button>' : ''}
-        ${d.length ? `<button type="button" id="tg-export">${line('download', 17)}تصدير Excel</button>` : ''}</div></section>
-    <section class="card">${ttl('students', 'الطلاب')}
-      ${d.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الصف</th><th>الشعبة</th><th>بانتظار الرصد</th><th>المرصودة</th><th></th></tr></thead><tbody>
-        ${d.map(x => `<tr data-id="${x.userId}"><td>${esc(x.name)} <span class="small muted ltr">${esc(x.username)}</span></td><td>${esc(x.grade || '—')}</td><td>${esc(x.section || '—')}</td>
-          <td>${x.pending ? `<span class="badge warn">${x.pending}</span>` : '0'}</td><td>${x.recorded}</td>
+  const grades = [...new Set(d.map(x => x.grade).filter(Boolean))].sort();
+  const ar = (a, b) => String(a || '').localeCompare(String(b || ''), 'ar');
+  const num = x => Number(x || 0);
+  const age = at => { const n = Math.floor((Date.now() - new Date(at)) / 86400000); return n <= 0 ? 'اليوم' : n === 1 ? 'منذ يوم' : `منذ ${n} أيام`; };
+  const view = () => {
+    const kw = gv.q.trim().toLowerCase();
+    const rows = d.filter(x => (gv.status === 'all' || (gv.status === 'pending' ? x.pending > 0 : x.recorded > 0 && !x.pending)) && (!gv.grade || x.grade === gv.grade)
+      && (!gv.section || x.section === gv.section) && (!kw || `${x.name} ${x.username}`.toLowerCase().includes(kw)));
+    const cmp = { pending: (a, b) => num(a.pending) - num(b.pending), recorded: (a, b) => num(a.recorded) - num(b.recorded), name: (a, b) => ar(a.name, b.name),
+      section: (a, b) => ar(a.section, b.section) || ar(a.name, b.name), grade: (a, b) => ar(a.grade, b.grade) || ar(a.name, b.name),
+      last: (a, b) => new Date(a.lastAt) - new Date(b.lastAt), oldest: (a, b) => (a.oldestPending ? new Date(a.oldestPending) : Infinity) - (b.oldestPending ? new Date(b.oldestPending) : Infinity) }[gv.key];
+    return rows.sort((a, b) => gv.dir * (cmp(a, b) || ar(a.name, b.name)));
+  };
+  const head = (key, label) => `<th><button type="button" class="tg-sort ${gv.key === key ? 'on' : ''}" data-sort="${key}" title="فرز">${label}${gv.key === key ? (gv.dir > 0 ? ' ▲' : ' ▼') : ''}</button></th>`;
+  const draw = () => {
+    const rows = view();
+    const secs = [...new Set(d.filter(x => !gv.grade || x.grade === gv.grade).map(x => x.section).filter(Boolean))].sort();
+    if (gv.section && !secs.includes(gv.section)) gv.section = '';
+    const shownPending = rows.filter(x => x.pending);
+    for (const id of [...gv.picked]) if (!rows.some(x => x.userId === id && x.pending)) gv.picked.delete(id);
+    box.innerHTML = `
+      <div class="tg-filters">
+        <div class="tg-seg" role="group" aria-label="الحالة">${[['pending', `بانتظار الرصد (${pendingStudents})`], ['recorded', 'مرصودة فقط'], ['all', `الكل (${d.length})`]].map(([k, t]) => `<button type="button" data-st="${k}" class="${gv.status === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+        <label>الصف <select id="tg-grade"><option value="">كل الصفوف</option>${grades.map(g => `<option ${g === gv.grade ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select></label>
+        <label>الشعبة <select id="tg-sec"><option value="">كل الشعب</option>${secs.map(x => `<option ${x === gv.section ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
+        <label>بحث <input id="tg-q" value="${esc(gv.q)}" placeholder="اسم الطالب" style="max-width:11rem"></label>
+        <label>الترتيب <select id="tg-sortsel">${SORTS.map(([k, t]) => `<option value="${k}" ${gv.key === k ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+        <button type="button" id="tg-reset">إعادة الضبط</button></div>
+      <p class="small muted">يعرض ${rows.length} من ${d.length} طالبًا${shownPending.length ? ` · بانتظار الرصد لدى ${shownPending.length} منهم (${shownPending.reduce((a, x) => a + x.pending, 0)} درجة)` : ''}.</p>
+      ${canWrite && shownPending.length ? `<div class="actions tg-bulk"><label class="st-radio"><input type="checkbox" id="tg-pickall" ${gv.picked.size && gv.picked.size === shownPending.length ? 'checked' : ''}> تحديد كل من ينتظر الرصد (${shownPending.length})</label>
+        <button type="button" class="primary" id="tg-rec-picked" ${gv.picked.size ? '' : 'disabled'}>تم رصد المحدد (${gv.picked.size})</button>
+        <button type="button" id="tg-rec-shown">تم رصد كل المعروضين (${shownPending.length})</button></div>` : ''}
+      ${rows.length ? `<div class="table-wrap"><table class="list"><thead><tr>${canWrite ? '<th class="as-chk"></th>' : ''}${head('name', 'الطالب')}${head('grade', 'الصف')}${head('section', 'الشعبة')}${head('pending', 'بانتظار الرصد')}${head('oldest', 'ينتظر منذ')}${head('recorded', 'المرصودة')}${head('last', 'آخر استبدال')}<th></th></tr></thead><tbody>
+        ${rows.map(x => `<tr data-id="${x.userId}">${canWrite ? `<td class="as-chk">${x.pending ? `<input type="checkbox" data-pick="${x.userId}" ${gv.picked.has(x.userId) ? 'checked' : ''} aria-label="تحديد ${esc(x.name)}">` : ''}</td>` : ''}
+          <td>${esc(x.name)} <span class="small muted ltr">${esc(x.username)}</span></td><td>${esc(x.grade || '—')}</td><td>${esc(x.section || '—')}</td>
+          <td>${x.pending ? `<span class="badge warn">${x.pending}</span>` : '0'}</td><td class="small">${x.oldestPending ? esc(age(x.oldestPending)) : '—'}</td><td>${x.recorded}</td><td class="small">${esc(hijri(x.lastAt))}</td>
           <td class="actions">${canWrite && x.pending ? `<button type="button" class="primary" data-rec="${x.userId}">تم الرصد</button>` : ''}
             <details class="small"><summary>السجل</summary><ul class="tg-items">${x.items.map(i => { const [t, k] = ST[i.status] || ['—', '']; return `<li>${esc(hijri(i.at, true))} · ${i.grades} درجة (${i.points} نقطة)
               <span class="badge ${k}">${t}</span>${i.reason ? ` <span class="muted">${esc(i.reason)}</span>` : ''}
               ${canWrite && i.status === 'pending' ? `<button type="button" class="danger" data-cancel="${i.id}">إلغاء</button>` : ''}</li>`; }).join('')}</ul></details></td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="empty">لم يستبدل أي من طلابك نقاطه بعد.</div>'}
-    </section>`;
+      </tbody></table></div>` : '<div class="empty">لا نتائج بهذه التصفية.</div>'}`;
+    const redraw = () => draw();
+    box.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { gv.status = b.dataset.st; redraw(); });
+    box.querySelector('#tg-grade').onchange = e => { gv.grade = e.target.value; redraw(); };
+    box.querySelector('#tg-sec').onchange = e => { gv.section = e.target.value; redraw(); };
+    box.querySelector('#tg-q').oninput = e => { gv.q = e.target.value; clearTimeout(draw.t); draw.t = setTimeout(() => { redraw(); const i = box.querySelector('#tg-q'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
+    box.querySelector('#tg-sortsel').onchange = e => { const s = SORTS.find(x => x[0] === e.target.value); gv.key = s[0]; gv.dir = s[2]; redraw(); };
+    box.querySelector('#tg-reset').onclick = () => { Object.assign(gv, { status: pendingAll ? 'pending' : 'all', grade: '', section: '', q: '', key: 'pending', dir: -1 }); gv.picked.clear(); redraw(); };
+    box.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { const k = b.dataset.sort; if (gv.key === k) gv.dir = -gv.dir; else { gv.key = k; gv.dir = ['name', 'grade', 'section', 'oldest'].includes(k) ? 1 : -1; } redraw(); });
+    box.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => { c.checked ? gv.picked.add(c.dataset.pick) : gv.picked.delete(c.dataset.pick); redraw(); });
+    box.querySelector('#tg-pickall')?.addEventListener('change', e => { gv.picked.clear(); if (e.target.checked) shownPending.forEach(x => gv.picked.add(x.userId)); redraw(); });
+    const recMany = async ids => { try { const n = await api('/teacher/grades/record-many', { method: 'POST', body: { users: ids } }); gv.picked.clear(); toast(`سُجّل رصد ${n} درجة`); await pageTeacherGrades(ctx); } catch (e) { fail(e); } };
+    box.querySelector('#tg-rec-picked')?.addEventListener('click', () => { if (confirm(`ستُعلَّم درجات ${gv.picked.size} طالبًا كمرصودة. هل رصدتها فعلًا؟`)) recMany([...gv.picked]); });
+    box.querySelector('#tg-rec-shown')?.addEventListener('click', () => { if (confirm(`ستُعلَّم درجات ${shownPending.length} طالبًا (المعروضين) كمرصودة. هل رصدتها فعلًا؟`)) recMany(shownPending.map(x => x.userId)); });
+    box.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => run(() => api('/teacher/grades/record', { method: 'POST', body: { user: b.dataset.rec } }), 'سُجّل الرصد'));
+    box.querySelectorAll('[data-cancel]').forEach(b => b.onclick = () => {
+      const reason = prompt('سبب الإلغاء (يظهر للطالب):');
+      if (reason && reason.trim().length >= 3) run(() => api('/teacher/grades/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel), reason: reason.trim() } }), 'أُلغيت وعادت النقاط للطالب');
+      else if (reason !== null) fail(new Error('اكتب سببًا واضحًا للإلغاء'));
+    });
+  };
+  $app.innerHTML = `
+    <section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>رصيد الدرجات</h1>
+      <p class="muted">درجات استبدلها طلابك من نقاط التميّز (كل درجة تقابل تدريبًا جادًا منتظمًا). ارصدها في نظام الدرجات ثم اضغط «تم الرصد». يمكنك إلغاء درجة لم تُرصد بعد بسبب مكتوب فتعود نقاط الطالب إليه. استعمل التصفية والفرز لتجد من تريد، وحدّد عدة طلاب لرصدهم دفعة واحدة.</p></div></div>
+      <div class="actions"><span class="badge ${pendingAll ? 'warn' : 'ok'}">${pendingAll ? `${pendingAll} درجة بانتظار الرصد لدى ${pendingStudents} طالبًا` : 'لا درجات بانتظار الرصد'}</span>
+        <span class="badge">${recordedAll} درجة مرصودة</span>
+        ${d.length ? `<button type="button" id="tg-export">${line('download', 17)}تصدير Excel (حسب العرض الحالي)</button>` : ''}</div></section>
+    <section class="card">${ttl('students', 'الطلاب')}<div id="tg-box">${d.length ? '' : '<div class="empty">لم يستبدل أي من طلابك نقاطه بعد.</div>'}</div></section>`;
+  const box = document.getElementById('tg-box');
   const run = async (fn, msg) => { try { await fn(); toast(msg); await pageTeacherGrades(ctx); } catch (e) { fail(e); } };
+  if (d.length) draw();
   if (canWrite) couponsCard(ctx);
-  document.getElementById('tg-all')?.addEventListener('click', () => {
-    if (confirm(`ستُعلَّم ${pendingAll} درجة كمرصودة لكل طلابك. هل رصدتها فعلًا؟`)) run(() => api('/teacher/grades/record', { method: 'POST', body: {} }), 'سُجّل رصد الدرجات');
-  });
-  $app.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => run(() => api('/teacher/grades/record', { method: 'POST', body: { user: b.dataset.rec } }), 'سُجّل الرصد'));
-  $app.querySelectorAll('[data-cancel]').forEach(b => b.onclick = () => {
-    const reason = prompt('سبب الإلغاء (يظهر للطالب):');
-    if (reason && reason.trim().length >= 3) run(() => api('/teacher/grades/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel), reason: reason.trim() } }), 'أُلغيت وعادت النقاط للطالب');
-    else if (reason !== null) fail(new Error('اكتب سببًا واضحًا للإلغاء'));
-  });
-  document.getElementById('tg-export')?.addEventListener('click', () => downloadXlsx('itqan-grades-balance', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'بانتظار الرصد', 'المرصودة'],
-    d.map(x => [x.name, x.username, x.grade || '', x.section || '', x.pending, x.recorded])));
+  document.getElementById('tg-export')?.addEventListener('click', () => downloadXlsx('itqan-grades-balance', ['الاسم', 'اسم المستخدم', 'الصف', 'الشعبة', 'بانتظار الرصد', 'المرصودة', 'ينتظر منذ', 'آخر استبدال'],
+    view().map(x => [x.name, x.username, x.grade || '', x.section || '', x.pending, x.recorded, x.oldestPending ? age(x.oldestPending) : '', hijri(x.lastAt)])));
 }
 
 // رسائل ومهام المعلم لطلابه: رسالة (قراءة فقط) أو مهمة تُحتسب تلقائيًا من تدريب الطالب

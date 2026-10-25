@@ -2055,12 +2055,27 @@ begin
   return (select coalesce(jsonb_agg(x order by (x->>'pending')::int desc, x->>'name'), '[]') from (
     select jsonb_build_object('userId', p.user_id, 'username', split_part(u.email, '@', 1), 'name', p.display_name, 'grade', p.grade, 'section', p.section,
       'pending', coalesce(sum(g.grades) filter (where g.status = 'pending'), 0), 'recorded', coalesce(sum(g.grades) filter (where g.status = 'recorded'), 0),
+      'lastAt', max(g.created_at), 'oldestPending', min(g.created_at) filter (where g.status = 'pending'),
       'items', (select coalesce(jsonb_agg(jsonb_build_object('id', h.id, 'grades', h.grades, 'points', h.points, 'status', h.status, 'at', h.created_at,
           'recordedAt', h.recorded_at, 'reason', h.cancel_reason) order by h.created_at desc), '[]')
         from (select * from grade_redemptions h2 where h2.user_id = p.user_id and h2.course_id = v_course order by h2.created_at desc limit 20) h)) x
     from grade_redemptions g join profiles p on p.user_id = g.user_id join auth.users u on u.id = g.user_id
     where g.course_id = v_course and g.status <> 'cancelled' and public._visible_student(g.user_id)
     group by p.user_id, u.email, p.display_name, p.grade, p.section) q);
+end $$;
+
+-- رصد درجات عدة طلاب دفعة واحدة (المعروضون بعد التصفية): pending → recorded، لطلاب المعلم المسندين فقط
+create or replace function public.teacher_record_grades_many(p_users uuid[], p_course bigint default null) returns int
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_course bigint := coalesce(p_course, public._default_course()); v_n int;
+begin
+  perform public._require_grade_staff(true);
+  perform public._require_course(v_course);
+  if p_users is null or cardinality(p_users) = 0 then return 0; end if;
+  update grade_redemptions g set status = 'recorded', recorded_at = now(), recorded_by = auth.uid()
+    where g.status = 'pending' and g.course_id = v_course and g.user_id = any(p_users) and public._visible_student(g.user_id);
+  get diagnostics v_n = row_count;
+  return v_n;
 end $$;
 
 -- رصد درجات طالب (أو كل طلابه إن لم يُحدَّد): pending → recorded
@@ -2116,7 +2131,7 @@ end $$;
 revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.student_balance(bigint), public.student_redeem(int, bigint), public.teacher_grade_balances(bigint),
-  public.teacher_record_grades(uuid, bigint), public.teacher_cancel_redemption(bigint, text),
+  public.teacher_record_grades(uuid, bigint), public.teacher_record_grades_many(uuid[], bigint), public.teacher_cancel_redemption(bigint, text),
   public.admin_get_grade_settings(), public.admin_set_grade_settings(int, int, boolean, text, int, int) to authenticated;
 revoke execute on function public._rank_days(bigint, uuid), public._grade_state(uuid, bigint), public._student_course(bigint), public._require_grade_staff(boolean) from authenticated;
 
