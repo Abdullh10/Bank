@@ -911,13 +911,18 @@ end $$;
 -- إنهاء الجلسة: النتيجة وتحليلها حسب الدرس ومجموعة المستوى.
 create or replace function public.student_finish(p_session bigint) returns jsonb
 language plpgsql security definer set search_path = public, pg_temp as $$
-declare s public.practice_sessions; v_score int;
+declare s public.practice_sessions; v_score int; r record;
 begin
   perform public._require_student();
   select * into s from practice_sessions where id = p_session and user_id = auth.uid();
   if not found then raise exception 'الجلسة غير موجودة'; end if;
   select count(*) filter (where correct) into v_score from practice_answers where session_id = p_session;
   if s.finished_at is null then update practice_sessions set finished_at = now(), score = v_score where id = p_session; end if;
+  -- مهام المعلم المفتوحة: تُحتسب فور انتهاء الجلسة (لتصل مكافأة المهمة المنجزة إلى رصيد الطالب دون انتظار فتح الصندوق)
+  for r in select cr.comm_id from comm_recipients cr join comms c on c.id = cr.comm_id
+           where cr.student_id = auth.uid() and cr.status = 'open' and c.kind = 'task' and c.status = 'active' loop
+    perform public._comm_refresh(r.comm_id, auth.uid());
+  end loop;
   return public._session_summary(p_session);
 end $$;
 
@@ -1966,6 +1971,9 @@ begin
     where g.user_id = p_user and g.course_id = p_course and g.status <> 'cancelled' and g.created_at >= v_since;
   select coalesce(sum(c.points), 0)::int into bonus from point_coupons c
     where c.redeemed_by = p_user and c.redeemed_course = p_course and c.status = 'redeemed' and c.redeemed_at >= v_since;
+  -- مكافآت المهام المنجزة في الموعد (لا تدخل نقاط الترتيب، كالكوبونات)
+  bonus := bonus + coalesce((select sum(cr.reward_pts) from comm_recipients cr join comms cm on cm.id = cr.comm_id
+    where cr.student_id = p_user and cr.status = 'done' and cr.reward_pts > 0 and cm.course_id = p_course and cr.done_at >= v_since), 0)::int;
   select coalesce(sum(g.grades), 0)::int into week_used from grade_redemptions g
     where g.user_id = p_user and g.status <> 'cancelled' and g.created_at >= v_week;
   return next;
@@ -2053,12 +2061,27 @@ begin
   return (select coalesce(jsonb_agg(x order by (x->>'pending')::int desc, x->>'name'), '[]') from (
     select jsonb_build_object('userId', p.user_id, 'username', split_part(u.email, '@', 1), 'name', p.display_name, 'grade', p.grade, 'section', p.section,
       'pending', coalesce(sum(g.grades) filter (where g.status = 'pending'), 0), 'recorded', coalesce(sum(g.grades) filter (where g.status = 'recorded'), 0),
+      'lastAt', max(g.created_at), 'oldestPending', min(g.created_at) filter (where g.status = 'pending'),
       'items', (select coalesce(jsonb_agg(jsonb_build_object('id', h.id, 'grades', h.grades, 'points', h.points, 'status', h.status, 'at', h.created_at,
           'recordedAt', h.recorded_at, 'reason', h.cancel_reason) order by h.created_at desc), '[]')
         from (select * from grade_redemptions h2 where h2.user_id = p.user_id and h2.course_id = v_course order by h2.created_at desc limit 20) h)) x
     from grade_redemptions g join profiles p on p.user_id = g.user_id join auth.users u on u.id = g.user_id
     where g.course_id = v_course and g.status <> 'cancelled' and public._visible_student(g.user_id)
     group by p.user_id, u.email, p.display_name, p.grade, p.section) q);
+end $$;
+
+-- رصد درجات عدة طلاب دفعة واحدة (المعروضون بعد التصفية): pending → recorded، لطلاب المعلم المسندين فقط
+create or replace function public.teacher_record_grades_many(p_users uuid[], p_course bigint default null) returns int
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_course bigint := coalesce(p_course, public._default_course()); v_n int;
+begin
+  perform public._require_grade_staff(true);
+  perform public._require_course(v_course);
+  if p_users is null or cardinality(p_users) = 0 then return 0; end if;
+  update grade_redemptions g set status = 'recorded', recorded_at = now(), recorded_by = auth.uid()
+    where g.status = 'pending' and g.course_id = v_course and g.user_id = any(p_users) and public._visible_student(g.user_id);
+  get diagnostics v_n = row_count;
+  return v_n;
 end $$;
 
 -- رصد درجات طالب (أو كل طلابه إن لم يُحدَّد): pending → recorded
@@ -2114,7 +2137,7 @@ end $$;
 revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.student_balance(bigint), public.student_redeem(int, bigint), public.teacher_grade_balances(bigint),
-  public.teacher_record_grades(uuid, bigint), public.teacher_cancel_redemption(bigint, text),
+  public.teacher_record_grades(uuid, bigint), public.teacher_record_grades_many(uuid[], bigint), public.teacher_cancel_redemption(bigint, text),
   public.admin_get_grade_settings(), public.admin_set_grade_settings(int, int, boolean, text, int, int) to authenticated;
 revoke execute on function public._rank_days(bigint, uuid), public._grade_state(uuid, bigint), public._student_course(bigint), public._require_grade_staff(boolean) from authenticated;
 
@@ -2188,7 +2211,7 @@ begin
   if v_role = 'viewer' then
     if p_points > g.teacher_coupon_max then raise exception 'الحد الأقصى لكوبون المعلم % نقطة', g.teacher_coupon_max; end if;
     v_week := (date_trunc('week', (now() at time zone 'Asia/Riyadh') + interval '1 day') - interval '1 day') at time zone 'Asia/Riyadh';
-    select coalesce(sum(points), 0) into v_used from point_coupons where created_by = auth.uid() and status <> 'cancelled' and created_at >= v_week;
+    v_used := public._quota_used(auth.uid(), v_week);
     if v_used + p_points > g.teacher_weekly_quota then raise exception 'تجاوزت حصتك الأسبوعية (% من % نقطة)', v_used, g.teacher_weekly_quota; end if;
   end if;
   loop
@@ -2212,7 +2235,7 @@ begin
   if v_role not in ('admin', 'viewer') then raise exception 'للمعلم ومالك المشروع' using errcode = '42501'; end if;
   select * into g from grade_settings where id = 1;
   v_week := (date_trunc('week', (now() at time zone 'Asia/Riyadh') + interval '1 day') - interval '1 day') at time zone 'Asia/Riyadh';
-  select coalesce(sum(points), 0) into v_used from point_coupons where created_by = auth.uid() and status <> 'cancelled' and created_at >= v_week;
+  v_used := public._quota_used(auth.uid(), v_week);
   return jsonb_build_object('max', case when v_role = 'admin' then 500 else g.teacher_coupon_max end,
     'quota', case when v_role = 'admin' then null else g.teacher_weekly_quota end, 'used', v_used,
     'items', (select coalesce(jsonb_agg(public._coupon_json(c) order by c.created_at desc), '[]')
@@ -2291,6 +2314,7 @@ create table if not exists public.comms (
   cancelled_by uuid, cancelled_at timestamptz,
   lesson_id bigint, n_questions int, min_accuracy int, due_at timestamptz
 );
+alter table public.comms add column if not exists reward_points int not null default 0 check (reward_points between 0 and 500);
 create index if not exists comms_sender_idx on public.comms (sender_id, created_at desc);
 create table if not exists public.comm_recipients (
   comm_id bigint not null references public.comms(id) on delete cascade,
@@ -2302,6 +2326,7 @@ create table if not exists public.comm_recipients (
   done_at timestamptz,
   primary key (comm_id, student_id)
 );
+alter table public.comm_recipients add column if not exists reward_pts int not null default 0;
 create index if not exists comm_rec_student_idx on public.comm_recipients (student_id, comm_id desc);
 create index if not exists comm_rec_unread_idx on public.comm_recipients (student_id) where read_at is null;
 alter table public.comms enable row level security;
@@ -2333,7 +2358,7 @@ begin
   for r in select student_id from comm_recipients where comm_id = p_comm and status = 'open' and (p_student is null or student_id = p_student) loop
     select * into pr from public._task_progress(r.student_id, c.lesson_id, c.created_at, c.due_at);
     if pr.valid >= c.n_questions and coalesce(100.0 * pr.correct / nullif(pr.valid, 0), 0) >= coalesce(c.min_accuracy, 0) then
-      update comm_recipients set status = 'done', done_at = now(), valid_cnt = pr.valid, correct_cnt = pr.correct where comm_id = p_comm and student_id = r.student_id;
+      update comm_recipients set status = 'done', done_at = now(), valid_cnt = pr.valid, correct_cnt = pr.correct, reward_pts = coalesce(c.reward_points, 0) where comm_id = p_comm and student_id = r.student_id;
     elsif now() > c.due_at then
       update comm_recipients set status = 'missed', valid_cnt = pr.valid, correct_cnt = pr.correct where comm_id = p_comm and student_id = r.student_id;
     else
@@ -2341,6 +2366,14 @@ begin
     end if;
   end loop;
 end $$;
+
+-- ما استهلكه المرسِل من حصته الأسبوعية (كوبونات + مكافآت مهامه المحتملة؛ ما فات موعده دون إنجاز يعود للحصة)
+create or replace function public._quota_used(p_user uuid, p_since timestamptz) returns int
+language sql stable security definer set search_path = public, pg_temp as $$
+  select (coalesce((select sum(points) from point_coupons where created_by = p_user and status <> 'cancelled' and created_at >= p_since), 0)
+    + coalesce((select sum(c.reward_points * (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status <> 'missed'))
+                from comms c where c.sender_id = p_user and c.kind = 'task' and c.status = 'active' and c.reward_points > 0 and c.created_at >= p_since), 0))::int
+$$;
 
 -- ---------- الطالب ----------
 create or replace function public.student_comm_summary() returns jsonb
@@ -2370,7 +2403,8 @@ begin
       select c.created_at at, jsonb_build_object('id', c.id, 'kind', c.kind, 'title', c.title, 'body', c.body, 'sender', c.sender_name, 'createdAt', c.created_at,
         'read', cr.read_at is not null, 'reply', cr.reply_code,
         'task', case when c.kind = 'task' then jsonb_build_object('lessonId', c.lesson_id, 'lesson', (select l.title from lessons l where l.id = c.lesson_id),
-          'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at, 'status', cr.status, 'valid', cr.valid_cnt, 'correct', cr.correct_cnt) end) j
+          'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at, 'status', cr.status, 'valid', cr.valid_cnt, 'correct', cr.correct_cnt,
+          'reward', c.reward_points, 'rewardGot', cr.reward_pts) end) j
       from comm_recipients cr join comms c on c.id = cr.comm_id
       where cr.student_id = auth.uid() and c.status = 'active' and c.expires_at > now()
       order by c.created_at desc limit 50) x));
@@ -2430,7 +2464,7 @@ language plpgsql security definer set search_path = public, pg_temp as $$
 declare g public.grade_settings; v_role text := public.my_role(); v_course bigint := coalesce(nullif(p->>'course', '')::bigint, public._default_course());
   v_kind text := p->>'kind'; v_title text := trim(coalesce(p->>'title', '')); v_body text := nullif(trim(coalesce(p->>'body', '')), '');
   v_mode text := coalesce(p#>>'{target,mode}', 'all'); v_section text := nullif(trim(coalesce(p#>>'{target,section}', '')), ''); v_grade text := nullif(trim(coalesce(p#>>'{target,grade}', '')), '');
-  v_list uuid[] := '{}'; v_ids uuid[]; v_n int; v_lesson bigint; v_nq int; v_acc int; v_due timestamptz; v_max int; v_today timestamptz; v_aud jsonb; v_busy int; v_id bigint;
+  v_list uuid[] := '{}'; v_ids uuid[]; v_n int; v_lesson bigint; v_nq int; v_acc int; v_due timestamptz; v_max int; v_today timestamptz; v_aud jsonb; v_busy int; v_id bigint; v_reward int := 0; v_week timestamptz; v_used int; v_cap int;
   bad constant text := '[\x01-\x08\x0b\x0c\x0e-\x1f‪-‮⁦-⁩]';
 begin
   perform public._require_comm_staff();
@@ -2467,6 +2501,20 @@ begin
     if v_nq is null or v_nq < 5 or v_nq > 200 then raise exception 'عدد الأسئلة بين 5 و200'; end if;
     if v_acc < 0 or v_acc > 100 then raise exception 'نسبة الصحة بين 0 و100'; end if;
     if v_due is null or v_due < now() + interval '1 hour' or v_due > now() + interval '60 days' then raise exception 'الموعد بعد ساعة على الأقل وخلال 60 يومًا'; end if;
+    v_reward := coalesce(nullif(p->>'reward', '')::int, 0);
+    v_cap := case when v_role = 'admin' then 500 else g.teacher_coupon_max end;
+    if v_reward < 0 or v_reward > v_cap then raise exception 'مكافأة المهمة بين 0 و% نقطة للطالب', v_cap; end if;
+    if v_reward > 0 then
+      -- مكافأة مرتبطة بإنجاز حقيقي لا بتخمين: 10 أسئلة على الأقل وصحة 50% فأكثر
+      if v_nq < 10 or v_acc < 50 then raise exception 'المهمة ذات المكافأة تتطلب 10 أسئلة على الأقل ونسبة صحة 50%% فأكثر'; end if;
+      if v_role = 'viewer' then
+        v_week := (date_trunc('week', (now() at time zone 'Asia/Riyadh') + interval '1 day') - interval '1 day') at time zone 'Asia/Riyadh';
+        v_used := public._quota_used(auth.uid(), v_week);
+        if v_used + v_reward * v_n > g.teacher_weekly_quota then
+          raise exception 'مكافآت المهمة (% نقطة) تتجاوز حصتك الأسبوعية (استهلكت % من %)', v_reward * v_n, v_used, g.teacher_weekly_quota;
+        end if;
+      end if;
+    end if;
     select count(*) into v_busy from unnest(v_ids) u(id) where (select count(*) from comm_recipients cr join comms c on c.id = cr.comm_id
       where cr.student_id = u.id and cr.status = 'open' and c.kind = 'task' and c.status = 'active' and c.due_at > now()) >= g.comm_active_tasks;
     if v_busy > 0 then raise exception 'لدى % من الطلاب % مهام نشطة بالفعل؛ انتظر إنجازها أو ألغِ مهمة', v_busy, g.comm_active_tasks; end if;
@@ -2476,9 +2524,9 @@ begin
              and status = 'active' and created_at > now() - interval '1 hour') then
     raise exception 'أرسلت الرسالة نفسها للمستلمين أنفسهم قبل قليل';
   end if;
-  insert into comms (kind, sender_id, sender_name, course_id, title, body, audience, n_recipients, lesson_id, n_questions, min_accuracy, due_at)
+  insert into comms (kind, sender_id, sender_name, course_id, title, body, audience, n_recipients, lesson_id, n_questions, min_accuracy, due_at, reward_points)
   values (v_kind, auth.uid(), (select display_name from profiles where user_id = auth.uid()), v_course, v_title, v_body,
-    case when v_mode = 'students' then v_aud || jsonb_build_object('students', to_jsonb(v_list)) else v_aud end, v_n, v_lesson, v_nq, v_acc, v_due)
+    case when v_mode = 'students' then v_aud || jsonb_build_object('students', to_jsonb(v_list)) else v_aud end, v_n, v_lesson, v_nq, v_acc, v_due, v_reward)
   returning id into v_id;
   insert into comm_recipients (comm_id, student_id) select v_id, u from unnest(v_ids) u;
   return jsonb_build_object('id', v_id, 'n', v_n);
@@ -2494,7 +2542,7 @@ begin
       'read', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.read_at is not null),
       'help', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.reply_code = 2),
       'ack', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.reply_code = 1),
-      'task', case when c.kind = 'task' then jsonb_build_object('lesson', (select l.title from lessons l where l.id = c.lesson_id), 'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at,
+      'task', case when c.kind = 'task' then jsonb_build_object('lesson', (select l.title from lessons l where l.id = c.lesson_id), 'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at, 'reward', c.reward_points,
          'done', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'done'),
          'open', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'open'),
          'missed', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'missed')) end)
@@ -2546,4 +2594,4 @@ grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.student_comm_summary(), public.student_inbox(), public.student_comms_mark_read(), public.student_comm_reply(bigint, int),
   public.staff_course_lessons(bigint), public.staff_my_students(bigint), public.staff_send_comm(jsonb), public.staff_list_comms(bigint),
   public.staff_comm_detail(bigint), public.staff_cancel_comm(bigint), public.admin_get_comm_settings(), public.admin_set_comm_settings(int, int, int) to authenticated;
-revoke execute on function public._task_progress(uuid, bigint, timestamptz, timestamptz), public._comm_refresh(bigint, uuid), public._require_comm_staff() from authenticated;
+revoke execute on function public._task_progress(uuid, bigint, timestamptz, timestamptz), public._comm_refresh(bigint, uuid), public._require_comm_staff(), public._quota_used(uuid, timestamptz) from authenticated;

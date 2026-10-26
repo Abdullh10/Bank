@@ -239,6 +239,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/staff/coupons') return method === 'GET' ? rpc('staff_list_coupons') : rpc('staff_create_coupon', { p_points: Number(body.points), p_note: body.note, p_days: Number(body.days) || 7 });
   if (p === '/staff/coupons/cancel') { await rpc('staff_cancel_coupon', { p_id: body.id }); return { ok: true }; }
   if (p === '/teacher/grades') return rpc('teacher_grade_balances', { p_course: course });
+  if (p === '/teacher/grades/record-many') return rpc('teacher_record_grades_many', { p_users: body.users || [], p_course: course });
   if (p === '/teacher/grades/record') return rpc('teacher_record_grades', { p_user: body.user || null, p_course: course });
   if (p === '/teacher/grades/cancel') { await rpc('teacher_cancel_redemption', { p_id: body.id, p_reason: body.reason }); return { ok: true }; }
   if (p === '/admin/grades/settings') return method === 'GET' ? rpc('admin_get_grade_settings')
