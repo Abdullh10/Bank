@@ -411,7 +411,7 @@ export async function pageStudentRank(ctx) {
         <li><span class="earn-v off">⏱</span><span><b>الإجابات السريعة:</b> الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</span></li>
         <li><span class="earn-v off">${num(r.dailyCap)}</span><span><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</span></li>
         <li><span class="earn-v">+${num(r.dayBonus)}</span><span><b>يوم تدريب جاد:</b> ${num(r.dayMin)} إجابات صالحة فأكثر بصحة ${num(r.dayAcc)}% فأكثر (حتى ${num(r.dayCap)} يومًا).</span></li>
-        <li><span class="earn-v">+1</span><span><b>تصحيح الأخطاء:</b> عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</span></li>
+        <li><span class="earn-v">+½ / −½</span><span><b>السؤال المكرر:</b> إن ظهر لك سؤال أجبت عنه من قبل، تُحتسب محاولتك الثانية فيه +½ للصحيحة و−½ للخاطئة، وما بعدها لا يُحتسب. والأسئلة التي لم تُجب عنها تظهر لك أولًا.</span></li>
         <li><span class="earn-v">+${num(r.weekBonus)}</span><span><b>المحافظة على التميّز:</b> كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق 30%.</span></li>
         <li><span class="earn-v off">↺</span><span>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</span></li>
       </ul>

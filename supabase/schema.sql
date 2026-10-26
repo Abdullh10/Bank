@@ -831,10 +831,12 @@ begin
       where a.session_id = v_retry and not a.correct and q.status = 'approved' and not q.excluded;
     if cardinality(v_wrong) = 0 then raise exception 'لا توجد أخطاء في هذه الجلسة'; end if;
     for w in select q.id, q.objective_id from questions q where q.id = any(v_wrong) loop
+      -- السؤال البديل: ما لم يُجب عنه الطالب من قبل أولًا
       select q2.id into v_alt from questions q2
         where q2.objective_id = w.objective_id and q2.type = 'mcq' and q2.status = 'approved' and not q2.excluded
           and not (q2.id = any(v_wrong)) and not (q2.id = any(v_alts))
-        order by random() limit 1;
+        order by exists (select 1 from practice_answers a join practice_sessions ps on ps.id = a.session_id
+                         where ps.user_id = auth.uid() and a.question_id = q2.id), random() limit 1;
       if v_alt is not null then v_alts := v_alts || v_alt; end if;
       v_alt := null;
     end loop;
@@ -849,21 +851,24 @@ begin
       join course_enrollments e on e.course_id = c.course_id and e.user_id = auth.uid();
     if coalesce(array_length(v_lessons, 1), 0) = 0 then raise exception 'اختر درسًا واحدًا على الأقل'; end if;
     -- متدرّج: 40% تطبيق و20% تفكير عليا (مقربة للأسفل) والباقي أساسي، ويُكمل النقص من بقية المجموعات
+    -- الأسئلة التي لم يُجب عنها الطالب من قبل أولًا (s = 0)، ثم المكررة؛ ونسب المستويات محفوظة داخل كل منهما
     v_apply := floor(v_count * .4); v_higher := floor(v_count * .2); v_basic := v_count - v_apply - v_higher;
-    with pool as (
+    with seen as (select distinct a.question_id from practice_answers a join practice_sessions ps on ps.id = a.session_id where ps.user_id = auth.uid()),
+    pool as (
       select q.id, public._level_group(q.thinking_level) g,
-        case q.difficulty when 'سهل' then 1 when 'متوسط' then 2 else 3 end d, random() r
+        case q.difficulty when 'سهل' then 1 when 'متوسط' then 2 else 3 end d, random() r,
+        (q.id in (select question_id from seen))::int s
       from questions q join objectives o on o.id = q.objective_id
       where o.lesson_id = any(v_lessons) and q.type = 'mcq' and q.status = 'approved' and not q.excluded
         and (v_levels = 'graded' or public._level_group(q.thinking_level) = v_levels)),
-    ranked as (select *, row_number() over (partition by g order by r) rn from pool),
+    ranked as (select *, row_number() over (partition by g order by s, r) rn from pool),
     quota as (select * from ranked where v_levels <> 'graded'
               or (g = 'basic' and rn <= v_basic) or (g = 'apply' and rn <= v_apply) or (g = 'higher' and rn <= v_higher)),
     picked as (
-      (select id, d, r, 0 pri from quota order by r limit v_count)
+      (select id, d, r, s, 0 pri from quota order by s, r limit v_count)
       union all
-      (select id, d, r, 1 from pool where id not in (select id from quota) order by r limit v_count)),
-    final as (select id, d, r from picked order by pri, r limit v_count)
+      (select id, d, r, s, 1 from pool where id not in (select id from quota) order by s, r limit v_count)),
+    final as (select id, d, r from picked order by s, pri, r limit v_count)
     -- الترتيب من السهل إلى الأصعب ليبني الثقة ثم يرفع التحدي
     select coalesce(array_agg(id order by d, r), '{}') into v_ids from final;
     if coalesce(array_length(v_ids, 1), 0) = 0 then raise exception 'لا توجد أسئلة بهذه الاختيارات؛ غيّر الدروس أو المستوى'; end if;
@@ -1709,7 +1714,8 @@ revoke execute on function public._require_course(bigint), public._default_cours
 -- 2026-10-18: قائمة التميّز — ترتيب المتدربين في الشعبة
 --   النقاط تكافئ التدريب الجاد والمنتظم لا التخمين: صافي الإجابات (+1 صحيحة، −⅓ خاطئة لأن البدائل أربعة، مضروبًا في معامل المستوى: أساسي ×1، تطبيق ×1.1، تفكير عليا ×1.2)،
 --   إجابات أسرع من 3 ثوانٍ لا تُحسب، وأول 50 إجابة صالحة في اليوم فقط، و+3 لكل يوم تدريب جاد (حتى 20)،
---   و+1 لكل سؤال أخطأ فيه الطالب أولًا ثم أصاب لاحقًا (حتى 30). شرط دخول الترتيب: 30 إجابة صالحة في 3 أيام على الأقل.
+--   والمحاولة الثانية لسؤال سبق أن أجاب عنه: +½ صحيحة و−½ خاطئة (بلا معامل مستوى، وما بعدها لا يُحتسب؛ 2026-10-26 بدل +1 لتصحيح الخطأ).
+--   شرط دخول الترتيب: 30 إجابة صالحة في 3 أيام على الأقل.
 --   إضافات قراءة فقط: لا تعدّل ولا تحذف أي شيء من جلسات التدريب وإجابات الطلاب.
 -- =====================================================================
 alter table public.profiles add column if not exists rank_since timestamptz;
@@ -1729,7 +1735,7 @@ insert into public.rank_terms (started_at, note)
 -- نقاط كل طالب في المقرر (داخلية): تُستدعى من الدوال المحمية أدناه فقط
 drop function if exists public._rank_rows(bigint, uuid[]);
 create or replace function public._rank_rows(p_course bigint, p_ids uuid[])
-returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, retry_fixes int, net numeric, score numeric, weeks_kept int)
+returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, repeats int, net numeric, score numeric, weeks_kept int, repeat_net numeric)
 language sql stable security definer set search_path = public, pg_temp as $$
   with term as (select max(started_at) s from public.rank_terms),
   cq as (select q.id, public._level_group(q.thinking_level) g from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
@@ -1746,9 +1752,9 @@ language sql stable security definer set search_path = public, pg_temp as $$
   valid as (select f.*, (f.answered_at at time zone 'Asia/Riyadh')::date d,
               row_number() over (partition by f.user_id, (f.answered_at at time zone 'Asia/Riyadh')::date order by f.answered_at) dn
             from first f where f.secs >= 3),
-  fix as (select f.user_id, count(*)::int n from first f
-          join (select distinct r.user_id, r.question_id from ranked r where r.rn > 1 and r.correct) r2 on r2.user_id = f.user_id and r2.question_id = f.question_id
-          where not f.correct group by 1),
+  -- المحاولة الثانية لكل سؤال فقط (والأسرع من 3 ثوانٍ لا تُحتسب): +½ صحيحة و−½ خاطئة
+  rep as (select r.user_id, count(*)::int n, sum(case when r.correct then 0.5 else -0.5 end) net from ranked r
+          where r.rn = 2 and r.secs >= 3 group by 1),
   wk as (select v.user_id, (date_trunc('week', v.d + 1) - interval '1 day')::date w, count(*) n, count(distinct v.d) dys, count(*) filter (where v.correct) c
          from valid v group by 1, 2),
   -- تجميعات لكل طالب بمرور واحد على كل مجموعة (بدل استعلامات فرعية مترابطة لكل طالب فتتضاعف التكلفة مع عدد الطلاب)
@@ -1761,12 +1767,12 @@ language sql stable security definer set search_path = public, pg_temp as $$
   wc as (select wk.user_id, count(*)::int n from wk where wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > 30 group by 1),
   agg as (
     select u.user_id, coalesce(wc.n, 0) weeks_kept, coalesce(fa.attempts, 0) attempts, coalesce(va.valid, 0) valid, coalesce(va.correct, 0) correct,
-      coalesce(fa.rushed, 0) rushed, coalesce(va.days_any, 0) days_any, coalesce(da.n, 0) days_active, coalesce(fix.n, 0) retry_fixes, coalesce(va.net, 0) net
+      coalesce(fa.rushed, 0) rushed, coalesce(va.days_any, 0) days_any, coalesce(da.n, 0) days_active, coalesce(rep.n, 0) repeats, coalesce(rep.net, 0) repeat_net, coalesce(va.net, 0) net
     from unnest(p_ids) as u(user_id)
       left join fa on fa.user_id = u.user_id left join va on va.user_id = u.user_id left join da on da.user_id = u.user_id
-      left join wc on wc.user_id = u.user_id left join fix on fix.user_id = u.user_id)
-  select user_id, attempts, valid, correct, rushed, days_any, days_active, retry_fixes, round(net, 1),
-    round(greatest(net + 3 * least(days_active, 20) + least(retry_fixes, 30) + 2 * weeks_kept, 0), 1), weeks_kept
+      left join wc on wc.user_id = u.user_id left join rep on rep.user_id = u.user_id)
+  select user_id, attempts, valid, correct, rushed, days_any, days_active, repeats, round(net, 1),
+    round(greatest(net + 3 * least(days_active, 20) + repeat_net + 2 * weeks_kept, 0), 1), weeks_kept, repeat_net
   from agg
 $$;
 
@@ -1774,7 +1780,7 @@ $$;
 create or replace function public.student_leaderboard(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare me public.profiles; v_course bigint; v_ids uuid[]; v_res jsonb;
-  v_rules jsonb := jsonb_build_object('minValid', 30, 'minDays', 3, 'rushSecs', 3, 'dailyCap', 50, 'dayBonus', 3, 'dayCap', 20, 'dayMin', 10, 'dayAcc', 50, 'weekBonus', 2, 'weekValid', 30, 'weekDays', 3, 'fixCap', 30, 'rushMaxPct', 40);
+  v_rules jsonb := jsonb_build_object('minValid', 30, 'minDays', 3, 'rushSecs', 3, 'dailyCap', 50, 'dayBonus', 3, 'dayCap', 20, 'dayMin', 10, 'dayAcc', 50, 'weekBonus', 2, 'weekValid', 30, 'weekDays', 3, 'repeatPts', 0.5, 'rushMaxPct', 40);
 begin
   perform public._require_student();
   select * into me from profiles where user_id = auth.uid();
@@ -1801,7 +1807,7 @@ begin
     'me', jsonb_build_object('eligible', coalesce((select elig from mine), false), 'rank', (select case when band = 'top' then rnk end from mine), 'band', (select band from mine),
       'score', coalesce((select score from mine), 0), 'net', coalesce((select net from mine), 0), 'valid', coalesce((select valid from mine), 0),
       'attempts', coalesce((select attempts from mine), 0), 'correct', coalesce((select correct from mine), 0), 'activeDays', coalesce((select days_any from mine), 0),
-      'fixes', coalesce((select retry_fixes from mine), 0),
+      'repeats', coalesce((select repeats from mine), 0), 'repeatNet', coalesce((select repeat_net from mine), 0),
       'fast', coalesce((select attempts >= 10 and 100.0 * rushed / nullif(attempts, 0) > 40 from mine), false),
       'needValid', greatest(0, 30 - coalesce((select valid from mine), 0)), 'needDays', greatest(0, 3 - coalesce((select days_any from mine), 0)),
       'pointsToMedian', (select case when band in ('q3', 'q4') then greatest(0.1, round((select score from med) - mine.score + 0.1, 1)) end from mine)),
