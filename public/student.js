@@ -406,13 +406,13 @@ export async function pageStudentRank(ctx) {
     </div>
     <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
       <ul class="rank-rules earn">
-        <li><span class="earn-v">+1 / −⅓</span><span><b>الصافي:</b> +1 لكل إجابة صحيحة و−⅓ لكل خاطئة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</span></li>
+        <li><span class="earn-v">+1 / −½</span><span><b>الصافي:</b> +1 لكل إجابة صحيحة، ويُخصم لكل خاطئة ½ في السؤال ذي البدائل الثلاثة و⅓ في ذي الأربعة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</span></li>
         <li><span class="earn-v">×1.1 / ×1.2</span><span><b>مستوى السؤال:</b> الصافي يُضرب في 1.1 لأسئلة التطبيق وفي 1.2 لأسئلة التفكير العليا، مكافأةً للجهد الأكبر؛ والأساسي ×1.</span></li>
         <li><span class="earn-v off">⏱</span><span><b>الإجابات السريعة:</b> الأسرع من ${num(r.rushSecs)} ثوانٍ لا تُحتسب.</span></li>
         <li><span class="earn-v off">${num(r.dailyCap)}</span><span><b>سقف يومي:</b> تُحتسب أول ${num(r.dailyCap)} إجابة صالحة في اليوم، فالانتظام أفضل من التدريب الكثيف يومًا واحدًا.</span></li>
         <li><span class="earn-v">+${num(r.dayBonus)}</span><span><b>يوم تدريب جاد:</b> ${num(r.dayMin)} إجابات صالحة فأكثر بصحة ${num(r.dayAcc)}% فأكثر (حتى ${num(r.dayCap)} يومًا).</span></li>
-        <li><span class="earn-v">+1</span><span><b>تصحيح الأخطاء:</b> عن كل سؤال أخطأت فيه ثم أصبت فيه لاحقًا (حتى ${num(r.fixCap)}).</span></li>
-        <li><span class="earn-v">+${num(r.weekBonus)}</span><span><b>المحافظة على التميّز:</b> كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق 30%.</span></li>
+        <li><span class="earn-v">+½ / −½</span><span><b>السؤال المكرر:</b> إن ظهر لك سؤال أجبت عنه من قبل، تُحتسب محاولتك الثانية فيه +½ للصحيحة و−½ للخاطئة، وما بعدها لا يُحتسب. والأسئلة التي لم تُجب عنها تظهر لك أولًا.</span></li>
+        <li><span class="earn-v">+${num(r.weekBonus)}</span><span><b>المحافظة على التميّز:</b> كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق ${num(r.guessFloor ?? 30)}%.</span></li>
         <li><span class="earn-v off">↺</span><span>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</span></li>
       </ul>
     </section>`;
@@ -490,7 +490,7 @@ export async function pageStudentBalance(ctx) {
           ${chk([
             [d.week.valid >= 30 ? 'ok' : 'no', '30 إجابة محتسبة هذا الأسبوع', '', meter(d.week.valid, 30, `${num(Math.min(d.week.valid, 30))} من 30 إجابة`)],
             [d.week.days >= 3 ? 'ok' : 'no', 'في 3 أيام تدريب مختلفة', '', meter(d.week.days, 3, `${num(Math.min(d.week.days, 3))} من 3 أيام`)],
-            [d.week.valid === 0 ? 'no' : d.week.accuracy > 30 ? 'ok' : 'bad', 'صحة فوق 30%', d.week.valid ? `صحتك هذا الأسبوع ${num(d.week.accuracy)}%${d.week.accuracy > 30 ? '' : '؛ تأنَّ واقرأ التفسير لترفعها'}. الأسبوع يبدأ من الأحد.` : 'تُحسب بعد أن تبدأ الإجابة. الأسبوع يبدأ من الأحد.']])}
+            [d.week.valid === 0 ? 'no' : d.week.accuracy > (d.week.floor ?? 30) ? 'ok' : 'bad', `صحة فوق ${num(d.week.floor ?? 30)}%`, d.week.valid ? `صحتك هذا الأسبوع ${num(d.week.accuracy)}%${d.week.accuracy > (d.week.floor ?? 30) ? '' : '؛ تأنَّ واقرأ التفسير لترفعها'}. الأسبوع يبدأ من الأحد.` : 'تُحسب بعد أن تبدأ الإجابة. الأسبوع يبدأ من الأحد.']])}
           ${d.weeksKept ? `<span class="small muted">أسابيع التميّز التي حافظت عليها: ${num(d.weeksKept)}</span>` : ''}</div>
         <div class="bal-stats">
           <div><b>${d.streak ? '🔥 ' : ''}${num(d.streak)}</b><span class="small muted">أيام جادة متتالية</span></div>
