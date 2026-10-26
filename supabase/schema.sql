@@ -1717,7 +1717,7 @@ revoke execute on function public._require_course(bigint), public._default_cours
 
 -- =====================================================================
 -- 2026-10-18: قائمة التميّز — ترتيب المتدربين في الشعبة
---   النقاط تكافئ التدريب الجاد والمنتظم لا التخمين: صافي الإجابات (+1 صحيحة، −⅓ خاطئة لأن البدائل أربعة، مضروبًا في معامل المستوى: أساسي ×1، تطبيق ×1.1، تفكير عليا ×1.2)،
+--   النقاط تكافئ التدريب الجاد والمنتظم لا التخمين: صافي الإجابات (+1 صحيحة، −1/(عدد البدائل − 1) خاطئة: −½ لثلاثة بدائل و−⅓ لأربعة، 2026-10-26، مضروبًا في معامل المستوى: أساسي ×1، تطبيق ×1.1، تفكير عليا ×1.2)،
 --   إجابات أسرع من 3 ثوانٍ لا تُحسب، وأول 50 إجابة صالحة في اليوم فقط، و+3 لكل يوم تدريب جاد (حتى 20)،
 --   والمحاولة الثانية لسؤال سبق أن أجاب عنه: +½ صحيحة و−½ خاطئة (بلا معامل مستوى، وما بعدها لا يُحتسب؛ 2026-10-26 بدل +1 لتصحيح الخطأ).
 --   شرط دخول الترتيب: 30 إجابة صالحة في 3 أيام على الأقل.
@@ -1737,16 +1737,28 @@ insert into public.rank_terms (started_at, note)
   select coalesce((select min(created_at) from public.practice_sessions), now()), 'بداية احتساب نقاط التميّز'
   where not exists (select 1 from public.rank_terms);
 
+-- حد «قريب من التخمين» للمقرر بالنسبة المئوية: 1.2 × احتمال الإصابة عشوائيًا (2026-10-26)
+--   ثلاثة بدائل (كيمياء 2-1) → 40%، وأربعة بدائل (كيمياء 1 و3) → 30% كما كان
+create or replace function public._guess_floor(p_course bigint) returns numeric
+language sql stable security definer set search_path = public, pg_temp as $$
+  select coalesce(round(120 * avg(1.0 / jsonb_array_length(q.options))), 30)
+  from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
+  join public.chapters c on c.id = l.chapter_id
+  where c.course_id = p_course and q.type = 'mcq' and jsonb_array_length(q.options) > 1
+$$;
+revoke execute on function public._guess_floor(bigint) from anon, public;
+
 -- نقاط كل طالب في المقرر (داخلية): تُستدعى من الدوال المحمية أدناه فقط
 drop function if exists public._rank_rows(bigint, uuid[]);
 create or replace function public._rank_rows(p_course bigint, p_ids uuid[])
 returns table (user_id uuid, attempts int, valid int, correct int, rushed int, days_any int, days_active int, repeats int, net numeric, score numeric, weeks_kept int, repeat_net numeric)
 language sql stable security definer set search_path = public, pg_temp as $$
   with term as (select max(started_at) s from public.rank_terms),
-  cq as (select q.id, public._level_group(q.thinking_level) g from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
+  gf as (select public._guess_floor(p_course) f),
+  cq as (select q.id, public._level_group(q.thinking_level) g, jsonb_array_length(q.options) k from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
          join public.chapters c on c.id = l.chapter_id where c.course_id = p_course),
   raw as (
-    select s.user_id, a.session_id, a.question_id, a.correct, a.answered_at, cq.g,
+    select s.user_id, a.session_id, a.question_id, a.correct, a.answered_at, cq.g, cq.k,
       extract(epoch from (a.answered_at - coalesce(lag(a.answered_at) over (partition by a.session_id order by a.answered_at), s.created_at))) as secs
     from public.practice_answers a join public.practice_sessions s on s.id = a.session_id join cq on cq.id = a.question_id
     where s.user_id = any(p_ids)),
@@ -1765,11 +1777,11 @@ language sql stable security definer set search_path = public, pg_temp as $$
   -- تجميعات لكل طالب بمرور واحد على كل مجموعة (بدل استعلامات فرعية مترابطة لكل طالب فتتضاعف التكلفة مع عدد الطلاب)
   fa as (select f.user_id, count(*)::int attempts, (count(*) filter (where f.secs < 3))::int rushed from first f group by 1),
   va as (select v.user_id, count(*)::int valid, (count(*) filter (where v.correct))::int correct, count(distinct v.d)::int days_any,
-           coalesce(sum((case v.g when 'higher' then 1.2 when 'apply' then 1.1 else 1.0 end) * (case when v.correct then 1 else -1.0 / 3 end)) filter (where v.dn <= 50), 0) net
+           coalesce(sum((case v.g when 'higher' then 1.2 when 'apply' then 1.1 else 1.0 end) * (case when v.correct then 1 else -1.0 / greatest(v.k - 1, 1) end)) filter (where v.dn <= 50), 0) net
          from valid v group by 1),
   da as (select z.user_id, count(*)::int n from (select v.user_id, v.d from valid v group by v.user_id, v.d
            having count(*) >= 10 and 2 * count(*) filter (where v.correct) >= count(*)) z group by 1),
-  wc as (select wk.user_id, count(*)::int n from wk where wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > 30 group by 1),
+  wc as (select wk.user_id, count(*)::int n from wk where wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > (select f from gf) group by 1),
   agg as (
     select u.user_id, coalesce(wc.n, 0) weeks_kept, coalesce(fa.attempts, 0) attempts, coalesce(va.valid, 0) valid, coalesce(va.correct, 0) correct,
       coalesce(fa.rushed, 0) rushed, coalesce(va.days_any, 0) days_any, coalesce(da.n, 0) days_active, coalesce(rep.n, 0) repeats, coalesce(rep.net, 0) repeat_net, coalesce(va.net, 0) net
@@ -1791,6 +1803,7 @@ begin
   select * into me from profiles where user_id = auth.uid();
   select c.id into v_course from course_enrollments e join courses c on c.id = e.course_id and c.status = 'ready'
     where e.user_id = auth.uid() and (p_course is null or c.id = p_course) order by c.sort_order, c.id limit 1;
+  if v_course is not null then v_rules := v_rules || jsonb_build_object('guessFloor', public._guess_floor(v_course)); end if;
   if v_course is null or coalesce(trim(me.section), '') = '' then
     return jsonb_build_object('available', false, 'reason', case when v_course is null then 'course' else 'section' end, 'rules', v_rules);
   end if;
@@ -1837,9 +1850,9 @@ begin
   return (select coalesce(jsonb_agg(jsonb_build_object('username', split_part(u.email, '@', 1), 'score', r.score, 'valid', r.valid, 'attempts', r.attempts,
       'accuracy', case when r.valid > 0 then round(100.0 * r.correct / r.valid) end, 'fastPct', case when r.attempts > 0 then round(100.0 * r.rushed / r.attempts) end,
       'activeDays', r.days_any,
-      -- يحتاج متابعة: إجابات سريعة جدًا، أو نسبة صحة قريبة من التخمين (≤ 30% مع بدائل أربعة)
+      -- يحتاج متابعة: إجابات سريعة جدًا، أو نسبة صحة قريبة من التخمين (_guess_floor: 40% لثلاثة بدائل، 30% لأربعة)
       'quality', case when r.attempts >= 10 and 100.0 * r.rushed / r.attempts > 40 then 'watch'
-                      when r.valid >= 30 and 100.0 * r.correct / r.valid <= 30 then 'watch'
+                      when r.valid >= 30 and 100.0 * r.correct / r.valid <= public._guess_floor(v_course) then 'watch'
                       when r.valid >= 30 then 'serious' else 'low' end)), '[]')
     from public._rank_rows(v_course, coalesce(v_ids, '{}')) r join auth.users u on u.id = r.user_id);
 end $$;
@@ -1966,7 +1979,7 @@ begin
   score := coalesce(r.score, 0); valid := coalesce(r.valid, 0); attempts := coalesce(r.attempts, 0); correct := coalesce(r.correct, 0);
   rushed := coalesce(r.rushed, 0); days_any := coalesce(r.days_any, 0); weeks_kept := coalesce(r.weeks_kept, 0);
   elig := valid >= 30 and days_any >= 3 and (attempts = 0 or 100.0 * rushed / attempts <= 40);
-  watch := (attempts >= 10 and 100.0 * rushed / attempts > 40) or (valid >= 30 and 100.0 * correct / valid <= 30);
+  watch := (attempts >= 10 and 100.0 * rushed / attempts > 40) or (valid >= 30 and 100.0 * correct / valid <= public._guess_floor(p_course));
   select coalesce(sum(g.points), 0)::int into spent from grade_redemptions g
     where g.user_id = p_user and g.course_id = p_course and g.status <> 'cancelled' and g.created_at >= v_since;
   select coalesce(sum(c.points), 0)::int into bonus from point_coupons c
@@ -2016,7 +2029,7 @@ begin
     'pending', v_pending, 'recorded', v_recorded, 'weekUsed', s.week_used, 'weekLeft', v_left,
     'eligible', s.elig, 'blocked', v_blocked, 'needValid', greatest(0, 30 - s.valid), 'needDays', greatest(0, 3 - s.days_any),
     'streak', v_streak, 'weeksKept', s.weeks_kept,
-    'week', jsonb_build_object('valid', v_wv, 'days', v_wd, 'accuracy', round(100.0 * v_wc / nullif(v_wv, 0)), 'kept', v_wv >= 30 and v_wd >= 3 and coalesce(100.0 * v_wc / nullif(v_wv, 0) > 30, false)), 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
+    'week', jsonb_build_object('valid', v_wv, 'days', v_wd, 'accuracy', round(100.0 * v_wc / nullif(v_wv, 0)), 'floor', public._guess_floor(v_course), 'kept', v_wv >= 30 and v_wd >= 3 and coalesce(100.0 * v_wc / nullif(v_wv, 0) > public._guess_floor(v_course), false)), 'today', jsonb_build_object('valid', v_tv, 'correct', v_tc, 'done', v_tv >= 10 and 2 * v_tc >= v_tv),
     'history', (select coalesce(jsonb_agg(jsonb_build_object('id', h.id, 'grades', h.grades, 'points', h.points, 'status', h.status, 'at', h.created_at,
         'recordedAt', h.recorded_at, 'reason', h.cancel_reason) order by h.created_at desc), '[]')
       from (select * from grade_redemptions where user_id = auth.uid() order by created_at desc limit 30) h));
