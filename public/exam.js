@@ -1,5 +1,6 @@
 // منشئ نماذج الاختبارات: اختيار الفصول والعدد والمستوى والنوع، ونماذج متعددة، وكليشة المدرسة، وتصدير PDF عبر الطباعة.
 import { icon } from './icons.js';
+import { qImages } from './media.js';
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'];
 const DIFFS = ['سهل', 'متوسط', 'صعب'];
@@ -118,6 +119,21 @@ function pick(pool, count, rand) {
 }
 
 const state = { header: loadHeader(), opts: null, exam: null };
+
+// صور أسئلة الاختبار لملف Word: البيانات والأبعاد. SVG لا يُضمَّن (يظهر وصفه)، وما يتعذر جلبه كذلك.
+async function fetchImages(exam) {
+  const srcs = [...new Set(exam.models.flatMap(m => [...m.mcq.map(x => x.q), ...m.essay]).flatMap(q => (q.images || []).map(im => im.src)))]
+    .filter(src => !/\.svg$/i.test(src));
+  const out = new Map();
+  await Promise.all(srcs.map(async src => {
+    try {
+      const data = await (await fetch(src)).arrayBuffer();
+      const bmp = await createImageBitmap(new Blob([data]));
+      out.set(src, { data, w: bmp.width, h: bmp.height });
+    } catch { /* يظهر وصف الصورة بدلها */ }
+  }));
+  return out;
+}
 
 // مكتبة docx (إصدار مثبت) تُحمَّل من CDN عند أول تصدير Word فقط
 const DOCX_URL = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
@@ -350,7 +366,7 @@ export async function pageExam(ctx) {
         ${o.answerGrid ? answerGrid(m) : ''}
         <ol class="paper-mcq">${m.mcq.map(({ q, options }, i) => `
           <li class="pq" data-swap="mcq:${q.id}">
-            <div class="pq-stem"><span class="pq-n">${i + 1}</span>${esc(q.stem)}</div>${stim(q.stimulus)}
+            <div class="pq-stem"><span class="pq-n">${i + 1}</span>${esc(q.stem)}</div>${stim(q.stimulus)}${qImages(q.images, 'q-figs pq-figs')}
             <div class="pq-opts ${optsCls(options)}">${options.map((x, k) => `<span><b>${LETTERS[k]})</b> ${esc(x)}</span>`).join('')}</div>
           </li>`).join('')}</ol>
       </section>`);
@@ -359,7 +375,7 @@ export async function pageExam(ctx) {
         <h3 class="q-title">السؤال ${ORDINALS[qn++]}: أجب عن الأسئلة الآتية <span>(${fmt(m.essay.reduce((s, q) => s + state.exam.essayMarks(q), 0))} درجة)</span></h3>
         <ol class="paper-essay">${m.essay.map((q, i) => `
           <li class="pq" data-swap="essay:${q.id}">
-            <div class="pq-stem"><span class="pq-n">${i + 1}</span>${esc(q.stem)} <span class="pq-mark">(${fmt(state.exam.essayMarks(q))} درجات)</span></div>${stim(q.stimulus)}
+            <div class="pq-stem"><span class="pq-n">${i + 1}</span>${esc(q.stem)} <span class="pq-mark">(${fmt(state.exam.essayMarks(q))} درجات)</span></div>${stim(q.stimulus)}${qImages(q.images, 'q-figs pq-figs')}
             <div class="answer-lines">${'<div></div>'.repeat(Math.min(8, 3 + Math.round(state.exam.essayMarks(q))))}</div>
           </li>`).join('')}</ol>
       </section>`);
@@ -468,7 +484,7 @@ export async function pageExam(ctx) {
   const exportWord = async kind => {
     const [D, { buildExamDocx }, logo] = await Promise.all([loadDocx(), import('./exam-docx.js'),
       fetch('assets/org-logo.png').then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null)]);
-    const doc = buildExamDocx(D, { exam: state.exam, header: h, opts: o, kind, logo, letters: LETTERS, ordinals: ORDINALS, fmt });
+    const doc = buildExamDocx(D, { exam: state.exam, header: h, opts: o, kind, logo, letters: LETTERS, ordinals: ORDINALS, fmt, images: await fetchImages(state.exam) });
     const blob = await D.Packer.toBlob(doc);
     // أسماء ملفات إنجليزية: بعض المتصفحات تتجاهل الأسماء العربية فيُحفظ الملف دون امتداد
     const names = { student: 'student', key: 'answer-key', all: 'full' };

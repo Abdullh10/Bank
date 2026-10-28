@@ -2,15 +2,19 @@
 // المكتبة docx تُمرَّر من الخارج (تُحمَّل من CDN عند الحاجة) حتى يبقى هذا الملف قابلًا للاختبار في Node.
 // كل سؤال يبقى في صفحة واحدة: فقراته مربوطة بـ keepNext/keepLines، والجداول لا تنقسم صفوفها.
 
+import { plainMath } from './math.js';
+
 const FONT = 'Arial';
 const NAVY = '1F2D6B';
 
-export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters, ordinals, fmt }) {
+// images: Map من مصدر الصورة إلى { data, w, h } (تُجلب في exam.js)؛ الصورة التي لم تُجلب يحل محلها وصفها.
+export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters, ordinals, fmt, images = new Map() }) {
   const { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle,
     ImageRun, PageBreak, Footer, PageNumber, ShadingType, VerticalAlign, TableLayoutType } = D;
 
   // ---------- أدوات ----------
-  const run = (text, x = {}) => new TextRun({ text: String(text ?? ''), font: FONT, rightToLeft: true,
+  // الصيغ الرياضية ($…$) تُكتب نصًا مقروءًا (Word لا يعرضها كما في الموقع)
+  const run = (text, x = {}) => new TextRun({ text: plainMath(text), font: FONT, rightToLeft: true,
     size: x.size || 24, sizeComplexScript: x.size || 24, bold: !!x.bold, boldComplexScript: !!x.bold, color: x.color });
   const para = (children, x = {}) => new Paragraph({
     bidirectional: true, alignment: x.align || AlignmentType.START,
@@ -36,6 +40,13 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
   });
   const th = (t, x = {}) => cell(t, { ...x, bold: true, size: 20, fill: 'EEF1F8' });
   const spacer = (after = 120) => p('', { after });
+  // صور السؤال: بعرض 9 سم على الأكثر مع حفظ النسبة
+  const figs = q => (q.images || []).flatMap(im => {
+    const got = images.get(im.src);
+    if (!got) return im.alt ? [p(`[شكل: ${im.alt}]`, { size: 20, color: '555555', keepNext: true })] : [];
+    const w = Math.min(340, got.w), hgt = Math.round(got.h * (w / got.w));
+    return [para(new ImageRun({ data: got.data, transformation: { width: w, height: hgt } }), { align: AlignmentType.CENTER, keepNext: true, after: 60 })];
+  });
 
   // ---------- الكليشة ----------
   const head = (m, isKey) => {
@@ -100,7 +111,7 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
         // أربعة بدائل في سطر واحد تضيق أسرع من ثلاثة
         const long = options.some(x => x.length > (options.length > 3 ? 20 : 28));
         const stim = stimTable(q.stimulus);
-        out.push(p(`${i + 1}. ${q.stem}`, { bold: true, keepNext: true, after: 40 }), ...stim);
+        out.push(p(`${i + 1}. ${q.stem}`, { bold: true, keepNext: true, after: 40 }), ...stim, ...figs(q));
         if (long) options.forEach((x, k) => out.push(p(`${letters[k]}) ${x}`, { keepNext: k < options.length - 1, indent: { right: 360 }, after: k < options.length - 1 ? 20 : 160 })));
         else out.push(optsRow(options), spacer(80));
       });
@@ -110,7 +121,7 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
       m.essay.forEach((q, i) => {
         const lines = Math.min(8, 3 + Math.round(exam.essayMarks(q)));
         out.push(para([run(`${i + 1}. ${q.stem}`, { bold: true }), run(`  (${fmt(exam.essayMarks(q))} درجات)`, { size: 20 })], { keepNext: true, after: 40 }),
-          ...stimTable(q.stimulus));
+          ...stimTable(q.stimulus), ...figs(q));
         out.push(answerLines(lines), spacer(100));
       });
     }

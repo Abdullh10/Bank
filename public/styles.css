@@ -1178,3 +1178,22 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .tg-bulk { margin: .4rem 0; }
 .tg-sort { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: inherit; cursor: pointer; box-shadow: none; min-height: 0; }
 .tg-sort.on { color: var(--brand-3, #1c4c8c); }
+
+/* ---------- الرموز الرياضية وصور الأسئلة (2026-10-28) ---------- */
+.math { unicode-bidi: isolate; direction: ltr; }
+.math-block { display: block; text-align: center; margin: .5rem 0; overflow-x: auto; overflow-y: hidden; }
+.math-raw { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .92em; }
+.math .katex { font-size: 1.08em; }
+.q-figs { display: flex; flex-wrap: wrap; gap: .75rem; margin: .4rem 0 .9rem; }
+.q-fig { margin: 0; max-width: 100%; }
+.q-fig img { display: block; max-width: min(100%, 420px); max-height: 320px; height: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.q-fig figcaption { font-size: .82rem; color: var(--muted); margin-top: .25rem; }
+.pq-figs .q-fig img { max-width: 300px; max-height: 220px; border-radius: 4px; }
+.e-preview { margin-top: .4rem; padding: .6rem .8rem; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface-2, #f6f8fb); line-height: 2; }
+.e-imgs { display: grid; gap: .5rem; margin: .3rem 0 .5rem; }
+.e-img { display: grid; grid-template-columns: 72px 1fr auto; gap: .5rem; align-items: center; }
+.e-img img { width: 72px; height: 54px; object-fit: contain; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.e-img-add { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.e-img-add input { flex: 1 1 14rem; min-width: 0; }
+@media (max-width: 560px) { .e-img { grid-template-columns: 56px 1fr; } .e-img button { grid-column: 1 / -1; } }
+@media print { .q-fig img { max-height: 200px; border-color: #999; } .q-fig { break-inside: avoid; } }

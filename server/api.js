@@ -40,7 +40,7 @@ function objectiveRow(o) {
 function questionRow(q, withAnswers) {
   const base = {
     id: q.id, objectiveId: q.objective_id, type: q.type, number: q.number, stem: q.stem,
-    stimulus: J.parse(q.stimulus), options: J.parse(q.options, []), thinkingLevel: q.thinking_level,
+    stimulus: J.parse(q.stimulus), images: J.parse(q.images), options: J.parse(q.options, []), thinkingLevel: q.thinking_level,
     questionKind: q.question_kind, difficulty: q.difficulty, sourceRef: q.source_ref,
     status: q.status, excluded: !!q.excluded, origin: q.origin,
   };
@@ -230,10 +230,10 @@ function saveAutoCheck(id) {
   return ac;
 }
 
-const Q_COLS = ['stem', 'stimulus', 'options', 'correct_index', 'explanation', 'distractor_notes', 'model_answer',
+const Q_COLS = ['stem', 'stimulus', 'images', 'options', 'correct_index', 'explanation', 'distractor_notes', 'model_answer',
   'answer_elements', 'solution_steps', 'marks', 'rubric', 'common_errors', 'thinking_level', 'question_kind',
   'difficulty', 'source_ref', 'reviewer_notes'];
-const JSON_COLS = new Set(['stimulus', 'options', 'distractor_notes', 'answer_elements', 'solution_steps', 'marks', 'rubric', 'common_errors']);
+const JSON_COLS = new Set(['stimulus', 'images', 'options', 'distractor_notes', 'answer_elements', 'solution_steps', 'marks', 'rubric', 'common_errors']);
 
 api.post('/objectives/:code/questions', requireRole('admin'), (req, res) => {
   const o = loadObjective(req.params.code);

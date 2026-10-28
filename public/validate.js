@@ -1,6 +1,8 @@
 // التحقق من البيانات قبل الحفظ + التحقق الآلي من بنية الأسئلة.
 // التحقق الآلي لا يعني اعتمادًا علميًا: الاعتماد قرار بشري يُسجل في status.
 
+import { okImage, MAX_IMAGES } from './media.js';
+
 const DIFFICULTY = ['سهل', 'متوسط', 'صعب'];
 const LEVELS = ['تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع'];
 
@@ -22,6 +24,12 @@ export function cleanQuestion(input, type) {
     reviewer_notes: input.reviewer_notes != null ? String(input.reviewer_notes).trim() : undefined,
     stimulus: input.stimulus ?? null,
   };
+  // الصور: تُرسل فقط إن حددها المحرر (غيابها يُبقي صور السؤال كما هي)
+  if (input.images !== undefined) {
+    q.images = (Array.isArray(input.images) ? input.images : []).map(im => ({ src: String(im?.src ?? '').trim(), alt: norm(im?.alt) }));
+    if (q.images.length > MAX_IMAGES) e.push(`الصور ${MAX_IMAGES} على الأكثر`);
+    if (q.images.some(im => !okImage(im))) e.push('مصدر صورة غير مسموح أو وصفها طويل');
+  }
   if (q.stem.length < 8) e.push('نص السؤال قصير جدًا');
   if (q.difficulty && !DIFFICULTY.includes(q.difficulty)) e.push('درجة الصعوبة غير صالحة');
   if (q.thinking_level && !LEVELS.includes(q.thinking_level)) e.push('مستوى التفكير غير صالح');

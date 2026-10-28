@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS questions (
   number INTEGER NOT NULL,
   stem TEXT NOT NULL,
   stimulus TEXT,               -- JSON: جدول بيانات مرفق بالسؤال {headers:[], rows:[[]]}
+  images TEXT,                 -- JSON: صور السؤال [{src, alt}]
   options TEXT,                -- JSON: ثلاثة بدائل لأسئلة الاختيار
   correct_index INTEGER,
   explanation TEXT,
@@ -153,6 +154,9 @@ export function getDb() {
   if (!db) {
     db = new DatabaseSync(DB_PATH);
     db.exec(SCHEMA);
+    // قواعد أُنشئت قبل إضافة الأعمدة الجديدة
+    const cols = new Set(db.prepare('PRAGMA table_info(questions)').all().map(c => c.name));
+    if (!cols.has('images')) db.exec('ALTER TABLE questions ADD COLUMN images TEXT');
   }
   return db;
 }

@@ -189,6 +189,9 @@ create table if not exists public.questions (
   reviewed_at timestamptz,
   updated_at timestamptz not null default now()
 );
+-- صور السؤال (2026-10-28): مصفوفة [{src, alt}] حتى 4 صور، تُعرض بعد نص السؤال.
+--   src: مسار ثابت في الموقع (qimg/…) أو ملف في مخزن Supabase «question-media». يُتحقق منه في _validate_question.
+alter table public.questions add column if not exists images jsonb;
 create index if not exists idx_q_obj on public.questions(objective_id);
 
 create table if not exists public.question_answers (
@@ -380,6 +383,16 @@ begin
   if length(trim(coalesce(p->>'stem', ''))) < 8 then errs := array_append(errs, 'نص السؤال قصير جدًا'); end if;
   if p ? 'difficulty' and p->>'difficulty' is not null and p->>'difficulty' not in ('سهل', 'متوسط', 'صعب') then errs := array_append(errs, 'درجة الصعوبة غير صالحة'); end if;
   if p ? 'thinking_level' and p->>'thinking_level' is not null and p->>'thinking_level' not in ('تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع') then errs := array_append(errs, 'مستوى التفكير غير صالح'); end if;
+  -- الصور: مصدر من الموقع نفسه (qimg/) أو من مخزن question-media فقط، ونص بديل قصير
+  if p ? 'images' and jsonb_typeof(p->'images') is distinct from 'null' then
+    if jsonb_typeof(p->'images') <> 'array' or jsonb_array_length(p->'images') > 4 then errs := array_append(errs, 'الصور قائمة من 4 صور على الأكثر');
+    elsif exists (select 1 from jsonb_array_elements(p->'images') x
+        where jsonb_typeof(x) <> 'object'
+          or coalesce(x->>'src', '') !~ '^(qimg/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif|svg)|https://[a-z0-9]+\.supabase\.co/storage/v1/object/public/question-media/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif))$'
+          or (x->>'src') like '%..%' or length(coalesce(x->>'alt', '')) > 200) then
+      errs := array_append(errs, 'مصدر صورة غير مسموح أو وصفها طويل');
+    end if;
+  end if;
   if p_type = 'mcq' then
     -- ثلاثة بدائل (أ ب ج) أو أربعة (أ ب ج د) حسب المقرر
     if jsonb_typeof(p->'options') is distinct from 'array' or jsonb_array_length(p->'options') not in (3, 4) then errs := array_append(errs, 'يجب أن يكون لسؤال الاختيار ثلاثة بدائل أو أربعة');
@@ -411,6 +424,7 @@ begin
   v_before := public._question_json(p_id);
   -- أي تعديل بشري ينقل السؤال إلى «قيد المراجعة»
   update public.questions set stem = trim(p->>'stem'), stimulus = nullif(p->'stimulus', 'null'::jsonb),
+    images = case when p ? 'images' then nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb) else images end,
     options = case when q.type = 'mcq' then p->'options' else options end,
     thinking_level = p->>'thinking_level', question_kind = p->>'question_kind', difficulty = p->>'difficulty',
     source_ref = p->>'source_ref',
@@ -442,8 +456,9 @@ begin
   if p_type not in ('mcq', 'essay') then raise exception 'نوع غير صالح'; end if;
   perform public._validate_question(p_type, p);
   select coalesce(max(number), 0) + 1 into v_num from public.questions where objective_id = o.id and type = p_type;
-  insert into public.questions (objective_id, type, number, stem, stimulus, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-  values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), case when p_type = 'mcq' then p->'options' end,
+  insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
+  values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb),
+    case when p_type = 'mcq' then p->'options' end,
     p->>'thinking_level', p->>'question_kind', p->>'difficulty', p->>'source_ref', 'in_review', 'human')
   returning id into v_id;
   insert into public.question_answers (question_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, auto_check)
@@ -492,8 +507,8 @@ begin
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   select max(number) + 1 into v_num from public.questions where objective_id = q.objective_id and type = q.type;
-  insert into public.questions (objective_id, type, number, stem, stimulus, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-  select objective_id, type, v_num, stem, stimulus, options, thinking_level, question_kind, difficulty, source_ref, 'in_review', 'human'
+  insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
+  select objective_id, type, v_num, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, 'in_review', 'human'
     from public.questions where id = p_id returning id into v_id;
   insert into public.question_answers (question_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, auto_check)
   select v_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, p_auto_check
@@ -565,7 +580,7 @@ $$;
 create or replace function public._q_public(q public.questions, a public.question_answers, p_answers boolean) returns jsonb
 language sql stable as $$
   select jsonb_build_object('id', q.id, 'objectiveId', q.objective_id, 'type', q.type, 'number', q.number, 'stem', q.stem,
-    'stimulus', q.stimulus, 'options', coalesce(q.options, '[]'), 'thinkingLevel', q.thinking_level,
+    'stimulus', q.stimulus, 'images', q.images, 'options', coalesce(q.options, '[]'), 'thinkingLevel', q.thinking_level,
     'questionKind', q.question_kind, 'difficulty', q.difficulty, 'sourceRef', q.source_ref,
     'status', q.status, 'excluded', q.excluded, 'origin', q.origin)
   || case when p_answers then jsonb_build_object('correctIndex', a.correct_index, 'explanation', a.explanation,
@@ -805,7 +820,7 @@ end $$;
 -- السؤال كما يراه الطالب: دون الإجابة ولا التفسير ولا أي بيانات مراجعة.
 create or replace function public._student_q(q public.questions) returns jsonb
 language sql stable security definer set search_path = public, pg_temp as $$
-  select jsonb_build_object('id', q.id, 'stem', q.stem, 'stimulus', q.stimulus, 'options', q.options,
+  select jsonb_build_object('id', q.id, 'stem', q.stem, 'stimulus', q.stimulus, 'images', q.images, 'options', q.options,
     'group', public._level_group(q.thinking_level), 'difficulty', q.difficulty,
     'lesson', (select l.title from objectives o join lessons l on l.id = o.lesson_id where o.id = q.objective_id))
 $$;
@@ -2608,3 +2623,26 @@ grant execute on function public.student_comm_summary(), public.student_inbox(),
   public.staff_course_lessons(bigint), public.staff_my_students(bigint), public.staff_send_comm(jsonb), public.staff_list_comms(bigint),
   public.staff_comm_detail(bigint), public.staff_cancel_comm(bigint), public.admin_get_comm_settings(), public.admin_set_comm_settings(int, int, int) to authenticated;
 revoke execute on function public._task_progress(uuid, bigint, timestamptz, timestamptz), public._comm_refresh(bigint, uuid), public._require_comm_staff(), public._quota_used(uuid, timestamptz) from authenticated;
+
+-- =====================================================================
+-- 2026-10-28: مخزن صور الأسئلة (Supabase Storage)
+--   القراءة عامة (الصور تُعرض داخل المنصة المغلقة بأسماء عشوائية لا تُخمَّن)، والرفع والحذف لمالك المشروع فقط.
+--   صيغ مسموحة: PNG وJPEG وWebP وGIF (لا SVG في الرفع؛ SVG للصور الثابتة في qimg/ فقط) بحد 1 ميغابايت.
+--   يُتخطى هذا الجزء في قاعدة لا يوجد فيها مخطط storage (مثل بيئة الاختبار المحلية).
+-- =====================================================================
+do $$
+begin
+  if not exists (select 1 from information_schema.schemata where schema_name = 'storage') then return; end if;
+  insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values ('question-media', 'question-media', true, 1048576, array['image/png', 'image/jpeg', 'image/webp', 'image/gif'])
+  on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+  drop policy if exists "question-media admin insert" on storage.objects;
+  drop policy if exists "question-media admin update" on storage.objects;
+  drop policy if exists "question-media admin delete" on storage.objects;
+  create policy "question-media admin insert" on storage.objects for insert to authenticated
+    with check (bucket_id = 'question-media' and public.is_admin());
+  create policy "question-media admin update" on storage.objects for update to authenticated
+    using (bucket_id = 'question-media' and public.is_admin()) with check (bucket_id = 'question-media' and public.is_admin());
+  create policy "question-media admin delete" on storage.objects for delete to authenticated
+    using (bucket_id = 'question-media' and public.is_admin());
+end $$;

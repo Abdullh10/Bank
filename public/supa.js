@@ -122,6 +122,19 @@ async function adminUsers(body) {
   throw Object.assign(new Error(msg), { status: status === 401 ? 401 : 400 });
 }
 
+// رفع صورة سؤال إلى مخزن «question-media» (لمالك المشروع؛ سياسات المخزن تفرض ذلك). يرجع الرابط العام للصورة.
+const IMG_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
+export async function uploadQuestionImage(file) {
+  const ext = IMG_TYPES[file?.type];
+  if (!ext) throw new Error('الصيغ المسموحة: PNG وJPEG وWebP وGIF');
+  if (file.size > 1024 * 1024) throw new Error('حجم الصورة أكبر من 1 ميغابايت؛ صغّرها ثم أعد المحاولة');
+  const path = `q/${crypto.randomUUID()}.${ext}`;
+  const bucket = client.storage.from('question-media');
+  const { error } = await bucket.upload(path, file, { contentType: file.type, cacheControl: '31536000', upsert: false });
+  if (error) throw new Error(/row-level security|not authorized|403/i.test(error.message || '') ? 'رفع الصور لمالك المشروع فقط' : `تعذر رفع الصورة: ${error.message}`);
+  return bucket.getPublicUrl(path).data.publicUrl;
+}
+
 export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   const [p, query = ''] = path.split('?');
   const f = Object.fromEntries([...new URLSearchParams(query)].filter(([, v]) => v !== ''));

@@ -2,6 +2,8 @@
 // المشكلة: في فقرة من اليمين لليسار يعكس المتصفح ترتيب «0.10 M» فتظهر «M 0.10»، ويفكّك الأسس (10⁻⁴)، ويقلب «25 °C».
 // الحل: تحيط الدالة كل مقطع لاتيني/رقمي (أرقام، رموز، وحدات، معادلات) بعازل اتجاه يسار-يمين (LRI … PDI)
 // في عُقد النص المعروضة فقط؛ لا يُكتب شيء في قاعدة البيانات ولا يتأثر ما يكتبه المستخدم في الحقول.
+import { hasMath } from './math.js';
+
 const LRI = '⁦', PDI = '⁩';
 // بداية المقطع: حرف لاتيني أو إغريقي أو رقم؛ داخله رموز الصيغ والأس والرمز السفلي والفراغ؛ نهايته حرف أو رقم أو ° أو % أو شحنة أو قوس.
 const IN = 'A-Za-z0-9\\u0370-\\u03FF\\u00B2\\u00B3\\u00B9⁰-⁹₀-₉.,×·÷()\\[\\]/%°+\\-−=→⇌↔←⇒⇐↑↓⇅<>≈≠≡∝≥≤±⁺⁻₊₋₌√^_|½ ';
@@ -42,7 +44,8 @@ function walk(root) {
     acceptNode(n) {
       const p = n.parentElement;
       if (!p || SKIP.has(p.tagName) || p.isContentEditable || p.closest('[dir="ltr"], .ltr, [contenteditable="true"]')) return NodeFilter.FILTER_REJECT;
-      return n.data.includes(LRI) || !(HAS_RTL.test(n.data) || LATIN.test(n.data)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+      // نص فيه صيغة رياضية ($…$) تعالجه math.js أولًا؛ وما يبقى منه نصًا عاديًا يصل إلى هنا بعدها
+      return n.data.includes(LRI) || hasMath(n.data) || !(HAS_RTL.test(n.data) || LATIN.test(n.data)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
     },
   });
   const nodes = [];
