@@ -103,10 +103,13 @@ export async function pageStudentHome(ctx, kind = 'course') {
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
           <summary>${tahsili ? `${icon(SUBJECT_ICONS[c.number] || 'chapters', 30)}<span><b>${esc(c.title)}</b></span>`
             : `${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span>${multi && c.course ? `<small class="muted">${esc(c.course)} · </small>` : ''}<b>الفصل ${c.number}:</b> ${esc(c.title)}</span>`}</summary>
-          ${c.lessons.map(l => {
+          ${c.lessons.map((l, i) => {
             const n = l.basic + l.apply + l.higher;
-            return `<label class="st-lesson"><input type="checkbox" data-lesson="${l.id}" ${chosen.has(l.id) ? 'checked' : ''} ${n ? '' : 'disabled'}>
-              <span>${esc(l.title)}</span>
+            // التحصيلي: عنوان الوحدة «الصف · الموضوع»، فتُجمع الوحدات تحت عنوان صفها
+            const [grade, title] = tahsili && l.title.includes(' · ') ? l.title.split(' · ') : [null, l.title];
+            const prevGrade = i && tahsili ? c.lessons[i - 1].title.split(' · ')[0] : null;
+            return `${grade && grade !== prevGrade ? `<div class="st-grade">${esc(grade)}</div>` : ''}<label class="st-lesson"><input type="checkbox" data-lesson="${l.id}" ${chosen.has(l.id) ? 'checked' : ''} ${n ? '' : 'disabled'}>
+              <span>${esc(title)}</span>
               ${l.answered ? `<span class="st-mastery" title="نسبة إجاباتك الصحيحة في هذا الدرس"><span style="width:${pct(l.correct, l.answered)}%"></span></span><small>${pct(l.correct, l.answered)}%</small>` : '<small class="muted">لم تبدأ</small>'}
             </label>`;
           }).join('')}
