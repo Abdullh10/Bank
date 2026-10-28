@@ -79,6 +79,10 @@ alter table public.courses add column if not exists sort_order int not null defa
 alter table public.courses add column if not exists eta text;
 alter table public.courses drop constraint if exists courses_status_check;
 alter table public.courses add constraint courses_status_check check (status in ('ready', 'preparing'));
+-- نوع المقرر (2026-10-29): مقرر دراسي، أو «الاستعداد للتحصيلي» (فصوله المواد الأربع ودروسه وحداتها، وأسئلته بأربعة بدائل دائمًا)
+alter table public.courses add column if not exists kind text not null default 'course';
+alter table public.courses drop constraint if exists courses_kind_check;
+alter table public.courses add constraint courses_kind_check check (kind in ('course', 'tahsili'));
 update public.courses set sort_order = 20 where id = 1 and sort_order = 100;
 insert into public.courses (id, code, title, subject, grade, term, country, status, sort_order) values
   (2, 'كيمياء 1', 'الكيمياء 1', 'الكيمياء', 'الأول الثانوي', 'الأول', 'السعودية', 'preparing', 10),
@@ -407,6 +411,17 @@ begin
   if array_length(errs, 1) > 0 then raise exception '%', array_to_string(errs, '؛ ') using errcode = '22023'; end if;
 end $$;
 
+-- أسئلة «الاستعداد للتحصيلي» بأربعة بدائل دائمًا كالاختبار الحقيقي (2026-10-29)
+create or replace function public._check_tahsili_options(p_objective bigint, p_type text, p jsonb) returns void
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  if p_type = 'mcq' and jsonb_typeof(p->'options') = 'array' and jsonb_array_length(p->'options') <> 4
+     and exists (select 1 from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
+                 join courses c on c.id = ch.course_id where o.id = p_objective and c.kind = 'tahsili') then
+    raise exception 'أسئلة التحصيلي بأربعة بدائل (أ ب ج د)' using errcode = '22023';
+  end if;
+end $$;
+
 create or replace function public._question_json(p_id bigint) returns jsonb
 language sql stable security definer set search_path = public, pg_temp as $$
   select to_jsonb(q) || coalesce(to_jsonb(a) - 'question_id', '{}'::jsonb)
@@ -421,6 +436,7 @@ begin
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   perform public._validate_question(q.type, p);
+  perform public._check_tahsili_options(q.objective_id, q.type, p);
   v_before := public._question_json(p_id);
   -- أي تعديل بشري ينقل السؤال إلى «قيد المراجعة»
   update public.questions set stem = trim(p->>'stem'), stimulus = nullif(p->'stimulus', 'null'::jsonb),
@@ -455,6 +471,7 @@ begin
   if not found then raise exception 'الهدف غير موجود'; end if;
   if p_type not in ('mcq', 'essay') then raise exception 'نوع غير صالح'; end if;
   perform public._validate_question(p_type, p);
+  perform public._check_tahsili_options(o.id, p_type, p);
   select coalesce(max(number), 0) + 1 into v_num from public.questions where objective_id = o.id and type = p_type;
   insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
   values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb),
@@ -692,7 +709,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
     (select jsonb_build_object('id', user_id, 'username', split_part(coalesce((select u.email from auth.users u where u.id = profiles.user_id), email), '@', 1), 'displayName', display_name, 'role', role,
        'section', section, 'grade', grade, 'profileConfirmed', profile_confirmed,
        -- مقررات الطالب المسندة (الجاهزة) لعرضها في الترويسة
-       'courses', (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'code', c.code, 'grade', c.grade, 'term', c.term) order by c.sort_order), '[]')
+       'courses', (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'code', c.code, 'grade', c.grade, 'term', c.term, 'kind', c.kind) order by c.sort_order), '[]')
          from course_enrollments e join courses c on c.id = e.course_id and c.status = 'ready' where e.user_id = profiles.user_id))
      from profiles where user_id = auth.uid()) end
 $$;
@@ -803,7 +820,7 @@ language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_student();
   -- فصول المقررات المسندة للطالب فقط (والجاهزة)، مرتبة حسب المقرر ثم الفصل
-  return (select coalesce(jsonb_agg(jsonb_build_object('number', c.number, 'title', c.title, 'course', cr.code, 'courseId', cr.id, 'lessons',
+  return (select coalesce(jsonb_agg(jsonb_build_object('number', c.number, 'title', c.title, 'course', cr.code, 'courseId', cr.id, 'kind', cr.kind, 'lessons',
     (select coalesce(jsonb_agg(jsonb_build_object('id', l.id, 'number', l.number, 'title', l.title,
         'basic', (select count(*) from questions q join objectives o on o.id = q.objective_id where o.lesson_id = l.id and q.type = 'mcq' and q.status = 'approved' and not q.excluded and public._level_group(q.thinking_level) = 'basic'),
         'apply', (select count(*) from questions q join objectives o on o.id = q.objective_id where o.lesson_id = l.id and q.type = 'mcq' and q.status = 'approved' and not q.excluded and public._level_group(q.thinking_level) = 'apply'),
@@ -1278,7 +1295,7 @@ language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
   return (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'code', c.code, 'title', c.title, 'grade', c.grade, 'term', c.term,
-      'status', c.status, 'eta', c.eta, 'sortOrder', c.sort_order,
+      'status', c.status, 'eta', c.eta, 'sortOrder', c.sort_order, 'kind', c.kind,
       'chapters', (select count(*) from chapters ch where ch.course_id = c.id),
       'objectives', (select count(*) from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id where ch.course_id = c.id),
       'questions', (select count(*) from questions q join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
@@ -1465,7 +1482,7 @@ language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
   perform public._require_member();
   return (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'code', c.code, 'title', c.title, 'grade', c.grade, 'term', c.term,
-      'status', c.status, 'eta', c.eta, 'sortOrder', c.sort_order,
+      'status', c.status, 'eta', c.eta, 'sortOrder', c.sort_order, 'kind', c.kind,
       'chapters', (select count(*) from chapters ch where ch.course_id = c.id),
       'objectives', (select count(*) from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id where ch.course_id = c.id),
       'questions', (select count(*) from questions q join objectives o on o.id = q.objective_id join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
@@ -2646,3 +2663,20 @@ begin
   create policy "question-media admin delete" on storage.objects for delete to authenticated
     using (bucket_id = 'question-media' and public.is_admin());
 end $$;
+
+-- =====================================================================
+-- 2026-10-29: قسم «الاستعداد للتحصيلي» (البنية)
+--   مقرر من نوع tahsili: فصوله المواد الأربع بالنسب الرسمية (25% لكل مادة)، ودروسه الوحدات، وأهدافه الموضوعات.
+--   يبقى «قيد الإعداد» حتى يكتمل محتواه؛ ويُسند للطلاب من «الحسابات» كأي مقرر. نقاطه منفصلة عن المقرر الدراسي.
+--   المعرفات: الفصول 501–504، والوحدات 50000 + 100×المادة + الوحدة، والموضوعات 5000000 + 10000×المادة + 100×الوحدة + الموضوع
+--   (لا تتقاطع مع المقررات الأخرى، وتتسع لـ 99 وحدة لكل مادة). المحتوى من data/tahsili عبر scripts/build-tahsili-seed.js.
+-- =====================================================================
+insert into public.courses (id, code, title, subject, grade, term, country, status, sort_order, kind) values
+  (5, 'التحصيلي', 'الاستعداد للتحصيلي', 'الأحياء والكيمياء والفيزياء والرياضيات', 'الثالث الثانوي', 'الأول', 'السعودية', 'preparing', 90, 'tahsili')
+on conflict (id) do update set kind = 'tahsili';
+insert into public.chapters (id, course_id, number, title, description) values
+  (501, 5, 1, 'الأحياء والبيئة', '25% من أسئلة الاختبار'),
+  (502, 5, 2, 'الكيمياء', '25% من أسئلة الاختبار'),
+  (503, 5, 3, 'الفيزياء', '25% من أسئلة الاختبار'),
+  (504, 5, 4, 'الرياضيات', '25% من أسئلة الاختبار')
+on conflict (id) do nothing;

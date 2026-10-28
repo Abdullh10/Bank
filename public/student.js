@@ -62,10 +62,21 @@ export function pageStudentConfirm(ctx) {
   };
 }
 
-export async function pageStudentHome(ctx) {
+// kind: «course» صفحة «تدرّب» للمقرر الدراسي، و«tahsili» قسم «الاستعداد للتحصيلي» (المواد الأربع ووحداتها)؛ لكل منهما دروسه فقط
+let homeKind = 'course';
+const SUBJECT_ICONS = { 1: 'drop', 2: 'molecule', 3: 'atom', 4: 'calc' };
+export async function pageStudentHome(ctx, kind = 'course') {
   const { state, esc, $app, api, fail } = ctx;
+  homeKind = kind;
+  const tahsili = kind === 'tahsili';
   if (session && !session.summary) return renderQuestion(ctx); // جلسة جارية
-  const catalog = await api('/student/catalog');
+  const catalog = (await api('/student/catalog')).filter(c => (c.kind || 'course') === kind);
+  if (!catalog.length && tahsili) {
+    $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('exam', 64)}<div>
+      <h1>الاستعداد للتحصيلي</h1>
+      <p class="muted">لم يُفتح لك هذا القسم بعد؛ يفتحه معلمك حين يجهز محتواه.</p></div></div></section>`;
+    return;
+  }
   if (!catalog.length) {
     $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
       <h1>مرحبًا ${esc(state.user.displayName.split(' ')[0])}</h1>
@@ -76,17 +87,22 @@ export async function pageStudentHome(ctx) {
   const chosen = new Set(prefs.lessons);
   const multi = new Set(catalog.map(c => c.courseId)).size > 1;
   $app.innerHTML = `
-    <section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
+    ${tahsili ? `<section class="hero banner"><div class="hero-ic">${icon('exam', 64)}<div>
+      <span class="eyebrow">${icon('spark', 18)} أسئلة تدريبية على نمط اختبار التحصيل الدراسي</span>
+      <h1>الاستعداد للتحصيلي</h1>
+      <p class="muted">الأحياء والكيمياء والفيزياء والرياضيات، لكل مادة 25% من الاختبار. اختر المادة ووحداتها ثم ابدأ؛ التصحيح والتفسير بعد كل سؤال.</p></div></div></section>`
+    : `<section class="hero banner"><div class="hero-ic">${icon('practice', 64)}<div>
       <span class="eyebrow">${icon('spark', 18)} تدريب ذاتي لا يدخل في الدرجات</span>
       <h1>تدرّب يا ${esc(state.user.displayName.split(' ')[0])}</h1>
-      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى، ثم ابدأ. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>
+      <p class="muted">اختر الدروس وعدد الأسئلة والمستوى، ثم ابدأ. التصحيح والتفسير يظهران بعد كل سؤال.</p></div></div></section>`}
     <section class="card st-bal" id="st-bal" hidden></section>
     <section class="card st-task" id="st-task" hidden></section>
-    <ol class="st-steps"><li><b>١</b> اختر الدروس</li><li><b>٢</b> اضبط الجلسة</li><li><b>٣</b> ابدأ التدريب</li></ol>
+    <ol class="st-steps"><li><b>١</b> ${tahsili ? 'اختر الوحدات' : 'اختر الدروس'}</li><li><b>٢</b> اضبط الجلسة</li><li><b>٣</b> ابدأ التدريب</li></ol>
     <div class="grid2 st-setup">
-      <section class="card">${ttl('lessons', 'الدروس')}
+      <section class="card">${ttl('lessons', tahsili ? 'المواد والوحدات' : 'الدروس')}
         ${catalog.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
-          <summary>${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span>${multi && c.course ? `<small class="muted">${esc(c.course)} · </small>` : ''}<b>الفصل ${c.number}:</b> ${esc(c.title)}</span></summary>
+          <summary>${tahsili ? `${icon(SUBJECT_ICONS[c.number] || 'chapters', 30)}<span><b>${esc(c.title)}</b></span>`
+            : `${icon(CHAPTER_ICONS[c.number] || 'chapters', 30)}<span>${multi && c.course ? `<small class="muted">${esc(c.course)} · </small>` : ''}<b>الفصل ${c.number}:</b> ${esc(c.title)}</span>`}</summary>
           ${c.lessons.map(l => {
             const n = l.basic + l.apply + l.higher;
             return `<label class="st-lesson"><input type="checkbox" data-lesson="${l.id}" ${chosen.has(l.id) ? 'checked' : ''} ${n ? '' : 'disabled'}>
@@ -111,9 +127,23 @@ export async function pageStudentHome(ctx) {
       <button class="primary st-start" id="s-start" type="button">${line('next', 18)}ابدأ التدريب</button></div>`;
   const sum = () => {
     const n = $app.querySelectorAll('[data-lesson]:checked').length, c = document.getElementById('s-count').value;
-    document.getElementById('st-sum').textContent = n ? `${n === 1 ? 'درس واحد' : n + ' دروس'} · ${c} سؤالًا` : 'اختر درسًا واحدًا على الأقل';
+    document.getElementById('st-sum').textContent = n ? `${n === 1 ? (tahsili ? 'وحدة واحدة' : 'درس واحد') : n + (tahsili ? ' وحدات' : ' دروس')} · ${c} سؤالًا` : (tahsili ? 'اختر وحدة واحدة على الأقل' : 'اختر درسًا واحدًا على الأقل');
   };
   $app.querySelectorAll('input, select').forEach(e => { e.onchange = sum; }); sum();
+  // بطاقات المقرر الدراسي (التميّز والمهام والرصيد) لا تظهر في قسم التحصيلي: نقاطه منفصلة عن نقاط المقرر
+  if (!tahsili) courseCards(ctx);
+  document.getElementById('s-start').onclick = async () => {
+    const lessons = [...$app.querySelectorAll('[data-lesson]:checked')].map(i => Number(i.dataset.lesson));
+    const p = { lessons, count: Number(document.getElementById('s-count').value),
+      levels: $app.querySelector('[name="s-level"]:checked').value, timed: document.getElementById('s-timed').checked };
+    if (!lessons.length) return fail(new Error(tahsili ? 'اختر وحدة واحدة على الأقل' : 'اختر درسًا واحدًا على الأقل'));
+    savePrefs(p);
+    await startSession(ctx, p);
+  };
+}
+
+function courseCards(ctx) {
+  const { esc, api } = ctx;
   // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
   cachedApi(api, '/student/rank').then(d => {
     const box = document.getElementById('st-top5');
@@ -143,14 +173,6 @@ export async function pageStudentHome(ctx) {
       <div class="bar ${d.ready ? 'ok' : ''}"><span style="width:${Math.round(100 * frac)}%"></span></div>`;
     box.hidden = false;
   }).catch(() => {});
-  document.getElementById('s-start').onclick = async () => {
-    const lessons = [...$app.querySelectorAll('[data-lesson]:checked')].map(i => Number(i.dataset.lesson));
-    const p = { lessons, count: Number(document.getElementById('s-count').value),
-      levels: $app.querySelector('[name="s-level"]:checked').value, timed: document.getElementById('s-timed').checked };
-    if (!lessons.length) return fail(new Error('اختر درسًا واحدًا على الأقل'));
-    savePrefs(p);
-    await startSession(ctx, p);
-  };
 }
 
 async function startSession(ctx, p) {
@@ -160,7 +182,7 @@ async function startSession(ctx, p) {
   try {
     const s = await api('/student/start', { method: 'POST', body: p });
     session = { ...s, idx: 0, answers: {}, order: Object.fromEntries(s.questions.map(q => [q.id, shuffle([...q.options.keys()])])), startedAt: Date.now(), summary: null };
-    location.hash = '#/';
+    location.hash = homeKind === 'tahsili' ? '#/tahsili' : '#/';
     renderQuestion(ctx);
   } catch (e) { fail(e); if (btn) { btn.disabled = false; btn.textContent = 'ابدأ التدريب'; } }
 }

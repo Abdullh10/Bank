@@ -197,6 +197,9 @@ function bar(value, total, cls = '') {
     <span style="width:${pct(value, total)}%"></span></div>`;
 }
 
+// في قسم «الاستعداد للتحصيلي» الفصل مادة (الأحياء، الكيمياء، …)
+const chWord = () => (state.course?.kind === 'tahsili' ? 'المادة' : 'الفصل');
+
 function stimulusTable(s) {
   if (!s) return '';
   return `<div class="table-wrap"><table class="data-table"><thead><tr>${s.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
@@ -276,7 +279,7 @@ const progress = (label, v, t, cls = '') => `<div class="progress-line"><span>${
 function chapterCard(c) {
   return `<a class="card chapter-card" href="#/chapter/${c.number}">
     <div class="ch-head"><span class="ch-ic">${icon(CHAPTER_ICONS[c.number] || 'practice', 50)}<span class="chapter-num">${c.number}</span></span>
-      <div><span class="ch-kicker">الفصل ${c.number}</span><h3>${esc(c.title)}</h3></div></div>
+      <div><span class="ch-kicker">${chWord()} ${c.number}</span><h3>${esc(c.title)}</h3></div></div>
     <div class="meta-row">${badge(`${c.lessons} دروس`)}${badge(`${c.objectives} هدفًا`)}${badge(`${c.questions} سؤالًا`, c.questions ? 'brand' : '')}</div>
     <div class="progress-line small"><span>الأهداف المعتمدة</span><span class="muted">${c.approved || 0}/${c.objectives}</span>${bar(c.approved, c.objectives, 'ok')}</div>
   </a>`;
@@ -285,18 +288,18 @@ function chapterCard(c) {
 async function pageChapters() {
   const chapters = await api('/chapters');
   $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ الفصول</div>
-    <div class="hero"><div class="hero-ic">${icon('chapters', 52)}<div><h1>فصول المقرر</h1><p class="muted">مرتبة وفق ملف أهداف المقرر المعتمد في المشروع.</p></div></div></div>
+    <div class="hero"><div class="hero-ic">${icon('chapters', 52)}<div><h1>${state.course?.kind === 'tahsili' ? 'مواد الاختبار ووحداتها' : 'فصول المقرر'}</h1><p class="muted">مرتبة وفق ملف أهداف المقرر المعتمد في المشروع.</p></div></div></div>
     <div class="grid cards">${chapters.map(chapterCard).join('')}</div>`;
 }
 
 async function pageChapter(n) {
   const ch = await api('/chapters/' + n);
-  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapters">الفصول</a> ‹ الفصل ${ch.number}</div>
-    <div class="hero"><div class="hero-ic">${icon(CHAPTER_ICONS[ch.number] || 'chapters', 52)}<div><h1>الفصل ${ch.number}: ${esc(ch.title)}</h1></div></div></div>
+  $app.innerHTML = `<div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapters">الفصول</a> ‹ ${chWord()} ${ch.number}</div>
+    <div class="hero"><div class="hero-ic">${icon(CHAPTER_ICONS[ch.number] || 'chapters', 52)}<div><h1>${chWord()} ${ch.number}: ${esc(ch.title)}</h1></div></div></div>
     ${ch.lessons.map(l => `
       <section class="card lesson" id="lesson-${l.number}">
         <div class="lesson-head">
-          ${ttl('lessons', `الدرس ${ch.number}-${l.number}: ${esc(l.title)}`, 'h2', 32)}
+          ${ttl('lessons', `${state.course?.kind === 'tahsili' ? `الوحدة ${l.number}` : `الدرس ${ch.number}-${l.number}`}: ${esc(l.title)}`, 'h2', 32)}
           <span class="meta-row">${badge(`${l.objectives.length} هدفًا`)}
             ${badge(`${l.objectives.filter(o => o.reviewStatus === 'approved').length} معتمد`, 'ok')}</span>
         </div>
@@ -338,7 +341,7 @@ async function pageObjective(code) {
   const active = q => !q.excluded;
   const idx = data.lessonNav.indexOf(o.code);
   $app.innerHTML = `
-    <div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapter/${o.chapter.number}">الفصل ${o.chapter.number}: ${esc(o.chapter.title)}</a>
+    <div class="crumbs"><a href="#/course">الرئيسية</a> ‹ <a href="#/chapter/${o.chapter.number}">${chWord()} ${o.chapter.number}: ${esc(o.chapter.title)}</a>
       ‹ <a href="#/chapter/${o.chapter.number}">الدرس ${o.chapter.number}-${o.lesson.number}: ${esc(o.lesson.title)}</a></div>
     <div class="print-only"><h2>${esc(o.chapter.title)} — ${esc(o.lesson.title)}</h2></div>
     <div class="hero">
@@ -862,7 +865,7 @@ function bankRow(q) {
   return `<article class="q" id="q-${q.id}">
     <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)">${protectedBank() ? '' : `<input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>`}
       <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span></label>${qMeta(q)}</div>
-    <div class="small muted">الفصل ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
+    <div class="small muted">${chWord()} ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
     ${q.type === 'mcq' ? `<ol class="opts">${q.options.map((o, i) => `<li class="opt ${state.user && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>` : ''}
   </article>`;
@@ -1003,7 +1006,8 @@ async function route() {
   const role = state.user.role, isStudent = role === 'student';
   document.querySelectorAll('[data-perm]').forEach(a => {
     const p = a.dataset.perm;
-    a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance', 'inbox'].includes(a.dataset.nav) || state.supabase) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || ['grades', 'comms'].includes(a.dataset.nav))) && (a.dataset.nav !== 'comms' || ['admin', 'viewer'].includes(role)));
+    a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance', 'inbox'].includes(a.dataset.nav) || state.supabase)
+      && (a.dataset.nav !== 'tahsili' || (state.user.courses || []).some(c => c.kind === 'tahsili')) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || ['grades', 'comms'].includes(a.dataset.nav))) && (a.dataset.nav !== 'comms' || ['admin', 'viewer'].includes(role)));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
@@ -1014,6 +1018,7 @@ async function route() {
       else if (page === 'rank' && state.supabase) await pageStudentRank(ctx);
       else if (page === 'balance' && state.supabase) await pageStudentBalance(ctx);
       else if (page === 'inbox' && state.supabase) { await pageStudentInbox(ctx); setInboxBadge(0); inboxAt = Date.now(); }
+      else if (page === 'tahsili') await pageStudentHome(ctx, 'tahsili');
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
     } catch (e) {
       if (e?.status === 401) return fail(e);
