@@ -1197,3 +1197,6 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .e-img-add input { flex: 1 1 14rem; min-width: 0; }
 @media (max-width: 560px) { .e-img { grid-template-columns: 56px 1fr; } .e-img button { grid-column: 1 / -1; } }
 @media print { .q-fig img { max-height: 200px; border-color: #999; } .q-fig { break-inside: avoid; } }
+/* التحصيلي: عنوان الصف فوق وحداته */
+.st-grade { margin: .7rem .2rem .25rem; font-size: .84rem; font-weight: 700; color: var(--brand-2, #12305a); border-bottom: 1px solid var(--line); padding-bottom: .2rem; }
+.st-grade:first-of-type { margin-top: .3rem; }

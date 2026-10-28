@@ -39,6 +39,12 @@ on conflict (id) do update set original_text = excluded.original_text, approved_
   }
 }
 
+// وحدات قديمة لم تعد في units.json تُحذف إن لم يكن فيها أسئلة (مع موضوعاتها)؛ وما فيه أسئلة يبقى ولا يُمس
+const keep = [...units.values()].map(x => unitId(x.s, x.u));
+head.push(`delete from public.lessons l using public.chapters c
+where l.chapter_id = c.id and c.course_id = ${COURSE} and l.id not in (${keep.join(', ')})
+  and not exists (select 1 from public.objectives o join public.questions q on q.objective_id = o.id where o.lesson_id = l.id);`);
+
 // ---------- الأسئلة ----------
 const errors = [], blocks = [];
 let total = 0;

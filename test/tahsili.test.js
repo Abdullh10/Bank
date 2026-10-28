@@ -57,3 +57,13 @@ test('ملف البنية: المواد الأربع بترتيب الدليل �
     assert.ok(s.units.every(x => x.topics.length >= 1));
   }
 });
+test('وحدات الكيمياء مرتبة حسب الصف، وعنوان كل وحدة يبدأ بصفها', () => {
+  const u = JSON.parse(fs.readFileSync(new URL('../data/tahsili/units.json', import.meta.url)));
+  const chem = u.subjects.find(s => s.title === 'الكيمياء').units.filter(x => x.number !== 99);
+  assert.ok(u.subjects.every(s => s.units.find(x => x.number === 99)?.title === 'كل الصفوف · مراجعة شاملة'), 'المراجعة الشاملة تحت «كل الصفوف»');
+  const order = ['أول ثانوي', 'ثاني ثانوي', 'ثالث ثانوي'];
+  assert.ok(chem.every(x => x.title.startsWith(`${x.grade} · `)), 'العنوان يبدأ بالصف');
+  const ranks = chem.sort((a, b) => a.number - b.number).map(x => order.indexOf(x.grade));
+  assert.ok(ranks.every(r => r >= 0) && ranks.every((r, i) => !i || r >= ranks[i - 1]), 'الأرقام تتبع ترتيب الصفوف');
+  assert.deepEqual(order.map(g => chem.filter(x => x.grade === g).length), [5, 21, 6]);
+});
