@@ -197,6 +197,8 @@ function bar(value, total, cls = '') {
     <span style="width:${pct(value, total)}%"></span></div>`;
 }
 
+// سنة ورود السؤال في اختبار التحصيل الدراسي (أسئلة التجميعات)
+const yearBadge = q => (q.examYear ? ` <span class="badge year" title="سنة ورود السؤال في اختبار التحصيل الدراسي">ورد في تحصيلي ${q.examYear}</span>` : '');
 // في قسم «الاستعداد للتحصيلي» الفصل مادة (الأحياء، الكيمياء، …)
 const chWord = () => (state.course?.kind === 'tahsili' ? 'المادة' : 'الفصل');
 
@@ -485,7 +487,7 @@ function mcqCard(q, answers) {
       ${chosen.correct ? 'إجابة صحيحة.' : `إجابة غير صحيحة؛ الصحيحة (${LETTERS[chosen.correctIndex]}).`} ${esc(chosen.explanation)}
       ${!chosen.correct && chosen.distractorNote ? `<div class="small">${esc(chosen.distractorNote)}</div>` : ''}</div>` : '';
   return `<article class="q ${q.excluded ? 'excluded' : ''}" id="q-${q.id}">
-    <div class="q-head"><span class="q-num">سؤال ${q.number}</span>${mode === 'review' ? qMeta(q) : ''}</div>
+    <div class="q-head"><span class="q-num">سؤال ${q.number}</span>${yearBadge(q)}${mode === 'review' ? qMeta(q) : ''}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
     <ol class="opts">${opts}</ol>${feedback}${key}
     ${showKey ? reviewTools(q) : ''}
@@ -506,7 +508,7 @@ function essayCard(q, answers) {
       ${q.sourceRef ? `<div class="small muted">المرجع: ${esc(cleanRef(q.sourceRef))}</div>` : ''}
     </div></details>` : '';
   return `<article class="q ${q.excluded ? 'excluded' : ''}" id="q-${q.id}">
-    <div class="q-head"><span class="q-num">سؤال مقالي ${q.number}</span>${answers ? qMeta(q) : ''}</div>
+    <div class="q-head"><span class="q-num">سؤال مقالي ${q.number}</span>${yearBadge(q)}${answers ? qMeta(q) : ''}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}${body}
     ${objState.mode === 'review' && answers ? reviewTools(q) : ''}
   </article>`;
@@ -675,6 +677,7 @@ function openEditor(type, q, save, done, nOpts = 3) {
       <div class="field"><label for="e-diff">درجة الصعوبة</label>${sel('e-diff', ['سهل', 'متوسط', 'صعب'], q.difficulty)}</div>
       <div class="field"><label for="e-kind">نوع السؤال</label><input dir="auto" id="e-kind" value="${escRaw(q.questionKind)}"></div>
       <div class="field"><label for="e-src">المرجع</label><input dir="auto" id="e-src" value="${escRaw(q.sourceRef)}"></div>
+      ${state.course?.kind === 'tahsili' || q.examYear ? `<div class="field"><label for="e-year">سنة الورود في التحصيلي <span class="small muted">(فارغة إن لم تُعرف)</span></label><input dir="ltr" id="e-year" type="number" min="2000" max="2100" value="${q.examYear ?? ''}"></div>` : ''}
     </div>`;
   const mcq = `<div class="field"><label for="e-n">عدد البدائل</label>
       <select id="e-n"><option value="3" ${q.options.length !== 4 ? 'selected' : ''}>ثلاثة (أ ب ج)</option><option value="4" ${q.options.length === 4 ? 'selected' : ''}>أربعة (أ ب ج د)</option></select></div>
@@ -736,7 +739,8 @@ function openEditor(type, q, save, done, nOpts = 3) {
   const v = id => d.querySelector('#' + id).value;
   d.querySelector('#e-save').onclick = guard(async () => {
     const body = { stem: v('e-stem'), thinking_level: v('e-level') || null, difficulty: v('e-diff') || null,
-      question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null, images: imgs };
+      question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null, images: imgs,
+      ...(d.querySelector('#e-year') ? { exam_year: v('e-year') } : {}) };
     if (type === 'mcq') {
       const idx = [...Array(Number(v('e-n'))).keys()];
       Object.assign(body, { options: idx.map(i => v('e-opt' + i)), correct_index: Number(v('e-correct')),
@@ -864,7 +868,7 @@ async function pageBank() {
 function bankRow(q) {
   return `<article class="q" id="q-${q.id}">
     <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)">${protectedBank() ? '' : `<input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>`}
-      <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span></label>${qMeta(q)}</div>
+      <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span>${yearBadge(q)}</label>${qMeta(q)}</div>
     <div class="small muted">${chWord()} ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
     <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
     ${q.type === 'mcq' ? `<ol class="opts">${q.options.map((o, i) => `<li class="opt ${state.user && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>` : ''}

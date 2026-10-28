@@ -24,6 +24,12 @@ export function cleanQuestion(input, type) {
     reviewer_notes: input.reviewer_notes != null ? String(input.reviewer_notes).trim() : undefined,
     stimulus: input.stimulus ?? null,
   };
+  // سنة الورود في التحصيلي: تُرسل فقط إن حددها المحرر
+  if (input.exam_year !== undefined) {
+    const y = input.exam_year === '' || input.exam_year == null ? null : Number(input.exam_year);
+    if (y !== null && !(Number.isInteger(y) && y >= 2000 && y <= 2100)) e.push('سنة الورود بين 2000 و2100');
+    q.exam_year = y;
+  }
   // الصور: تُرسل فقط إن حددها المحرر (غيابها يُبقي صور السؤال كما هي)
   if (input.images !== undefined) {
     q.images = (Array.isArray(input.images) ? input.images : []).map(im => ({ src: String(im?.src ?? '').trim(), alt: norm(im?.alt) }));

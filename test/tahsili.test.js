@@ -29,7 +29,10 @@ test('مفتاح الإجابة وملاحظات البدائل متسقة', () 
   assert.match(checkQuestion({ ...good, distractor_notes: ['', '', 'س2', 'س3'] }).join(), /سبب خطأ كل بديل/);
   assert.match(checkQuestion({ ...good, explanation: ' ' }).join(), /التفسير مطلوب/);
 });
-test('المستوى والصعوبة والموضوع', () => {
+test('المستوى والصعوبة والموضوع وسنة الورود', () => {
+  assert.deepEqual(checkQuestion({ ...good, year: 2025 }), []);
+  assert.match(checkQuestion({ ...good, year: 25 }).join(), /سنة الورود/);
+  assert.match(checkQuestion({ ...good, year: '2025' }).join(), /سنة الورود/);
   assert.match(checkQuestion({ ...good, thinking_level: 'حفظ' }).join(), /مستوى التفكير/);
   assert.match(checkQuestion({ ...good, difficulty: 'صعب جدا' }).join(), /الصعوبة/);
   assert.match(checkQuestion({ ...good, topic: 2 }, { topics: [1] }).join(), /الموضوع 2/);

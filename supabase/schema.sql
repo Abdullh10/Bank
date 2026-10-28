@@ -196,6 +196,10 @@ create table if not exists public.questions (
 -- صور السؤال (2026-10-28): مصفوفة [{src, alt}] حتى 4 صور، تُعرض بعد نص السؤال.
 --   src: مسار ثابت في الموقع (qimg/…) أو ملف في مخزن Supabase «question-media». يُتحقق منه في _validate_question.
 alter table public.questions add column if not exists images jsonb;
+-- سنة ورود السؤال في اختبار التحصيل الدراسي (2026-10-29): لأسئلة التجميعات، وتظهر للطالب. فارغة إن لم تُعرف السنة.
+alter table public.questions add column if not exists exam_year smallint;
+alter table public.questions drop constraint if exists questions_exam_year_check;
+alter table public.questions add constraint questions_exam_year_check check (exam_year is null or exam_year between 2000 and 2100);
 create index if not exists idx_q_obj on public.questions(objective_id);
 
 create table if not exists public.question_answers (
@@ -387,6 +391,8 @@ begin
   if length(trim(coalesce(p->>'stem', ''))) < 8 then errs := array_append(errs, 'نص السؤال قصير جدًا'); end if;
   if p ? 'difficulty' and p->>'difficulty' is not null and p->>'difficulty' not in ('سهل', 'متوسط', 'صعب') then errs := array_append(errs, 'درجة الصعوبة غير صالحة'); end if;
   if p ? 'thinking_level' and p->>'thinking_level' is not null and p->>'thinking_level' not in ('تذكر', 'فهم', 'تطبيق', 'تحليل', 'تقويم', 'إبداع') then errs := array_append(errs, 'مستوى التفكير غير صالح'); end if;
+  if p ? 'exam_year' and jsonb_typeof(p->'exam_year') not in ('null', 'number') then errs := array_append(errs, 'سنة الورود رقم');
+  elsif p ? 'exam_year' and jsonb_typeof(p->'exam_year') = 'number' and (p->>'exam_year')::numeric not between 2000 and 2100 then errs := array_append(errs, 'سنة الورود بين 2000 و2100'); end if;
   -- الصور: مصدر من الموقع نفسه (qimg/) أو من مخزن question-media فقط، ونص بديل قصير
   if p ? 'images' and jsonb_typeof(p->'images') is distinct from 'null' then
     if jsonb_typeof(p->'images') <> 'array' or jsonb_array_length(p->'images') > 4 then errs := array_append(errs, 'الصور قائمة من 4 صور على الأكثر');
@@ -441,6 +447,7 @@ begin
   -- أي تعديل بشري ينقل السؤال إلى «قيد المراجعة»
   update public.questions set stem = trim(p->>'stem'), stimulus = nullif(p->'stimulus', 'null'::jsonb),
     images = case when p ? 'images' then nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb) else images end,
+    exam_year = case when p ? 'exam_year' then (p->>'exam_year')::smallint else exam_year end,
     options = case when q.type = 'mcq' then p->'options' else options end,
     thinking_level = p->>'thinking_level', question_kind = p->>'question_kind', difficulty = p->>'difficulty',
     source_ref = p->>'source_ref',
@@ -473,8 +480,8 @@ begin
   perform public._validate_question(p_type, p);
   perform public._check_tahsili_options(o.id, p_type, p);
   select coalesce(max(number), 0) + 1 into v_num from public.questions where objective_id = o.id and type = p_type;
-  insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-  values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb),
+  insert into public.questions (objective_id, type, number, stem, stimulus, images, exam_year, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
+  values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb), (p->>'exam_year')::smallint,
     case when p_type = 'mcq' then p->'options' end,
     p->>'thinking_level', p->>'question_kind', p->>'difficulty', p->>'source_ref', 'in_review', 'human')
   returning id into v_id;
@@ -524,8 +531,8 @@ begin
   select * into q from public.questions where id = p_id;
   if not found then raise exception 'السؤال غير موجود'; end if;
   select max(number) + 1 into v_num from public.questions where objective_id = q.objective_id and type = q.type;
-  insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-  select objective_id, type, v_num, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, 'in_review', 'human'
+  insert into public.questions (objective_id, type, number, stem, stimulus, images, exam_year, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
+  select objective_id, type, v_num, stem, stimulus, images, exam_year, options, thinking_level, question_kind, difficulty, source_ref, 'in_review', 'human'
     from public.questions where id = p_id returning id into v_id;
   insert into public.question_answers (question_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, auto_check)
   select v_id, correct_index, explanation, distractor_notes, model_answer, answer_elements, solution_steps, marks, rubric, common_errors, p_auto_check
@@ -597,7 +604,7 @@ $$;
 create or replace function public._q_public(q public.questions, a public.question_answers, p_answers boolean) returns jsonb
 language sql stable as $$
   select jsonb_build_object('id', q.id, 'objectiveId', q.objective_id, 'type', q.type, 'number', q.number, 'stem', q.stem,
-    'stimulus', q.stimulus, 'images', q.images, 'options', coalesce(q.options, '[]'), 'thinkingLevel', q.thinking_level,
+    'stimulus', q.stimulus, 'images', q.images, 'examYear', q.exam_year, 'options', coalesce(q.options, '[]'), 'thinkingLevel', q.thinking_level,
     'questionKind', q.question_kind, 'difficulty', q.difficulty, 'sourceRef', q.source_ref,
     'status', q.status, 'excluded', q.excluded, 'origin', q.origin)
   || case when p_answers then jsonb_build_object('correctIndex', a.correct_index, 'explanation', a.explanation,
@@ -837,7 +844,7 @@ end $$;
 -- السؤال كما يراه الطالب: دون الإجابة ولا التفسير ولا أي بيانات مراجعة.
 create or replace function public._student_q(q public.questions) returns jsonb
 language sql stable security definer set search_path = public, pg_temp as $$
-  select jsonb_build_object('id', q.id, 'stem', q.stem, 'stimulus', q.stimulus, 'images', q.images, 'options', q.options,
+  select jsonb_build_object('id', q.id, 'stem', q.stem, 'stimulus', q.stimulus, 'images', q.images, 'examYear', q.exam_year, 'options', q.options,
     'group', public._level_group(q.thinking_level), 'difficulty', q.difficulty,
     'lesson', (select l.title from objectives o join lessons l on l.id = o.lesson_id where o.id = q.objective_id))
 $$;
