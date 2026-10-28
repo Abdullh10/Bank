@@ -233,7 +233,7 @@ function renderQuestion(ctx) {
     </div>
     <div class="bar"><span style="width:${pct(answeredCount, session.questions.length)}%"></span></div>
     <article class="card st-q">
-      <div class="st-qhead"><div class="st-meta">${esc(q.lesson)} · ${GROUPS[q.group]}</div><button type="button" class="st-report" id="st-report" title="الإبلاغ عن مشكلة في السؤال">${line('flag', 15)}الإبلاغ عن مشكلة في السؤال</button></div>
+      <div class="st-qhead"><div class="st-meta">${esc(q.lesson.includes(' · ') ? q.lesson.split(' · ')[1] : q.lesson)} · ${GROUPS[q.group]}${q.examYear ? ` <span class="badge year" title="سنة ورود السؤال في اختبار التحصيل الدراسي">ورد في تحصيلي ${q.examYear}</span>` : ''}</div><button type="button" class="st-report" id="st-report" title="الإبلاغ عن مشكلة في السؤال">${line('flag', 15)}الإبلاغ عن مشكلة في السؤال</button></div>
       <p class="st-stem">${esc(q.stem)}</p>
       ${qImages(q.images, 'q-figs st-figs')}
       ${q.stimulus ? `<div class="table-wrap"><table class="data-table"><thead><tr>${q.stimulus.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>

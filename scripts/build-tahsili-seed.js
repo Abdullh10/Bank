@@ -70,10 +70,10 @@ for (const f of files) {
     const rows = qs.map((q, i) => ({ n: i + 1, q, ac: autoCheck({ ...q, type: 'mcq' }, []) }));
     total += rows.length;
     blocks.push(`-- ${f} · الموضوع ${t} (${rows.length} سؤالًا)
-insert into public.questions (objective_id, type, number, stem, stimulus, images, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
-select ${obj}, 'mcq', v.number, v.stem, null, v.images::jsonb, v.options::jsonb, v.tl, v.qk, v.diff, v.src, 'generated', 'tahsili_collection'
-from (values\n${rows.map(({ n, q }) => `(${[n, lit(q.stem.trim()), js(q.images?.length ? q.images : null), js(q.options), lit(q.thinking_level), lit(q.question_kind ?? null), lit(q.difficulty), lit(q.source_ref ?? data.meta?.source ?? null)].join(', ')})`).join(',\n')}
-) as v(number, stem, images, options, tl, qk, diff, src)
+insert into public.questions (objective_id, type, number, stem, stimulus, images, exam_year, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
+select ${obj}, 'mcq', v.number, v.stem, null, v.images::jsonb, v.yr::smallint, v.options::jsonb, v.tl, v.qk, v.diff, v.src, 'generated', 'tahsili_collection'
+from (values\n${rows.map(({ n, q }) => `(${[n, lit(q.stem.trim()), js(q.images?.length ? q.images : null), q.year ?? 'null', js(q.options), lit(q.thinking_level), lit(q.question_kind ?? null), lit(q.difficulty), lit(q.source_ref ?? data.meta?.source ?? null)].join(', ')})`).join(',\n')}
+) as v(number, stem, images, yr, options, tl, qk, diff, src)
 where not exists (select 1 from public.questions x where x.objective_id = ${obj} and x.type = 'mcq' and x.number = v.number);
 insert into public.question_answers (question_id, correct_index, explanation, distractor_notes, auto_check)
 select x.id, v.ci, v.ex, v.dn::jsonb, v.ac::jsonb

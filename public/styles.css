@@ -1200,3 +1200,4 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 /* التحصيلي: عنوان الصف فوق وحداته */
 .st-grade { margin: .7rem .2rem .25rem; font-size: .84rem; font-weight: 700; color: var(--brand-2, #12305a); border-bottom: 1px solid var(--line); padding-bottom: .2rem; }
 .st-grade:first-of-type { margin-top: .3rem; }
+.badge.year { background: var(--goldsoft, #fbf3e2); color: #7a5410; border: 1px solid #ecd9ae; font-weight: 600; }
