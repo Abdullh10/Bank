@@ -18,15 +18,16 @@ export function pickCourse(list, wanted, isOwner) {
     || list.find(c => c.status === 'ready') || list[0] || null;
 }
 
-export const courseLine = c => (c ? `${c.code} · الصف ${c.grade} · الفصل الدراسي ${c.term}` : '');
+const TAHSILI_LINE = 'الأحياء والكيمياء والفيزياء والرياضيات';
+export const courseLine = c => (!c ? '' : c.kind === 'tahsili' ? `${c.title || c.code} · ${TAHSILI_LINE}` : `${c.code} · الصف ${c.grade} · الفصل الدراسي ${c.term}`);
 
 export function pageCourses(ctx) {
   const { esc, $app, courses, current, isOwner, select } = ctx;
   const card = c => {
     const ready = c.status === 'ready', open = ready || isOwner, isCur = current?.id === c.id;
     return `<article class="course-card ${ready ? '' : 'preparing'} ${isCur ? 'current' : ''}" ${open ? '' : 'aria-disabled="true"'}>
-      <div class="cc-head">${icon('chapters', 54, TONE[c.grade] || 'navy')}
-        <div><h2>${esc(c.code)}</h2><p>الصف ${esc(c.grade)}<br>الفصل الدراسي ${esc(c.term)}</p></div></div>
+      <div class="cc-head">${icon(c.kind === 'tahsili' ? 'exam' : 'chapters', 54, c.kind === 'tahsili' ? 'gold' : TONE[c.grade] || 'navy')}
+        <div><h2>${esc(c.kind === 'tahsili' ? c.title : c.code)}</h2><p>${c.kind === 'tahsili' ? `${TAHSILI_LINE}<br>للمرحلة الثانوية كاملة` : `الصف ${esc(c.grade)}<br>الفصل الدراسي ${esc(c.term)}`}</p></div></div>
       <div class="cc-status">${ready ? `<span class="badge ok">${line('check', 14)} متاح</span>` : `<span class="badge warn">${line('clock', 14)} قيد الإعداد</span>`}
         ${isCur ? '<span class="badge brand">المقرر الحالي</span>' : ''}</div>
       ${ready ? `<dl class="cc-nums"><div><dt>هدفًا</dt><dd>${num(c.objectives)}</dd></div><div><dt>سؤالًا</dt><dd>${num(c.questions)}</dd></div>

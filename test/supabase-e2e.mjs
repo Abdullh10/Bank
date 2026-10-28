@@ -264,7 +264,8 @@ ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVis
 // مالك المشروع: يفتح المقرر «قيد الإعداد» ليتابعه، والتبديل بين المقررات يغيّر البنك والترويسة
 await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
 await p.goto(BASE + '#/');  await p.waitForSelector('.course-card');
-ok('owner: preparing courses openable', (await p.locator('.course-card.preparing [data-course]').count()) === 3);
+// قيد الإعداد: كيمياء 1 و2-2 و3 و«الاستعداد للتحصيلي»
+ok('owner: preparing courses openable', (await p.locator('.course-card.preparing [data-course]').count()) === 4);
 await p.locator('[data-course="3"]').click(); await p.waitForSelector('.notice.warn');
 ok('owner: 2-2 home shows preparing notice + header', (await p.locator('main').innerText()).includes('قيد الإعداد') && (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-2 · الصف الثاني الثانوي · الفصل الدراسي الثاني'));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
