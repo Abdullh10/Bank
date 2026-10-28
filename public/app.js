@@ -10,6 +10,8 @@ import { PERMS, ROLE_NAMES } from './roles.js';
 import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 import { startBidi } from './bidi.js';
+import { startMath } from './math.js';
+import { qImages, okImage, MAX_IMAGES } from './media.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
 const state = { user: null, selection: new Set(), courses: null, course: null };
@@ -481,7 +483,7 @@ function mcqCard(q, answers) {
       ${!chosen.correct && chosen.distractorNote ? `<div class="small">${esc(chosen.distractorNote)}</div>` : ''}</div>` : '';
   return `<article class="q ${q.excluded ? 'excluded' : ''}" id="q-${q.id}">
     <div class="q-head"><span class="q-num">سؤال ${q.number}</span>${mode === 'review' ? qMeta(q) : ''}</div>
-    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
+    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
     <ol class="opts">${opts}</ol>${feedback}${key}
     ${showKey ? reviewTools(q) : ''}
   </article>`;
@@ -502,7 +504,7 @@ function essayCard(q, answers) {
     </div></details>` : '';
   return `<article class="q ${q.excluded ? 'excluded' : ''}" id="q-${q.id}">
     <div class="q-head"><span class="q-num">سؤال مقالي ${q.number}</span>${answers ? qMeta(q) : ''}</div>
-    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${body}
+    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}${body}
     ${objState.mode === 'review' && answers ? reviewTools(q) : ''}
   </article>`;
 }
@@ -655,7 +657,16 @@ function openEditor(type, q, save, done, nOpts = 3) {
   q = q || { options: Array(nOpts).fill(''), correctIndex: 0 };
   const opts4 = [...q.options, '', '', '', ''].slice(0, 4);
   const common = `
-    <div class="field"><label for="e-stem">نص السؤال</label><textarea dir="auto" id="e-stem">${escRaw(q.stem)}</textarea></div>
+    <div class="field"><label for="e-stem">نص السؤال</label><textarea dir="auto" id="e-stem">${escRaw(q.stem)}</textarea>
+      <p class="small muted">للرموز الرياضية اكتب الصيغة بين علامتي <span dir="ltr">$</span>، مثل <span dir="ltr" data-no-math>$x^2 + \\frac{1}{2}$</span>، أو بين <span dir="ltr">$$</span> و<span dir="ltr">$$</span> لصيغة في سطر مستقل.</p>
+      <div class="e-preview" id="e-prev" aria-live="polite" hidden></div></div>
+    <div class="field"><span class="label">صور السؤال <span class="small muted">(حتى ${MAX_IMAGES} صور، 1 ميغابايت للصورة)</span></span>
+      <div class="e-imgs" id="e-imgs"></div>
+      <div class="e-img-add">
+        ${state.supabase ? `<label class="btn" for="e-img-file">رفع صورة</label><input type="file" id="e-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>` : ''}
+        <input dir="ltr" id="e-img-path" placeholder="أو مسار من الموقع: qimg/…">
+        <button type="button" id="e-img-addpath">إضافة المسار</button>
+      </div></div>
     <div class="form-grid">
       <div class="field"><label for="e-level">مستوى التفكير</label>${sel('e-level', LEVEL_OPTS, q.thinkingLevel)}</div>
       <div class="field"><label for="e-diff">درجة الصعوبة</label>${sel('e-diff', ['سهل', 'متوسط', 'صعب'], q.difficulty)}</div>
@@ -691,10 +702,38 @@ function openEditor(type, q, save, done, nOpts = 3) {
     const c = d.querySelector('#e-correct'); if (c && Number(c.value) >= n) c.value = '0';
   };
   if (type === 'mcq') { d.querySelector('#e-n').onchange = syncN; syncN(); }
+  // معاينة الصيغ الرياضية أثناء الكتابة (يرسمها math.js)
+  const prev = d.querySelector('#e-prev'), stemEl = d.querySelector('#e-stem');
+  const syncPrev = () => { prev.hidden = !stemEl.value.includes('$'); prev.textContent = stemEl.value; };
+  stemEl.addEventListener('input', syncPrev); syncPrev();
+  // الصور: تعديلها محلي حتى «حفظ»
+  const imgs = (q.images || []).map(im => ({ src: im.src, alt: im.alt || '' }));
+  const imgBox = d.querySelector('#e-imgs');
+  const drawImgs = () => {
+    imgBox.innerHTML = imgs.length ? imgs.map((im, i) => `<div class="e-img"><img src="${escRaw(im.src)}" alt="">
+      <input dir="auto" data-alt="${i}" value="${escRaw(im.alt)}" placeholder="وصف الصورة (يظهر تحتها ويقرؤه قارئ الشاشة)" maxlength="200">
+      <button type="button" class="danger" data-rm="${i}">حذف</button></div>`).join('') : '<p class="small muted">لا توجد صور.</p>';
+    imgBox.querySelectorAll('[data-alt]').forEach(x => { x.oninput = () => { imgs[x.dataset.alt].alt = x.value; }; });
+    imgBox.querySelectorAll('[data-rm]').forEach(b => { b.onclick = () => { imgs.splice(Number(b.dataset.rm), 1); drawImgs(); }; });
+  };
+  const addImg = src => {
+    if (imgs.length >= MAX_IMAGES) return toast(`الصور ${MAX_IMAGES} على الأكثر`, true);
+    if (!okImage({ src })) return toast('مسار غير مسموح: من مجلد qimg/ في الموقع، أو صورة مرفوعة', true);
+    imgs.push({ src, alt: '' }); drawImgs();
+  };
+  drawImgs();
+  d.querySelector('#e-img-addpath').onclick = () => { const x = d.querySelector('#e-img-path'); addImg(x.value.trim()); if (imgs.some(im => im.src === x.value.trim())) x.value = ''; };
+  const file = d.querySelector('#e-img-file');
+  if (file) file.onchange = guard(async () => {
+    const f = file.files[0]; file.value = '';
+    if (!f) return;
+    if (imgs.length >= MAX_IMAGES) return toast(`الصور ${MAX_IMAGES} على الأكثر`, true);
+    try { toast('جارٍ رفع الصورة…'); addImg(await supa.uploadQuestionImage(f)); } catch (e) { fail(e); }
+  });
   const v = id => d.querySelector('#' + id).value;
   d.querySelector('#e-save').onclick = guard(async () => {
     const body = { stem: v('e-stem'), thinking_level: v('e-level') || null, difficulty: v('e-diff') || null,
-      question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null };
+      question_kind: v('e-kind'), source_ref: v('e-src'), stimulus: q.stimulus || null, images: imgs };
     if (type === 'mcq') {
       const idx = [...Array(Number(v('e-n'))).keys()];
       Object.assign(body, { options: idx.map(i => v('e-opt' + i)), correct_index: Number(v('e-correct')),
@@ -824,7 +863,7 @@ function bankRow(q) {
     <div class="q-head"><label class="actions" style="margin:0;color:var(--ink)">${protectedBank() ? '' : `<input type="checkbox" style="width:auto" data-pick="${q.id}" ${state.selection.has(q.id) ? 'checked' : ''}>`}
       <span class="q-num">#${q.id} · ${q.type === 'mcq' ? 'اختيار' : 'مقالي'}</span></label>${qMeta(q)}</div>
     <div class="small muted">الفصل ${q.chapter.number} ‹ ${esc(q.lesson.title)} ‹ <a href="#/objective/${encodeURIComponent(q.objectiveCode)}">${esc(q.objectiveCode)}</a>: ${esc(q.objectiveText)}</div>
-    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
+    <div class="q-stem">${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
     ${q.type === 'mcq' ? `<ol class="opts">${q.options.map((o, i) => `<li class="opt ${state.user && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>` : ''}
   </article>`;
 }
@@ -837,10 +876,10 @@ function buildSheet(kind, current) {
   const mcq = picked.filter(q => q.type === 'mcq'), essay = picked.filter(q => q.type === 'essay');
   const title = prompt('عنوان الورقة:', 'اختبار كيمياء 2-1') ?? 'اختبار كيمياء 2-1';
   const w = `<div class="card"><h1>${esc(title)}</h1><p>${teacher ? 'نسخة المعلم — مع الإجابات ومفتاح التصحيح' : 'الاسم: ........................ الصف: ........'}</p></div>
-    ${mcq.length ? `<h2 style="margin-top:1rem">أولًا: اختر الإجابة الصحيحة</h2>${mcq.map((q, n) => `<div class="q"><div class="q-stem">${n + 1}. ${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
+    ${mcq.length ? `<h2 style="margin-top:1rem">أولًا: اختر الإجابة الصحيحة</h2>${mcq.map((q, n) => `<div class="q"><div class="q-stem">${n + 1}. ${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
       <ol class="opts">${q.options.map((o, i) => `<li class="opt ${teacher && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>
       ${teacher ? `<div class="answer"><strong>الإجابة: ${LETTERS[q.correctIndex]}</strong> — ${esc(q.explanation)}</div>` : ''}</div>`).join('')}` : ''}
-    ${essay.length ? `<h2 style="margin-top:1rem">ثانيًا: الأسئلة المقالية</h2>${essay.map((q, n) => `<div class="q"><div class="q-stem">${n + 1}. ${esc(q.stem)}</div>${stimulusTable(q.stimulus)}
+    ${essay.length ? `<h2 style="margin-top:1rem">ثانيًا: الأسئلة المقالية</h2>${essay.map((q, n) => `<div class="q"><div class="q-stem">${n + 1}. ${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
       ${teacher ? `<div class="answer"><h4>الإجابة النموذجية</h4>${esc(q.modelAnswer)}
         ${q.marks?.length ? `<h4>توزيع الدرجات</h4><ul>${q.marks.map(m => `<li>${esc(m.element)}: ${esc(m.marks)}</li>`).join('')}</ul>` : ''}</div>`
         : '<div style="height:7rem;border-bottom:1px dashed var(--line)"></div>'}</div>`).join('')}` : ''}
@@ -1087,4 +1126,5 @@ document.addEventListener('visibilitychange', async () => {
 });
 
 // عرض الأرقام والوحدات والصيغ داخل النص العربي بترتيبها الصحيح (عرض فقط؛ لا يُكتب في البيانات)
+startMath(document.body);
 startBidi(document.body);
