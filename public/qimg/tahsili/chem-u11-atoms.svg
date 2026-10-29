@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 190" width="400" height="190">
+<rect width="400" height="190" fill="#fff"/>
+<circle cx="80" cy="95" r="46" fill="none" stroke="#1f2a44" stroke-width="2"/><circle cx="80.0" cy="49.0" r="6" fill="#111"/><circle cx="80" cy="95" r="27" fill="#c08cc4"/><text x="80" y="105" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-style="italic">x</text>
+<text x="170" y="108" text-anchor="middle" font-size="36" font-family="Arial">+</text>
+<circle cx="290" cy="95" r="46" fill="none" stroke="#1f2a44" stroke-width="2"/><circle cx="290.0" cy="49.0" r="6" fill="#111"/><circle cx="290.0" cy="141.0" r="6" fill="#111"/><circle cx="290" cy="95" r="78" fill="none" stroke="#1f2a44" stroke-width="2"/><circle cx="290.0" cy="17.0" r="6" fill="#111"/><circle cx="364.2" cy="70.9" r="6" fill="#111"/><circle cx="335.8" cy="158.1" r="6" fill="#111"/><circle cx="244.2" cy="158.1" r="6" fill="#111"/><circle cx="215.8" cy="70.9" r="6" fill="#111"/><circle cx="290" cy="95" r="27" fill="#a8d8a0"/><text x="290" y="105" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-style="italic">y</text>
+</svg>
