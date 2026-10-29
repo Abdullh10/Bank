@@ -344,3 +344,6 @@ update public.profiles set role='student', display_name='اسم الطالب', s
 - **2026-10-29، الدفعة الرابعة من تجميعات الكيمياء (بقية ثاني ثانوي، الوحدات 10–26):** 795 سؤالًا، فاكتملت كيمياء ثاني ثانوي. مع موضوعات الوحدات و63 شكلًا بصيغة SVG في `public/qimg/tahsili/`. تقرير المراجعة في `data/tahsili/reviews/chem-batch4.md`. البذرة صارت ملفين لكبر حجمها: `supabase/seed-tahsili/01.sql` و`02.sql`.
   - **المطلوب:** نفّذ `01.sql` ثم `02.sql` بالترتيب (آمنان للتكرار). لا تغيير على `schema.sql`.
   - **الاعتماد:** `update public.questions set status = 'approved', reviewed_at = now() where status = 'generated' and objective_id in (select o.id from public.objectives o where o.lesson_id between 50210 and 50226);`
+- **2026-10-29، الدفعة الخامسة من تجميعات الكيمياء (ثالث ثانوي، الوحدات 27–32):** 356 سؤالًا، فاكتملت تجميعات الكيمياء كلها (1677 سؤالًا). تقرير المراجعة في `data/tahsili/reviews/chem-batch5.md`. البذرة صارت ثلاثة ملفات: `supabase/seed-tahsili/01.sql` و`02.sql` و`03.sql`.
+  - **المطلوب:** نفّذ الملفات الثلاثة بالترتيب (آمنة للتكرار). لا تغيير على `schema.sql`.
+  - **الاعتماد:** `update public.questions set status = 'approved', reviewed_at = now() where status = 'generated' and objective_id in (select o.id from public.objectives o where o.lesson_id between 50227 and 50232);`

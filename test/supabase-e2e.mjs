@@ -277,7 +277,7 @@ ok('owner: 2-2 bank is empty', (await p.locator('#bank-count').innerText()).trim
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 ok('objective link switches back to its course', (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-1'));
 // التحصيلي اختيار من متعدد فقط: لا قسم مقالي ولا عدد مطلوب له ولا مرشح «مقالي» في البنك، وقاعدة البيانات ترفض السؤال المقالي
-await p.goto(BASE + '#/objective/T-S2-U03-T01'); await p.waitForSelector('#mcq-list .q');
+await p.goto(BASE + '#/objective/T-S2-U03-T01'); await p.locator('main', { hasText: 'T-S2-U03-T01' }).waitFor(); await p.waitForSelector('#mcq-list .q');
 ok('tahsili: topic page has no essay section', !(await p.locator('#essay-section').count()) && !(await p.locator('[data-add="essay"]').count()));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
 ok('tahsili: bank has no question-type filter', !(await p.locator('#f-type').count()) && !(await p.locator('#bank-count').innerText()).trim().startsWith('0'));
