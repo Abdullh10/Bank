@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 345" width="470" height="345" font-family="Tahoma, Arial, sans-serif">
+<rect width="470" height="345" fill="#fff"/>
+<path d="M60 300H440M60 300V20" stroke="#1f2a44" stroke-width="2.5" fill="none"/><path d="M450 300l-12 -6v12z" fill="#1f2a44"/><path d="M60 10l-6 12h12z" fill="#1f2a44"/><text x="250.0" y="330" text-anchor="middle" font-size="15">سير التفاعل</text><text transform="translate(46 160.0) rotate(-90)" text-anchor="middle" font-size="15">الطاقة</text><path d="M70 170 H150 C180 170 205 70 230 70 C255 70 280 265 310 265 H430" stroke="#c0392b" stroke-width="3" fill="none"/><text x="78" y="160" font-size="15">المتفاعلات</text><text x="360" y="255" font-size="15">النواتج</text><text x="190" y="55" font-size="14">المعقد المنشط</text>
+</svg>
