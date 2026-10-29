@@ -667,7 +667,7 @@
   {
    "topic": 3,
    "year": 2025,
-   "stem": "حسب نموذج برونستد-لوري يعد الماء في التفاعل التالي: $\\text{NH}_{3(aq)} + \\text{H}_2\\text{O}_{(l)} \\rightleftharpoons \\text{NH}_4^+_{(aq)} + \\text{OH}^-_{(aq)}$",
+   "stem": "حسب نموذج برونستد-لوري يعد الماء في التفاعل التالي: $\\text{NH}_{3(aq)} + \\text{H}_2\\text{O}_{(l)} \\rightleftharpoons {\\text{NH}_4}^+_{(aq)} + \\text{OH}^-_{(aq)}$",
    "options": [
     "قاعدة",
     "حمض",
