@@ -32,9 +32,10 @@ on conflict (id) do update set title = excluded.title;`);
     head.push(`insert into public.lessons (id, chapter_id, number, title, summary) values (${unitId(s.number, u.number)}, ${subjectId(s.number)}, ${u.number}, ${lit(u.title)}, ${lit(u.grade ? `الصف ${u.grade}` : null)})
 on conflict (id) do update set title = excluded.title, summary = excluded.summary;`);
     for (const t of u.topics) {
-      head.push(`insert into public.objectives (id, lesson_id, code, number, original_text, approved_text, thinking_level, review_status)
-values (${topicId(s.number, u.number, t.number)}, ${unitId(s.number, u.number)}, ${lit(topicCode(s.number, u.number, t.number))}, ${t.number}, ${lit(t.title)}, ${lit(t.title)}, null, 'approved')
-on conflict (id) do update set original_text = excluded.original_text, approved_text = excluded.approved_text;`);
+      // اختبار التحصيلي اختيار من متعدد فقط: لا أسئلة مقالية مطلوبة (وإلا عُدّ الموضوع ناقصًا في مؤشرات التغطية)
+      head.push(`insert into public.objectives (id, lesson_id, code, number, original_text, approved_text, thinking_level, review_status, required_essay)
+values (${topicId(s.number, u.number, t.number)}, ${unitId(s.number, u.number)}, ${lit(topicCode(s.number, u.number, t.number))}, ${t.number}, ${lit(t.title)}, ${lit(t.title)}, null, 'approved', 0)
+on conflict (id) do update set original_text = excluded.original_text, approved_text = excluded.approved_text, required_essay = 0;`);
     }
   }
 }

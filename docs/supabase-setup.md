@@ -333,7 +333,8 @@ update public.profiles set role='student', display_name='اسم الطالب', s
     2. نفّذ `supabase/seed-tahsili/01.sql`.
     3. الأسئلة بحالة «مولدة»، فلا تظهر للطلاب حتى تُعتمد. للاعتماد: من صفحة كل هدف، أو دفعة واحدة بأمر `update public.questions set status = 'approved', reviewed_at = now() where objective_id in (select o.id from public.objectives o join public.lessons l on l.id = o.lesson_id where l.id in (50201, 50202));`.
 - **2026-10-29، الدفعة الثانية من تجميعات الكيمياء (بقية أول ثانوي):**
+  - **لا مقالي في التحصيلي:** قاعدة البيانات ترفض إنشاء سؤال مقالي في قسم «الاستعداد للتحصيلي». وفي صفحاته لا يظهر قسم «الأسئلة المقالية» ولا عدده المطلوب ولا مرشح «نوع السؤال» في البنك ولا مؤشرات المقالي، والأعداد تُعرض «N سؤالًا». وموضوعاته لا تطلب أسئلة مقالية (`required_essay = 0`)، فلا تُعدّ ناقصة في مؤشرات التغطية.
   - **المحتوى:** 213 سؤالًا لوحدات أول ثانوي الباقية: «تركيب الذرة» (57)، و«العنصر والمركب والتفاعلات الكيميائية» (71)، و«الحسابات الكيميائية» (85)، من تجميعات يلو 2026 بإذن منصة يلو، موزعة على موضوعات الوحدات (العناوين الفرعية في المصدر). أسئلة الاختبار المبكر 2025 مسجلة بسنة 2025 ومعلَّمة في المصدر. شكلان جديدان بصيغة SVG في `public/qimg/tahsili/`. تقرير المراجعة في `data/tahsili/reviews/chem-batch2.md`.
   - **المطلوب:**
-    1. نفّذ `supabase/seed-tahsili/01.sql` الجديد (آمن للتكرار: أسئلة الدفعة الأولى لا تتكرر). لا تغيير على `schema.sql`.
+    1. أعد تنفيذ `schema.sql` كاملًا (آمن للتكرار)، ثم `supabase/seed-tahsili/01.sql` الجديد (آمن للتكرار: أسئلة الدفعة الأولى لا تتكرر).
     2. للاعتماد دفعة واحدة: `update public.questions set status = 'approved', reviewed_at = now() where status = 'generated' and objective_id in (select o.id from public.objectives o where o.lesson_id in (50203, 50204, 50205));`.

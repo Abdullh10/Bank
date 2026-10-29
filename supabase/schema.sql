@@ -421,9 +421,13 @@ end $$;
 create or replace function public._check_tahsili_options(p_objective bigint, p_type text, p jsonb) returns void
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 begin
-  if p_type = 'mcq' and jsonb_typeof(p->'options') = 'array' and jsonb_array_length(p->'options') <> 4
-     and exists (select 1 from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
-                 join courses c on c.id = ch.course_id where o.id = p_objective and c.kind = 'tahsili') then
+  if not exists (select 1 from objectives o join lessons l on l.id = o.lesson_id join chapters ch on ch.id = l.chapter_id
+                 join courses c on c.id = ch.course_id where o.id = p_objective and c.kind = 'tahsili') then return; end if;
+  -- اختبار التحصيلي اختيار من متعدد فقط: لا أسئلة مقالية في قسمه
+  if p_type <> 'mcq' then
+    raise exception 'أسئلة التحصيلي اختيار من متعدد فقط (لا مقالي فيه)' using errcode = '22023';
+  end if;
+  if jsonb_typeof(p->'options') = 'array' and jsonb_array_length(p->'options') <> 4 then
     raise exception 'أسئلة التحصيلي بأربعة بدائل (أ ب ج د)' using errcode = '22023';
   end if;
 end $$;
@@ -477,8 +481,8 @@ begin
   select * into o from public.objectives where code = p_code;
   if not found then raise exception 'الهدف غير موجود'; end if;
   if p_type not in ('mcq', 'essay') then raise exception 'نوع غير صالح'; end if;
-  perform public._validate_question(p_type, p);
   perform public._check_tahsili_options(o.id, p_type, p);
+  perform public._validate_question(p_type, p);
   select coalesce(max(number), 0) + 1 into v_num from public.questions where objective_id = o.id and type = p_type;
   insert into public.questions (objective_id, type, number, stem, stimulus, images, exam_year, options, thinking_level, question_kind, difficulty, source_ref, status, origin)
   values (o.id, p_type, v_num, trim(p->>'stem'), nullif(p->'stimulus', 'null'::jsonb), nullif(nullif(p->'images', 'null'::jsonb), '[]'::jsonb), (p->>'exam_year')::smallint,
