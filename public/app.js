@@ -201,6 +201,8 @@ function bar(value, total, cls = '') {
 const yearBadge = q => (q.examYear ? ` <span class="badge year" title="سنة ورود السؤال في اختبار التحصيل الدراسي">ورد في تحصيلي ${q.examYear}</span>` : '');
 // في قسم «الاستعداد للتحصيلي» الفصل مادة (الأحياء، الكيمياء، …)
 const chWord = () => (state.course?.kind === 'tahsili' ? 'المادة' : 'الفصل');
+// أسئلة التحصيلي اختيار من متعدد فقط (لا مقالي فيه)
+const noEssay = () => state.course?.kind === 'tahsili';
 
 function stimulusTable(s) {
   if (!s) return '';
@@ -248,7 +250,7 @@ async function pageHome() {
     ${s.course?.status === 'preparing' ? `<p class="notice warn">هذا المقرر <b>قيد الإعداد</b> ولا يظهر لغير مالك المشروع. تُضاف أهدافه وأسئلته في مرحلة المحتوى.</p>` : ''}
     <div class="grid kpi">
       ${kpi(s.chapters, 'فصول', 'chapters')}${kpi(s.lessons, 'دروس', 'lessons')}${kpi(o.n, 'هدفًا تعليميًا', 'objectives')}
-      ${kpi(q.mcq || 0, 'سؤال اختيار من متعدد', 'mcq')}${kpi(q.essay || 0, 'سؤالًا مقاليًا', 'essay')}
+      ${kpi(q.mcq || 0, 'سؤال اختيار من متعدد', 'mcq')}${noEssay() ? '' : kpi(q.essay || 0, 'سؤالًا مقاليًا', 'essay')}
     </div>
     <div class="grid cards" style="margin-top:1rem">
       <div class="card">
@@ -311,7 +313,8 @@ async function pageChapter(n) {
             <span class="obj-code">${esc(o.code)}</span>
             <a class="obj-text" href="#/objective/${encodeURIComponent(o.code)}">${esc(o.approvedText || o.originalText)}</a>
             <span class="obj-badges">${objBadge(o.reviewStatus)}
-              ${o.mcq + o.essay ? badge(`${o.mcq}/${o.requiredMcq} اختيار · ${o.essay}/${o.requiredEssay} مقالي`,
+              ${noEssay() ? (o.mcq ? badge(`${o.mcq} سؤالًا`, 'brand') : badge('لا أسئلة بعد'))
+                : o.mcq + o.essay ? badge(`${o.mcq}/${o.requiredMcq} اختيار · ${o.essay}/${o.requiredEssay} مقالي`,
                 o.mcq >= o.requiredMcq && o.essay >= o.requiredEssay ? 'brand' : 'warn') : badge('لا أسئلة بعد')}
               ${o.memoCoverage ? badge('الكتاب المدرسي: ' + o.memoCoverage, COVERAGE_KIND[o.memoCoverage]) : ''}</span>
           </li>`).join('')}
@@ -398,13 +401,13 @@ async function pageObjective(code) {
       ${objState.mode === 'test' && mcq.length ? `<div class="actions no-print" style="margin-top:.8rem"><button type="button" class="primary" id="finish-test">إنهاء الاختبار وعرض النتيجة</button><span id="test-result"></span></div>` : ''}
     </section>
 
-    <section class="card" id="essay-section">
+    ${noEssay() ? '' : `<section class="card" id="essay-section">
       <div class="section-title" style="margin-top:0">
         ${ttl('essay', `الأسئلة المقالية <span class="muted small">(${essay.filter(active).length} من ${o.requiredEssay} مطلوبة)</span>`)}
         ${can('edit') ? `<button type="button" class="primary no-print" data-add="essay">+ سؤال مقالي</button>` : ''}
       </div>
       ${essay.length ? essay.map(q => essayCard(q, data.answersIncluded)).join('') : '<div class="empty">لا توجد أسئلة مقالية لهذا الهدف بعد.</div>'}
-    </section>
+    </section>`}
     ${can('notes') && state.supabase ? '<section class="card no-print" id="notes-card"></section>' : ''}`;
   bindObjective(o, questions, s);
   if (can('notes') && state.supabase) notesCard(nctx(), document.getElementById('notes-card'), o, questions, s);
@@ -429,7 +432,7 @@ function reviewPanel(o) {
       <textarea dir="auto" id="approved-text">${esc(o.approvedText || o.proposedText || o.originalText)}</textarea></div>
     <div class="form-grid">
       <div class="field"><label for="req-mcq">عدد أسئلة الاختيار المطلوب</label><input id="req-mcq" type="number" min="0" max="30" value="${o.requiredMcq}"></div>
-      <div class="field"><label for="req-essay">عدد الأسئلة المقالية المطلوب</label><input id="req-essay" type="number" min="0" max="30" value="${o.requiredEssay}"></div>
+      ${noEssay() ? '' : `<div class="field"><label for="req-essay">عدد الأسئلة المقالية المطلوب</label><input id="req-essay" type="number" min="0" max="30" value="${o.requiredEssay}"></div>`}
     </div>` : `<p class="small muted">يُعتمد الهدف بصياغته الحالية. لاقتراح صياغة أخرى اكتب «ملاحظة» في أسفل الصفحة، ويطّلع عليها مالك المشروع.</p>`}
     <div class="field"><label for="review-note">سبب القرار (إلزامي عند الإعادة)</label><textarea dir="auto" id="review-note"></textarea></div>
     <div class="actions">
@@ -574,7 +577,7 @@ function bindObjective(o, questions, s) {
   if (sc) sc.onclick = guard(async () => {
     try {
       await api(`/objectives/${o.code}`, { method: 'PATCH', body: {
-        required_mcq: Number(document.getElementById('req-mcq').value), required_essay: Number(document.getElementById('req-essay').value) } });
+        required_mcq: Number(document.getElementById('req-mcq').value), required_essay: noEssay() ? 0 : Number(document.getElementById('req-essay').value) } });
       toast('تم حفظ الأعداد المطلوبة'); reload();
     } catch (e) { fail(e); }
   });
@@ -776,6 +779,7 @@ function filterBank(all, f) {
 }
 async function pageBank() {
   const [chapters, bank] = await Promise.all([api('/chapters'), api('/bank')]);
+  if (noEssay()) delete bankFilter.type; // مرشح «مقالي» من مقرر آخر يُفرغ بنك التحصيلي دون أن يظهر
   const lessons = bankFilter.chapter
     ? [...new Map(bank.questions.filter(x => x.chapter.number === Number(bankFilter.chapter)).map(x => [x.lesson.number, x.lesson])).values()].sort((a, b) => a.number - b.number)
     : [];
@@ -793,7 +797,7 @@ async function pageBank() {
       <div class="filters">
         ${f('chapter', 'الفصل', chapters.map(c => [c.number, `${c.number}. ${c.title}`]))}
         ${f('lesson', 'الدرس', lessons.map(l => [l.number, `${l.number}. ${l.title}`]))}
-        ${f('type', 'نوع السؤال', [['mcq', 'اختيار من متعدد'], ['essay', 'مقالي']])}
+        ${noEssay() ? '' : f('type', 'نوع السؤال', [['mcq', 'اختيار من متعدد'], ['essay', 'مقالي']])}
         ${f('level', 'مستوى التفكير', LEVEL_OPTS.map(l => [l, l]))}
         ${f('difficulty', 'الصعوبة', [['سهل', 'سهل'], ['متوسط', 'متوسط'], ['صعب', 'صعب']])}
         ${f('status', internalView() ? 'حالة المراجعة' : 'حالة الاعتماد', internalView() ? Object.entries(Q_STATUS).map(([k, [t]]) => [k, t]) : [['approved', 'معتمد'], ['generated', 'قيد الاعتماد']])}
@@ -907,7 +911,7 @@ async function pageReports() {
     <div class="hero"><div class="hero-ic">${icon('reports', 52)}<div><h1>التقارير والمؤشرات</h1>
     <p class="muted">تُحسب كل الأرقام لحظيًا من قاعدة البيانات.</p></div></div></div>
     <div class="grid kpi">${kpi(o.n, 'إجمالي الأهداف', 'objectives')}${kpi(o.reviewed || 0, 'أهداف روجعت', 'shield', 'navy')}${kpi(o.approved || 0, 'أهداف معتمدة', 'check')}
-      ${kpi(o.returned || 0, 'أهداف تحتاج إلى تعديل', 'essay')}${kpi(q.mcq || 0, 'أسئلة اختيار', 'mcq')}${kpi(q.essay || 0, 'أسئلة مقالية', 'essay', 'navy')}
+      ${kpi(o.returned || 0, 'أهداف تحتاج إلى تعديل', 'essay')}${kpi(q.mcq || 0, 'أسئلة اختيار', 'mcq')}${noEssay() ? '' : kpi(q.essay || 0, 'أسئلة مقالية', 'essay', 'navy')}
       ${kpi(q.approved || 0, 'أسئلة معتمدة', 'check')}${kpi((q.n || 0) - (q.approved || 0), 'أسئلة تحتاج إلى مراجعة', 'bank', 'gold')}</div>
     <div class="grid cards" style="margin-top:1rem">
       <section class="card">${ttl('objectives', 'توزيع الأهداف حسب مستوى التفكير')}<p class="small muted">تصنيف مقترح آليًا حتى يعتمده المراجع.</p>

@@ -1,6 +1,7 @@
 // اختبار وضع Supabase بالمتصفح دون اتصال بالإنترنت: قاعدة PostgreSQL محلية عليها supabase/schema.sql وملفات البيانات،
 // ومحاكي بسيط لمكتبة supabase-js ينفّذ كل استدعاء بدور anon أو authenticated كما في Supabase (فتُختبر سياسات RLS والدوال المحمية فعليًا).
 // التشغيل: PGURL=postgres://postgres@localhost:54329/sbtest PG_MODULE=<مسار وحدة pg> node test/supabase-e2e.mjs <مجلد الإخراج>
+// (ومعها XLSX_MODULE=<مجلد فيه حزمة xlsx>، وKATEX_DIR=<مجلد dist لحزمة katex> إن لم تكن katex بجوار وحدة pg)
 // قبل التشغيل: قاعدة فارغة فيها مخطط auth مبسّط (auth.users و auth.uid()) والدوران anon و authenticated، ثم schema.sql ثم supabase/seed/*.sql.
 import http from 'node:http';
 import fs from 'node:fs';
@@ -131,6 +132,9 @@ const results = [], errors = [];
 const ok = (n, v, extra = '') => results.push(`${v ? 'PASS' : 'FAIL'} ${n} ${extra}`);
 const ctx = await browser.newContext({ viewport: { width: Number(process.env.E2E_WIDTH || 1280), height: 900 }, locale: 'ar', acceptDownloads: true, deviceScaleFactor: Number(process.env.SHOT_SCALE || 1), colorScheme: process.env.E2E_DARK ? 'dark' : 'light' });
 await ctx.route('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.XLSX_MODULE + '/xlsx/dist/xlsx.full.min.js', 'utf8') }));
+// KaTeX (لأسئلة التحصيلي ذات الصيغ) من نسخة محلية: KATEX_DIR أو حزمة katex بجوار وحدة pg
+const KATEX_DIR = process.env.KATEX_DIR || path.join(path.dirname(createRequire(process.env.PG_MODULE + '/').resolve('katex/package.json')), 'dist');
+await ctx.route('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/**', r => r.fulfill({ path: path.join(KATEX_DIR, r.request().url().split('/dist/')[1]), headers: { 'access-control-allow-origin': '*' } }));
 await ctx.route(SDK, r => r.fulfill({ contentType: 'text/javascript', body: FAKE_SDK, headers: { 'access-control-allow-origin': '*' } }));
 if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
 // عزل الاتجاه (public/bidi.js) يضيف علامات غير مرئية داخل النص؛ تُعطَّل هنا لأن الاختبار يقارن النص حرفيًا
@@ -272,6 +276,14 @@ await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
 ok('owner: 2-2 bank is empty', (await p.locator('#bank-count').innerText()).trim().startsWith('0'));
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 ok('objective link switches back to its course', (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-1'));
+// التحصيلي اختيار من متعدد فقط: لا قسم مقالي ولا عدد مطلوب له ولا مرشح «مقالي» في البنك، وقاعدة البيانات ترفض السؤال المقالي
+await p.goto(BASE + '#/objective/T-S2-U03-T01'); await p.waitForSelector('#mcq-list .q');
+ok('tahsili: topic page has no essay section', !(await p.locator('#essay-section').count()) && !(await p.locator('[data-add="essay"]').count()));
+await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
+ok('tahsili: bank has no question-type filter', !(await p.locator('#f-type').count()) && !(await p.locator('#bank-count').innerText()).trim().startsWith('0'));
+const essayTahsili = await asRole('55555555-5555-5555-5555-555555555555', `select public.create_question('T-S2-U03-T01', 'essay', '{"stem":"اشرح تركيب الذرة بالتفصيل","model_answer":"…","thinking_level":"فهم","difficulty":"سهل"}'::jsonb) r`);
+ok('tahsili: database refuses essay questions', String(essayTahsili.error?.message || '').includes('اختيار من متعدد فقط'), essayTahsili.error?.message);
+ok('tahsili: topics require no essays', (await pool.query(`select count(*)::int n from public.objectives where id between 5000000 and 5999999 and required_essay <> 0`)).rows[0].n === 0);
 // مالك المشروع: يعدّل المحتوى ويغلق الملاحظات
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
