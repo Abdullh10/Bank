@@ -338,3 +338,6 @@ update public.profiles set role='student', display_name='اسم الطالب', s
   - **المطلوب:**
     1. أعد تنفيذ `schema.sql` كاملًا (آمن للتكرار)، ثم `supabase/seed-tahsili/01.sql` الجديد (آمن للتكرار: أسئلة الدفعة الأولى لا تتكرر).
     2. للاعتماد دفعة واحدة: `update public.questions set status = 'approved', reviewed_at = now() where status = 'generated' and objective_id in (select o.id from public.objectives o where o.lesson_id in (50203, 50204, 50205));`.
+- **2026-10-29، الدفعة الثالثة من تجميعات الكيمياء (ثاني ثانوي، الوحدات 6–9):** 202 سؤال: «الضوء والكم والذرة ومستوياتها» (63)، و«التوزيع الإلكتروني» (40)، و«الجدول الدوري الحديث» (29)، و«تصنيف العناصر وتدرج خواصها» (70)، مع موضوعات الوحدات وشكل الطيف (`public/qimg/tahsili/chem-u6-spectrum.svg`). تقرير المراجعة في `data/tahsili/reviews/chem-batch3.md`.
+  - **المطلوب:** نفّذ `supabase/seed-tahsili/01.sql` الجديد (آمن للتكرار). لا تغيير على `schema.sql`.
+  - **الاعتماد:** `update public.questions set status = 'approved', reviewed_at = now() where status = 'generated' and objective_id in (select o.id from public.objectives o where o.lesson_id in (50206, 50207, 50208, 50209));`
