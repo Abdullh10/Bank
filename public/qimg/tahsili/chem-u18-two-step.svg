@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 345" width="470" height="345" font-family="Tahoma, Arial, sans-serif">
+<rect width="470" height="345" fill="#fff"/>
+<path d="M60 300H440M60 300V20" stroke="#1f2a44" stroke-width="2.5" fill="none"/><path d="M450 300l-12 -6v12z" fill="#1f2a44"/><path d="M60 10l-6 12h12z" fill="#1f2a44"/><text x="250.0" y="330" text-anchor="middle" font-size="15">مسار التفاعل</text><text transform="translate(46 160.0) rotate(-90)" text-anchor="middle" font-size="15">الطاقة</text><path d="M70 190 H110 C130 190 135 70 170 70 C205 70 205 250 230 250 C255 250 265 120 300 120 C335 120 335 205 360 205 H430" stroke="#1f2a44" stroke-width="3" fill="none"/>
+</svg>
