@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220" width="400" height="220" font-family="Arial, Helvetica, sans-serif">
+<rect width="400" height="220" fill="#fff"/>
+<polygon points="95.0,60.0 138.3,85.0 138.3,135.0 95.0,160.0 51.7,135.0 51.7,85.0" fill="none" stroke="#1f2a44" stroke-width="2.4" stroke-linejoin="round"/><polygon points="305.0,60.0 348.3,85.0 348.3,135.0 305.0,160.0 261.7,135.0 261.7,85.0" fill="none" stroke="#1f2a44" stroke-width="2.4" stroke-linejoin="round"/><path d="M138 135 L180 110 M220 110 L262 135" stroke="#1f2a44" stroke-width="2.4"/><text x="200" y="117" text-anchor="middle" font-size="19" font-family="Arial">O</text>
+</svg>
