@@ -1,0 +1,1306 @@
+{
+ "meta": {
+  "source": "تجميعات يلو للكيمياء 2026 (بإذن منصة يلو التعليمية)",
+  "lesson": "الأكسدة والاختزال"
+ },
+ "questions": [
+  {
+   "topic": 1,
+   "year": 2024,
+   "stem": "الاختزال هو عملية ..",
+   "options": [
+    "اكتساب إلكترونات",
+    "فقد إلكترونات",
+    "زيادة عدد التأكسد",
+    "فقد بروتونات"
+   ],
+   "correct_index": 0,
+   "explanation": "الاختزال اكتساب إلكترونات ونقص عدد التأكسد.",
+   "distractor_notes": [
+    "",
+    "الأكسدة.",
+    "الأكسدة.",
+    "لا."
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س1"
+  },
+  {
+   "topic": 1,
+   "year": 2021,
+   "stem": "أي الآتي لا يصف العامل المختزل؟",
+   "options": [
+    "يمنح إلكترونات",
+    "يستقبل الإلكترونات",
+    "كهروسالبيته منخفضة",
+    "يحدث له أكسدة"
+   ],
+   "correct_index": 1,
+   "explanation": "العامل المختزل يمنح الإلكترونات فيتأكسد.",
+   "distractor_notes": [
+    "يصفه.",
+    "",
+    "يصفه.",
+    "يصفه."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س2"
+  },
+  {
+   "topic": 1,
+   "year": 2021,
+   "stem": "يعد العنصر عاملًا مؤكسدًا قويًا إذا :",
+   "options": [
+    "وصل للتركيب الثماني",
+    "كانت كهروسالبيته مرتفعة",
+    "كانت طاقة تأينه منخفضة",
+    "كانت درجة غليانه مرتفعة"
+   ],
+   "correct_index": 1,
+   "explanation": "يجذب الإلكترونات بقوة.",
+   "distractor_notes": [
+    "لا يميل للتفاعل.",
+    "",
+    "صفة المختزل.",
+    "لا علاقة."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س3"
+  },
+  {
+   "topic": 1,
+   "year": 2023,
+   "stem": "أي المعادلات التالية يمثل عملية الأكسدة؟",
+   "options": [
+    "$\\text{Ag}_{(s)} \\rightarrow \\text{Ag}^+_{(aq)} + e^-$",
+    "$\\text{Hg}^{2+}_{(aq)} + 2e^- \\rightarrow \\text{Hg}_{(l)}$",
+    "$\\text{Al}^{3+}_{(aq)} + 3e^- \\rightarrow \\text{Al}_{(s)}$",
+    "$\\text{Mg}^{2+}_{(aq)} + 2e^- \\rightarrow \\text{Mg}_{(s)}$"
+   ],
+   "correct_index": 0,
+   "explanation": "فقد إلكترون.",
+   "distractor_notes": [
+    "",
+    "اختزال.",
+    "اختزال.",
+    "اختزال."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س4"
+  },
+  {
+   "topic": 1,
+   "year": 2024,
+   "stem": "ما العامل المختزل في المعادلة التالية؟ $\\text{Zn}_{(s)} + \\text{Cu}^{2+}_{(aq)} \\rightarrow \\text{Zn}^{2+}_{(aq)} + \\text{Cu}_{(s)}$",
+   "options": [
+    "$\\text{Zn}^{2+}_{(aq)}$",
+    "$\\text{Cu}_{(s)}$",
+    "$\\text{Zn}_{(s)}$",
+    "$\\text{Cu}^{2+}_{(aq)}$"
+   ],
+   "correct_index": 2,
+   "explanation": "الخارصين فقد إلكترونين.",
+   "distractor_notes": [
+    "ناتج.",
+    "ناتج.",
+    "",
+    "العامل المؤكسد."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س5"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "أي التالي صحيح للتفاعل: $2\\text{Na}_{(s)} + \\text{Cl}_{2(g)} \\rightarrow 2\\text{NaCl}_{(s)}$",
+   "options": [
+    "الصوديوم عامل مختزل",
+    "الكلور زاد عدد تأكسده",
+    "الصوديوم عامل مؤكسد",
+    "الكلور عامل مختزل"
+   ],
+   "correct_index": 0,
+   "explanation": "الصوديوم يفقد إلكترونًا.",
+   "distractor_notes": [
+    "",
+    "نقص من 0 إلى −1.",
+    "العكس.",
+    "العكس."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س6"
+  },
+  {
+   "topic": 1,
+   "year": 2021,
+   "stem": "العامل المؤكسد في المعادلة هو : $2\\text{K} + \\text{Cl}_2 \\rightarrow 2\\text{KCl}$",
+   "options": [
+    "KCl",
+    "$\\text{Cl}_2$",
+    "K",
+    "لا يوجد"
+   ],
+   "correct_index": 1,
+   "explanation": "الكلور يكتسب إلكترونات.",
+   "distractor_notes": [
+    "ناتج.",
+    "",
+    "مختزل.",
+    "يوجد."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س7"
+  },
+  {
+   "topic": 1,
+   "year": 2021,
+   "stem": "العامل المؤكسد هو : $2\\text{Na} + \\text{Br}_2 \\rightarrow 2\\text{NaBr}$",
+   "options": [
+    "$\\text{Br}_2$",
+    "$\\text{Na}^+$",
+    "Na",
+    "NaBr"
+   ],
+   "correct_index": 0,
+   "explanation": "البروم يُختزل.",
+   "distractor_notes": [
+    "",
+    "ليس متفاعلًا.",
+    "مختزل.",
+    "ناتج."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س8"
+  },
+  {
+   "topic": 1,
+   "year": 2023,
+   "stem": "العامل المؤكسد يحدث له أثناء التفاعل",
+   "options": [
+    "عملية أكسدة",
+    "زيادة عدد الأكسدة",
+    "فقدان إلكترونات",
+    "عملية اختزال"
+   ],
+   "correct_index": 3,
+   "explanation": "يكتسب إلكترونات.",
+   "distractor_notes": [
+    "العكس.",
+    "العكس.",
+    "العكس.",
+    ""
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س9"
+  },
+  {
+   "topic": 1,
+   "year": 2023,
+   "stem": "يكون العامل المختزل قويًا بسبب",
+   "options": [
+    "كهروسالبيته منخفضة",
+    "كهروسالبيته عالية",
+    "درجة غليانه عالية جدًا",
+    "طاقة تأينه عالية"
+   ],
+   "correct_index": 0,
+   "explanation": "يفقد الإلكترونات بسهولة.",
+   "distractor_notes": [
+    "",
+    "صفة المؤكسد.",
+    "لا علاقة.",
+    "تجعله أضعف."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س10"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "يعد العنصر عامل مختزل قوي إذا :",
+   "options": [
+    "كهروسالبيته منخفضة",
+    "وصل للتركيب الثماني",
+    "كهروسالبيته عالية",
+    "ينتمي للغازات النبيلة"
+   ],
+   "correct_index": 0,
+   "explanation": "كالفلزات القلوية.",
+   "distractor_notes": [
+    "",
+    "مستقر.",
+    "المؤكسد.",
+    "خامل."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س11"
+  },
+  {
+   "topic": 1,
+   "year": 2021,
+   "stem": "القطب الذي يحدث له عملية أكسدة في التفاعل الآتي: $\\text{Zn}_{(s)} + \\text{Cu}^{2+}_{(aq)} \\rightarrow \\text{Zn}^{2+}_{(aq)} + \\text{Cu}_{(s)}$",
+   "options": [
+    "$\\text{Zn}^{2+}$",
+    "$\\text{Cu}^{2+}$",
+    "Zn",
+    "Cu"
+   ],
+   "correct_index": 2,
+   "explanation": "Zn ← Zn²⁺.",
+   "distractor_notes": [
+    "ناتج.",
+    "يُختزل.",
+    "",
+    "ناتج."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س12"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "ما هو نصف تفاعل الأكسدة في التفاعل التالي؟ $\\text{I}_2 + \\text{Fe} \\rightarrow \\text{Fe}^{2+} + 2\\text{I}^-$",
+   "options": [
+    "$\\text{Fe} \\rightarrow \\text{Fe}^{2+} + 2e^-$",
+    "$\\text{I}_2 + 2e^- \\rightarrow 2\\text{I}^-$",
+    "$\\text{Fe}^{2+} \\rightarrow \\text{Fe} + 2e^-$",
+    "$2\\text{I}^{-} \\rightarrow 2\\text{I} + 2e^-$"
+   ],
+   "correct_index": 0,
+   "explanation": "الحديد يفقد إلكترونين.",
+   "distractor_notes": [
+    "",
+    "اختزال.",
+    "غير موزون الشحنة.",
+    "ليس في التفاعل."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س13"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "ما هو العامل المؤكسد الأقوى من بين العناصر الآتية؟",
+   "options": [
+    "$\\text{Br}_2$",
+    "$\\text{I}_2$",
+    "$\\text{Cl}_2$",
+    "$\\text{F}_2$"
+   ],
+   "correct_index": 3,
+   "explanation": "الفلور أعلى كهروسالبية.",
+   "distractor_notes": [
+    "أضعف.",
+    "أضعفها.",
+    "أضعف من F₂.",
+    ""
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س14"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "ما العامل المؤكسد في التفاعل؟ $\\text{MgI}_2 + \\text{Br}_2 \\rightarrow \\text{MgBr}_2 + \\text{I}_2$",
+   "options": [
+    "$\\text{I}_2$",
+    "$\\text{Br}_2$",
+    "$\\text{MgBr}_2$",
+    "$\\text{MgI}_2$"
+   ],
+   "correct_index": 1,
+   "explanation": "البروم يُختزل.",
+   "distractor_notes": [
+    "ناتج.",
+    "",
+    "ناتج.",
+    "فيه المختزل I⁻."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س15"
+  },
+  {
+   "topic": 1,
+   "year": 2025,
+   "stem": "طبقًا للتفاعل: $\\text{Zn}_{(s)} + \\text{Cu}^{2+}_{(aq)} \\rightarrow \\text{Zn}^{2+}_{(aq)} + \\text{Cu}_{(s)}$",
+   "options": [
+    "$\\text{Zn}_{(s)}$ عامل مؤكسد",
+    "$\\text{Cu}^{2+}_{(aq)}$ عامل مختزل",
+    "$\\text{Cu}^{2+}_{(aq)}$ عامل مؤكسد",
+    "$\\text{Zn}_{(s)}$ حدث له اختزال"
+   ],
+   "correct_index": 2,
+   "explanation": "Cu²⁺ يُختزل.",
+   "distractor_notes": [
+    "مختزل.",
+    "مؤكسد.",
+    "",
+    "تأكسد."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س16"
+  },
+  {
+   "topic": 1,
+   "year": 2020,
+   "stem": "ماذا يحدث للعامل المختزل؟",
+   "options": [
+    "يختزل",
+    "يتأكسد",
+    "يكسب الكترونات",
+    "لا يحدث شيء"
+   ],
+   "correct_index": 1,
+   "explanation": "يفقد إلكترونات.",
+   "distractor_notes": [
+    "العكس.",
+    "",
+    "العكس.",
+    "لا."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س42"
+  },
+  {
+   "topic": 1,
+   "year": 2020,
+   "stem": "في عملية الأكسدة يحدث :",
+   "options": [
+    "زيادة في عدد التأكسد",
+    "نقصان في عدد التأكسد",
+    "يكسب الإلكترونات",
+    "يكسب نيوترونات"
+   ],
+   "correct_index": 0,
+   "explanation": "فقد إلكترونات.",
+   "distractor_notes": [
+    "",
+    "الاختزال.",
+    "الاختزال.",
+    "لا."
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س43"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "حدد أي من التالي معادلة تأكسد :",
+   "options": [
+    "$\\text{Fe}^{2+} \\rightarrow \\text{Fe}^{3+}$",
+    "$\\text{Cl}^- \\rightarrow \\text{Cl}^{2-}$",
+    "$\\text{Cl} \\rightarrow \\text{Cl}^-$",
+    "$\\text{Fe}^{3+} \\rightarrow \\text{Fe}^{2+}$"
+   ],
+   "correct_index": 0,
+   "explanation": "زيادة عدد التأكسد.",
+   "distractor_notes": [
+    "",
+    "نقص.",
+    "نقص.",
+    "نقص."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س44"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "المجموعة التي عناصرها تعد عوامل مختزلة قوية:",
+   "options": [
+    "الهالوجينات",
+    "الانتقالية",
+    "النبيلة",
+    "الفلزات القلوية"
+   ],
+   "correct_index": 3,
+   "explanation": "تفقد إلكترونها بسهولة.",
+   "distractor_notes": [
+    "مؤكسدة.",
+    "متوسطة.",
+    "خاملة.",
+    ""
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س45"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "في التفاعل التالي: ما الذي حدث للكلور؟ $\\text{Cl}_{2(g)} + 2e^- \\rightarrow 2\\text{Cl}^-_{(aq)}$",
+   "options": [
+    "أكسدة",
+    "تعادل",
+    "اختزال",
+    "لم يحدث شيء"
+   ],
+   "correct_index": 2,
+   "explanation": "اكتساب إلكترونات.",
+   "distractor_notes": [
+    "العكس.",
+    "لا.",
+    "",
+    "لا."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س46"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "القطب الذي يحدث له عملية أكسدة في التفاعل الآتي: $2\\text{Al}_{(s)} + 3\\text{Sn}^{2+}_{(aq)} \\rightarrow 2\\text{Al}^{3+}_{(aq)} + 3\\text{Sn}$",
+   "options": [
+    "$\\text{Sn}_{(s)}$",
+    "$\\text{Al}_{(s)}$",
+    "$\\text{Al}^{3+}_{(aq)}$",
+    "$\\text{Sn}^{2+}_{(aq)}$"
+   ],
+   "correct_index": 1,
+   "explanation": "Al يفقد إلكترونات.",
+   "distractor_notes": [
+    "ناتج.",
+    "",
+    "ناتج.",
+    "يُختزل."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س47"
+  },
+  {
+   "topic": 1,
+   "year": 2020,
+   "stem": "أي التالي يمثل نصف التفاعل؟ $\\text{Fe}_{(s)} \\rightarrow \\text{Fe}^{2+}_{(aq)} + 2e^-$",
+   "options": [
+    "الحديد عامل مختزل",
+    "ذرة الحديد اكتسبت إلكترونين",
+    "الحديد عامل مؤكسد",
+    "نقص عدد تأكسد ذرة الحديد"
+   ],
+   "correct_index": 0,
+   "explanation": "فقد إلكترونين فهو مختزل.",
+   "distractor_notes": [
+    "",
+    "فقدت.",
+    "العكس.",
+    "زاد."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س48"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "في التفاعل: $\\text{MnO}_2 + \\text{Fe}^{3+} \\rightarrow \\text{MnO}_4^- + \\text{Fe}^{2+}$",
+   "options": [
+    "المنجنيز يتأكسد",
+    "الحديد يتأكسد",
+    "المنجنيز يختزل",
+    "الأكسجين يتأكسد"
+   ],
+   "correct_index": 0,
+   "explanation": "Mn من +4 إلى +7.",
+   "distractor_notes": [
+    "",
+    "يُختزل من +3 إلى +2.",
+    "العكس.",
+    "يبقى −2."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س49"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "حدد تفاعل الأكسدة فيما يلي",
+   "options": [
+    "$\\text{K} \\rightarrow \\text{K}^+ + e^-$",
+    "$\\text{Cl}_2 + 2e^- \\rightarrow 2\\text{Cl}^-$",
+    "$\\text{Ca}^{2+} + 2e^- \\rightarrow \\text{Ca}$",
+    "$\\text{Ag}^+ + e^- \\rightarrow \\text{Ag}$"
+   ],
+   "correct_index": 0,
+   "explanation": "فقد إلكترون.",
+   "distractor_notes": [
+    "",
+    "اختزال.",
+    "اختزال.",
+    "اختزال."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س50"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "إذا حدثت عملية أكسدة لعنصر فإن عدد التأكسد له :",
+   "options": [
+    "يساوي صفر",
+    "لا يتغير",
+    "ينقص",
+    "يزيد"
+   ],
+   "correct_index": 3,
+   "explanation": "التعريف.",
+   "distractor_notes": [
+    "لا.",
+    "لا.",
+    "الاختزال.",
+    ""
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س51"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "العامل المختزل في التفاعل : $\\text{H}_2\\text{S}_{(g)} + \\text{Cl}_{2(g)} \\rightarrow \\text{S}_{(s)} + 2\\text{HCl}_{(g)}$",
+   "options": [
+    "$\\text{H}_{2(g)}$",
+    "$\\text{Cl}_{2(g)}$",
+    "$\\text{H}_2\\text{S}_{(g)}$",
+    "$\\text{HCl}_{(g)}$"
+   ],
+   "correct_index": 2,
+   "explanation": "S من −2 إلى 0.",
+   "distractor_notes": [
+    "ليس متفاعلًا.",
+    "مؤكسد.",
+    "",
+    "ناتج."
+   ],
+   "thinking_level": "تحليل",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س52"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "فقدان الذرة الإلكترونات :",
+   "options": [
+    "الأكسدة",
+    "التفكك",
+    "الاختزال",
+    "التكوين"
+   ],
+   "correct_index": 0,
+   "explanation": "الأكسدة.",
+   "distractor_notes": [
+    "",
+    "لا.",
+    "العكس.",
+    "لا."
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س53"
+  },
+  {
+   "topic": 1,
+   "year": null,
+   "stem": "أي التالي يعد تفاعل أكسدة؟",
+   "options": [
+    "$\\text{K}_{(s)} \\rightarrow \\text{K}^+_{(aq)}$",
+    "$\\text{Ag}^+_{(aq)} \\rightarrow \\text{Ag}_{(s)}$",
+    "$\\text{I}_{2(s)} \\rightarrow 2\\text{I}^-_{(aq)}$",
+    "$\\text{Ca}^{2+}_{(aq)} \\rightarrow \\text{Ca}_{(s)}$"
+   ],
+   "correct_index": 0,
+   "explanation": "K يفقد إلكترونًا.",
+   "distractor_notes": [
+    "",
+    "اختزال.",
+    "اختزال.",
+    "اختزال."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س55"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "كم عدد الإلكترونات التي تفقدها ذرة واحدة فقط من الحديد؟ $2\\text{Fe} + 3\\text{Cu}^{2+} \\rightarrow 3\\text{Cu} + 2\\text{Fe}^{3+}$",
+   "options": [
+    "6",
+    "3",
+    "2",
+    "4"
+   ],
+   "correct_index": 1,
+   "explanation": "من 0 إلى +3.",
+   "distractor_notes": [
+    "لذرتين.",
+    "",
+    "للنحاس.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س17"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الأكسجين في $\\text{H}_2\\text{O}$",
+   "options": [
+    "−2",
+    "+2",
+    "+5",
+    "+3"
+   ],
+   "correct_index": 0,
+   "explanation": "2(+1) + x = 0.",
+   "distractor_notes": [
+    "",
+    "إشارة.",
+    "خطأ.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س18"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الأكسجين في فوق أكسيد الهيدروجين $\\text{H}_2\\text{O}_2$ :",
+   "options": [
+    "−1",
+    "+1",
+    "+2",
+    "−2"
+   ],
+   "correct_index": 0,
+   "explanation": "استثناء: −1 في فوق الأكاسيد.",
+   "distractor_notes": [
+    "",
+    "إشارة.",
+    "خطأ.",
+    "المعتاد."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س19"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "كم عدد تأكسد الأكسجين ₈O في معظم مركباته؟",
+   "options": [
+    "+2",
+    "+5",
+    "−2",
+    "−1"
+   ],
+   "correct_index": 2,
+   "explanation": "يكتسب إلكترونين.",
+   "distractor_notes": [
+    "إشارة.",
+    "خطأ.",
+    "",
+    "فوق الأكاسيد."
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س20"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد عنصر الكبريت في $\\text{H}_2\\text{S}$ يساوي :",
+   "options": [
+    "+2",
+    "+4",
+    "−2",
+    "+6"
+   ],
+   "correct_index": 2,
+   "explanation": "2(+1) + x = 0.",
+   "distractor_notes": [
+    "إشارة.",
+    "خطأ.",
+    "",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س21"
+  },
+  {
+   "topic": 2,
+   "year": 2021,
+   "stem": "عدد تأكسد الكبريت في مركب $\\text{H}_2\\text{SO}_3$ :",
+   "options": [
+    "+2",
+    "+4",
+    "−2",
+    "−4"
+   ],
+   "correct_index": 1,
+   "explanation": "$2 + x - 6 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "",
+    "خطأ.",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س22"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الكبريت في $\\text{SO}_2$ :",
+   "options": [
+    "+4",
+    "+2",
+    "−4",
+    "−2"
+   ],
+   "correct_index": 0,
+   "explanation": "$x - 4 = 0$",
+   "distractor_notes": [
+    "",
+    "خطأ.",
+    "إشارة.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س23"
+  },
+  {
+   "topic": 2,
+   "year": 2023,
+   "stem": "عدد تأكسد الحديد في $\\text{Fe(OH)}_3$ :",
+   "options": [
+    "+3",
+    "−2",
+    "+2",
+    "−3"
+   ],
+   "correct_index": 0,
+   "explanation": "$x + 3(-1) = 0$",
+   "distractor_notes": [
+    "",
+    "خطأ.",
+    "Fe(OH)₂.",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س24"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الكروم في المركب $\\text{K}_2\\text{CrO}_4$",
+   "options": [
+    "+3",
+    "−5",
+    "−3",
+    "+6"
+   ],
+   "correct_index": 3,
+   "explanation": "$2 + x - 8 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "خطأ.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س25"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد تأكسد Cr في مركب $\\text{K}_2\\text{Cr}_2\\text{O}_7$",
+   "options": [
+    "−12",
+    "+12",
+    "−6",
+    "+6"
+   ],
+   "correct_index": 3,
+   "explanation": "$2 + 2x - 14 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "للذرتين.",
+    "إشارة.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س26"
+  },
+  {
+   "topic": 2,
+   "year": 2022,
+   "stem": "عدد تأكسد الحديد في FeO",
+   "options": [
+    "+2",
+    "−2",
+    "+3",
+    "−3"
+   ],
+   "correct_index": 0,
+   "explanation": "$x - 2 = 0$",
+   "distractor_notes": [
+    "",
+    "إشارة.",
+    "Fe₂O₃.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س27"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد النيتروجين في $\\text{NO}_3^-$",
+   "options": [
+    "−5",
+    "+5",
+    "+2",
+    "−4"
+   ],
+   "correct_index": 1,
+   "explanation": "$x - 6 = -1$",
+   "distractor_notes": [
+    "إشارة.",
+    "",
+    "خطأ.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س28"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد تأكسد النيتروجين في المركب $\\text{HNO}_3$ :",
+   "options": [
+    "+3",
+    "−3",
+    "+5",
+    "−5"
+   ],
+   "correct_index": 2,
+   "explanation": "$1 + x - 6 = 0$",
+   "distractor_notes": [
+    "HNO₂.",
+    "خطأ.",
+    "",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س29"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الكلور في $\\text{NaClO}_4$",
+   "options": [
+    "+8",
+    "+7",
+    "−7",
+    "−8"
+   ],
+   "correct_index": 1,
+   "explanation": "$1 + x - 8 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "",
+    "إشارة.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س30"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "عدد تأكسد الكلور في المركب $\\text{HClO}_3$:",
+   "options": [
+    "+3",
+    "−3",
+    "+5",
+    "−5"
+   ],
+   "correct_index": 2,
+   "explanation": "$1 + x - 6 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س31"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد أكسدة عنصر الألومنيوم ₁₃Al في مركباته يساوي ..",
+   "options": [
+    "−3",
+    "+1",
+    "+2",
+    "+3"
+   ],
+   "correct_index": 3,
+   "explanation": "يفقد ثلاثة إلكترونات.",
+   "distractor_notes": [
+    "إشارة.",
+    "خطأ.",
+    "خطأ.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س32"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد أكسدة الكربون في المركب $\\text{CO}_3^{2-}$ هو ..",
+   "options": [
+    "−4",
+    "+4",
+    "−2",
+    "+2"
+   ],
+   "correct_index": 1,
+   "explanation": "$x - 6 = -2$",
+   "distractor_notes": [
+    "إشارة.",
+    "",
+    "خطأ.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س33"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "ما عدد تأكسد الكبريت في المركب التالي: $\\text{SO}_3^{2-}$؟",
+   "options": [
+    "+6",
+    "+4",
+    "−6",
+    "−4"
+   ],
+   "correct_index": 1,
+   "explanation": "$x - 6 = -2$",
+   "distractor_notes": [
+    "SO₄²⁻.",
+    "",
+    "إشارة.",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س34"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد تأكسد الكبريت في المركب $\\text{H}_2\\text{SO}_4$ هو ..",
+   "options": [
+    "−2",
+    "+2",
+    "+6",
+    "+8"
+   ],
+   "correct_index": 2,
+   "explanation": "$2 + x - 8 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س35"
+  },
+  {
+   "topic": 2,
+   "year": 2023,
+   "stem": "عدد تأكسد النيتروجين في $\\text{N}_2\\text{O}_4$",
+   "options": [
+    "+2",
+    "+4",
+    "−2",
+    "−4"
+   ],
+   "correct_index": 1,
+   "explanation": "$2x - 8 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "",
+    "خطأ.",
+    "إشارة."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س36"
+  },
+  {
+   "topic": 2,
+   "year": 2021,
+   "stem": "عدد أكسدة الكربون في مركب كربونات الصوديوم $\\text{Na}_2\\text{CO}_3$ هو :",
+   "options": [
+    "+1",
+    "+2",
+    "+4",
+    "−2"
+   ],
+   "correct_index": 2,
+   "explanation": "$2 + x - 6 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س37"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "عدد التأكسد الشائع لعنصر عدده الذري 16 في مركباته مع الفلزات:",
+   "options": [
+    "+3",
+    "−3",
+    "+2",
+    "−2"
+   ],
+   "correct_index": 3,
+   "explanation": "الكبريت يكتسب إلكترونين (S²⁻).",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "إشارة.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س38"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "في أي المركبات التالية عدد تأكسد N يساوي −1؟",
+   "options": [
+    "$\\text{CaN}_2$",
+    "$\\text{HNO}_2$",
+    "$\\text{HNO}_3$",
+    "$\\text{NH}_3$"
+   ],
+   "correct_index": 0,
+   "explanation": "$2 + 2x = 0$ فـ x = −1.",
+   "distractor_notes": [
+    "",
+    "+3.",
+    "+5.",
+    "−3."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "متوسط",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س39"
+  },
+  {
+   "topic": 2,
+   "year": 2024,
+   "stem": "أي الآتي يجعل الشحنة الكلية للمركب صفرًا؟ (علمًا بأن $\\text{O}^{2-}$ و$\\text{Al}^{3+}$)",
+   "options": [
+    "$\\text{Al}_3\\text{O}_2$",
+    "AlO",
+    "$\\text{Al}_2\\text{O}_3$",
+    "$\\text{Al}_2\\text{O}_2$"
+   ],
+   "correct_index": 2,
+   "explanation": "$2(+3) + 3(-2) = 0$",
+   "distractor_notes": [
+    "+5.",
+    "+1.",
+    "",
+    "+2."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س40"
+  },
+  {
+   "topic": 2,
+   "year": 2025,
+   "stem": "أي المجموعات التالية يكون عدد تأكسدها صفرًا؟",
+   "options": [
+    "15",
+    "16",
+    "17",
+    "18"
+   ],
+   "correct_index": 3,
+   "explanation": "الغازات النبيلة.",
+   "distractor_notes": [
+    "−3.",
+    "−2.",
+    "−1.",
+    ""
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س41"
+  },
+  {
+   "topic": 2,
+   "year": null,
+   "stem": "ما نوع عنصر عدد التأكسد فيه موجب؟",
+   "options": [
+    "غاز نبيل",
+    "فلز",
+    "لا فلز",
+    "شبه فلز"
+   ],
+   "correct_index": 1,
+   "explanation": "الفلزات تفقد إلكترونات.",
+   "distractor_notes": [
+    "صفر.",
+    "",
+    "سالب غالبًا.",
+    "متغير."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س54"
+  },
+  {
+   "topic": 2,
+   "year": null,
+   "stem": "عدد تأكسد النيتروجين في $\\text{HNO}_2$",
+   "options": [
+    "−2",
+    "+2",
+    "+5",
+    "+3"
+   ],
+   "correct_index": 3,
+   "explanation": "$1 + x - 4 = 0$",
+   "distractor_notes": [
+    "خطأ.",
+    "خطأ.",
+    "HNO₃.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س56"
+  },
+  {
+   "topic": 2,
+   "year": null,
+   "stem": "عدد تأكسد الكلور في الأيون $\\text{ClO}^-$ يساوي:",
+   "options": [
+    "+1",
+    "−1",
+    "−2",
+    "+2"
+   ],
+   "correct_index": 0,
+   "explanation": "$x - 2 = -1$",
+   "distractor_notes": [
+    "",
+    "إشارة.",
+    "خطأ.",
+    "خطأ."
+   ],
+   "thinking_level": "تطبيق",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س57"
+  },
+  {
+   "topic": 2,
+   "year": null,
+   "stem": "الشحنة الكلية لمركب $\\text{Na}_2\\text{CO}_3$",
+   "options": [
+    "0",
+    "−2",
+    "+2",
+    "+4"
+   ],
+   "correct_index": 0,
+   "explanation": "المركب متعادل.",
+   "distractor_notes": [
+    "",
+    "شحنة الأيون.",
+    "خطأ.",
+    "عدد تأكسد C."
+   ],
+   "thinking_level": "فهم",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س58"
+  },
+  {
+   "topic": 2,
+   "year": null,
+   "stem": "عدد تأكسد ذرة النيون ₁₀Ne يساوي:",
+   "options": [
+    "صفر",
+    "+6",
+    "−2",
+    "+8"
+   ],
+   "correct_index": 0,
+   "explanation": "عنصر حر.",
+   "distractor_notes": [
+    "",
+    "لا.",
+    "لا.",
+    "لا."
+   ],
+   "thinking_level": "تذكر",
+   "difficulty": "سهل",
+   "source_ref": "تجميعات يلو للكيمياء 2026 · الأكسدة والاختزال · س59"
+  }
+ ]
+}
