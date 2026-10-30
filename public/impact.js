@@ -369,8 +369,110 @@ function renderResults(ctx, data, body) {
         <li><b>الحدود:</b> التحسن بين الاختبارين يشمل أثر التدريس العادي والنضج${s.sameTest ? ' وتذكّر أسئلة الاختبار نفسه' : ' واحتمال اختلاف صعوبة الصيغتين'}. والطلاب الأكثر استخدامًا قد يختلفون في دافعيتهم؛ ضبط المستوى القبلي يخفف ذلك ولا يلغيه.
           لذلك تُقرأ النتائج «ارتباطًا» لا «سببية مؤكدة».</li>
       </ul>
-      <p class="small muted">أُعدّ التقرير في ${esc(hijri(new Date().toISOString(), true))} · منصة إتقان · رمز الدراسة ${s.id}</p></section>`;
+      <p class="small muted">أُعدّ التقرير في ${esc(hijri(new Date().toISOString(), true))} · منصة إتقان · رمز الدراسة ${s.id}</p></section>
+    ${reportHtml(ctx, data, a)}`;
   bindTips(body);
+}
+
+// ---------- التقرير المطبوع: وثيقة رسمية مستقلة عن شكل الشاشة (تظهر في الطباعة فقط) ----------
+const pEq = p => (!Number.isFinite(p) ? '' : p < 0.001 ? 'p < 0.001' : 'p = ' + fmt(p, 3));
+const sigWord = p => (Number.isFinite(p) && p < 0.05 ? 'دال إحصائيًا' : 'غير دال إحصائيًا');
+// شريط «قبل ← بعد» بـ SVG: 0% يمين و100% يسار (اتجاه الصفحة)، دائرة مفرغة للقبلي ومصمتة للبعدي
+function rpBar(a, b) {
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+  const W = 150, x = v => 4 + (W - 8) * (1 - Math.max(0, Math.min(100, v)) / 100);
+  const ticks = [0, 25, 50, 75, 100].map(t => `<line x1="${x(t)}" x2="${x(t)}" y1="5" y2="13" class="rp-tick"/>`).join('');
+  return `<svg class="rp-bar" width="${W}" height="18" viewBox="0 0 ${W} 18" aria-hidden="true"><line x1="4" x2="${W - 4}" y1="9" y2="9" class="rp-axis"/>${ticks}
+    <line x1="${x(a)}" x2="${x(b)}" y1="9" y2="9" class="rp-seg${b < a ? ' down' : ''}"/><circle cx="${x(a)}" cy="9" r="4.2" class="rp-pre"/><circle cx="${x(b)}" cy="9" r="4.2" class="rp-post"/></svg>`;
+}
+function reportHtml(ctx, data, a) {
+  const { esc, state } = ctx;
+  const s = data.study, o = a.overall, c = a.counts, k = s.items.length;
+  const course = state?.course || (state?.courses || []).find(x => x.id === s.courseId);
+  const today = hijri(new Date().toISOString(), true);
+  let n = 0;
+  const L = v => `<span dir="ltr" class="rp-ltr">${v}</span>`, sg = x => L(signed(x));
+  const sec = t => `<h2 class="rp-h">${++n}. ${esc(t)}</h2>`;
+  const meta = [['المقرر', course ? [course.code, course.grade, course.term && 'الفصل ' + course.term].filter(Boolean).join(' · ') : '—'],
+    ['الاختبار القبلي', `${hijri(s.preDate)} · من ${s.preMax}`], ['الاختبار البعدي', s.postDate ? `${hijri(s.postDate)} · من ${s.postMax}` : '—'],
+    ['أداة القياس', `${k ? num(k) + ' سؤالًا · ' : ''}${s.sameTest ? 'الاختبار نفسه في القياسين' : 'صيغتان متكافئتان'}`],
+    ['العينة', `${num(o.n)} طالبًا لهم القياسان`], ['تاريخ التقرير', today]];
+  const lvl = a.evidence.level;
+  const head = [['متوسط القبلي', pc(o.mPre)], ['متوسط البعدي', pc(o.mPost)], ['التغير', signed(o.mDiff) + ' نقطة'], ['حجم الأثر (g)', fmt(o.g, 2)], ['نسبة من تحسّن', Math.round((100 * o.improved) / o.n) + '%']];
+  const row = cells => `<tr>${cells.map(x => `<td>${x}</td>`).join('')}</tr>`;
+  const table = (heads, rows, cls = '') => `<table class="rp-t ${cls}"><thead><tr>${heads.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  const legend = `<p class="rp-legend"><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.2" class="rp-pre"/></svg> القبلي
+    <svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.2" class="rp-post"/></svg> البعدي · المحور من 0% إلى 100%</p>`;
+  const weak = a.objectives ? [...a.objectives].filter(x => Number.isFinite(x.mPost)).sort((x, y) => x.mPost - y.mPost).slice(0, 3) : [];
+  return `<article class="imp-report" dir="rtl">
+  <header class="rp-cover">
+    <div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="54" height="54"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب في الكيمياء</span></div></div>
+    <div class="rp-title"><span class="rp-kicker">تقرير قياس الأثر</span><h1>${esc(s.title)}</h1>
+      <p>دراسة قبلية-بعدية لأثر التدريب على المنصة في تحصيل الطلاب</p></div>
+    <dl class="rp-meta">${meta.map(([l, v]) => `<div><dt>${esc(l)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+  </header>
+
+  ${sec('الخلاصة')}
+  <div class="rp-verdict rp-${lvl}"><b>${esc(a.evidence.label)}</b><p>${esc(a.evidence.text)}</p></div>
+  <div class="rp-figs">${head.map(([l, v]) => `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>
+  ${a.warnings.length ? `<ul class="rp-notes">${a.warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+
+  ${sec('المقارنة بين القياسين القبلي والبعدي')}
+  ${table(['المؤشر', 'القيمة', 'التفسير'], [
+    row(['متوسط القبلي (الانحراف المعياري)', `${pc(o.mPre)} (${fmt(o.sPre)})`, '']),
+    row(['متوسط البعدي (الانحراف المعياري)', `${pc(o.mPost)} (${fmt(o.sPost)})`, '']),
+    row(['متوسط التغير', `${sg(o.mDiff)} نقطة مئوية`, `${num(o.improved)} تحسّن · ${num(o.same)} ثبت · ${num(o.declined)} تراجع`]),
+    row(['اختبار t للعينات المرتبطة', L(`t(${o.df}) = ${fmt(o.t, 2)} · ${pEq(o.p)}`), sigWord(o.p)]),
+    row(['حجم الأثر (هيدجز g) وفترة الثقة 95%', L(`${fmt(o.g, 2)} [${fmt(o.ciLow, 2)}, ${fmt(o.ciHigh, 2)}]`), esc(effectLabel(o.g))]),
+    row(['الكسب المعدّل (هاك)', fmt(o.hake, 2), esc(gainLabel(o.hake))]),
+    row(['الارتباط بين القياسين', L(`r = ${fmt(o.r, 2)}`), '']),
+  ], 'rp-kv')}
+  <p class="rp-small">العينة ${num(o.n)} طالبًا أدّوا الاختبارين${c.preOnly ? `، واستُبعد ${num(c.preOnly)} أدّوا القبلي فقط` : ''}${c.postOnly ? `، و${num(c.postOnly)} أدّوا البعدي فقط` : ''}.
+    ${a.attrition ? `متوسط القبلي لمن لم يكمل ${pc(a.attrition.missingPre)} مقابل ${pc(a.attrition.completedPre)} لمن أكمل.` : ''}</p>
+
+  ${sec('النتائج حسب الشعبة والمستوى القبلي')}
+  ${table(['الشعبة', 'العدد', 'القبلي', 'البعدي', 'التغير', 'قبل ← بعد'], a.sections.map(g => row([`شعبة ${esc(g.key)}`, num(g.n),
+    ...(Number.isFinite(g.mPre) ? [pc(g.mPre), pc(g.mPost), sg(g.mPost - g.mPre), rpBar(g.mPre, g.mPost)] : ['<span class="rp-muted">عيّنة صغيرة</span>', '', '', ''])])), `rp-num${a.sections.length <= 14 ? ' rp-keep' : ''}`)}
+  ${legend}
+  ${table(['المستوى في القبلي', 'العدد', 'القبلي', 'البعدي', 'التغير', 'حجم الأثر'], a.bands.map(b => row([esc(BANDS[b.key]), num(b.n),
+    ...(b.n >= MIN_GROUP ? [pc(b.mPre), pc(b.mPost), sg(b.mDiff), fmt(b.g, 2)] : ['<span class="rp-muted">عيّنة صغيرة</span>', '', '', ''])])), 'rp-num rp-keep')}
+  <p class="rp-small">الفئة الأضعف قبليًا تبدو أكثر تحسنًا جزئيًا بسبب الارتداد نحو المتوسط، والأقوى يحدّها سقف الدرجة؛ لذا يُبنى الحكم على أثر المنصة على القسم التالي.</p>
+
+  ${sec('علاقة التدريب على المنصة بالتحسن')}
+  ${a.tiers ? `${table(['مجموعة الاستخدام', 'الإجابات الجادة', 'العدد', 'القبلي', 'البعدي', 'التغير', 'قبل ← بعد'], a.tiers.map(t => row([TIERS[t.tier], `من ${num(t.minUse)} إلى ${num(t.maxUse)}`, num(t.n), pc(t.mPre), pc(t.mPost), sg(t.mPost - t.mPre), rpBar(t.mPre, t.mPost)])), 'rp-num rp-keep')}
+    ${a.dose ? `<div class="rp-box"><b>بعد ضبط المستوى القبلي (تحليل التغاير ANCOVA):</b> يزيد البعدي المتوقع للطالب في الثلث الأعلى استخدامًا على نظيره المساوي له في القبلي من الثلث الأدنى بمقدار
+      <b>${sg(a.dose.adjDiff)} نقطة</b> (${fmt(a.dose.adjD, 2)} انحرافًا معياريًا، ${esc(effectLabel(a.dose.adjD))})، ${L(pEq(a.dose.p))}، ${sigWord(a.dose.p)}.
+      الارتباط الجزئي للاستخدام ${L('r = ' + fmt(a.dose.partialR, 2))}، و${L('R² = ' + fmt(a.dose.r2, 2))}${a.dose.withPrior ? '، مع ضبط الدرجة السابقة' : ''}.</div>` : ''}`
+    : `<p>يلزم ${MIN_N} طلاب على الأقل باستخدام متفاوت لتحليل علاقة الاستخدام بالتحسن.</p>`}
+  ${a.within ? `<div class="rp-box"><b>مقارنة الطالب بنفسه:</b> كسب الطلاب في الأهداف التي تدرّبوا عليها (${PRACTICED} إجابات جادة فأكثر) <b>${sg(a.within.gainPracticed)}</b> نقطة،
+    وفي الأهداف التي لم يتدرّبوا عليها <b>${sg(a.within.gainNot)}</b> نقطة؛ الفرق ${sg(a.within.diff)} نقطة، ${L(pEq(a.within.p))} (${num(a.within.n)} طالبًا)، ${sigWord(a.within.p)}.
+    هذه المقارنة تلغي أثر الفروق بين الطلاب لأن كل طالب يُقارن بنفسه.</div>` : ''}
+  <p class="rp-small">الاستخدام: ${num(a.usage.total)} إجابة جادة (3 ثوانٍ فأكثر) بين تاريخي الاختبارين، الوسيط ${num(a.usage.median)} للطالب، و${num(a.usage.none)} طالبًا لم يتدرّبوا.</p>
+
+  ${a.objectives ? `${sec('النتائج حسب نواتج التعلم')}
+  ${table(['الهدف', 'الأسئلة', 'القبلي', 'البعدي', 'التغير', 'متوسط التدريب', 'تدرّب عليه'], a.objectives.map(ob => row([`<span class="rp-code" dir="ltr">${esc(ob.code)}</span> ${esc(ob.text)}`,
+    num(ob.items), pc(ob.mPre), pc(ob.mPost), sg(ob.gain), fmt(ob.practice, 1), Math.round(ob.practicedPct) + '%'])), 'rp-num rp-obj')}
+  ${weak.length ? `<p class="rp-small"><b>أهداف تحتاج معالجة</b> (الأدنى في البعدي): ${weak.map(w => `${esc(w.code)} (${pc(w.mPost)})`).join('، ')}.</p>` : ''}` : ''}
+
+  ${a.quality && (a.quality.pre || a.quality.post) ? `${sec('جودة أداة القياس')}
+  ${table(['الاختبار', 'الطلاب', 'الثبات (KR-20)', 'التقدير', 'أسئلة سهلة جدًا', 'أسئلة صعبة جدًا', 'تمييز ضعيف'], ['pre', 'post'].filter(p => a.quality[p]).map(p => {
+    const q = a.quality[p], list = f => q.items.filter(f).map(it => 'س' + it.n).join('، ') || '—';
+    return row([PHASES[p], num(q.n), fmt(q.alpha, 2), esc(alphaLabel(q.alpha)), list(it => it.difficulty > 0.9), list(it => it.difficulty < 0.2), list(it => Number.isFinite(it.discrimination) && it.discrimination < 0.2)]);
+  }), 'rp-num')}` : ''}
+
+  ${sec('المنهجية وحدود الدراسة')}
+  <ul class="rp-list">
+    <li><b>التصميم:</b> شبه تجريبي، قبلي-بعدي لمجموعة واحدة، مدعوم بتحليل الجرعة-الاستجابة${a.within ? ' والمقارنة داخل الطالب' : ''}.</li>
+    <li><b>المؤشرات:</b> اختبار t للعينات المرتبطة؛ هيدجز g بالانحراف المعياري المجمّع للقياسين مع فترة ثقة 95%؛ كسب هاك = (البعدي − القبلي) ÷ (100 − القبلي). الدلالة عند مستوى 0.05.</li>
+    <li><b>تفسير حجم الأثر:</b> أقل من 0.2 لا يُذكر، 0.2–0.4 ملموس، 0.4–0.6 جيد، أكثر من 0.6 كبير.</li>
+    <li><b>قياس الاستخدام:</b> الإجابات الأولى الجادة على أسئلة المقرر بين تاريخي الاختبارين، لا النقاط ولا الإجابات المتسرعة.</li>
+    <li><b>الحدود:</b> لا توجد مجموعة ضابطة، فيشمل التحسن أثر التدريس والنضج${s.sameTest ? ' وتذكّر أسئلة الاختبار' : ''}؛ والأكثر استخدامًا قد يختلفون في الدافعية. تُقرأ النتائج دليلًا على الارتباط لا سببيةً قاطعة.</li>
+  </ul>
+  ${s.note ? `<p class="rp-small"><b>ملاحظات التطبيق:</b> ${esc(s.note)}</p>` : ''}
+
+  <footer class="rp-sign">${['معلم المادة', 'المشرف التربوي', 'قائد المدرسة'].map(r => `<div><span>${r}</span><p>الاسم: ............................</p><p>التوقيع: ..........................</p></div>`).join('')}</footer>
+  <p class="rp-foot">صدر هذا التقرير آليًا من منصة إتقان في ${esc(today)} · رمز الدراسة ${s.id}</p>
+</article>`;
 }
 
 const kpi = (esc, v, l, ic, sub = '') => `<div class="card">${icon(ic, 46)}<div class="value">${esc(v)}</div>
