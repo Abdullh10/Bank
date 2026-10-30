@@ -140,6 +140,8 @@ if (!process.env.ALLOW_FONTS) await ctx.route(/fonts\.(googleapis|gstatic)\.com/
 // عزل الاتجاه (public/bidi.js) يضيف علامات غير مرئية داخل النص؛ تُعطَّل هنا لأن الاختبار يقارن النص حرفيًا
 await ctx.addInitScript(() => { window.__ITQAN_NO_BIDI = true; });
 const p = await ctx.newPage();
+// عناصر القائمة داخل القائمة الجانبية (مغلقة افتراضيًا): المعتبر أنها غير مخفية للدور
+const navShown = nav => p.$$eval(`.nav a[data-nav="${nav}"]`, as => as.some(a => !a.hidden));
 p.on('pageerror', e => errors.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|404/.test(m.text())) errors.push('console: ' + m.text()); });
 const BASE = `http://${process.env.E2E_HOST || 'localhost'}:8766/Bank/public/`;
@@ -196,7 +198,7 @@ ok('viewer: objective page without answers or review mode', (await p.locator('[d
 const vObj = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_objective', { method: 'POST',
   headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: JSON.stringify({ p_code: 'C1-L1-O14' }) })).json());
 ok('viewer: database withholds objective answers', vObj.data?.answersIncluded === false && !vObj.data.questions.some(q => 'correctIndex' in q || 'modelAnswer' in q));
-ok('viewer: no bank in menu', !(await p.locator('[data-nav="bank"]').isVisible()));
+ok('viewer: no bank in menu', !(await navShown('bank')));
 await p.goto(BASE + '#/bank'); await p.waitForTimeout(600);
 ok('viewer: bank page unavailable', (await p.locator('main').innerText()).includes('غير متاحة لدورك'));
 const vBank = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST',
@@ -264,7 +266,23 @@ ok('export objectives CSV', fs.readFileSync(await dl2.path(), 'utf8').trim().spl
 // ---------- حساب الطالب ----------
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
-ok('admin: students nav visible', await p.locator('[data-nav="students"]').isVisible());
+ok('admin: students nav visible', await navShown('students'));
+{ // القائمة الجانبية: مغلقة، تُفتح بزر الثلاث شرطات، والاختيار ينقل ويغلقها، وEsc يغلقها
+  const back = await p.evaluate(() => location.hash);
+  ok('drawer: closed by default', !(await p.locator('[data-nav="students"]').isVisible()));
+  await p.click('#menu-btn');
+  await p.waitForSelector('.drawer.open [data-nav="students"]', { state: 'visible' });
+  ok('drawer: opens from the menu button', await p.getAttribute('#menu-btn', 'aria-expanded') === 'true');
+  await p.click('.drawer.open [data-nav="impact"]');
+  await p.waitForFunction(() => location.hash === '#/impact' && !document.querySelector('.drawer.open'));
+  ok('drawer: choosing a section navigates and closes', await p.getAttribute('#menu-btn', 'aria-expanded') === 'false');
+  await p.click('#menu-btn'); await p.waitForSelector('.drawer.open');
+  ok('drawer: current section highlighted', await p.$eval('.drawer [data-nav="impact"]', a => a.classList.contains('active')));
+  await p.keyboard.press('Escape');
+  await p.waitForFunction(() => !document.querySelector('.drawer.open'));
+  ok('drawer: Esc closes', true);
+  await p.evaluate(h => { location.hash = h; }, back || '#/');
+}
 // مالك المشروع: يفتح المقرر «قيد الإعداد» ليتابعه، والتبديل بين المقررات يغيّر البنك والترويسة
 await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
 await p.goto(BASE + '#/');  await p.waitForSelector('.course-card');
@@ -463,7 +481,7 @@ await p.fill('#l-user', 'st2test'); await p.fill('#l-pass', st[3] || 'x'); await
 await p.waitForSelector('#c-form');
 ok('student: confirm page prefilled', (await p.inputValue('#c-name')) === 'طالب ثان تجريبي' && (await p.inputValue('#c-sec')) === '2' && (await p.locator('#c-form').innerText()).includes('ثاني ثانوي'));
 await p.click('#c-form button[type=submit]'); await p.waitForSelector('#s-start');
-ok('student: nav shows only practice + history', await p.locator('[data-nav="history"]').isVisible() && !(await p.locator('[data-nav="bank"]').isVisible()) && !(await p.locator('[data-nav="exam"]').isVisible()));
+ok('student: nav shows only practice + history', await navShown('history') && !(await navShown('bank')) && !(await navShown('exam')));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#s-start');
 ok('student: teacher pages redirect to practice', !(await p.locator('#bank-list, .kpi').count()));
 const blocked = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/get_bank', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
@@ -512,7 +530,7 @@ await p.goto(BASE + '#/history'); await p.waitForSelector('.hero');
 await p.waitForTimeout(500);
 await p.screenshot({ path: `${OUT}/student-history.png`, fullPage: true });
 ok('student: history lists sessions', (await p.locator('main').innerText()).includes('آخر الجلسات') && (await p.locator('main tbody tr').count()) >= 1);
-ok('student: «التميّز» in the menu', await p.locator('[data-nav="rank"]').isVisible());
+ok('student: «التميّز» in the menu', await navShown('rank'));
 await p.goto(BASE + '#/rank'); await p.waitForSelector('.rank-rules');
 ok('student: rank page explains the points and the entry conditions', (await p.locator('main').innerText()).includes('كيف تُحسب نقاطي؟') && (await p.locator('main').innerText()).includes('لم تدخل الترتيب بعد'));
 ok('student: rank page shows progress toward the 30 answers / 3 days', (await p.locator('.bar').count()) === 2);
@@ -520,7 +538,7 @@ await p.screenshot({ path: `${OUT}/student-rank.png`, fullPage: true });
 const rk = await p.evaluate(async () => (await fetch(location.origin + '/mock/rpc/student_leaderboard', { method: 'POST', headers: { 'content-type': 'application/json', authorization: localStorage.getItem('mocktok') }, body: '{}' })).json());
 ok('student: leaderboard RPC exposes no other student details', rk.data && !JSON.stringify(rk.data).includes('username') && rk.data.top.every(t => Object.keys(t).sort().join() === 'me,name,rank,score'), JSON.stringify(Object.keys(rk.data || {})));
 // الرصيد: غير مؤهل أولًا، ثم نمنحه تدريبًا جادًا (بيانات تجريبية تُحذف بعد اختبار المعلم) ويستبدل نقاطه بدرجة
-ok('student: «الرصيد» in the menu', await p.locator('[data-nav="balance"]').isVisible());
+ok('student: «الرصيد» in the menu', await navShown('balance'));
 await p.goto(BASE + '#/balance'); await p.waitForSelector('.bal-main');
 await p.screenshot({ path: `${OUT}/student-balance-empty.png`, fullPage: true });
 ok('student: balance page shows no redeem button before enough points, and the weekly keep-up bonus', (await p.locator('main').innerText()).includes('حافظ على تميّزك') && !(await p.locator('[data-redeem]').count()));
@@ -586,7 +604,7 @@ const m2 = await asRole(OWNER, 'select to_jsonb(public.staff_send_comm($1::jsonb
 ok('owner: message and task sent to one student', m1.data?.n === 1 && m2.data?.n === 1, JSON.stringify([m1.error, m2.error]));
 await p.goto(BASE + '#/'); await p.waitForSelector('#st-task:not([hidden])');
 ok('student: home shows the current task card', (await p.locator('#st-task').innerText()).includes('مهمة الدرس'));
-await p.locator('[data-nav="inbox"]').click(); await p.waitForSelector('.in-item');
+await p.click('#menu-btn'); await p.locator('.drawer.open [data-nav="inbox"]').click(); await p.waitForSelector('.in-item');
 ok('student: inbox lists the message and the task, title escaped (no HTML injected)', (await p.locator('.in-item').count()) === 2 && (await p.locator('.in-item b >> text=<b>الآن</b>').count()) === 1);
 ok('student: task shows lesson, required count and progress bar', (await p.locator('.is-task').innerText()).includes('10 سؤالًا') && (await p.locator('.is-task').innerText()).includes('مكافأة 25 نقطة') && (await p.locator('.is-task .bar').count()) === 1);
 await p.click('[data-reply^="2:"]'); await p.waitForSelector('.in-reply .badge.warn');
@@ -652,7 +670,7 @@ await p.goto(BASE + '#/progress'); await p.waitForSelector('#tp-sec');
 ok('teacher: last activity in hijri order (day month yearهـ)', /\d{1,2} \S+( \S+)? \d{4}هـ/.test(await p.locator('main tbody').first().innerText()));
 ok('teacher: training-quality column on the progress page', (await p.locator('main').innerText()).includes('جودة التدريب'));
 ok('teacher: progress lists only the assigned student', (await p.locator('main').innerText()).includes('طالب ثان تجريبي') && !(await p.locator('main').innerText()).includes('طالب أول تجريبي'));
-ok('teacher: «رسائل ومهام» in the menu, reviewer-style roles excluded', await p.locator('[data-nav="comms"]').isVisible());
+ok('teacher: «رسائل ومهام» in the menu, reviewer-style roles excluded', await navShown('comms'));
 await p.goto(BASE + '#/comms'); await p.waitForSelector('#cm-send');
 await p.selectOption('#cm-mode', 'students'); await p.waitForTimeout(300);
 await p.screenshot({ path: `${OUT}/teacher-comms-students.png` });
@@ -684,7 +702,7 @@ const otherStu = (await asRole('22222222-2222-2222-2222-222222222222', "select t
 ok('teacher cannot message a student outside his assignment', !!otherStu.error);
 await p.screenshot({ path: `${OUT}/teacher-comms.png`, fullPage: true });
 await pool.query('delete from public.comms');
-ok('teacher: «رصيد الدرجات» in the menu', await p.locator('[data-nav="grades"]').isVisible());
+ok('teacher: «رصيد الدرجات» in the menu', await navShown('grades'));
 await p.goto(BASE + '#/grades'); await p.waitForSelector('tr[data-id]');
 ok('teacher: grade balance lists the assigned student with 1 pending', (await p.locator('tr[data-id]').first().innerText()).includes('طالب ثان تجريبي') && (await p.locator('.hero .badge.warn').innerText()).includes('1 درجة'));
 await p.screenshot({ path: `${OUT}/teacher-grades.png`, fullPage: true });
@@ -714,7 +732,7 @@ await p.screenshot({ path: `${OUT}/teacher-coupons.png`, fullPage: true });
 ok('teacher coupon redeemable by the teacher\'s assigned student', (await asRole(sid, 'select to_jsonb(public.student_redeem_coupon($1)) r', [tCode])).data.ok === true);
 await pool.query(`delete from public.grade_redemptions; delete from public.practice_sessions where settings @> '{"e2e":true}'`);
 await pool.query('delete from public.point_coupons');
-ok('teacher (viewer): no students admin link', !(await p.locator('[data-nav="students"]').isVisible()));
+ok('teacher (viewer): no students admin link', !(await navShown('students')));
 // مدير المدرسة: الأسئلة ولوحة المؤشرات فقط
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'principal1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');

@@ -990,7 +990,10 @@ function pagePending() {
 // ---------- الموجّه ----------
 // عدّاد الرسائل غير المقروءة في قائمة الطالب: استعلام خفيف واحد كل 45 ثانية على الأكثر
 let inboxAt = 0;
-function setInboxBadge(n) { const el = document.getElementById('nav-unread'); if (!el) return; el.textContent = n > 9 ? '9+' : String(n); el.hidden = !n; }
+function setInboxBadge(n) {
+  const el = document.getElementById('nav-unread'); if (!el) return; el.textContent = n > 9 ? '9+' : String(n); el.hidden = !n;
+  document.getElementById('menu-dot').hidden = !n;
+}
 async function refreshInboxBadge() {
   if (Date.now() - inboxAt < 45000) return;
   inboxAt = Date.now();
@@ -1000,6 +1003,7 @@ async function route() {
   const seq = ++routeSeq;
   // نافذة تحرير مفتوحة لا تبقى بعد الانتقال (مثل السحب للرجوع على الآيباد)
   if ($dlg.open) $dlg.close();
+  setDrawer(false);
   const hash = location.hash.replace(/^#/, '') || '/';
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
@@ -1071,6 +1075,31 @@ async function route() {
 // صفحات تعمل على قاعدة Supabase فقط (لا يوفرها الخادم المحلي القديم)
 const SUPABASE_ONLY = ['notes', 'impact'];
 window.addEventListener('hashchange', route);
+
+// القائمة الجانبية: تُفتح بزر الثلاث شرطات، وتُغلق بالاختيار أو بالخلفية أو بزر الإغلاق أو بـ Esc.
+const $drawer = document.getElementById('drawer'), $drawerBd = document.getElementById('drawer-bd'), $menuBtn = document.getElementById('menu-btn');
+function setDrawer(open) {
+  if ($drawer.classList.contains('open') === open) return;
+  $drawer.classList.toggle('open', open);
+  $drawer.inert = !open;
+  $drawer.setAttribute('aria-hidden', String(!open));
+  $menuBtn.setAttribute('aria-expanded', String(open));
+  document.body.classList.toggle('drawer-open', open);
+  if (open) {
+    $drawerBd.hidden = false;
+    requestAnimationFrame(() => $drawerBd.classList.add('show'));
+    ($drawer.querySelector('.nav a.active:not([hidden])') || $drawer.querySelector('.nav a:not([hidden])'))?.focus({ preventScroll: true });
+  } else {
+    $drawerBd.classList.remove('show');
+    setTimeout(() => { if (!$drawer.classList.contains('open')) $drawerBd.hidden = true; }, 250);
+    if ($drawer.contains(document.activeElement)) $menuBtn.focus({ preventScroll: true });
+  }
+}
+$menuBtn.onclick = () => setDrawer(!$drawer.classList.contains('open'));
+$drawerBd.onclick = () => setDrawer(false);
+document.getElementById('drawer-x').onclick = () => setDrawer(false);
+$drawer.addEventListener('click', e => { if (e.target.closest('a')) setDrawer(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $drawer.classList.contains('open')) setDrawer(false); });
 // رابط إلى الصفحة الحالية نفسها (مثل «بنك الأسئلة» من ورقة الأسئلة) لا يطلق hashchange؛ يُعاد عرض الصفحة
 document.addEventListener('click', e => {
   const a = e.target.closest?.('a[href^="#/"]');
