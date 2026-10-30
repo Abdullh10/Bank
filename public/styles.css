@@ -1283,3 +1283,76 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .imp-sort:focus-visible { box-shadow: var(--ring); border-radius: 6px; }
 .imp-arrow { font-size: .7rem; color: var(--ink-3); }
 th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { color: var(--brand-2, var(--brand)); }
+
+/* ---------- تقرير قياس الأثر المطبوع (A4): وثيقة رسمية لا صورة للشاشة ---------- */
+.imp-report { display: none; }
+@media print {
+  @page imp { size: A4 portrait; margin: 14mm 13mm 16mm;
+    @bottom-center { content: "منصة إتقان · تقرير قياس الأثر · صفحة " counter(page) " من " counter(pages); font: 8pt "IBM Plex Sans Arabic", sans-serif; color: #6b7686; } }
+  main:has(.imp-report) > :not(#imp-body), #imp-body:has(.imp-report) > :not(.imp-report) { display: none !important; }
+  main:has(.imp-report) { padding: 0; max-width: none; }
+  body:has(.imp-report) { background: #fff !important; }
+  body:has(.imp-report)::before, body:has(.imp-report)::after { display: none !important; }
+  .imp-report {
+    display: block; page: imp; color: #1b2430; font: 10pt/1.65 "IBM Plex Sans Arabic", sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .imp-report * { box-shadow: none !important; }
+  .rp-cover { border: 1px solid #c9d3df; border-top: 5px solid #12305a; border-radius: 6px; padding: 12pt 14pt 10pt; margin-bottom: 12pt; }
+  .rp-brand { display: flex; align-items: center; gap: 8pt; padding-bottom: 8pt; border-bottom: 1px solid #e3e8ef; }
+  .rp-brand b { display: block; font: 800 12pt "Noto Kufi Arabic", sans-serif; color: #12305a; }
+  .rp-brand span { font-size: 8.5pt; color: #5b6676; }
+  .rp-title { text-align: center; padding: 10pt 0 8pt; }
+  .rp-kicker { display: inline-block; font-size: 8.5pt; font-weight: 600; color: #8a6a2a; letter-spacing: 0; border: 1px solid #d9c39a; border-radius: 99px; padding: 0 10pt; }
+  .rp-title h1 { font: 800 16pt/1.5 "Noto Kufi Arabic", sans-serif; color: #12305a; margin: 5pt 0 2pt; }
+  .rp-title p { margin: 0; color: #5b6676; font-size: 9.5pt; }
+  .rp-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0; border: 1px solid #e3e8ef; border-radius: 4px; }
+  .rp-meta div { padding: 4pt 8pt; border-inline-start: 1px solid #e3e8ef; border-top: 1px solid #e3e8ef; }
+  .rp-meta div:nth-child(3n+1) { border-inline-start: 0; }
+  .rp-meta div:nth-child(-n+3) { border-top: 0; }
+  .rp-meta dt { font-size: 7.5pt; color: #6b7686; }
+  .rp-meta dd { margin: 0; font-weight: 600; font-size: 9pt; }
+  .rp-h { font: 700 11.5pt "Noto Kufi Arabic", sans-serif; color: #12305a; margin: 14pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5px solid #12305a; break-after: avoid; }
+  .rp-verdict { border: 1px solid #c9d3df; border-inline-start: 5px solid #5b6676; border-radius: 4px; padding: 7pt 10pt; background: #f6f8fb; break-inside: avoid; }
+  .rp-verdict.rp-strong, .rp-verdict.rp-moderate { border-inline-start-color: #1f7a4d; background: #f1f8f4; }
+  .rp-verdict.rp-initial { border-inline-start-color: #2a6fb0; background: #f1f6fb; }
+  .rp-verdict.rp-none, .rp-verdict.rp-insufficient { border-inline-start-color: #b7791f; background: #fdf8ef; }
+  .rp-verdict b { font-size: 11pt; color: #12305a; }
+  .rp-verdict p { margin: 2pt 0 0; }
+  .rp-figs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6pt; margin: 8pt 0; break-inside: avoid; }
+  .rp-figs div { border: 1px solid #e3e8ef; border-radius: 4px; padding: 6pt 4pt; text-align: center; }
+  .rp-figs b { display: block; font: 700 14pt "IBM Plex Sans Arabic", sans-serif; color: #12305a; font-variant-numeric: tabular-nums; }
+  .rp-figs span { font-size: 8pt; color: #5b6676; }
+  .rp-notes { margin: 4pt 0; padding-inline-start: 14pt; font-size: 8.5pt; color: #8a5a00; }
+  .rp-t { width: 100%; border-collapse: collapse; margin: 4pt 0 6pt; font-size: 9pt; page-break-inside: auto; }
+  .rp-t thead { display: table-header-group; }
+  .rp-t tr { break-inside: avoid; }
+  .rp-t th { background: #12305a !important; color: #fff; font-weight: 600; padding: 4pt 6pt; text-align: start; border: 1px solid #12305a; font-size: 8.5pt; }
+  .rp-t td { padding: 3.5pt 6pt; border: 1px solid #dde3ea; vertical-align: middle; }
+  .rp-t tbody tr:nth-child(even) td { background: #f6f8fb; }
+  .rp-num td:not(:first-child) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rp-kv td:first-child { width: 38%; font-weight: 600; }
+  .rp-kv td:nth-child(2) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rp-obj td:first-child { white-space: normal; font-size: 8.5pt; }
+  .rp-code { font-size: 7.5pt; color: #5b6676; }
+  .rp-bar { display: block; }
+  .rp-axis { stroke: #c9d3df; stroke-width: 1; }
+  .rp-tick { stroke: #dde3ea; stroke-width: 1; }
+  .rp-seg { stroke: #2a6fb0; stroke-width: 3; }
+  .rp-seg.down { stroke: #b03a2e; }
+  .rp-pre { fill: #fff; stroke: #12305a; stroke-width: 1.6; }
+  .rp-post { fill: #12305a; stroke: #12305a; stroke-width: 1.6; }
+  .rp-legend { display: flex; align-items: center; gap: 4pt; font-size: 8pt; color: #5b6676; margin: 0 0 8pt; }
+  .rp-box { border: 1px solid #dde3ea; border-radius: 4px; padding: 6pt 9pt; margin: 6pt 0; background: #fafbfd; break-inside: avoid; }
+  .rp-small { font-size: 8.5pt; color: #4a5565; margin: 3pt 0; }
+  .rp-muted { color: #8a94a3; }
+  .rp-ltr { white-space: nowrap; unicode-bidi: isolate; }
+  .rp-t.rp-keep { break-inside: avoid; }
+  .rp-list { margin: 0; padding-inline-start: 14pt; font-size: 9pt; }
+  .rp-list li { margin-bottom: 2pt; }
+  .rp-sign { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12pt; margin-top: 22pt; break-inside: avoid; }
+  .rp-sign div { border-top: 1px solid #c9d3df; padding-top: 6pt; }
+  .rp-sign span { font-weight: 700; color: #12305a; }
+  .rp-sign p { margin: 6pt 0 0; font-size: 8.5pt; color: #4a5565; }
+  .rp-foot { margin-top: 14pt; text-align: center; font-size: 7.5pt; color: #8a94a3; }
+}
