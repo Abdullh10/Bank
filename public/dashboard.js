@@ -42,7 +42,7 @@ function stack(esc, parts, total) {
 }
 
 let tipEl = null;
-function bindTips(root) {
+export function bindTips(root) {
   tipEl ||= Object.assign(document.createElement('div'), { className: 'd-tip', role: 'tooltip' });
   if (!tipEl.isConnected) document.body.append(tipEl);
   const show = el => {

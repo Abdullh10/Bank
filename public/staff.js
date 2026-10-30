@@ -267,7 +267,7 @@ async function couponsCard(ctx, fresh = null) {
 // SheetJS من cdnjs (إصدار مثبت)، يُحمَّل عند الحاجة فقط. ملفات CSV تُقرأ دونه.
 const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 let xlsxLoading = null;
-function loadXlsx() {
+export function loadXlsx() {
   if (window.XLSX) return Promise.resolve(window.XLSX);
   xlsxLoading ||= new Promise((resolve, reject) => {
     const sc = Object.assign(document.createElement('script'), { src: XLSX_URL, onload: () => resolve(window.XLSX),
@@ -301,7 +301,7 @@ export function rowsToStudents(rows) {
   return rows.slice(headAt + 1).map(r => Object.fromEntries(OUT_COLS.map(k => [k, idx[k] != null ? r[idx[k]] || '' : ''])))
     .filter(s => s.name);
 }
-function parseCsv(text) {
+export function parseCsv(text) {
   const rows = []; let row = [], cell = '', q = false;
   text = text.replace(/^﻿/, '');
   for (let i = 0; i < text.length; i++) {
@@ -321,13 +321,13 @@ async function readStudentFile(file) {
   const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
   return rowsToStudents(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false }));
 }
-async function downloadXlsx(name, header, rows) {
+export async function downloadXlsx(name, header, rows, sheet = 'الطلاب') {
   try {
     const XLSX = await loadXlsx();
     const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
     ws['!cols'] = header.map((_, i) => ({ wch: Math.max(12, ...rows.map(r => String(r[i] ?? '').length + 2)) }));
     const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
-    XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
+    XLSX.utils.book_append_sheet(wb, ws, sheet);
     XLSX.writeFile(wb, name + '.xlsx');
   } catch {
     // بديل دون المكتبة: CSV يفتحه Excel مباشرة
