@@ -5,6 +5,7 @@ import { similarPairs } from './validate.js';
 import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentInbox, pageStudentConfirm, resetStudentSession } from './student.js';
 import { pageTeacherProgress, pageTeacherGrades, pageTeacherComms, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
 import { pageDashboard } from './dashboard.js';
+import { pageImpact } from './impact.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
 import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
@@ -1050,6 +1051,7 @@ async function route() {
     else if (page === 'bank' && can('bank')) await pageBank();
     else if (page === 'reports') await (state.supabase ? pageDashboard(nctx()) : pageReports());
     else if (page === 'exam' && can('exam')) await pageExam({ api, esc, fail, toast, $app, course: state.course, protectedBank: protectedBank() });
+    else if (page === 'impact' && can('impact') && state.supabase) await pageImpact(ctx, arg ? decodeURIComponent(arg) : '');
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
     else if (page === 'grades' && can('progress') && state.supabase) await pageTeacherGrades(ctx);
     else if (page === 'comms' && ['admin', 'viewer'].includes(role) && state.supabase) await pageTeacherComms(ctx);
@@ -1067,7 +1069,7 @@ async function route() {
 }
 
 // صفحات تعمل على قاعدة Supabase فقط (لا يوفرها الخادم المحلي القديم)
-const SUPABASE_ONLY = ['notes'];
+const SUPABASE_ONLY = ['notes', 'impact'];
 window.addEventListener('hashchange', route);
 // رابط إلى الصفحة الحالية نفسها (مثل «بنك الأسئلة» من ورقة الأسئلة) لا يطلق hashchange؛ يُعاد عرض الصفحة
 document.addEventListener('click', e => {

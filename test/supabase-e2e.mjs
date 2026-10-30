@@ -284,6 +284,51 @@ ok('tahsili: bank has no question-type filter', !(await p.locator('#f-type').cou
 const essayTahsili = await asRole('55555555-5555-5555-5555-555555555555', `select public.create_question('T-S2-U03-T01', 'essay', '{"stem":"اشرح تركيب الذرة بالتفصيل","model_answer":"…","thinking_level":"فهم","difficulty":"سهل"}'::jsonb) r`);
 ok('tahsili: database refuses essay questions', String(essayTahsili.error?.message || '').includes('اختيار من متعدد فقط'), essayTahsili.error?.message);
 ok('tahsili: topics require no essays', (await pool.query(`select count(*)::int n from public.objectives where id between 5000000 and 5999999 and required_essay <> 0`)).rows[0].n === 0);
+// قياس الأثر: المالك ينشئ دراسة ويرفع درجات القبلي والبعدي (ملف CSV بدرجة كل سؤال)، فتظهر النتائج؛ والمدير لا يرى الأسماء
+{
+  // العودة إلى مقرر كيمياء 2-1 (الفحص السابق فتح مقرر التحصيلي)
+  await p.goto(BASE + '#/objective/C1-L1-O14'); await p.locator('#brand-sub', { hasText: 'كيمياء 2-1' }).waitFor();
+  await p.goto(BASE + '#/impact'); await p.locator('main', { hasText: 'قياس الأثر' }).waitFor();
+  ok('impact: section opens with empty state', (await p.locator('main').innerText()).includes('لا توجد دراسات أثر بعد'));
+  await p.click('a[href="#/impact/new"]'); await p.waitForSelector('#imp-form');
+  const objs = (await pool.query(`select o.code from objectives o join lessons l on l.id = o.lesson_id join chapters c on c.id = l.chapter_id where c.course_id = 1 order by o.id limit 2`)).rows.map(r => r.code);
+  await p.fill('#imp-title', 'دراسة تجريبية'); await p.fill('#imp-pre', '2020-01-01'); await p.fill('#imp-post', '2099-01-01');
+  await p.fill('#imp-premax', '4'); await p.fill('#imp-postmax', '4'); await p.fill('#imp-n', '4');
+  for (let i = 0; i < 4; i++) await p.locator('.imp-iobj').nth(i).fill(objs[i % 2]);
+  await p.click('#imp-form button[type="submit"]'); await p.waitForSelector('[data-up="pre"]', { state: 'attached' });
+  ok('impact: study created and opens data tab', (await p.locator('main').innerText()).includes('الطلاب ودرجاتهم'));
+  // 12 طالبًا مؤقتًا في المقرر (يُحذفون في نهاية الفحص)
+  for (let i = 1; i <= 12; i++) {
+    const em = `impst${String(i).padStart(2, '0')}@chem21.local`;
+    const { rows: [u] } = await pool.query(`insert into auth.users (email) values ($1) on conflict (email) do update set email = excluded.email returning id`, [em]);
+    await pool.query(`update public.profiles set role = 'student', managed = true, section = $2, display_name = $3 where user_id = $1`, [u.id, i % 2 ? '2/1' : '2/2', 'طالب أثر ' + i]);
+    await pool.query(`insert into public.course_enrollments (user_id, course_id) values ($1, 1) on conflict do nothing`, [u.id]);
+  }
+  const roster = (await pool.query(`select split_part(u.email, '@', 1) un from course_enrollments e join profiles pr on pr.user_id = e.user_id and pr.role = 'student'
+    join auth.users u on u.id = e.user_id where e.course_id = 1 order by un`)).rows.map(r => r.un);
+  await p.reload(); await p.waitForSelector('[data-up="pre"]', { state: 'attached' });
+  const csv = (fn) => 'الاسم,اسم المستخدم,الشعبة,س1,س2,س3,س4,المجموع\n' + roster.map((u, i) => `,${u},,${fn(i).join(',')},`).join('\n');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'imp-'));
+  fs.writeFileSync(path.join(tmp, 'pre.csv'), csv(i => [i % 2, 0, (i >> 1) % 2, 0]));
+  fs.writeFileSync(path.join(tmp, 'post.csv'), csv(i => [1, i % 3 ? 1 : 0, 1, i % 2]) + '\n,nobody-x,,1,1,1,1,');
+  await p.setInputFiles('[data-up="pre"]', path.join(tmp, 'pre.csv'));
+  await p.locator('.imp-phase', { hasText: 'الاختبار القبلي' }).locator('.d-big', { hasText: String(roster.length) }).waitFor();
+  await p.setInputFiles('[data-up="post"]', path.join(tmp, 'post.csv'));
+  await p.locator('[data-res="post"] .notice.warn', { hasText: 'nobody-x' }).waitFor();
+  ok('impact: uploads saved, unknown username reported', (await p.locator('.imp-phase', { hasText: 'الاختبار البعدي' }).locator('.d-big').innerText()).trim() === String(roster.length));
+  await p.click('.seg a:has-text("النتائج")'); await p.waitForSelector('.imp-verdict');
+  const res = await p.locator('main').innerText();
+  ok('impact: results show verdict, effect size, objectives, test quality', /حجم الأثر/.test(res) && /حسب الأهداف/.test(res) && /جودة الاختبار/.test(res) && /المنهجية وحدود الدراسة/.test(res), res.slice(0, 300));
+  await p.screenshot({ path: `${OUT}/impact-results.png`, fullPage: true });
+  const sid = (await pool.query(`select id from impact_studies order by id desc limit 1`)).rows[0].id;
+  await pool.query(`insert into auth.users (id, email) values ('66666666-6666-6666-6666-666666666666','prin-imp@chem21.local') on conflict do nothing`);
+  await pool.query(`update public.profiles set role = 'principal' where email = 'prin-imp@chem21.local'`);
+  const pr = await asRole('66666666-6666-6666-6666-666666666666', 'select public.impact_get($1) r', [sid]);
+  ok('impact: principal sees rows without names', !pr.error && pr.data.rows.length > 0 && pr.data.rows.every(r => r.name == null && r.username == null), pr.error?.message);
+  const pi = await asRole('66666666-6666-6666-6666-666666666666', `select public.impact_import($1, 'pre', '[]'::jsonb) r`, [sid]);
+  ok('impact: principal cannot import scores', /لمالك المشروع والمعلم/.test(pi.error?.message || ''), pi.error?.message);
+  await pool.query(`delete from auth.users where email = 'prin-imp@chem21.local' or email like 'impst%@chem21.local'`);
+}
 // مالك المشروع: يعدّل المحتوى ويغلق الملاحظات
 await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list .q');
 await p.locator('[data-mode="review"]').click(); await p.waitForSelector('.q-tools');
@@ -663,7 +708,7 @@ await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'principal1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 const navOf = async () => p.$$eval('.nav a', as => as.filter(a => !a.hidden).map(a => a.dataset.nav));
 ok('principal: role label', (await p.locator('#userbox').innerText()).includes('مدير المدرسة'));
-ok('principal: nav = home, chapters, bank, dashboard', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'reports']), JSON.stringify(await navOf()));
+ok('principal: nav = home, chapters, bank, dashboard, impact', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'reports', 'impact']), JSON.stringify(await navOf()));
 await p.goto(BASE + '#/reports'); await p.waitForSelector('.d-cols');
 ok('principal: dashboard with weekly + section charts, no revisions/notes', (await p.locator('.d-col').count()) === 8 && (await p.locator('.d-bars').count()) >= 4 && !(await p.locator('#revs').count()));
 await p.screenshot({ path: `${OUT}/dashboard-principal.png`, fullPage: true });
@@ -678,7 +723,7 @@ ok('principal: questions readable, no review tools', (await p.locator('.review-p
 // المشرف التربوي: اطلاع + منشئ الاختبارات + لوحة المؤشرات، دون تعديل
 await p.click('#logout'); await p.waitForSelector('#l-user');
 await p.fill('#l-user', 'super1'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
-ok('supervisor: nav includes exam builder + dashboard, no progress/notes/accounts', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'exam', 'reports']), JSON.stringify(await navOf()));
+ok('supervisor: nav includes exam builder + dashboard + impact, no progress/notes/accounts', JSON.stringify(await navOf()) === JSON.stringify(['home', 'chapters', 'bank', 'exam', 'reports', 'impact']), JSON.stringify(await navOf()));
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build', { timeout: 20000 });
 await p.click('#x-build'); await p.waitForSelector('.set-key .answer-grid.key');
 ok('supervisor: exam built with its answer key', /[أبج]/.test(await p.locator('.set-key .answer-grid.key').first().innerText()));

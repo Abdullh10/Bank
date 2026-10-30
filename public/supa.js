@@ -283,6 +283,13 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
   // ---------- الملاحظات ولوحة المؤشرات ----------
   if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });
+  // ---------- قياس الأثر ----------
+  if (p === '/impact') return rpc('impact_list', { p_course: course });
+  if (p === '/impact/save') return { id: await rpc('impact_save', { p_id: null, p: body, p_course: course }) };
+  if ((m = p.match(/^\/impact\/(\d+)$/))) return rpc('impact_get', { p_id: Number(m[1]) });
+  if ((m = p.match(/^\/impact\/(\d+)\/save$/))) return { id: await rpc('impact_save', { p_id: Number(m[1]), p: body, p_course: course }) };
+  if ((m = p.match(/^\/impact\/(\d+)\/delete$/))) { await rpc('impact_delete', { p_id: Number(m[1]) }); return { ok: true }; }
+  if ((m = p.match(/^\/impact\/(\d+)\/import$/))) return rpc('impact_import', { p_id: Number(m[1]), p_phase: body.phase, p_rows: body.rows });
   if (p === '/exam/answers') return rpc('get_exam_answers', { p_ids: body.ids });
   if (p === '/notes') {
     if (method === 'GET') return rpc('get_notes', { p_code: f.code || null, p_status: f.status || 'open' });

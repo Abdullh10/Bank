@@ -1201,3 +1201,39 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .st-grade { margin: .7rem .2rem .25rem; font-size: .84rem; font-weight: 700; color: var(--brand-2, #12305a); border-bottom: 1px solid var(--line); padding-bottom: .2rem; }
 .st-grade:first-of-type { margin-top: .3rem; }
 .badge.year { background: var(--goldsoft, #fbf3e2); color: #7a5410; border: 1px solid #ecd9ae; font-weight: 600; }
+
+/* ---------- قياس الأثر ---------- */
+.imp-steps { margin: 0; padding-inline-start: 1.3rem; display: grid; gap: .55rem; }
+.imp-steps li b { display: block; }
+.imp-card { text-decoration: none; color: inherit; display: block; }
+.imp-card:hover { box-shadow: var(--shadow-2, var(--shadow)); }
+.imp-badges { display: flex; flex-wrap: wrap; gap: .35rem; margin: .4rem 0 0; }
+.imp-check { display: flex; gap: .5rem; align-items: center; margin: .6rem 0; }
+.imp-check input { width: auto; }
+.imp-count { max-width: 12rem; }
+.imp-items input { min-width: 6rem; }
+.imp-verdict { font-size: 1.05rem; }
+.imp-neg { color: var(--bad); }
+.imp-method ul { margin: 0; padding-inline-start: 1.2rem; display: grid; gap: .4rem; }
+.imp-result:empty { display: none; }
+.imp-result ul { margin: .3rem 0 0; padding-inline-start: 1.2rem; }
+/* «قبل ← بعد»: دائرة مفرغة للقبلي ومصمتة للبعدي، ولا يعتمد المعنى على اللون وحده */
+.imp-db { display: grid; gap: .7rem; }
+.imp-db-row { display: grid; grid-template-columns: minmax(7rem, 38%) 1fr 3.4rem; align-items: center; gap: .6rem; font-size: .88rem; outline: none; border-radius: 8px; padding: .15rem .2rem; }
+.imp-db-row:hover, .imp-db-row:focus-visible { background: var(--surface-2); }
+.imp-db-row:focus-visible { box-shadow: var(--ring); }
+.imp-db-track { position: relative; height: 18px; background: linear-gradient(var(--d-track), var(--d-track)) center / 100% 2px no-repeat; }
+.imp-db-line { position: absolute; top: 7px; height: 4px; background: var(--d-mark); border-radius: 2px; }
+.imp-db-line.down { background: var(--bad); }
+.imp-db-dot { position: absolute; top: 2px; width: 14px; height: 14px; margin-inline-start: -7px; border-radius: 50%; box-sizing: border-box; }
+.imp-db-dot.pre { background: var(--surface); border: 2.5px solid var(--d-mark); }
+.imp-db-dot.post { background: var(--brand-2, var(--brand)); border: 2.5px solid var(--brand-2, var(--brand)); }
+.imp-db-val { font-variant-numeric: tabular-nums; text-align: end; color: var(--ink-2); }
+.imp-legend { display: flex; align-items: center; gap: .4rem; margin: .6rem 0 0; }
+.imp-legend .imp-db-dot { position: static; display: inline-block; margin: 0; }
+@media print {
+  .imp-db-dot, .imp-db-line { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .imp-db-dot.post { background: #000 !important; border-color: #000 !important; }
+  .imp-db-dot.pre { background: #fff !important; border-color: #000 !important; }
+  .imp-db-line { background: #555 !important; }
+}

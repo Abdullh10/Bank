@@ -6,16 +6,17 @@
 //   exam      منشئ الاختبارات
 //   progress  تقدم الطلاب بالأسماء
 //   dashboard لوحة المؤشرات (أرقام مجمّعة دون أسماء)
+//   impact    قياس الأثر: عرض الدراسات ونتائجها (الإنشاء والإدخال للمالك والمعلم، والأسماء للمالك والمعلم والمراجع فقط)
 //   accounts  إدارة حسابات الطلاب والفريق
 //   bank      صفحة «بنك الأسئلة» (المعلم لا يراها؛ يختار أسئلته من منشئ الاختبارات)
 //   answers   الإجابات في صفحة الهدف (المعلم لا يراها؛ مفتاح الإجابة يأتيه مع الاختبار الذي ينشئه)
 //   fullbank  البنك كاملًا بإجاباته وطباعته (غيرهما: إجابات هدف واحد في كل مرة، ومفتاح الاختبار لأسئلته فقط)
 export const PERMS = {
-  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'accounts', 'fullbank', 'bank', 'answers'],
-  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard', 'fullbank', 'bank', 'answers'],
-  viewer: ['exam', 'progress', 'dashboard'],
-  supervisor: ['exam', 'dashboard', 'bank', 'answers'],
-  principal: ['dashboard', 'bank', 'answers'],
+  admin: ['edit', 'review', 'notes', 'exam', 'progress', 'dashboard', 'impact', 'accounts', 'fullbank', 'bank', 'answers'],
+  reviewer: ['review', 'notes', 'exam', 'progress', 'dashboard', 'impact', 'fullbank', 'bank', 'answers'],
+  viewer: ['exam', 'progress', 'dashboard', 'impact'],
+  supervisor: ['exam', 'dashboard', 'impact', 'bank', 'answers'],
+  principal: ['dashboard', 'impact', 'bank', 'answers'],
 };
 
 export const ROLE_NAMES = {
