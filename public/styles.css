@@ -1237,3 +1237,7 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
   .imp-db-dot.pre { background: #fff !important; border-color: #000 !important; }
   .imp-db-line { background: #555 !important; }
 }
+/* حقول الدراسة: العناوين في سطر واحد، والحقول على خط واحد مهما طال العنوان، والتلميح تحت الحقل */
+.imp-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: start; }
+.imp-grid .field label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.imp-hint { display: block; margin-top: .25rem; }

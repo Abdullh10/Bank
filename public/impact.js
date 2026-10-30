@@ -62,10 +62,10 @@ async function pageForm(ctx, id) {
     <div class="hero"><div class="hero-ic">${icon('trophy', 52)}<div><h1>${id ? 'تعديل دراسة الأثر' : 'دراسة أثر جديدة'}</h1>
       <p class="muted">البيانات الأساسية للاختبارين. يمكنك تعديلها لاحقًا.</p></div></div></div>
     <form id="imp-form" class="card">
-      <div class="form-grid">
-        <div class="field"><label for="imp-title">عنوان الدراسة</label><input id="imp-title" required value="${esc(s.title)}" placeholder="مثل: أثر المنصة في الفصل الأول · كيمياء 2-1"></div>
-        <div class="field"><label for="imp-pre">تاريخ الاختبار القبلي</label><input id="imp-pre" type="date" required value="${esc(s.preDate || '')}"></div>
-        <div class="field"><label for="imp-post">تاريخ الاختبار البعدي <span class="small muted">(يمكن تحديده لاحقًا)</span></label><input id="imp-post" type="date" value="${esc(s.postDate || '')}"></div>
+      <div class="field"><label for="imp-title">عنوان الدراسة</label><input id="imp-title" required value="${esc(s.title)}" placeholder="مثل: أثر المنصة في الفصل الأول · كيمياء 2-1"></div>
+      <div class="form-grid imp-grid">
+        <div class="field"><label for="imp-pre">تاريخ القبلي</label><input id="imp-pre" type="date" required value="${esc(s.preDate || '')}"></div>
+        <div class="field"><label for="imp-post">تاريخ البعدي</label><input id="imp-post" type="date" value="${esc(s.postDate || '')}"><span class="small muted imp-hint">يمكن تحديده لاحقًا</span></div>
         <div class="field"><label for="imp-premax">الدرجة العظمى للقبلي</label><input id="imp-premax" type="number" min="1" step="0.5" required value="${esc(s.preMax)}"></div>
         <div class="field"><label for="imp-postmax">الدرجة العظمى للبعدي</label><input id="imp-postmax" type="number" min="1" step="0.5" required value="${esc(s.postMax)}"></div>
       </div>
