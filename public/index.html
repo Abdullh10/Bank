@@ -15,42 +15,62 @@
   <meta name="theme-color" content="#12305a" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#081322" media="(prefers-color-scheme: dark)">
   <!-- version:start (يُولَّد بـ scripts/stamp-version.js؛ لا تعدّله يدويًا) -->
-  <meta name="itqan-version" content="14aeb9a00e">
-  <script type="importmap">{"imports":{"./app.js":"./app.js?v=14aeb9a00e","./bidi.js":"./bidi.js?v=14aeb9a00e","./config.js":"./config.js?v=14aeb9a00e","./courses.js":"./courses.js?v=14aeb9a00e","./dashboard.js":"./dashboard.js?v=14aeb9a00e","./dates.js":"./dates.js?v=14aeb9a00e","./exam-docx.js":"./exam-docx.js?v=14aeb9a00e","./exam.js":"./exam.js?v=14aeb9a00e","./icons.js":"./icons.js?v=14aeb9a00e","./impact-stats.js":"./impact-stats.js?v=14aeb9a00e","./impact.js":"./impact.js?v=14aeb9a00e","./math.js":"./math.js?v=14aeb9a00e","./media.js":"./media.js?v=14aeb9a00e","./notes.js":"./notes.js?v=14aeb9a00e","./roles.js":"./roles.js?v=14aeb9a00e","./staff.js":"./staff.js?v=14aeb9a00e","./student.js":"./student.js?v=14aeb9a00e","./supa.js":"./supa.js?v=14aeb9a00e","./validate.js":"./validate.js?v=14aeb9a00e"}}</script>
-  <link rel="stylesheet" href="styles.css?v=14aeb9a00e">
-  <script type="module" src="app.js?v=14aeb9a00e"></script>
+  <meta name="itqan-version" content="7283d9129e">
+  <script type="importmap">{"imports":{"./app.js":"./app.js?v=7283d9129e","./bidi.js":"./bidi.js?v=7283d9129e","./config.js":"./config.js?v=7283d9129e","./courses.js":"./courses.js?v=7283d9129e","./dashboard.js":"./dashboard.js?v=7283d9129e","./dates.js":"./dates.js?v=7283d9129e","./exam-docx.js":"./exam-docx.js?v=7283d9129e","./exam.js":"./exam.js?v=7283d9129e","./icons.js":"./icons.js?v=7283d9129e","./impact-stats.js":"./impact-stats.js?v=7283d9129e","./impact.js":"./impact.js?v=7283d9129e","./math.js":"./math.js?v=7283d9129e","./media.js":"./media.js?v=7283d9129e","./notes.js":"./notes.js?v=7283d9129e","./roles.js":"./roles.js?v=7283d9129e","./staff.js":"./staff.js?v=7283d9129e","./student.js":"./student.js?v=7283d9129e","./supa.js":"./supa.js?v=7283d9129e","./validate.js":"./validate.js?v=7283d9129e"}}</script>
+  <link rel="stylesheet" href="styles.css?v=7283d9129e">
+  <script type="module" src="app.js?v=7283d9129e"></script>
   <!-- version:end -->
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
 </head>
 <body class="locked booting">
   <header class="topbar">
     <div class="topbar-inner">
+      <button type="button" class="menu-btn" id="menu-btn" aria-label="القائمة" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><b class="menu-dot" id="menu-dot" hidden></b></button>
       <a class="brand" href="#/">
         <img class="logo-light" src="assets/itqan-mark.svg" alt="" width="44" height="44"><img class="logo-dark" src="assets/itqan-mark-dark.svg" alt="" width="44" height="44">
         <span>إتقان <em>منصة بنك الأسئلة والتدريب في الكيمياء</em><small id="brand-sub">مقررات الكيمياء · المرحلة الثانوية</small></span>
       </a>
-      <nav class="nav" aria-label="القائمة الرئيسية">
+      <div class="userbox" id="userbox"></div>
+    </div>
+  </header>
+  <div class="drawer-bd" id="drawer-bd" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="القائمة الرئيسية" aria-hidden="true" inert>
+    <div class="drawer-head">
+      <a class="drawer-brand" href="#/"><img class="logo-light" src="assets/itqan-mark.svg" alt="" width="40" height="40"><img class="logo-dark" src="assets/itqan-mark-dark.svg" alt="" width="40" height="40"><span>إتقان</span></a>
+      <button type="button" class="drawer-x" id="drawer-x" aria-label="إغلاق القائمة"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg></button>
+    </div>
+    <nav class="nav" aria-label="أقسام المنصة">
+      <div class="nav-group"><h6>المحتوى</h6>
         <a href="#/" data-nav="home" data-perm="staff"><i data-icon="home"></i><span>المقررات</span></a>
         <a href="#/chapters" data-nav="chapters" data-perm="staff"><i data-icon="chapters"></i><span>الفصول</span></a>
         <a href="#/bank" data-nav="bank" data-perm="bank"><i data-icon="bank"></i><span>بنك الأسئلة</span></a>
         <a href="#/exam" data-nav="exam" data-perm="exam"><i data-icon="exam"></i><span>منشئ الاختبارات</span></a>
+      </div>
+      <div class="nav-group"><h6>المتابعة والتحليل</h6>
         <a href="#/reports" data-nav="reports" data-perm="dashboard"><i data-icon="reports"></i><span>لوحة المؤشرات</span></a>
         <a href="#/impact" data-nav="impact" data-perm="impact"><i data-icon="trophy"></i><span>قياس الأثر</span></a>
         <a href="#/progress" data-nav="progress" data-perm="progress"><i data-icon="progress"></i><span>تقدم الطلاب</span></a>
+      </div>
+      <div class="nav-group"><h6>التواصل</h6>
         <a href="#/comms" data-nav="comms" data-perm="progress"><i data-icon="mail"></i><span>رسائل ومهام</span></a>
         <a href="#/grades" data-nav="grades" data-perm="progress"><i data-icon="coin"></i><span>رصيد الدرجات</span></a>
         <a href="#/notes" data-nav="notes" data-perm="notes"><i data-icon="notes"></i><span>الملاحظات</span></a>
+      </div>
+      <div class="nav-group"><h6>الإدارة</h6>
         <a href="#/students" data-nav="students" data-perm="accounts"><i data-icon="students"></i><span>الحسابات</span></a>
+      </div>
+      <div class="nav-group"><h6>تعلّمي</h6>
         <a href="#/" data-nav="home" data-perm="student"><i data-icon="practice"></i><span>تدرّب</span></a>
         <a href="#/tahsili" data-nav="tahsili" data-perm="student"><i data-icon="exam"></i><span>التحصيلي</span></a>
         <a href="#/history" data-nav="history" data-perm="student"><i data-icon="history"></i><span>سجلي</span></a>
+      </div>
+      <div class="nav-group"><h6>إنجازي</h6>
         <a href="#/rank" data-nav="rank" data-perm="student"><i data-icon="trophy"></i><span>التميّز</span></a>
         <a href="#/balance" data-nav="balance" data-perm="student"><i data-icon="coin"></i><span>الرصيد</span></a>
         <a href="#/inbox" data-nav="inbox" data-perm="student"><i data-icon="mail"></i><span>رسائل معلمي</span><b class="nav-badge" id="nav-unread" hidden></b></a>
-      </nav>
-      <div class="userbox" id="userbox"></div>
-    </div>
-  </header>
+      </div>
+    </nav>
+  </aside>
   <div class="boot-splash" role="status" aria-label="جارٍ التحميل"><img class="logo-fixed" src="assets/itqan-mark.svg" alt="" width="72" height="72"><span class="boot-spin" aria-hidden="true"></span></div>
   <main id="app" tabindex="-1"></main>
   <footer class="footer">جميع الحقوق محفوظة © 2026 · برمجة وتطوير الأستاذ عبدالله حمدي</footer>
