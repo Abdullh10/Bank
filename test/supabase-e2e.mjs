@@ -316,6 +316,18 @@ ok('tahsili: topics require no essays', (await pool.query(`select count(*)::int 
   await p.setInputFiles('[data-up="post"]', path.join(tmp, 'post.csv'));
   await p.locator('[data-res="post"] .notice.warn', { hasText: 'nobody-x' }).waitFor();
   ok('impact: uploads saved, unknown username reported', (await p.locator('.imp-phase', { hasText: 'الاختبار البعدي' }).locator('.d-big').innerText()).trim() === String(roster.length));
+  // فلترة جدول الطلاب وفرزه
+  await p.selectOption('#imp-sec', '2/1');
+  const secOk = (await p.locator('#imp-count').innerText()).includes('يظهر 6 من');
+  await p.fill('#imp-q', 'impst03');
+  const qOk = (await p.locator('#imp-rows tr').count()) === 1;
+  await p.fill('#imp-q', ''); await p.selectOption('#imp-sec', '');
+  await p.click('[data-sort="pre"]');
+  const pres = (await p.$$eval('#imp-rows tr', trs => trs.map(tr => Number(tr.cells[2].textContent)))).filter(Number.isFinite);
+  ok('impact: students table filters by section/search and sorts by pre (descending)', secOk && qOk && pres.length >= 12 && pres.every((v, i) => !i || pres[i - 1] >= v), JSON.stringify(pres));
+  await p.selectOption('#imp-st', 'noPost');
+  ok('impact: status filter (no post score) leaves only students outside the roster test', (await p.locator('#imp-count').innerText()).startsWith('يظهر 0 من'), await p.locator('#imp-count').innerText());
+  await p.selectOption('#imp-st', 'all');
   await p.click('.seg a:has-text("النتائج")'); await p.waitForSelector('.imp-verdict');
   const res = await p.locator('main').innerText();
   ok('impact: results show verdict, effect size, objectives, test quality', /حجم الأثر/.test(res) && /حسب الأهداف/.test(res) && /جودة الاختبار/.test(res) && /المنهجية وحدود الدراسة/.test(res), res.slice(0, 300));

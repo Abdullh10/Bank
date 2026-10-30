@@ -1241,3 +1241,13 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 .imp-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: start; }
 .imp-grid .field label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 .imp-hint { display: block; margin-top: .25rem; }
+/* قياس الأثر: فلترة جدول الطلاب وفرزه */
+.imp-filters { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .6rem 0 .8rem; }
+.imp-filters input[type="search"] { flex: 1 1 220px; max-width: 340px; }
+.imp-filters select { width: auto; flex: 0 1 220px; }
+.imp-table th { padding: 0; }
+.imp-sort { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: .35rem; width: 100%; padding: .55rem .6rem; cursor: pointer; font-weight: 600; white-space: nowrap; }
+.imp-sort:hover { background: var(--surface-2); }
+.imp-sort:focus-visible { box-shadow: var(--ring); border-radius: 6px; }
+.imp-arrow { font-size: .7rem; color: var(--ink-3); }
+th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { color: var(--brand-2, var(--brand)); }
