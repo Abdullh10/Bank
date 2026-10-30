@@ -175,6 +175,9 @@ function renderData(ctx, data, body, reload) {
   const { api, esc, toast, fail } = ctx;
   const s = data.study, k = s.items.length, rows = data.rows;
   const counts = ph => rows.filter(r => r[ph] != null).length;
+  const sections = [...new Set(rows.map(r => r.section || '—'))].sort((a, b) => a.localeCompare(b, 'ar', { numeric: true }));
+  if (view.study !== s.id) Object.assign(view, { study: s.id, q: '', section: '', status: 'all', sort: 'name', dir: 1 });
+  if (view.section && !sections.includes(view.section)) view.section = '';
   body.innerHTML = `<div class="grid cards">${['pre', 'post', 'prior'].map(ph => `<section class="card imp-phase">
       ${ttl(esc, ph === 'prior' ? 'history' : 'upload', PHASES[ph])}
       <p><b class="d-big">${num(counts(ph))}</b> طالبًا من ${num(rows.length)}</p>
@@ -185,10 +188,52 @@ function renderData(ctx, data, body, reload) {
       <div class="imp-result" data-res="${ph}"></div></section>`).join('')}</div>
     <section class="card">${ttl(esc, 'students', 'الطلاب ودرجاتهم')}
       <p class="small muted">طلاب المقرر الذين تتابعهم. «الإجابات الجادة» هي الإجابات الأولى على أسئلة لم يجب عنها الطالب من قبل، واستغرقت 3 ثوانٍ فأكثر، بين تاريخي الاختبارين.</p>
-      <div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>القبلي</th><th>البعدي</th><th>سابق</th><th>الإجابات الجادة</th><th>أيام النشاط</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${esc(r.name || '—')} <span class="small muted" dir="ltr">${esc(r.username || '')}</span></td><td>${esc(r.section || '—')}</td>
-        <td>${r.pre ?? '<span class="muted">—</span>'}</td><td>${r.post ?? '<span class="muted">—</span>'}</td><td>${r.prior ?? '<span class="muted">—</span>'}</td>
-        <td>${num(r.usage.valid)}</td><td>${num(r.usage.days)}</td></tr>`).join('')}</tbody></table></div></section>`;
+      <div class="imp-filters no-print">
+        <input id="imp-q" type="search" placeholder="بحث بالاسم أو اسم المستخدم" value="${esc(view.q)}" aria-label="بحث">
+        <select id="imp-sec" aria-label="الشعبة"><option value="">كل الشعب</option>${sections.map(x => `<option ${view.section === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>
+        <select id="imp-st" aria-label="الحالة">${Object.entries(STATUS).map(([v, l]) => `<option value="${v}" ${view.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+        <span class="small muted" id="imp-count"></span>
+      </div>
+      <div class="table-wrap"><table class="list imp-table"><thead><tr>${COLS.map(([key, label]) =>
+        `<th aria-sort="${view.sort === key ? (view.dir > 0 ? 'ascending' : 'descending') : 'none'}"><button type="button" class="imp-sort" data-sort="${key}">${label}<span class="imp-arrow">${view.sort === key ? (view.dir > 0 ? '▲' : '▼') : '↕'}</span></button></th>`).join('')}</tr></thead>
+      <tbody id="imp-rows"></tbody></table></div></section>`;
+
+  // الفلترة والفرز في المتصفح (يبقى الاختيار بعد رفع ملف وإعادة العرض)
+  const dash = '<span class="muted">—</span>';
+  const draw = () => {
+    const q = view.q.trim().toLowerCase();
+    const list = rows.filter(r => (!view.section || (r.section || '—') === view.section)
+      && (!q || (r.name || '').toLowerCase().includes(q) || (r.username || '').includes(q))
+      && STATUS_FN[view.status](r));
+    const val = COLS.find(c => c[0] === view.sort)[2];
+    list.sort((a, b) => {
+      const x = val(a), y = val(b);
+      if (x == null && y == null) return 0;
+      if (x == null) return 1; // الفارغ في الآخر دائمًا
+      if (y == null) return -1;
+      return view.dir * (typeof x === 'string' ? x.localeCompare(y, 'ar', { numeric: true }) : x - y);
+    });
+    document.getElementById('imp-rows').innerHTML = list.length ? list.map(r => `<tr><td>${esc(r.name || '—')} <span class="small muted" dir="ltr">${esc(r.username || '')}</span></td><td>${esc(r.section || '—')}</td>
+      <td>${r.pre ?? dash}</td><td>${r.post ?? dash}</td><td>${r.prior ?? dash}</td><td>${num(r.usage.valid)}</td><td>${num(r.usage.days)}</td></tr>`).join('')
+      : `<tr><td colspan="7" class="muted">لا يوجد طلاب بهذه الفلترة.</td></tr>`;
+    document.getElementById('imp-count').textContent = `يظهر ${num(list.length)} من ${num(rows.length)}`;
+    body.querySelectorAll('.imp-sort').forEach(b => {
+      const on = b.dataset.sort === view.sort;
+      b.closest('th').setAttribute('aria-sort', on ? (view.dir > 0 ? 'ascending' : 'descending') : 'none');
+      b.querySelector('.imp-arrow').textContent = on ? (view.dir > 0 ? '▲' : '▼') : '↕';
+    });
+  };
+  document.getElementById('imp-q').addEventListener('input', e => { view.q = e.target.value; draw(); });
+  document.getElementById('imp-sec').addEventListener('change', e => { view.section = e.target.value; draw(); });
+  document.getElementById('imp-st').addEventListener('change', e => { view.status = e.target.value; draw(); });
+  body.querySelectorAll('.imp-sort').forEach(b => b.addEventListener('click', () => {
+    const key = b.dataset.sort;
+    // النقرة الأولى: الأسماء والشعب تصاعديًا، والأرقام تنازليًا (الأعلى أولًا)؛ والنقرة التالية تعكس
+    view.dir = view.sort === key ? -view.dir : (['name', 'section'].includes(key) ? 1 : -1);
+    view.sort = key;
+    draw();
+  }));
+  draw();
 
   body.querySelectorAll('[data-tpl]').forEach(b => b.addEventListener('click', () => {
     const ph = b.dataset.tpl, items = ph !== 'prior' && k ? s.items.map((_, i) => `س${i + 1}`) : [];
@@ -216,6 +261,15 @@ function renderData(ctx, data, body, reload) {
     inp.value = '';
   }));
 }
+
+// فلترة جدول الطلاب وفرزه (حالة واحدة لكل الصفحة، تُصفَّر عند فتح دراسة أخرى)
+const view = { study: null, q: '', section: '', status: 'all', sort: 'name', dir: 1 };
+const STATUS = { all: 'كل الطلاب', noPre: 'لم تُدخل له درجة القبلي', noPost: 'لم تُدخل له درجة البعدي', both: 'له الاختباران', none: 'لا درجات له', noUse: 'لم يتدرّب بين الاختبارين' };
+const STATUS_FN = { all: () => true, noPre: r => r.pre == null, noPost: r => r.post == null, both: r => r.pre != null && r.post != null,
+  none: r => r.pre == null && r.post == null && r.prior == null, noUse: r => !r.usage.valid };
+const numOrNull = v => (v == null ? null : Number(v));
+const COLS = [['name', 'الطالب', r => r.name || r.username || ''], ['section', 'الشعبة', r => r.section || null], ['pre', 'القبلي', r => numOrNull(r.pre)],
+  ['post', 'البعدي', r => numOrNull(r.post)], ['prior', 'سابق', r => numOrNull(r.prior)], ['valid', 'الإجابات الجادة', r => r.usage.valid], ['days', 'أيام النشاط', r => r.usage.days]];
 
 // رسم «قبل ← بعد» لكل مجموعة: دائرة مفرغة للقبلي ومصمتة للبعدي على محور 0–100%
 function dumbbell(esc, groups, label) {
