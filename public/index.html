@@ -15,10 +15,10 @@
   <meta name="theme-color" content="#12305a" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#081322" media="(prefers-color-scheme: dark)">
   <!-- version:start (يُولَّد بـ scripts/stamp-version.js؛ لا تعدّله يدويًا) -->
-  <meta name="itqan-version" content="a19b2127cf">
-  <script type="importmap">{"imports":{"./app.js":"./app.js?v=a19b2127cf","./bidi.js":"./bidi.js?v=a19b2127cf","./config.js":"./config.js?v=a19b2127cf","./courses.js":"./courses.js?v=a19b2127cf","./dashboard.js":"./dashboard.js?v=a19b2127cf","./dates.js":"./dates.js?v=a19b2127cf","./exam-docx.js":"./exam-docx.js?v=a19b2127cf","./exam.js":"./exam.js?v=a19b2127cf","./icons.js":"./icons.js?v=a19b2127cf","./impact-stats.js":"./impact-stats.js?v=a19b2127cf","./impact.js":"./impact.js?v=a19b2127cf","./math.js":"./math.js?v=a19b2127cf","./media.js":"./media.js?v=a19b2127cf","./notes.js":"./notes.js?v=a19b2127cf","./roles.js":"./roles.js?v=a19b2127cf","./staff.js":"./staff.js?v=a19b2127cf","./student.js":"./student.js?v=a19b2127cf","./supa.js":"./supa.js?v=a19b2127cf","./validate.js":"./validate.js?v=a19b2127cf"}}</script>
-  <link rel="stylesheet" href="styles.css?v=a19b2127cf">
-  <script type="module" src="app.js?v=a19b2127cf"></script>
+  <meta name="itqan-version" content="fb395aa4af">
+  <script type="importmap">{"imports":{"./app.js":"./app.js?v=fb395aa4af","./bidi.js":"./bidi.js?v=fb395aa4af","./config.js":"./config.js?v=fb395aa4af","./courses.js":"./courses.js?v=fb395aa4af","./dashboard.js":"./dashboard.js?v=fb395aa4af","./dates.js":"./dates.js?v=fb395aa4af","./exam-docx.js":"./exam-docx.js?v=fb395aa4af","./exam.js":"./exam.js?v=fb395aa4af","./icons.js":"./icons.js?v=fb395aa4af","./impact-stats.js":"./impact-stats.js?v=fb395aa4af","./impact.js":"./impact.js?v=fb395aa4af","./math.js":"./math.js?v=fb395aa4af","./media.js":"./media.js?v=fb395aa4af","./notes.js":"./notes.js?v=fb395aa4af","./roles.js":"./roles.js?v=fb395aa4af","./staff.js":"./staff.js?v=fb395aa4af","./student.js":"./student.js?v=fb395aa4af","./supa.js":"./supa.js?v=fb395aa4af","./validate.js":"./validate.js?v=fb395aa4af"}}</script>
+  <link rel="stylesheet" href="styles.css?v=fb395aa4af">
+  <script type="module" src="app.js?v=fb395aa4af"></script>
   <!-- version:end -->
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
 </head>
@@ -45,6 +45,7 @@
         <a href="#/chapters" data-nav="chapters" data-perm="staff"><i data-icon="chapters"></i><span>الفصول</span></a>
         <a href="#/bank" data-nav="bank" data-perm="bank"><i data-icon="bank"></i><span>بنك الأسئلة</span></a>
         <a href="#/exam" data-nav="exam" data-perm="exam"><i data-icon="exam"></i><span>منشئ الاختبارات</span></a>
+        <a href="#/prep" data-nav="prep" data-perm="progress"><i data-icon="objectives"></i><span>الاستعداد للاختبار</span></a>
       </div>
       <div class="nav-group"><h6>المتابعة والتحليل</h6>
         <a href="#/reports" data-nav="reports" data-perm="dashboard"><i data-icon="reports"></i><span>لوحة المؤشرات</span></a>
@@ -62,6 +63,7 @@
       <div class="nav-group"><h6>تعلّمي</h6>
         <a href="#/" data-nav="home" data-perm="student"><i data-icon="practice"></i><span>تدرّب</span></a>
         <a href="#/tahsili" data-nav="tahsili" data-perm="student"><i data-icon="exam"></i><span>التحصيلي</span></a>
+        <a href="#/prep" data-nav="prep" data-perm="student" hidden><i data-icon="objectives"></i><span>الاستعداد للاختبار</span></a>
         <a href="#/history" data-nav="history" data-perm="student"><i data-icon="history"></i><span>سجلي</span></a>
       </div>
       <div class="nav-group"><h6>إنجازي</h6>

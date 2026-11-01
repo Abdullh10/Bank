@@ -241,11 +241,19 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/comms/read') { await rpc('student_comms_mark_read'); return { ok: true }; }
   if (p === '/student/comms/reply') { await rpc('student_comm_reply', { p_id: body.id, p_code: body.code }); return { ok: true }; }
   if (p === '/student/balance') return rpc('student_balance', { p_course: f.course ? Number(f.course) : null });
+  if (p === '/student/prep') return rpc('student_prep_list');
+  if (p === '/student/prep/start') return rpc('student_prep_start', { p_set: Number(body.set), p_mode: body.mode || 'next' });
+  if (p === '/student/prep/answer') return rpc('student_prep_answer', { p_set: Number(body.set), p_question: body.question, p_choice: body.choice });
+  if (p === '/student/prep/restart') return rpc('student_prep_restart', { p_set: Number(body.set) });
   if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------
   if (p === '/staff/comms') return method === 'GET' ? rpc('staff_list_comms', { p_course: course }) : rpc('staff_send_comm', { p: { ...body, course } });
   if (p === '/staff/comms/detail') return rpc('staff_comm_detail', { p_id: Number(f.id) });
   if (p === '/staff/comms/cancel') { await rpc('staff_cancel_comm', { p_id: body.id }); return { ok: true }; }
+  if (p === '/staff/prep') return method === 'GET' ? rpc('prep_list', { p_course: course }) : { id: await rpc('prep_save', { p_id: body.id ? Number(body.id) : null, p: body, p_course: course }) };
+  if (p === '/staff/prep/visible') { await rpc('prep_set_visible', { p_id: Number(body.id), p_visible: !!body.visible }); return { ok: true }; }
+  if (p === '/staff/prep/delete') { await rpc('prep_delete', { p_id: Number(body.id) }); return { ok: true }; }
+  if (p === '/staff/prep/stats') return rpc('prep_stats', { p_id: Number(f.id) });
   if (p === '/staff/lessons') return rpc('staff_course_lessons', { p_course: course });
   if (p === '/staff/students') return rpc('staff_my_students', { p_course: course });
   if (p === '/admin/comms/settings') return method === 'GET' ? rpc('admin_get_comm_settings') : rpc('admin_set_comm_settings', { p_daily: Number(body.daily), p_active: Number(body.activeTasks), p_max: Number(body.maxRecipients) });

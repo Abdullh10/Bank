@@ -1356,3 +1356,10 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
   .rp-sign p { margin: 6pt 0 0; font-size: 8.5pt; color: #4a5565; }
   .rp-foot { margin-top: 14pt; text-align: center; font-size: 7.5pt; color: #8a94a3; }
 }
+
+/* ---------- الاستعداد للاختبار ---------- */
+.pr-card .ttl { margin-bottom: .3rem; }
+.pr-prog { display: grid; gap: .35rem; margin: .6rem 0 .2rem; }
+.pr-lesson { display: flex; padding-inline-start: 1.6rem; }
+.pr-all { display: flex; margin: .35rem 0 .15rem; }
+.pr-secs { display: flex; flex-wrap: wrap; gap: .3rem 1rem; }

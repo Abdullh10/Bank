@@ -2,8 +2,8 @@
 import { pageExam, resetExam } from './exam.js';
 import { SUPABASE } from './config.js';
 import { similarPairs } from './validate.js';
-import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentInbox, pageStudentConfirm, resetStudentSession } from './student.js';
-import { pageTeacherProgress, pageTeacherGrades, pageTeacherComms, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
+import { pageStudentHome, pageStudentHistory, pageStudentRank, pageStudentBalance, pageStudentInbox, pageStudentPrep, pageStudentConfirm, resetStudentSession } from './student.js';
+import { pageTeacherProgress, pageTeacherGrades, pageTeacherComms, pageTeacherPrep, pageAdminStudents, pageAdminTeam, resetStaffState } from './staff.js';
 import { pageDashboard } from './dashboard.js';
 import { pageImpact } from './impact.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
@@ -328,7 +328,7 @@ const objState = { mode: 'test', answers: {} };
 
 // الخروج (أو انتهاء الجلسة): تُمسح كل حالة المستخدم السابق من الجهاز قبل عرض صفحة الدخول.
 function signedOut() {
-  resetStudentSession(); resetExam(); resetStaffState(); resetNotesState(); bankCache = null;
+  resetStudentSession(); prepOpen = false; prepAt = 0; resetExam(); resetStaffState(); resetNotesState(); bankCache = null;
   for (const k in bankFilter) delete bankFilter[k];
   state.selection.clear();
   Object.assign(objState, { mode: 'test', answers: {} });
@@ -999,6 +999,14 @@ async function refreshInboxBadge() {
   inboxAt = Date.now();
   try { setInboxBadge((await supa.supaApi('/student/comms/summary')).unread || 0); } catch { /* العدّاد اختياري */ }
 }
+// «الاستعداد للاختبار» يظهر في قائمة الطالب فقط حين يفتح له معلمه مجموعة (يُحدَّث كل 45 ثانية على الأكثر، وفورًا عند فتح القسم)
+let prepOpen = false, prepAt = 0;
+async function refreshPrepNav(force) {
+  if (!force && Date.now() - prepAt < 45000) return;
+  prepAt = Date.now();
+  try { prepOpen = (await supa.supaApi('/student/prep')).length > 0; } catch { return; }
+  document.querySelectorAll('.nav a[data-nav="prep"][data-perm="student"]').forEach(a => { a.hidden = !prepOpen; });
+}
 async function route() {
   const seq = ++routeSeq;
   // نافذة تحرير مفتوحة لا تبقى بعد الانتقال (مثل السحب للرجوع على الآيباد)
@@ -1020,11 +1028,14 @@ async function route() {
   document.querySelectorAll('[data-perm]').forEach(a => {
     const p = a.dataset.perm;
     a.hidden = !(p === 'student' ? isStudent && (!['rank', 'balance', 'inbox'].includes(a.dataset.nav) || state.supabase)
-      && (a.dataset.nav !== 'tahsili' || (state.user.courses || []).some(c => c.kind === 'tahsili')) : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || ['grades', 'comms'].includes(a.dataset.nav))) && (a.dataset.nav !== 'comms' || ['admin', 'viewer'].includes(role)));
+      && (a.dataset.nav !== 'tahsili' || (state.user.courses || []).some(c => c.kind === 'tahsili'))
+      && (a.dataset.nav !== 'prep' || (state.supabase && prepOpen))
+      : p === 'staff' ? !isStudent : can(p) && (state.supabase || !(SUPABASE_ONLY.includes(p) || ['grades', 'comms', 'prep'].includes(a.dataset.nav))) && (!['comms', 'prep'].includes(a.dataset.nav) || ['admin', 'viewer'].includes(role)));
   });
   const ctx = { api, esc, fail, toast, $app, state, done: () => route() };
   if (isStudent) {
     if (state.supabase && page !== 'inbox') refreshInboxBadge();
+    if (state.supabase) refreshPrepNav(page === 'prep');
     try {
       if (!state.user.profileConfirmed) pageStudentConfirm(ctx);
       else if (page === 'history') await pageStudentHistory(ctx);
@@ -1032,6 +1043,7 @@ async function route() {
       else if (page === 'balance' && state.supabase) await pageStudentBalance(ctx);
       else if (page === 'inbox' && state.supabase) { await pageStudentInbox(ctx); setInboxBadge(0); inboxAt = Date.now(); }
       else if (page === 'tahsili') await pageStudentHome(ctx, 'tahsili');
+      else if (page === 'prep' && state.supabase) await pageStudentPrep(ctx);
       else { if (page) location.replace('#/'); await pageStudentHome(ctx); }
     } catch (e) {
       if (e?.status === 401) return fail(e);
@@ -1059,6 +1071,7 @@ async function route() {
     else if (page === 'progress' && can('progress')) await pageTeacherProgress(ctx);
     else if (page === 'grades' && can('progress') && state.supabase) await pageTeacherGrades(ctx);
     else if (page === 'comms' && ['admin', 'viewer'].includes(role) && state.supabase) await pageTeacherComms(ctx);
+    else if (page === 'prep' && ['admin', 'viewer'].includes(role) && state.supabase) await pageTeacherPrep(ctx);
     else if (page === 'notes' && can('notes') && state.supabase) await pageNotes(nctx());
     else if (page === 'students' && can('accounts')) await pageAdminStudents(ctx);
     else if (page === 'team' && can('accounts') && state.supabase) await pageAdminTeam(ctx);

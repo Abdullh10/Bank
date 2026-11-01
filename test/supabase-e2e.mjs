@@ -595,6 +595,55 @@ await p.goto(BASE + '#/balance'); await p.waitForSelector('#cp-code');
 ok('database: coupon marked redeemed', cpDb.rows[0].status === 'redeemed');
 ok('coupon points do not enter the excellence score', (await asRole(sid, 'select to_jsonb(public.student_leaderboard()) r')).data.me.score === scoreBefore);
 ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_redeem_coupon($1)) r', [ownCoupon.code])).data.ok === false);
+// الاستعداد للاختبار: مجموعة يحددها المالك، تظهر وتختفي، ولا تغيّر النقاط ولا الرصيد ولا الترتيب ولا جلسات التدريب
+{
+  const PREP_OWNER = '55555555-5555-5555-5555-555555555555';
+  const lessons = (await pool.query("select array_agg(l.id order by l.number) ids from public.lessons l join public.chapters c on c.id = l.chapter_id where c.course_id = 1 and c.number = 1")).rows[0].ids.map(Number);
+  const saved = await asRole(PREP_OWNER, 'select to_jsonb(public.prep_save(null, $1::jsonb, 1)) r', [JSON.stringify({ title: 'الاستعداد لاختبار الفصل الأول', lessons })]);
+  const setId = Number(saved.data);
+  ok('prep: owner creates a set (hidden by default)', setId > 0, JSON.stringify(saved.error));
+  const bad = await asRole(PREP_OWNER, 'select to_jsonb(public.prep_save(null, $1::jsonb, 1)) r', [JSON.stringify({ title: 'خارج المقرر', lessons: [999999] })]);
+  ok('prep: lessons outside the course rejected', /ليست من هذا المقرر/.test(bad.error?.message || ''), bad.error?.message);
+  ok('prep: hidden set not listed for the student', (await asRole(sid, 'select public.student_prep_list() r')).data.length === 0);
+  ok('prep: student cannot start a hidden set', /أُغلق/.test((await asRole(sid, 'select public.student_prep_start($1) r', [setId])).error?.message || ''));
+  const snap = async () => {
+    const lb = (await asRole(sid, 'select to_jsonb(public.student_leaderboard()) r')).data.me;
+    const bal = (await asRole(sid, 'select to_jsonb(public.student_balance()) r')).data;
+    const pa = (await pool.query('select count(*)::int n from public.practice_answers a join public.practice_sessions s on s.id = a.session_id where s.user_id = $1', [sid])).rows[0].n;
+    return JSON.stringify({ score: lb.score, points: bal.points, today: bal.today, week: bal.week, streak: bal.streak, pa });
+  };
+  const before = await snap();
+  await asRole(PREP_OWNER, 'select public.prep_set_visible($1, true) r', [setId]);
+  await p.goto(BASE + '#/'); await p.reload(); await p.waitForSelector('#logout');
+  await p.goto(BASE + '#/prep'); await p.waitForSelector('.pr-card');
+  ok('prep: visible set appears in the student menu', await navShown('prep'));
+  const n = (await asRole(sid, 'select public.student_prep_list() r')).data[0].n;
+  ok('prep: card shows coverage «0 of N» and the no-points note', (await p.locator('.pr-card').innerText()).includes(`أجبت عن 0 من ${n}`) && (await p.locator('main').innerText()).includes('لا يُحتسب في النقاط'), String(n));
+  await p.screenshot({ path: `${OUT}/student-prep.png`, fullPage: true });
+  await p.click('[data-go]'); await p.waitForSelector('.st-run');
+  ok('prep: round shows the set title', (await p.locator('.st-top').innerText()).includes('الاستعداد لاختبار الفصل الأول'));
+  for (let k = 0; k < 3; k++) { await p.locator('.st-opt').first().click(); await p.waitForSelector('#st-next'); if (k < 2) await p.click('#st-next'); }
+  await p.screenshot({ path: `${OUT}/student-prep-q.png`, fullPage: true });
+  p.once('dialog', d => d.accept()); await p.click('#st-end'); await p.waitForSelector('#st-prep-next');
+  ok('prep: round summary offers next round and back', (await p.locator('.st-result').innerText()).includes('من 20') || (await p.locator('.st-result').innerText()).includes(`من ${Math.min(20, n)}`));
+  await p.click('#st-prep-back'); await p.waitForSelector('.pr-card');
+  ok('prep: progress saved (3 of N)', (await p.locator('.pr-card').innerText()).includes(`أجبت عن 3 من ${n}`));
+  ok('prep: points, balance, streak and practice answers unchanged', (await snap()) === before, before + ' → ' + (await snap()));
+  const tp = (await asRole(PREP_OWNER, 'select to_jsonb(public.prep_stats($1)) r', [setId])).data;
+  ok('prep: owner sees the student participation', tp.students.some(r => r.username === 'st2test' && r.covered === 3));
+  const q1 = (await pool.query('select question_id from public.exam_prep_answers where set_id = $1 limit 1', [setId])).rows[0].question_id;
+  const essay = (await pool.query("select q.id from public.questions q join public.objectives o on o.id = q.objective_id where o.lesson_id = any($1::bigint[]) and q.type <> 'mcq' limit 1", [lessons])).rows[0]?.id;
+  if (essay) ok('prep: essay questions are not part of the set', /ليس من هذه المجموعة/.test((await asRole(sid, 'select public.student_prep_answer($1, $2, 0) r', [setId, essay])).error?.message || ''));
+  await asRole(PREP_OWNER, 'select public.prep_set_visible($1, false) r', [setId]);
+  ok('prep: hiding the set stops answers', /أُغلق/.test((await asRole(sid, 'select public.student_prep_answer($1, $2, 0) r', [setId, q1])).error?.message || ''));
+  await asRole(PREP_OWNER, 'select public.prep_set_visible($1, true) r', [setId]);
+  ok('prep: restart resets coverage', (await asRole(sid, 'select public.student_prep_restart($1) r', [setId])).data.covered === 0);
+  await asRole(PREP_OWNER, 'select public.prep_save($1, $2::jsonb) r', [setId, JSON.stringify({ title: 'شعبة أخرى', lessons, sections: ['شعبة غير موجودة'] })]);
+  ok('prep: a set for other sections is not listed', (await asRole(sid, 'select public.student_prep_list() r')).data.length === 0);
+  ok('prep: a student cannot manage sets', /للمعلم ومالك المشروع|بانتظار التفعيل/.test((await asRole(sid, 'select public.prep_list(1) r')).error?.message || ''));
+  await asRole(PREP_OWNER, 'select public.prep_delete($1) r', [setId]);
+  ok('prep: deleting the set removes its answers', (await pool.query('select count(*)::int n from public.exam_prep_answers where set_id = $1', [setId])).rows[0].n === 0);
+}
 // رسائل ومهام المعلم: المالك يرسل للطالب، والطالب يقرأ ويرد، والمهمة تُحتسب من تدريبه
 const OWNER = '55555555-5555-5555-5555-555555555555';
 const taskLesson = (await pool.query("select o.lesson_id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 1 and q.type = 'mcq' group by 1 order by count(*) desc limit 1")).rows[0].lesson_id;
