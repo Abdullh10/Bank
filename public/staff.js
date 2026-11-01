@@ -5,6 +5,7 @@ import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
+const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
 const ttl = (ic, html, tag = 'h2', size = 30) => `<${tag} class="ttl">${icon(ic, size)}<span>${html}</span></${tag}>`;
 const ROLE = { student: 'نشط', pending: 'موقوف' };
 
@@ -223,6 +224,88 @@ export async function pageTeacherComms(ctx) {
         ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td><td>${r.read ? '✓' : '—'}</td>
           <td>${r.reply === 2 ? '<span class="badge warn">يحتاج مساعدة</span>' : r.reply === 1 ? 'فهمت' : '—'}</td>
           ${isTask ? `<td>${ST[r.status]}</td><td>${r.valid} سؤالًا${r.valid ? ` · ${pct(r.correct, r.valid)}%` : ''}</td>` : ''}</tr>`).join('')}</tbody></table></div>`;
+    } catch (err) { fail(err); }
+  });
+}
+
+// ---------- الاستعداد للاختبار: المعلم يحدد الدروس، والطالب يتدرّب على كل أسئلتها دون نقاط ----------
+export async function pageTeacherPrep(ctx, editId = null) {
+  const { esc, $app, api, fail, toast } = ctx;
+  const [sets, chapters, students] = await Promise.all([api('/staff/prep'), api('/staff/lessons'), api('/staff/students')]);
+  const owner = ctx.state?.user?.role === 'admin';
+  const edit = editId ? sets.find(s => s.id === editId) : null;
+  const chosen = new Set(edit?.lessons || []), secChosen = new Set(edit?.sections || []);
+  const sections = [...new Set(students.filter(s => s.enrolled).map(s => s.section).filter(Boolean))].sort();
+  $app.innerHTML = `
+    <section class="hero"><div class="hero-ic">${icon('objectives', 52)}<div><h1>الاستعداد للاختبار</h1>
+      <p class="muted">اختر دروس الاختبار القادم فيتدرّب ${owner ? 'الطلاب' : 'طلابك'} على <b>كل</b> أسئلتها المعتمدة (الاختيار من متعدد) على جولات، مع التصحيح والتفسير بعد كل سؤال.
+        هذا التدريب <b>لا يُحتسب</b> في النقاط ولا الترتيب ولا الرصيد ولا المهام ولا قياس الأثر. تبدأ المجموعة مخفية، وتظهرها للطلاب وتخفيها متى شئت.</p></div></div></section>
+    <section class="card" id="pr-form">${ttl('objectives', edit ? 'تعديل المجموعة' : 'مجموعة جديدة')}
+      <div class="field"><label for="pr-title">العنوان (يراه الطالب)</label><input id="pr-title" maxlength="120" placeholder="مثال: الاستعداد لاختبار الفصل الرابع" value="${esc(edit?.title || '')}"></div>
+      <div class="field"><label for="pr-note">ملاحظة للطالب (اختيارية)</label><input id="pr-note" maxlength="500" value="${esc(edit?.note || '')}"></div>
+      <fieldset class="field"><legend>الدروس</legend>
+        ${chapters.map(c => `<details class="st-ch" ${c.lessons.some(l => chosen.has(l.id)) ? 'open' : ''}>
+          <summary><b>الفصل ${c.number}:</b> ${esc(c.title)}${c.lessons.some(l => chosen.has(l.id)) ? ` <span class="badge brand">${c.lessons.filter(l => chosen.has(l.id)).length}</span>` : ''}</summary>
+          <label class="chk pr-all"><input type="checkbox" data-ch="${c.number}" ${c.lessons.length && c.lessons.every(l => chosen.has(l.id)) ? 'checked' : ''}> <b>الفصل كاملًا</b></label>
+          ${c.lessons.map(l => `<label class="chk pr-lesson"><input type="checkbox" data-pl="${l.id}" data-of="${c.number}" ${chosen.has(l.id) ? 'checked' : ''}> ${esc(l.number + '. ' + l.title)}</label>`).join('')}
+        </details>`).join('')}
+      </fieldset>
+      ${sections.length > 1 ? `<fieldset class="field"><legend>الشعب <span class="small muted">(دون تحديد = كل الشعب)</span></legend>
+        <div class="pr-secs">${sections.map(x => `<label class="chk"><input type="checkbox" data-sec="${esc(x)}" ${secChosen.has(x) ? 'checked' : ''}> ${esc(x)}</label>`).join('')}</div></fieldset>` : ''}
+      <div class="actions"><button type="button" class="primary" id="pr-save">${edit ? 'حفظ التعديل' : 'إنشاء المجموعة (مخفية)'}</button>${edit ? '<button type="button" id="pr-cancel">إلغاء</button>' : ''}</div>
+    </section>
+    <section class="card">${ttl('objectives', 'المجموعات')}
+      ${sets.length ? `<ul class="cm-list">${sets.map(s => `<li class="cm-item ${s.visible ? '' : 'off'}" data-set="${s.id}">
+        <div class="in-head"><b>${esc(s.title)}</b> <span class="badge ${s.visible ? 'ok' : ''}">${s.visible ? 'ظاهرة للطلاب' : 'مخفية'}</span>
+          ${owner && s.author ? `<span class="small muted">${esc(s.author)}</span>` : ''}</div>
+        <div class="small muted">${num(s.n)} سؤالًا · ${esc(s.lessonTitles.join('، '))}${s.sections.length ? ` · الشعب: ${esc(s.sections.join('، '))}` : ''} · تدرّب ${num(s.students)} طالبًا</div>
+        ${s.notIncluded ? `<div class="small muted">${num(s.notIncluded)} سؤالًا في هذه الدروس غير مشمولة (مقالية أو غير معتمدة بعد).</div>` : ''}
+        ${s.n ? '' : '<div class="notice warn small">لا توجد أسئلة معتمدة في هذه الدروس بعد.</div>'}
+        <div class="actions">${s.canEdit ? `<button type="button" class="${s.visible ? '' : 'primary'}" data-vis="${s.id}" data-on="${s.visible ? 0 : 1}">${s.visible ? 'إخفاء عن الطلاب' : 'إظهار للطلاب'}</button>
+          <button type="button" data-edit="${s.id}">تعديل</button>` : ''}
+          <button type="button" data-stats="${s.id}">مشاركة الطلاب</button>
+          ${s.canEdit ? `<button type="button" class="danger" data-del="${s.id}">حذف</button>` : ''}</div>
+        <div class="cm-detail" id="prd-${s.id}"></div></li>`).join('')}</ul>` : '<div class="empty">لا توجد مجموعات بعد.</div>'}
+    </section>`;
+  const q = sel => $app.querySelector(sel);
+  // تحديد الفصل يحدد دروسه كلها، وحالة الفصل تتبع دروسه
+  $app.querySelectorAll('[data-ch]').forEach(c => c.onchange = () => { $app.querySelectorAll(`[data-of="${c.dataset.ch}"]`).forEach(l => { l.checked = c.checked; }); });
+  $app.querySelectorAll('[data-pl]').forEach(l => l.onchange = () => {
+    const all = [...$app.querySelectorAll(`[data-of="${l.dataset.of}"]`)];
+    const ch = q(`[data-ch="${l.dataset.of}"]`); ch.checked = all.every(x => x.checked); ch.indeterminate = !ch.checked && all.some(x => x.checked);
+  });
+  q('#pr-cancel')?.addEventListener('click', () => pageTeacherPrep(ctx).catch(fail));
+  q('#pr-save').onclick = async e => {
+    const b = e.currentTarget;
+    const body = { id: edit?.id, title: q('#pr-title').value, note: q('#pr-note').value,
+      lessons: [...$app.querySelectorAll('[data-pl]:checked')].map(i => Number(i.dataset.pl)), sections: [...$app.querySelectorAll('[data-sec]:checked')].map(i => i.dataset.sec) };
+    if (body.title.trim().length < 2) return fail(new Error('اكتب عنوانًا للمجموعة'));
+    if (!body.lessons.length) return fail(new Error('اختر درسًا واحدًا على الأقل'));
+    b.disabled = true;
+    try { await api('/staff/prep', { method: 'POST', body }); toast(edit ? 'حُفظ التعديل' : 'أُنشئت المجموعة (مخفية حتى تظهرها)'); await pageTeacherPrep(ctx); }
+    catch (err) { b.disabled = false; fail(err); }
+  };
+  $app.querySelectorAll('[data-vis]').forEach(b => b.onclick = async () => {
+    const on = b.dataset.on === '1';
+    try { await api('/staff/prep/visible', { method: 'POST', body: { id: b.dataset.vis, visible: on } }); toast(on ? 'ظهرت للطلاب' : 'أُخفيت عن الطلاب'); await pageTeacherPrep(ctx); } catch (err) { fail(err); }
+  });
+  $app.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => pageTeacherPrep(ctx, Number(b.dataset.edit)).then(() => q('#pr-form')?.scrollIntoView({ behavior: 'smooth' })).catch(fail));
+  $app.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    if (!confirm('حذف المجموعة نهائيًا مع سجل تدريب الطلاب عليها؟ (لإيقافها مؤقتًا استخدم «إخفاء عن الطلاب»)')) return;
+    try { await api('/staff/prep/delete', { method: 'POST', body: { id: b.dataset.del } }); toast('حُذفت'); await pageTeacherPrep(ctx); } catch (err) { fail(err); }
+  });
+  $app.querySelectorAll('[data-stats]').forEach(b => b.onclick = async () => {
+    const box = document.getElementById('prd-' + b.dataset.stats);
+    if (box.innerHTML) { box.innerHTML = ''; return; }
+    try {
+      const d = await api('/staff/prep/stats?id=' + b.dataset.stats);
+      const rows = d.students, started = rows.filter(r => r.covered);
+      box.innerHTML = `<p class="small">بدأ ${num(started.length)} من ${num(rows.length)} طالبًا${started.length ? `، وأكمل كل الأسئلة ${num(rows.filter(r => r.n && r.covered >= r.n).length)}` : ''}.</p>
+        ${d.lessons.length ? `<p class="small"><b>الأضعف:</b> ${d.lessons.slice(0, 3).map(l => `${esc(l.lesson)} (${pct(l.correct, l.n)}%)`).join('، ')}</p>` : ''}
+        <div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>التقدم</th><th>الصحة</th><th>آخر نشاط</th></tr></thead><tbody>
+        ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td>
+          <td>${num(r.covered)} من ${num(r.n)}${r.cycle > 1 ? ` <span class="small muted">(جولة ${num(r.cycle)})</span>` : ''}</td>
+          <td>${r.covered ? pct(r.correct, r.covered) + '%' : '—'}</td><td class="small">${r.lastAt ? esc(hijri(r.lastAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>`;
     } catch (err) { fail(err); }
   });
 }

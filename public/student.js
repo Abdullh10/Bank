@@ -69,6 +69,7 @@ export async function pageStudentHome(ctx, kind = 'course') {
   const { state, esc, $app, api, fail } = ctx;
   homeKind = kind;
   const tahsili = kind === 'tahsili';
+  if (session?.prep) session = null; // جولة الاستعداد محفوظة إجاباتها، ويُكملها الطالب من قسمها
   if (session && !session.summary) return renderQuestion(ctx); // جلسة جارية
   const catalog = (await api('/student/catalog')).filter(c => (c.kind || 'course') === kind);
   if (!catalog.length && tahsili) {
@@ -227,7 +228,7 @@ function renderQuestion(ctx) {
   const last = session.idx === session.questions.length - 1;
   $app.innerHTML = `<div class="st-run">
     <div class="st-top">
-      <span>${icon(session.retry ? 'history' : 'practice', 28)}${session.retry ? 'إعادة الأخطاء · ' : ''}سؤال ${session.idx + 1} من ${session.questions.length}</span>
+      <span>${icon(session.retry || session.mode === 'wrong' ? 'history' : session.prep ? 'objectives' : 'practice', 28)}${session.prep ? `${esc(session.prep.title)} · ${session.mode === 'wrong' ? 'مراجعة الأخطاء · ' : ''}` : session.retry ? 'إعادة الأخطاء · ' : ''}سؤال ${session.idx + 1} من ${session.questions.length}</span>
       ${session.timeLimit ? '<span class="st-timer" id="st-timer" aria-live="off"></span>' : ''}
       <button type="button" id="st-end">إنهاء الجلسة</button>
     </div>
@@ -260,10 +261,17 @@ function renderQuestion(ctx) {
     const sess = session;
     try {
       // keep: تُحفظ نتيجة الإجابة حتى لو انتقل الطالب إلى «سجلي» قبل وصول الرد
-      const r = await api('/student/answer', { method: 'POST', body: { session: sess.id, question: q.id, choice: Number(b.dataset.orig) }, keep: true });
+      const r = sess.prep
+        ? await api('/student/prep/answer', { method: 'POST', body: { set: sess.prep.id, question: q.id, choice: Number(b.dataset.orig) }, keep: true })
+        : await api('/student/answer', { method: 'POST', body: { session: sess.id, question: q.id, choice: Number(b.dataset.orig) }, keep: true });
       sess.answers[q.id] = { ...r, choice: Number(b.dataset.orig) };
       if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx);
-    } catch (e) { fail(e); if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx); }
+    } catch (e) {
+      fail(e);
+      // أخفى المعلم المجموعة أثناء الجولة: نعود إلى صفحة القسم
+      if (sess.prep && e.status === 403) { session = null; location.hash = '#/prep'; ctx.done(); return; }
+      if (session === sess && document.querySelector('.st-run')) renderQuestion(ctx);
+    }
   });
   document.getElementById('st-report').onclick = () => reportDialog(ctx, q);
   const others = document.getElementById('st-others');
@@ -311,6 +319,7 @@ let finishing = false;
 async function finishSession(ctx) {
   const { api, fail } = ctx;
   if (finishing || !session) return;
+  if (session.prep) { session.summary = prepSummary(session); homeCache.clear(); if (document.querySelector('.st-run')) renderSummary(ctx); return; }
   finishing = true;
   try {
     const sum = await api('/student/finish', { method: 'POST', body: { session: session.id }, keep: true });
@@ -340,16 +349,84 @@ function renderSummary(ctx) {
       <section class="card">${ttl('lessons', 'حسب الدرس')}${table(s.byLesson.map(r => [r.lesson, r.correct, r.n]), esc)}</section>
       <section class="card">${ttl('reports', 'حسب المستوى')}${table(s.byGroup.map(r => [GROUPS[r.group], r.correct, r.n]), esc)}</section>
     </div>
-    <div class="actions st-nav st-after">
+    ${session.prep ? `<div class="actions st-nav st-after">
+      <button type="button" class="primary" id="st-prep-next">${line('next', 17)}الجولة التالية</button>
+      ${s.wrong ? `<button type="button" id="st-prep-wrong">${icon('history', 22, 'navy')}راجع أخطائي</button>` : ''}
+      <button type="button" id="st-prep-back">${line('prev', 17)}الاستعداد للاختبار</button>
+    </div>` : `<div class="actions st-nav st-after">
       ${s.wrong ? `<button type="button" class="primary" id="st-retry">${icon('history', 22, 'navy')}أعد الأخطاء</button>` : ''}
       <button type="button" id="st-new">${line('plus', 17)}جلسة جديدة</button>
       <a class="btn" href="#/history">${line('clock', 17)}سجلي</a>
-    </div>
+    </div>`}
   </div>`;
+  if (session.prep) {
+    const set = session.prep;
+    document.getElementById('st-prep-next').onclick = () => startPrep(ctx, set, 'next');
+    document.getElementById('st-prep-wrong')?.addEventListener('click', () => startPrep(ctx, set, 'wrong'));
+    document.getElementById('st-prep-back').onclick = () => { session = null; ctx.done(); };
+    window.scrollTo(0, 0);
+    return;
+  }
   const retry = document.getElementById('st-retry');
   if (retry) retry.onclick = () => startSession(ctx, { retry: s.id });
   document.getElementById('st-new').onclick = () => { session = null; ctx.done(); };
   window.scrollTo(0, 0);
+}
+
+// ---------- الاستعداد للاختبار: أسئلة يحددها المعلم، تدريب بلا نقاط ----------
+// النتيجة تُحسب هنا من إجابات الجولة (لا جلسة تدريب في الخادم، فلا تدخل النقاط ولا السجل)
+function prepSummary(sess) {
+  const ans = sess.questions.filter(q => sess.answers[q.id]);
+  const groupBy = (key, label) => Object.values(ans.reduce((m, q) => {
+    const k = key(q); m[k] ||= { [label]: k, n: 0, correct: 0 }; m[k].n++; if (sess.answers[q.id].correct) m[k].correct++; return m;
+  }, {}));
+  const score = ans.filter(q => sess.answers[q.id].correct).length;
+  return { total: sess.questions.length, answered: ans.length, score, wrong: ans.length - score,
+    byLesson: groupBy(q => q.lesson, 'lesson'), byGroup: groupBy(q => q.group, 'group') };
+}
+async function startPrep(ctx, set, mode) {
+  const { api, fail } = ctx;
+  try {
+    const s = await api('/student/prep/start', { method: 'POST', body: { set: set.id, mode } });
+    session = { ...s, prep: s.set, idx: 0, answers: {}, order: Object.fromEntries(s.questions.map(q => [q.id, shuffle([...q.options.keys()])])), startedAt: Date.now(), summary: null };
+    if (location.hash !== '#/prep') location.hash = '#/prep';
+    renderQuestion(ctx);
+  } catch (e) { fail(e); }
+}
+export async function pageStudentPrep(ctx) {
+  const { esc, $app, api, fail, toast } = ctx;
+  if (session?.prep && !session.summary) return renderQuestion(ctx); // جولة جارية
+  if (session?.prep && session.summary) return renderSummary(ctx);
+  const sets = await api('/student/prep');
+  const multi = new Set(sets.map(s => s.courseId)).size > 1;
+  $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('objectives', 64)}<div>
+      <span class="eyebrow">${icon('spark', 18)} تدريب للمراجعة: لا يُحتسب في النقاط ولا الترتيب</span>
+      <h1>الاستعداد للاختبار</h1>
+      <p class="muted">أسئلة حددها معلمك لاختبارك القادم. تمرّ عليها كلها على جولات من 20 سؤالًا، والتصحيح والتفسير بعد كل سؤال، ثم تراجع ما أخطأت فيه.</p></div></div></section>
+    ${sets.length ? `<div class="grid cards">${sets.map(s => {
+      const done = s.n && s.covered >= s.n;
+      return `<section class="card pr-card">
+        <h2 class="ttl">${icon('objectives', 30)}<span>${esc(s.title)}</span></h2>
+        ${multi ? `<p class="small muted">${esc(s.course)}</p>` : ''}
+        ${s.note ? `<p class="small">${esc(s.note)}</p>` : ''}
+        <p class="small muted">${esc(s.lessonTitles.join('، '))}</p>
+        <div class="pr-prog"><div class="bar ${done ? 'ok' : ''}"><span style="width:${pct(s.covered, s.n)}%"></span></div>
+          <span class="small"><b>أجبت عن ${num(s.covered)} من ${num(s.n)}</b>${s.covered ? ` · صحيح ${num(s.correct)} (${pct(s.correct, s.covered)}%)` : ''}${s.cycle > 1 ? ` · الجولة ${num(s.cycle)}` : ''}</span></div>
+        <div class="actions">
+          ${done ? '' : `<button type="button" class="primary" data-go="${s.id}">${line('next', 17)}${s.covered ? 'تابع' : 'ابدأ'}</button>`}
+          ${s.wrong ? `<button type="button" data-wrong="${s.id}">${icon('history', 20, 'navy')}راجع أخطائي (${num(s.wrong)})</button>` : ''}
+          ${s.covered ? `<button type="button" data-restart="${s.id}">${line('plus', 17)}ابدأ من جديد</button>` : ''}
+        </div>
+        ${done && !s.wrong ? '<p class="notice ok small">أنهيت كل الأسئلة دون أخطاء متبقية. أحسنت!</p>' : ''}
+      </section>`; }).join('')}</div>`
+    : `<div class="empty">${icon('empty', 56)}<p>لا توجد أسئلة استعداد مفتوحة لك الآن؛ يفتحها معلمك قبل الاختبار.</p></div>`}`;
+  const byId = id => sets.find(s => String(s.id) === id);
+  $app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => startPrep(ctx, byId(b.dataset.go), 'next'));
+  $app.querySelectorAll('[data-wrong]').forEach(b => b.onclick = () => startPrep(ctx, byId(b.dataset.wrong), 'wrong'));
+  $app.querySelectorAll('[data-restart]').forEach(b => b.onclick = async () => {
+    if (!confirm('تبدأ المرور على كل الأسئلة من جديد ويُصفَّر عدّاد تقدمك (تبقى إجاباتك السابقة محفوظة). متابعة؟')) return;
+    try { await api('/student/prep/restart', { method: 'POST', body: { set: b.dataset.restart } }); toast('بدأت جولة جديدة'); pageStudentPrep(ctx).catch(fail); } catch (e) { fail(e); }
+  });
 }
 
 function table(rows, esc) {
