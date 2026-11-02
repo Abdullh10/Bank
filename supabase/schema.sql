@@ -3145,8 +3145,8 @@ begin
   if p_choice is null or p_choice < 0 or p_choice >= (select jsonb_array_length(options) from questions where id = p_question) then raise exception 'اختيار غير صالح'; end if;
   -- حد يومي يمنع جمع مفاتيح الإجابة آليًا (مستقل عن حد التدريب)
   perform pg_advisory_xact_lock(hashtext('prep:' || auth.uid()::text));
-  if (select count(*) from exam_prep_answers where user_id = auth.uid() and answered_at > now() - interval '1 day') >= 500 then
-    raise exception 'وصلت إلى الحد اليومي لأسئلة الاستعداد (500)؛ عد غدًا';
+  if (select count(*) from exam_prep_answers where user_id = auth.uid() and answered_at > now() - interval '1 day') >= 800 then
+    raise exception 'وصلت إلى الحد اليومي لأسئلة الاستعداد (800)؛ عد غدًا';
   end if;
   insert into exam_prep_runs (set_id, user_id) values (s.id, auth.uid()) on conflict do nothing;
   select cycle into v_cycle from exam_prep_runs where set_id = s.id and user_id = auth.uid();
