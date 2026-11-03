@@ -3,6 +3,7 @@ import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
+import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml } from './survey.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -151,7 +152,8 @@ export async function pageTeacherComms(ctx) {
     <section class="card">${ttl('mail', 'إرسال جديد')}
       <div class="cm-form">
         <div class="cm-row"><label class="st-radio"><input type="radio" name="cm-kind" value="message" checked> رسالة</label>
-          <label class="st-radio"><input type="radio" name="cm-kind" value="task"> مهمة (حل أسئلة في درس)</label></div>
+          <label class="st-radio"><input type="radio" name="cm-kind" value="task"> مهمة (حل أسئلة في درس)</label>
+          <label class="st-radio"><input type="radio" name="cm-kind" value="survey"> استبانة رأي الطلاب في المنصة</label></div>
         <div class="cm-chips" id="cm-tpl"><span class="small muted">قوالب:</span>${COMM_TEMPLATES.map((t, i) => `<button type="button" data-tpl="${i}">${esc(t[0])}</button>`).join('')}</div>
         <div class="field"><label for="cm-title">العنوان (80 حرفًا)</label><input id="cm-title" maxlength="80"></div>
         <div class="field"><label for="cm-body">النص (اختياري، 500 حرف)</label><textarea id="cm-body" dir="auto" maxlength="500" rows="3"></textarea>
@@ -163,6 +165,13 @@ export async function pageTeacherComms(ctx) {
           <label>آخر موعد <input type="date" id="cm-due" value="${defDue}"></label>
           <label>مكافأة الإنجاز (نقاط لكل طالب) <input type="number" id="cm-reward" min="0" max="500" value="0" style="max-width:6rem"></label>
           <span class="small muted" style="flex-basis:100%">المكافأة اختيارية: تُضاف لرصيد من يُنجز المهمة قبل الموعد (لا تدخل نقاط الترتيب)، وتُخصم من حصتك الأسبوعية (النقاط × عدد الطلاب) وتعود حصة من لم ينجز. تتطلب 10 أسئلة على الأقل وصحة 50% فأكثر.</span></div>
+        <div id="cm-survey" hidden>
+          <p class="small muted">استبانة علمية ثابتة (${SURVEY_ITEMS.length - 1} عبارة ليكرت خماسية في 4 أبعاد + عبارة انتباه + سؤالان مفتوحان، نحو 3 دقائق)، مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).
+            الإجابات <b>سرية</b>: ترى النتائج مجمّعة دون أسماء ومن 5 إجابات فأكثر، ولا نقاط ولا مكافأة عليها. أرسلها بعد الاختبار البعدي وقبل إعلان درجاته.</p>
+          <label>مدة الاستبانة <select id="cm-days"><option value="7">7 أيام</option><option value="10" selected>10 أيام</option><option value="14">14 يومًا</option></select></label>
+          <details class="sv-preview"><summary>عرض العبارات</summary><ol>${SURVEY_ITEMS.map(i => `<li>${esc(i.text)}${i.rev ? ' <span class="badge">عكسية</span>' : ''}${i.att ? ' <span class="badge">انتباه</span>' : ''}</li>`).join('')}</ol>
+            <p class="small">ثم سؤالان اختياريان: ${SURVEY_OPEN.map(esc).join(' / ')}</p></details>
+        </div>
         <div class="cm-row"><label>المرحلة (الصف) <select id="cm-grade"><option value="">كل المراحل</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select></label>
           <label>الشعبة <select id="cm-sec"><option value="">كل الشعب</option></select></label>
           <label>إلى <select id="cm-mode"><option value="all"></option><option value="students">طلاب محددين من القائمة</option></select></label></div>
@@ -174,15 +183,19 @@ export async function pageTeacherComms(ctx) {
       ${list.length ? `<ul class="cm-list">${list.map(c => {
         const t = c.task, off = c.status === 'cancelled';
         return `<li class="cm-item ${off ? 'off' : ''}" data-comm="${c.id}"><div class="in-head"><b>${esc(c.title)}</b>
-          <span class="badge ${c.kind === 'task' ? 'brand' : ''}">${c.kind === 'task' ? 'مهمة' : 'رسالة'}</span>${off ? '<span class="badge">ملغاة</span>' : ''}
+          <span class="badge ${c.kind === 'message' ? '' : 'brand'}">${{ task: 'مهمة', survey: 'استبانة' }[c.kind] || 'رسالة'}</span>${off ? `<span class="badge">${c.survey ? 'مغلقة' : 'ملغاة'}</span>` : ''}
           <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
           ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
           <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''}${t.reward ? ` · مكافأة ${t.reward} نقطة` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
-          <div class="actions"><button type="button" data-detail="${c.id}">التفاصيل</button>${off ? '' : `<button type="button" class="danger" data-cancel="${c.id}">إلغاء</button>`}</div>
+          ${c.survey ? `<div class="small muted">استجاب ${c.survey.responses} من ${c.n} · ${c.survey.open ? `تُغلق ${esc(hijri(c.survey.closesAt))}` : 'أُغلقت'}</div>` : ''}
+          <div class="actions">${c.survey ? `<button type="button" class="primary" data-svres="${c.id}">النتائج</button>` : ''}<button type="button" data-detail="${c.id}">التفاصيل</button>${off || (c.survey && !c.survey.open) ? '' : `<button type="button" class="danger" data-cancel="${c.id}" data-kind="${c.kind}">${c.survey ? 'إغلاق الاستبانة' : 'إلغاء'}</button>`}</div>
           <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
   const q = s => $app.querySelector(s);
   const kind = () => $app.querySelector('[name=cm-kind]:checked').value;
-  $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => { q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; });
+  $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => {
+    q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; q('#cm-survey').hidden = kind() !== 'survey';
+    if (kind() === 'survey' && !q('#cm-title').value.trim()) q('#cm-title').value = 'استبانة رأيك في منصة إتقان';
+  });
   $app.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = COMM_TEMPLATES[Number(b.dataset.tpl)]; q('#cm-title').value = t[1]; q('#cm-body').value = t[2]; });
   // التصفية: المرحلة ثم الشعبة (الشعب المعروضة تتبع المرحلة)، وتنطبق على «الكل» وعلى قائمة الطلاب المحددين
   const matching = () => students.filter(s => (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
@@ -204,22 +217,34 @@ export async function pageTeacherComms(ctx) {
     const b = e.currentTarget, mode = q('#cm-mode').value;
     const body = { kind: kind(), title: q('#cm-title').value, body: q('#cm-body').value,
       target: { mode, grade: q('#cm-grade').value || null, section: q('#cm-sec').value || null, students: mode === 'students' ? [...$app.querySelectorAll('[data-stu]:checked')].map(i => i.dataset.stu) : [] } };
+    if (body.kind === 'survey') body.days = q('#cm-days').value;
     if (body.kind === 'task') Object.assign(body, { lesson: q('#cm-lesson').value, n: q('#cm-n').value, minAccuracy: q('#cm-acc').value, reward: q('#cm-reward').value || 0, due: `${q('#cm-due').value}T23:59:00+03:00` });
     b.disabled = true;
     try { const r = await api('/staff/comms', { method: 'POST', body }); toast(`أُرسلت إلى ${r.n} طالبًا`); await pageTeacherComms(ctx); }
     catch (err) { b.disabled = false; fail(err); }
   };
   $app.querySelectorAll('[data-cancel]').forEach(b => b.onclick = async () => {
-    if (!confirm('إلغاء هذه الرسالة؟ ستختفي من صناديق الطلاب.')) return;
-    try { await api('/staff/comms/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel) } }); toast('أُلغيت'); await pageTeacherComms(ctx); } catch (err) { fail(err); }
+    if (!confirm(b.dataset.kind === 'survey' ? 'إغلاق الاستبانة الآن؟ لن يستطيع الطلاب الإجابة بعدها، وتظهر النتائج.' : 'إلغاء هذه الرسالة؟ ستختفي من صناديق الطلاب.')) return;
+    try { await api('/staff/comms/cancel', { method: 'POST', body: { id: Number(b.dataset.cancel) } }); toast(b.dataset.kind === 'survey' ? 'أُغلقت الاستبانة' : 'أُلغيت'); await pageTeacherComms(ctx); } catch (err) { fail(err); }
+  });
+  $app.querySelectorAll('[data-svres]').forEach(b => b.onclick = async () => {
+    const box = document.getElementById('cmd-' + b.dataset.svres);
+    if (box.dataset.sv) { box.innerHTML = ''; delete box.dataset.sv; return; }
+    try { box.innerHTML = surveyResultsHtml(esc, await api('/staff/comms/survey?id=' + b.dataset.svres)); box.dataset.sv = 1; } catch (err) { fail(err); }
   });
   const ST = { open: 'جارية', done: 'أنجز', missed: 'انتهى الموعد' };
   $app.querySelectorAll('[data-detail]').forEach(b => b.onclick = async () => {
     const box = document.getElementById('cmd-' + b.dataset.detail);
-    if (box.innerHTML) { box.innerHTML = ''; return; }
+    if (box.innerHTML && !box.dataset.sv) { box.innerHTML = ''; return; }
     try {
       const rows = await api('/staff/comms/detail?id=' + b.dataset.detail);
-      const isTask = list.find(c => String(c.id) === b.dataset.detail)?.kind === 'task';
+      const kindOf = list.find(c => String(c.id) === b.dataset.detail)?.kind, isTask = kindOf === 'task';
+      if (kindOf === 'survey') {
+        delete box.dataset.sv;
+        box.innerHTML = `<p class="small muted">من أرسل الاستبانة فقط (دون إجاباته؛ الإجابات تظهر مجمّعة في «النتائج»).</p><div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>الحالة</th></tr></thead><tbody>
+          ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td><td>${r.status === 'done' ? '<span class="badge ok">أرسل</span>' : 'لم يرسل'}</td></tr>`).join('')}</tbody></table></div>`;
+        return;
+      }
       box.innerHTML = `<div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>قرأها</th><th>رده</th>${isTask ? '<th>الحالة</th><th>التقدم</th>' : ''}</tr></thead><tbody>
         ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td><td>${r.read ? '✓' : '—'}</td>
           <td>${r.reply === 2 ? '<span class="badge warn">يحتاج مساعدة</span>' : r.reply === 1 ? 'فهمت' : '—'}</td>
