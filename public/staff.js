@@ -228,6 +228,25 @@ export async function pageTeacherComms(ctx) {
   });
 }
 
+// تصفية مشاركة الطلاب وترتيبها في «الاستعداد للاختبار»
+const PREP_STATUS = {
+  all: ['كل الطلاب', () => true],
+  none: ['لم يبدأ', r => !r.covered],
+  partial: ['بدأ ولم يكمل', r => r.covered > 0 && r.covered < r.n],
+  done: ['أكمل كل الأسئلة', r => r.n && r.covered >= r.n],
+  weak: ['صحته أقل من 70%', (r, a) => a >= 0 && a < 0.7],
+};
+const PREP_SORT = {
+  section: ['الشعبة', (x, y) => String(x.section || '').localeCompare(String(y.section || ''), 'ar', { numeric: true })],
+  most: ['الأكثر تدريبًا', (x, y) => y.covered - x.covered],
+  least: ['الأقل تدريبًا', (x, y) => x.covered - y.covered],
+  accHi: ['الأعلى صحة', (x, y, a) => a(y) - a(x)],
+  accLo: ['الأقل صحة', (x, y, a) => (a(x) < 0) - (a(y) < 0) || a(x) - a(y)],
+  recent: ['الأحدث نشاطًا', (x, y) => String(y.lastAt || '').localeCompare(String(x.lastAt || ''))],
+  oldest: ['الأقدم نشاطًا', (x, y) => (!x.lastAt) - (!y.lastAt) || String(x.lastAt || '').localeCompare(String(y.lastAt || ''))],
+  name: ['الاسم', () => 0],
+};
+
 // ---------- الاستعداد للاختبار: المعلم يحدد الدروس، والطالب يتدرّب على كل أسئلتها دون نقاط ----------
 export async function pageTeacherPrep(ctx, editId = null) {
   const { esc, $app, api, fail, toast } = ctx;
@@ -300,12 +319,38 @@ export async function pageTeacherPrep(ctx, editId = null) {
     try {
       const d = await api('/staff/prep/stats?id=' + b.dataset.stats);
       const rows = d.students, started = rows.filter(r => r.covered);
+      const secs = [...new Set(rows.map(r => r.section).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'ar', { numeric: true }));
+      const acc = r => (r.covered ? r.correct / r.covered : -1);
       box.innerHTML = `<p class="small">بدأ ${num(started.length)} من ${num(rows.length)} طالبًا${started.length ? `، وأكمل كل الأسئلة ${num(rows.filter(r => r.n && r.covered >= r.n).length)}` : ''}.</p>
         ${d.lessons.length ? `<p class="small"><b>الأضعف:</b> ${d.lessons.slice(0, 3).map(l => `${esc(l.lesson)} (${pct(l.correct, l.n)}%)`).join('، ')}</p>` : ''}
-        <div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>التقدم</th><th>الصحة</th><th>آخر نشاط</th></tr></thead><tbody>
-        ${rows.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td>
+        <div class="imp-filters pr-filters">
+          <input type="search" class="pr-q" placeholder="ابحث بالاسم أو اسم المستخدم" aria-label="بحث">
+          ${secs.length > 1 ? `<select class="pr-sec" aria-label="الشعبة"><option value="">كل الشعب</option>${secs.map(x => `<option value="${esc(x)}">شعبة ${esc(x)}</option>`).join('')}</select>` : ''}
+          <select class="pr-st" aria-label="الحالة">${Object.entries(PREP_STATUS).map(([k, [t]]) => `<option value="${k}">${t}</option>`).join('')}</select>
+          <select class="pr-sort" aria-label="الترتيب">${Object.entries(PREP_SORT).map(([k, [t]]) => `<option value="${k}">${t}</option>`).join('')}</select>
+          <button type="button" class="pr-xl">${line('download', 17)}تصدير Excel</button>
+          <span class="small muted pr-count" aria-live="polite"></span>
+        </div>
+        <div class="table-wrap"><table class="list"><thead><tr><th>الطالب</th><th>الشعبة</th><th>التقدم</th><th>الصحة</th><th>آخر نشاط</th></tr></thead><tbody class="pr-rows"></tbody></table></div>`;
+      const $ = sel => box.querySelector(sel);
+      const shown = () => {
+        const q = $('.pr-q').value.trim().toLowerCase(), sec = $('.pr-sec')?.value || '';
+        const [, test] = PREP_STATUS[$('.pr-st').value], [, cmp] = PREP_SORT[$('.pr-sort').value];
+        return rows.filter(r => (!q || `${r.name} ${r.username}`.toLowerCase().includes(q)) && (!sec || r.section === sec) && test(r, acc(r)))
+          .sort((x, y) => cmp(x, y, acc) || String(x.name).localeCompare(String(y.name), 'ar'));
+      };
+      const draw = () => {
+        const list = shown();
+        $('.pr-count').textContent = `يظهر ${num(list.length)} من ${num(rows.length)}`;
+        $('.pr-rows').innerHTML = list.length ? list.map(r => `<tr><td>${esc(r.name)} <span class="small muted ltr">${esc(r.username)}</span></td><td>${esc(r.section || '—')}</td>
           <td>${num(r.covered)} من ${num(r.n)}${r.cycle > 1 ? ` <span class="small muted">(جولة ${num(r.cycle)})</span>` : ''}</td>
-          <td>${r.covered ? pct(r.correct, r.covered) + '%' : '—'}</td><td class="small">${r.lastAt ? esc(hijri(r.lastAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>`;
+          <td>${r.covered ? pct(r.correct, r.covered) + '%' : '—'}</td><td class="small">${r.lastAt ? esc(hijri(r.lastAt)) : '—'}</td></tr>`).join('')
+          : '<tr><td colspan="5" class="muted">لا يوجد طلاب بهذه التصفية.</td></tr>';
+      };
+      box.querySelectorAll('.pr-filters input, .pr-filters select').forEach(el => { el.oninput = draw; });
+      $('.pr-xl').onclick = () => downloadXlsx(`الاستعداد-${d.set.title}`, ['الطالب', 'اسم المستخدم', 'الشعبة', 'أجاب عن', 'من', 'الصحيح', 'الصحة %', 'الجولة', 'آخر نشاط'],
+        shown().map(r => [r.name, r.username, r.section || '', r.covered, r.n, r.correct, r.covered ? pct(r.correct, r.covered) : '', r.cycle, r.lastAt ? hijri(r.lastAt) : ''])).catch(fail);
+      draw();
     } catch (err) { fail(err); }
   });
 }
