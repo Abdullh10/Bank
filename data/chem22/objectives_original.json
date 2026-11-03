@@ -1,0 +1,1495 @@
+{
+ "course": {
+  "subject": "الكيمياء",
+  "code": "كيمياء 2-2",
+  "grade": "الثاني الثانوي",
+  "term": "الثاني",
+  "country": "السعودية"
+ },
+ "source": {
+  "file": "ملف أهداف كيمياء 2-2 (نص، 6 فصول و24 درسًا)",
+  "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-11-03)",
+  "content_basis": "الكتاب المدرسي — كيمياء 2-2 (طبعة 1447)؛ الجزء الأول (الفصول 1–3، ص7–117) وصل، والجزء الثاني (الفصول 4–6) بانتظار الإرسال",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف. مستوى التفكير الوارد بين قوسين في نهاية بعض الأهداف نُقل إلى thinking_level_source وحُذف من النص.",
+  "option_count": 4,
+  "added_objectives": 54
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "الطاقة والتغيرات الكيميائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الطاقة",
+     "objectives": [
+      {
+       "id": "K22-C1-L1-O01",
+       "text": "أن يميز الطالب بين طاقة الوضع و الطاقة الحركية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O02",
+       "text": "أن يميز الطالب بين الحرارة و درجة الحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O03",
+       "text": "أن يذكر الطالب وحدات قياس كمية الحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O04",
+       "text": "أن يميز الطالب بين السعر و الحرارة النوعية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O05",
+       "text": "أن يحدد الطالب العلاقة بين وحدات الطاقة المختلفة.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O06",
+       "text": "أن يعرف الطالب المسعر.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O07",
+       "text": "أن يحسب الطالب الحرارة النوعية للمادة.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L1-O08",
+       "text": "أن يعرّف الطالب الطاقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L1-O09",
+       "text": "أن ينص الطالب على قانون حفظ الطاقة ويطبقه على تحولات الطاقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L1-O10",
+       "text": "أن يوضح الطالب المقصود بطاقة الوضع الكيميائية والعوامل التي تعتمد عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L1-O11",
+       "text": "أن يحسب الطالب درجة الحرارة النهائية أو كتلة المادة باستعمال علاقة الحرارة النوعية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L1-O12",
+       "text": "أن يرتب الطالب مواد مختلفة وفق سرعة ارتفاع درجة حرارتها اعتمادًا على قيم حرارتها النوعية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L1-O13",
+       "text": "أن يصف الطالب استعمالات الطاقة الشمسية والخلايا الكهروضوئية وجهود المملكة في مجال الطاقة المتجددة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الحرارة",
+     "objectives": [
+      {
+       "id": "K22-C1-L2-O01",
+       "text": "أن يعرف الطالب الكيمياء الحرارية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O02",
+       "text": "أن يوضح الطالب كيفية انتقال الحرارة في الأنظمة الحرارية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O03",
+       "text": "أن يحدد الطالب العمليات الحرارية في الأنظمة الحرارية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O04",
+       "text": "أن يقارن الطالب بين العمليات الطاردة و الماصة للحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O05",
+       "text": "أن يحسب الطالب كمية الحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O06",
+       "text": "أن يفسر الطالب تأثير الشمس في رفع درجة حرارة الرمل أكثر من مياه البحر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L2-O07",
+       "text": "أن يصف الطالب كيف يُستعمل المسعر لقياس الطاقة الممتصة أو المنطلقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O08",
+       "text": "أن يعرّف الطالب المحتوى الحراري (H) والتغير في المحتوى الحراري للتفاعل (ΔHrxn).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O09",
+       "text": "أن يحدد الطالب إشارة ΔH للتفاعلات الطاردة والماصة للحرارة ويفسرها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O10",
+       "text": "أن يفسر الطالب مخطط المحتوى الحراري لتفاعل طارد أو ماص للحرارة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O11",
+       "text": "أن يحدد الطالب الحرارة النوعية لفلز مجهول ويتعرفه باستعمال بيانات المسعر.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O12",
+       "text": "أن يوضح الطالب أن الحرارة المكتسبة أو المفقودة عند ضغط ثابت تساوي التغير في المحتوى الحراري (q = ΔH).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L2-O13",
+       "text": "أن يشرح الطالب آلية عمل الكمادة الساخنة والكمادة الباردة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "المعادلات الكيميائية الحرارية",
+     "objectives": [
+      {
+       "id": "K22-C1-L3-O01",
+       "text": "أن يكتب الطالب معادلات كيميائية حرارية تمثل تفاعلات كيميائية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L3-O02",
+       "text": "أن يصف الطالب كيفية فقد او اكتساب الطاقة في أثناء تغيرات الحالة الفيزيائية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L3-O03",
+       "text": "أن يعلل الطالب سبب غمر المزارعون بساتينهم بالماء في البلدان الباردة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L3-O04",
+       "text": "أن يعرّف الطالب حرارة الاحتراق والمحتوى الحراري القياسي ΔH°.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O05",
+       "text": "أن يعرّف الطالب حرارة التبخر المولارية وحرارة الانصهار المولارية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O06",
+       "text": "أن يربط الطالب بين حرارتي التبخر والتكثف، وحرارتي الانصهار والتجمد (ΔHvap = −ΔHcond، ΔHfus = −ΔHsolid).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O07",
+       "text": "أن يحسب الطالب الحرارة اللازمة أو المنطلقة لتغير حالة كتلة معينة من مادة باستعمال ΔHvap وΔHfus.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O08",
+       "text": "أن يفسر الطالب منحنى تسخين الماء ويحدد ما يحدث في كل منطقة منه.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O09",
+       "text": "أن يعرّف الطالب تفاعل الاحتراق ويذكر أمثلة على استعماله في توليد الطاقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L3-O10",
+       "text": "أن يوضح الطالب دور احتراق الجلوكوز في التنفس الخلوي وتخزين الطاقة في جزيئات ATP.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "حساب التغير في المحتوى الحراري",
+     "objectives": [
+      {
+       "id": "K22-C1-L4-O01",
+       "text": "أن يحسب الطالب كمية الحرارة المنطلقة او الممتصة من تفاعل كيميائي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L4-O02",
+       "text": "أن يعرف الطالب قانون هس.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L4-O03",
+       "text": "أن يحسب الطالب التغير في المحتوى الحراري لتفاعل ما من خلال قانون هس.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L4-O04",
+       "text": "أن يوضح الطالب المقصود بحرارة التكوين القياسية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L4-O05",
+       "text": "أن يحسب الطالب التغير في المحتوى الحراري لتفاعل باستعمال بيانات حرارة التكوين القياسية.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C1-L4-O06",
+       "text": "أن يوضح الطالب أثر عكس المعادلة الحرارية أو ضربها في عدد في قيمة ΔH.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L4-O07",
+       "text": "أن يحدد الطالب الحالة القياسية للعناصر ويفسر أن حرارة تكوينها القياسية تساوي صفرًا.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L4-O08",
+       "text": "أن يفسر الطالب مخطط حرارة التكوين القياسية ويربط استقرار المركب بقيمتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L4-O09",
+       "text": "أن يكتب الطالب معادلة تكوين مركب من عناصره في حالاتها القياسية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L4-O10",
+       "text": "أن يصف الطالب أثر ثالث أكسيد الكبريت في تكوين المطر الحمضي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C1-L4-O11",
+       "text": "أن يقارن الطالب بين أنواع الوقود من حيث الطاقة المنطلقة لكل مول ولكل كيلوجرام.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "سرعة التفاعلات الكيميائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "نظرية التصادم وسرعة التفاعل الكيميائي",
+     "objectives": [
+      {
+       "id": "K22-C2-L1-O01",
+       "text": "أن يعرف الطالب سرعة التفاعل.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O02",
+       "text": "أن يحسب الطالب متوسط سرعة التفاعل.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O03",
+       "text": "أن يذكر الطالب شروط حدوث التصادم المثمر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O04",
+       "text": "أن يعرف الطالب المعقد المنشط.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O05",
+       "text": "أن يعرف الطالب طاقة التنشيط.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O06",
+       "text": "أن يميز الطالب بين التفاعلات الطاردة و الماصة بيانيا.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L1-O07",
+       "text": "أن يذكر الطالب فروض نظرية التصادم.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L1-O08",
+       "text": "أن يفسر الطالب سبب عدم إفضاء كل التصادمات إلى تفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L1-O09",
+       "text": "أن يربط الطالب بين قيمة طاقة التنشيط وسرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L1-O10",
+       "text": "أن يعبر الطالب عن سرعة التفاعل بدلالة استهلاك المتفاعلات أو تكوّن النواتج ويفسر الإشارة السالبة في معادلة متوسط السرعة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L1-O11",
+       "text": "أن يقارن الطالب بين طاقة التنشيط للتفاعل الأمامي وللتفاعل العكسي من مخطط الطاقة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "العوامل المؤثرة في سرعة التفاعل الكيميائي",
+     "objectives": [
+      {
+       "id": "K22-C2-L2-O01",
+       "text": "أن يحدد الطالب أهمية العامل المحفز مع ذكر أمثله عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O02",
+       "text": "أن يذكر الطالب العوامل المؤثرة في سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O03",
+       "text": "أن يعلل الطالب تفاعل الخارصين اسرع من النحاس مع نترات الفضة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O04",
+       "text": "أن يذكر الطالب اثر مساحة السطح على سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O05",
+       "text": "أن يعرف الطالب المادة الحافزة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O06",
+       "text": "أن يعلل الطالب ان المادة الحافزة تزيد من سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O07",
+       "text": "أن يعرف الطالب المواد المثبطة مع ذكر أمثله عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O08",
+       "text": "أن يذكر الطالب اثر درجة الحرارة على سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L2-O09",
+       "text": "أن يفسر الطالب أثر تركيز المواد المتفاعلة في سرعة التفاعل وفق نظرية التصادم.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L2-O10",
+       "text": "أن يقدّر الطالب التغير في سرعة التفاعل عند رفع درجة الحرارة بمقدار 10 K أو مضاعفاتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L2-O11",
+       "text": "أن يفسر الطالب منحنى توزيع طاقة الجسيمات عند درجتي حرارة مختلفتين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L2-O12",
+       "text": "أن يفسر الطالب مخطط الطاقة لتفاعل محفَّز وغير محفَّز.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L2-O13",
+       "text": "أن يوضح الطالب أن المحفز لا يُستهلك في التفاعل ولا يزيد كمية النواتج.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L2-O14",
+       "text": "أن يوضح الطالب أثر درجة حرارة الجسم في سرعة التفاعلات الحيوية وعمل الإنزيمات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "قوانين سرعة التفاعل الكيميائي",
+     "objectives": [
+      {
+       "id": "K22-C2-L3-O01",
+       "text": "أن يكتب الطالب قانون سرعة التفاعل من خلال المعادلة الكيميائية.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L3-O02",
+       "text": "أن يحدد الطالب رتبة التفاعل الكيميائي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L3-O03",
+       "text": "أن يذكر الطالب وحدة قياس ثابت سرعة التفاعل.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C2-L3-O04",
+       "text": "أن يعرّف الطالب قانون سرعة التفاعل وثابت سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L3-O05",
+       "text": "أن يوضح الطالب العوامل التي يعتمد عليها ثابت سرعة التفاعل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L3-O06",
+       "text": "أن يتوقع الطالب أثر تغيير تركيز مادة متفاعلة في سرعة التفاعل بمعلومية رتبتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C2-L3-O07",
+       "text": "أن يحسب الطالب ثابت سرعة التفاعل أو السرعة الابتدائية من البيانات التجريبية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "الاتزان الكيميائي",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "حالة الاتزان الديناميكي",
+     "objectives": [
+      {
+       "id": "K22-C3-L1-O01",
+       "text": "أن يعرف الطالب التفاعل العكسي.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L1-O02",
+       "text": "أن يعرف الطالب الاتزان الكيميائي و يعدد خواصه.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L1-O03",
+       "text": "أن يكتب الطالب تعابير ثابت الاتزان للتفاعلات المتجانسة و غير المتجانسة.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L1-O04",
+       "text": "أن يذكر الطالب دلالة قيمة ثابت الاتزان.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L1-O05",
+       "text": "أن يحسب الطالب قيمة ثابت الاتزان من خلال تراكيز المواد.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L1-O06",
+       "text": "أن يقارن الطالب بين الاتزان المتجانس والاتزان غير المتجانس.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L1-O07",
+       "text": "أن يفسر الطالب الطبيعة الديناميكية للاتزان الكيميائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L1-O08",
+       "text": "أن يفسر الطالب منحنيات تغير تراكيز المتفاعلات والنواتج مع الزمن حتى الوصول إلى الاتزان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L1-O09",
+       "text": "أن ينص الطالب على قانون الاتزان الكيميائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L1-O10",
+       "text": "أن يوضح الطالب أن قيمة ثابت الاتزان ثابتة عند درجة حرارة معينة مهما اختلفت التراكيز الابتدائية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L1-O11",
+       "text": "أن يعلل الطالب حذف المواد الصلبة والسوائل النقية من تعبير ثابت الاتزان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "العوامل المؤثرة في الاتزان الكيميائي",
+     "objectives": [
+      {
+       "id": "K22-C3-L2-O01",
+       "text": "أن يذكر الطالب مبدأ لوشاتيليه.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O02",
+       "text": "أن يستنتج الطالب أثر اضافة او نقصان تركيز مادة على حالة الاتزان.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O03",
+       "text": "أن يستنتج الطالب أثر زيادة او نقصان الحرارة على حالة الاتزان.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O04",
+       "text": "أن يستنتج الطالب أثر زيادة او نقصان الضغط على حالة الاتزان.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O05",
+       "text": "أن يستنتج الطالب عدم تأثر حالة الاتزان عند اضافة مادة حافزة.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O06",
+       "text": "أن يحدد الطالب اثر العوامل المؤثرة في الاتزان على قيمة ثابت الاتزان.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L2-O07",
+       "text": "أن يطبق الطالب مبدأ لوتشاتلييه على أنظمة حيوية وصناعية وحياتية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L2-O08",
+       "text": "أن يفسر الطالب تغير لون مزيج N2O4 وNO2 عند التسخين والتبريد.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L2-O09",
+       "text": "أن يقترح الطالب ظروفًا تزيد كمية النواتج في نظام متزن.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "استعمال ثوابت الاتزان",
+     "objectives": [
+      {
+       "id": "K22-C3-L3-O01",
+       "text": "أن يحسب الطالب تركيز مادة عند الاتزان بمعلومية ثابت الاتزان.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O02",
+       "text": "أن يذكر الطالب أهمية ثابت حاصل الذوبانية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O03",
+       "text": "أن يعلل الطالب استخدام كبريتات الباريوم بدلا من كلوريد الباريوم في التصوير بالاشعة السينية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O04",
+       "text": "أن يحسب الطالب ذائبية مركب من ثابت حاصل الذائبية.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O05",
+       "text": "أن يقارن الطالب بين قيمة الحاصل الايوني و قيمة حاصل الذائبية.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O06",
+       "text": "أن يتوقع الطالب تكون راسب ام لا عند خلط محاليل مختلفة.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O07",
+       "text": "أن يفسر الطالب تأثير الايون المشترك.",
+       "thinking_level_source": "فهم",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C3-L3-O08",
+       "text": "أن يكتب الطالب تعبير ثابت حاصل الذائبية لمركب أيوني قليل الذوبان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L3-O09",
+       "text": "أن يحسب الطالب تركيز أيون في محلول مشبع، أو ثابت حاصل الذائبية من الذائبية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L3-O10",
+       "text": "أن يفسر الطالب دور الفلوريد في وقاية الأسنان من التسوس اعتمادًا على الذائبية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C3-L3-O11",
+       "text": "أن يحسب الطالب تراكيز الأيونات بعد خلط محلولين بحجوم معلومة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "الهيدروكربونات",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "مقدمة إلى الهيدروكربونات",
+     "objectives": [
+      {
+       "id": "K22-C4-L1-O01",
+       "text": "أن يعرف الطالب المركبات العضوية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O02",
+       "text": "أن يشرح الطالب كيف تكون النفط.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O03",
+       "text": "أن يعدد الطالب المصدران الرئيسيان للهيدروكربونات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O04",
+       "text": "أن يذكر الطالب المكون الرئيسي للغاز الطبيعي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O05",
+       "text": "أن يذكر الطالب أسم العالم الذي حضر أول مركب عضوي في المختبر.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O06",
+       "text": "أن يعدد الطالب خواص عنصر الكربون.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O07",
+       "text": "أن يعرف الطالب الهيدروكربونات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O08",
+       "text": "أن يوضح الطالب تمثيل الجزيئات بالنماذج المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O09",
+       "text": "أن يقارن الطالب بين الهيدروكربونات المشبعة وغير المشبعة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O10",
+       "text": "أن يشرح الطالب آلية عمل برج التقطير التجزيئي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L1-O11",
+       "text": "أن يعرف الطالب التكسير الحراري.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الألكانات",
+     "objectives": [
+      {
+       "id": "K22-C4-L2-O01",
+       "text": "أن يعرف الطالب الجازولين.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O02",
+       "text": "أن يعرف الطالب الألكانات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O03",
+       "text": "أن يكتب الطالب صيغة الالكانات ( جزيئية + بنائية + مكثفة ).",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O04",
+       "text": "أن يسمي الطالب الالكانات وفق نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O05",
+       "text": "أن يسمي الطالب الالكانات الحلقية وفق نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O06",
+       "text": "أن يكتب الطالب الصيغة البنائية للالكانات الحلقية وفق نظام IUPAC",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L2-O07",
+       "text": "أن يعدد الطالب خصائص الالكانات الفيزيائية والكيميائية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "الألكينات والألكاينات",
+     "objectives": [
+      {
+       "id": "K22-C4-L3-O01",
+       "text": "أن يعرف الطالب الألكينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O02",
+       "text": "أن يسمي الطالب الالكينات وفق نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O03",
+       "text": "أن يكتب الطالب صيغة الالكينات ( جزيئية + بنائية ) وفق نظام IUPAC",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O04",
+       "text": "أن يعدد الطالب خصائص الالكينات وأستخداماتها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O05",
+       "text": "أن يعرف الطالب الألكاينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O06",
+       "text": "أن يسمي الطالب الالكاينات وفق نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O07",
+       "text": "أن يكتب الطالب صيغة الالكاينات ( جزيئية + بنائية + مكثفة ) وفق نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L3-O08",
+       "text": "أن يعدد الطالب خصائص الالكاينات وأستعمالاتها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "متشكلات الهيدروكربونات",
+     "objectives": [
+      {
+       "id": "K22-C4-L4-O01",
+       "text": "أن يعرف الطالب المتشكلات .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O02",
+       "text": "أن يعرف الطالب المتشكلات البنائية .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O03",
+       "text": "أن يعرف الطالب المتشكلات الفراغية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O04",
+       "text": "أن يعرف الطالب المتشكلات الهندسية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O05",
+       "text": "أن يعرف الطالب المتشكلات الكيرالية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O06",
+       "text": "أن يعرف الطالب المتشكلات الضوئية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L4-O07",
+       "text": "أن يفسر الطالب تسمية المتشكلات الضوئية بهذا الأسم.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 5,
+     "title": "الهيدروكربونات الأروماتية",
+     "objectives": [
+      {
+       "id": "K22-C4-L5-O01",
+       "text": "أن يعرف الطالب المركبات الأروماتية .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O02",
+       "text": "أن يكتب الطالب صيغة البنزين ( الجزيئية + البنائية ) .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O03",
+       "text": "أن يذكر الطالب أسم العالم الذي أقترح الصيغة البنائية للبنزين .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O04",
+       "text": "أن يذكر الطالب أسم أول عالم قام بتحضير البنزين.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O05",
+       "text": "أن يعرف الطالب المركبات الأليفاتية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O06",
+       "text": "أن يسمي الطالب المركبات الاروماتية حسب نظام IUPAC .",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O07",
+       "text": "أن يذكر الطالب الأسماء التجارية لبعض المركبات الاروماتية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O08",
+       "text": "أن يفسر الطالب ضعف النشاط الكيميائي للبنزين.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C4-L5-O09",
+       "text": "أن يشرح الطالب الآثار الضارة المترتبة على التعرض للمركبات الأروماتية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "title": "مشتقات المركبات الهيدروكربونية وتفاعلاتها",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "هاليدات الألكيل وهاليدات الأريل",
+     "objectives": [
+      {
+       "id": "K22-C5-L1-O01",
+       "text": "أن يتعرف الطالب على المجموعات الوظيفية ويعطي امثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L1-O02",
+       "text": "أن يتعرف الطالب على الصيغة العامة لهاليدات الالكيل و هاليدات الاريل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L1-O03",
+       "text": "أن يكتب الطالب الاسم النظامي للمركبات هاليدات الالكيل و هاليدات الاريل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L1-O04",
+       "text": "أن يتعرف الطالب على الخواص الفيزيائية لهاليدات الالكيل وهاليدات الاريل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L1-O05",
+       "text": "أن يذكر الطالب استخدامات هاليدات الالكيل وهاليدات الاريل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L1-O06",
+       "text": "أن يكتب الطالب تفاعلات الاستبدال في المركبات العضوية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الكحولات والإيثرات والأمينات",
+     "objectives": [
+      {
+       "id": "K22-C5-L2-O01",
+       "text": "أن يتعرف الطالب على الصيغة العامة للكحولات و الايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O02",
+       "text": "أن يرسم الطالب الصيغ المختلفة للمركبات العضوية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O03",
+       "text": "أن يتعرف الطالب على الخواص الفيزيائية للكحولات و الايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O04",
+       "text": "أن يذكر الطالب استخدامات الكحولات و الايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O05",
+       "text": "أن يصنف الطالب الامينات الى اولية و ثانوية و ثالثة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O06",
+       "text": "أن يقارن الطالب بين ذائبية الكحولات و الايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O07",
+       "text": "أن يعلل الطالب ارتفاع درجة غليان الكحولات مقارنة بالايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O08",
+       "text": "أن يتعرف الطالب على المجموعة الوظيفية للكحولات و الايثرات و الامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O09",
+       "text": "أن يتعرف الطالب على تكوين الرابطة الهيدروجينية في الكحولات والامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O10",
+       "text": "أن يكتب الطالب الاسم النظامي للكحولات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O11",
+       "text": "أن يكتب الطالب الاسم النظامي للايثرات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L2-O12",
+       "text": "أن يكتب الطالب الاسم النظامي للامينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "مركبات الكربونيل",
+     "objectives": [
+      {
+       "id": "K22-C5-L3-O01",
+       "text": "أن يتعرف الطالب على الصيغة العامة للمركبات التي تحتوي على مجموعة الكاربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O02",
+       "text": "أن يكتب الطالب الاسم النظامي للمركبات الالدهيدات و الكيتونات و الاحماض الكاربوكسيلية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O03",
+       "text": "أن يكتب الطالب أسماء المركبات العضوية المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O04",
+       "text": "أن يتعرف الطالب على الخواص الفيزيائية للمركبات التي تحتوي على مجموعة الكاربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O05",
+       "text": "أن يذكر الطالب استخدامات المركبات التي تحتوي على مجموعة الكربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O06",
+       "text": "أن يتعرف الطالب على ذائبية المركبات التي تحتوي على الكربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O07",
+       "text": "أن يعلل الطالب بعض من الخواص الفيزيائية لمركبات الكاربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O08",
+       "text": "أن يتعرف الطالب على المجموعة الوظيفية للمركبات التي تحتوي مجموعة الكاربونيل.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O09",
+       "text": "أن يتعرف الطالب على تكوين الرابطة الهيدروجينية في الاحماض الكاربوكسيلية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O10",
+       "text": "أن يكتب الطالب الاسم النظامي للاسترات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L3-O11",
+       "text": "أن يكتب الطالب الاسم النظامي للاميدات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "تفاعلات أخرى للمركبات العضوية",
+     "objectives": [
+      {
+       "id": "K22-C5-L4-O01",
+       "text": "أن يصنف الطالب التفاعلات العضوية الى أنواعها المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L4-O02",
+       "text": "أن يكتب الطالب معادلات الاضافة و الحذف والتاكثف و الاكسدة في المركبات العضوية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L4-O03",
+       "text": "أن يتوقع الطالب نواتج التفاعل للمركبات العضوية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 5,
+     "title": "البوليمرات",
+     "objectives": [
+      {
+       "id": "K22-C5-L5-O01",
+       "text": "أن يعرف الطالب البوليمرات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O02",
+       "text": "أن يتعرف الطالب على الوحدة الأساسية في تكوين البوليمرات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O03",
+       "text": "أن يذكر الطالب استخدامات البوليمرات الشائعة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O04",
+       "text": "أن يصنف الطالب أنواع تفاعلات البوليمرات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O05",
+       "text": "أن يذكر الطالب خواص البوليمرات الكيميائية و الفيزيائية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O06",
+       "text": "أن يعلل الطالب سبب تدوير البوليمرات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C5-L5-O07",
+       "text": "أن يفسر الطالب وضع رموز على المنتجات البلاستيكية.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "title": "المركبات العضوية الحيوية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "البروتينات",
+     "objectives": [
+      {
+       "id": "K22-C6-L1-O01",
+       "text": "أن يتعرف الطالب على الوحدة الأساسية في تكوين البروتينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L1-O02",
+       "text": "أن يتعرف الطالب على وظائف وخصائص البروتينات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L1-O03",
+       "text": "أن يتعرف الطالب على تركيب الحمض الاميني.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L1-O04",
+       "text": "أن يتعرف الطالب على الببتيدات وانواعها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الكربوهيدرات",
+     "objectives": [
+      {
+       "id": "K22-C6-L2-O01",
+       "text": "أن يصنف الطالب الكربوهيدرات الى أحادية و ثنائية و عديدة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L2-O02",
+       "text": "أن يتعرف الطالب على تكوين السكريات بانواعها المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L2-O03",
+       "text": "أن يتعرف الطالب على خواص السكريات بانواعها المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "الليبيدات",
+     "objectives": [
+      {
+       "id": "K22-C6-L3-O01",
+       "text": "أن يعرف الطالب الليبيدات.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L3-O02",
+       "text": "أن يذكر الطالب و ظائف الليبيدات المختلفة.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L3-O03",
+       "text": "أن يعرف الطالب الاحماض الدهنية وصيغها و انواعها.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L3-O04",
+       "text": "أن يعلل الطالب سبب إزالة الصابون للأوساخ.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "الأحماض النووية",
+     "objectives": [
+      {
+       "id": "K22-C6-L4-O01",
+       "text": "أن يتعرف الطالب على تركيب الحمض النووي DNA.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L4-O02",
+       "text": "أن يتعرف الطالب على تركيب الحمض النووي RNA.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L4-O03",
+       "text": "أن يتعرف الطالب على خواص ووظائف الحمض النووي DNA.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L4-O04",
+       "text": "أن يتعرف الطالب على خواص ووظائف الحمض النووي RNA.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      },
+      {
+       "id": "K22-C6-L4-O05",
+       "text": "أن يتعرف الطالب على تركيب الحمض النووي.",
+       "thinking_level_source": "",
+       "status": "pending_review"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
