@@ -5,6 +5,7 @@
 import { qImages } from './media.js';
 import { icon, line, CHAPTER_ICONS } from './icons.js';
 import { hijri } from './dates.js';
+import { surveyForm } from './survey.js';
 
 const LETTERS = ['أ', 'ب', 'ج', 'د'];
 const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
@@ -676,7 +677,11 @@ export async function pageStudentInbox(ctx) {
   const card = it => {
     const t = it.task;
     let inner;
-    if (t) {
+    if (it.survey) {
+      inner = `<p class="in-body">${esc(it.body || 'استبانة قصيرة عن تجربتك في المنصة (نحو 3 دقائق). إجاباتك سرية ولا تؤثر على درجاتك أو نقاطك.')}</p>
+        <div class="actions">${it.survey.done ? '<span class="badge ok">أرسلت إجابتك، شكرًا لك</span>'
+          : `<button type="button" class="primary" data-survey="${it.id}">ابدأ الاستبانة</button><span class="small muted">تُغلق ${esc(hijri(it.survey.closesAt))}</span>`}</div>`;
+    } else if (t) {
       const acc = t.valid ? Math.round(100 * t.correct / t.valid) : 0, left = Math.max(0, t.n - t.valid), [st, k] = TS[t.status] || ['—', ''];
       inner = `<div class="in-task"><div class="small">الدرس: <b>${esc(t.lesson || '')}</b></div>
         <div class="small">المطلوب: ${num(t.n)} سؤالًا${t.minAccuracy ? ` بصحة ${num(t.minAccuracy)}% فأكثر` : ''}</div>
@@ -689,13 +694,17 @@ export async function pageStudentInbox(ctx) {
     } else inner = `<p class="in-body">${esc(it.body || '')}</p>
       <div class="actions in-reply">${it.reply ? `<span class="badge ${it.reply === 2 ? 'warn' : 'ok'}">${it.reply === 2 ? 'أخبرت معلمك أنك تحتاج مساعدة' : 'أخبرت معلمك أنك فهمت'}</span>`
         : `<button type="button" data-reply="1:${it.id}">فهمت</button><button type="button" data-reply="2:${it.id}">أحتاج مساعدة</button>`}</div>`;
-    return `<li class="in-item ${it.read ? '' : 'new'} ${it.task ? 'is-task' : ''}"><div class="in-head"><b>${esc(it.title)}</b>${it.read ? '' : ' <span class="badge brand">جديدة</span>'}
+    return `<li class="in-item ${it.read ? '' : 'new'} ${it.task || it.survey ? 'is-task' : ''}"><div class="in-head"><b>${esc(it.title)}</b>${it.read ? '' : ' <span class="badge brand">جديدة</span>'}
       <span class="small muted">${esc(it.sender || 'معلمك')} · ${esc(hijri(it.createdAt))}</span></div>${inner}</li>`;
   };
   $app.innerHTML = `<section class="hero"><div class="hero-ic">${icon('mail', 52)}<div><h1>رسائل معلمي</h1>
-    <p class="muted">رسائل معلمك ومهامه لك. المهام تُحتسب تلقائيًا من تدريبك، فلا تحتاج لتسليم شيء.</p></div></div></section>
+    <p class="muted">رسائل معلمك ومهامه واستباناته لك. المهام تُحتسب تلقائيًا من تدريبك، فلا تحتاج لتسليم شيء.</p></div></div></section>
     <section class="card">${d.items.length ? `<ul class="in-list">${d.items.map(card).join('')}</ul>` : '<div class="empty">لا توجد رسائل أو مهام الآن. حين يرسل لك معلمك شيئًا يظهر هنا.</div>'}</section>`;
   $app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { savePrefs({ ...loadPrefs(), lessons: [Number(b.dataset.go)] }); location.hash = '#/'; });
+  $app.querySelectorAll('[data-survey]').forEach(b => b.onclick = () => {
+    const it = d.items.find(x => String(x.id) === b.dataset.survey);
+    surveyForm(ctx, it, () => pageStudentInbox(ctx).catch(fail));
+  });
   $app.querySelectorAll('[data-reply]').forEach(b => b.onclick = async () => {
     const [code, id] = b.dataset.reply.split(':').map(Number);
     b.disabled = true;

@@ -241,6 +241,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/comms/read') { await rpc('student_comms_mark_read'); return { ok: true }; }
   if (p === '/student/comms/reply') { await rpc('student_comm_reply', { p_id: body.id, p_code: body.code }); return { ok: true }; }
   if (p === '/student/balance') return rpc('student_balance', { p_course: f.course ? Number(f.course) : null });
+  if (p === '/student/survey') { await rpc('student_submit_survey', { p_id: Number(body.id), p_answers: body.answers, p_open1: body.open1 || null, p_open2: body.open2 || null, p_duration: body.duration ?? null }); return { ok: true }; }
   if (p === '/student/prep') return rpc('student_prep_list');
   if (p === '/student/prep/start') return rpc('student_prep_start', { p_set: Number(body.set), p_mode: body.mode || 'next' });
   if (p === '/student/prep/answer') return rpc('student_prep_answer', { p_set: Number(body.set), p_question: body.question, p_choice: body.choice });
@@ -248,6 +249,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------
   if (p === '/staff/comms') return method === 'GET' ? rpc('staff_list_comms', { p_course: course }) : rpc('staff_send_comm', { p: { ...body, course } });
+  if (p === '/staff/comms/survey') return rpc('survey_results', { p_id: Number(f.id) });
   if (p === '/staff/comms/detail') return rpc('staff_comm_detail', { p_id: Number(f.id) });
   if (p === '/staff/comms/cancel') { await rpc('staff_cancel_comm', { p_id: body.id }); return { ok: true }; }
   if (p === '/staff/prep') return method === 'GET' ? rpc('prep_list', { p_course: course }) : { id: await rpc('prep_save', { p_id: body.id ? Number(body.id) : null, p: body, p_course: course }) };
@@ -293,6 +295,8 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });
   // ---------- قياس الأثر ----------
   if (p === '/impact') return rpc('impact_list', { p_course: course });
+  if (p === '/impact/surveys') return rpc('impact_survey_list');
+  if ((m = p.match(/^\/impact\/(\d+)\/survey$/))) return rpc('impact_survey', { p_study: Number(m[1]), p_comm: Number(f.comm) });
   if (p === '/impact/save') return { id: await rpc('impact_save', { p_id: null, p: body, p_course: course }) };
   if ((m = p.match(/^\/impact\/(\d+)$/))) return rpc('impact_get', { p_id: Number(m[1]) });
   if ((m = p.match(/^\/impact\/(\d+)\/save$/))) return { id: await rpc('impact_save', { p_id: Number(m[1]), p: body, p_course: course }) };

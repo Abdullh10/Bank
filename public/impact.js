@@ -5,6 +5,7 @@ import { hijri } from './dates.js';
 import { bindTips } from './dashboard.js';
 import { loadXlsx, parseCsv, downloadXlsx } from './staff.js';
 import { analyzeStudy, effectLabel, gainLabel, pLabel, rLabel, alphaLabel, fmt, MIN_N, MIN_GROUP, PRACTICED } from './impact-stats.js';
+import { clean as svClean, dimScore, spearman, rhoLabel, MIN_CORR } from './survey.js';
 
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
 const PHASES = { pre: 'الاختبار القبلي', post: 'الاختبار البعدي', prior: 'درجة سابقة (اختياري)' };
@@ -370,8 +371,49 @@ function renderResults(ctx, data, body) {
           لذلك تُقرأ النتائج «ارتباطًا» لا «سببية مؤكدة».</li>
       </ul>
       <p class="small muted">أُعدّ التقرير في ${esc(hijri(new Date().toISOString(), true))} · منصة إتقان · رمز الدراسة ${s.id}</p></section>
+    ${ctx.state?.user?.role === 'admin' ? `<section class="card no-print" id="imp-sv">${ttl(esc, 'students', 'الربط باستبانة الطلاب')}
+      <p class="small muted">يقارن إدراك كل طالب (من استبانة «رسائل ومهام») بما تحقق فعلًا: الكسب المعدّل ومقدار الاستخدام ودرجة البعدي. يظهر لمالك المشروع فقط، ودون أسماء.</p>
+      <div class="imp-filters"><select id="imp-sv-pick" aria-label="الاستبانة"><option value="">اختر استبانة…</option></select></div><div id="imp-sv-out"></div></section>` : ''}
     ${reportHtml(ctx, data, a)}`;
   bindTips(body);
+  if (ctx.state?.user?.role === 'admin') surveyLink(ctx, data);
+}
+
+// ارتباط إدراك الطلاب بالأثر الفعلي (سبيرمان مع فترة ثقة 95%). الإدراك الذاتي يرتبط عادةً ارتباطًا ضعيفًا بالتعلم المقيس (r ≈ 0.2–0.35)،
+// فيُقرأ دليلًا داعمًا لا برهانًا.
+async function surveyLink(ctx, data) {
+  const { api, esc, fail } = ctx;
+  const pick = document.getElementById('imp-sv-pick'), out = document.getElementById('imp-sv-out');
+  let list;
+  try { list = await api('/impact/surveys'); } catch { return; }
+  if (!pick?.isConnected) return;
+  if (!list.length) { out.innerHTML = '<p class="small muted">لا توجد استبانات بعد. أرسلها من «رسائل ومهام» ← «استبانة رأي الطلاب في المنصة».</p>'; pick.hidden = true; return; }
+  pick.innerHTML += list.map(x => `<option value="${x.id}">${esc(x.title)} · ${esc(hijri(x.createdAt))} (${num(x.responses)} إجابة)</option>`).join('');
+  pick.onchange = async () => {
+    if (!pick.value) { out.innerHTML = ''; return; }
+    try {
+      const resp = await api(`/impact/${data.study.id}/survey?comm=${pick.value}`);
+      const c = svClean(resp), byKey = new Map(c.kept.map(r => [r.key, r.a]));
+      const rows = data.rows.map(r => {
+        const pre = r.pre == null ? null : (100 * r.pre) / data.study.preMax, post = r.post == null ? null : (100 * r.post) / data.study.postMax;
+        return { ans: byKey.get(r.key), pre, post, use: r.usage?.valid || 0 };
+      }).filter(r => r.ans && r.pre != null && r.post != null);
+      const hake = r => (r.pre < 100 ? (r.post - r.pre) / (100 - r.pre) : null);
+      const pairs = [
+        ['B', 'التعلّم المدرك', 'الكسب المعدّل (هاك)', r => hake(r)],
+        ['B', 'التعلّم المدرك', 'مقدار الاستخدام', r => Math.log1p(r.use)],
+        ['A', 'الفائدة المدركة', 'مقدار الاستخدام', r => Math.log1p(r.use)],
+        ['C', 'الكفاءة الذاتية', 'درجة البعدي', r => r.post],
+      ].map(([dim, l1, l2, f]) => { const rs = rows.filter(r => f(r) != null); return { l1, l2, ...spearman(rs.map(r => dimScore(r.ans, dim)), rs.map(f)) }; });
+      out.innerHTML = `<p class="small">إجابات موثوقة ${num(c.kept.length)} من ${num(resp.length)}${c.kept.length < resp.length ? ` (استُبعدت ${num(resp.length - c.kept.length)} بفحص الانتباه والإجابة الموحّدة والسرعة)` : ''}، منها <b>${num(rows.length)}</b> لطلاب لهم الاختباران في هذه الدراسة.</p>
+        ${rows.length < MIN_CORR ? `<p class="notice warn small">يلزم ${MIN_CORR} طالبًا على الأقل لهم الاستبانة والاختباران لعرض الارتباطات.</p>` : `
+        <div class="table-wrap"><table class="list"><thead><tr><th>إدراك الطالب</th><th>مقابل</th><th>ارتباط سبيرمان</th><th>فترة الثقة 95%</th><th>القوة</th></tr></thead><tbody>
+          ${pairs.map(x => `<tr><td>${esc(x.l1)}</td><td>${esc(x.l2)}</td><td>${fmt(x.rho, 2)}</td><td><span dir="ltr">[${fmt(x.lo, 2)}, ${fmt(x.hi, 2)}]</span></td><td>${esc(rhoLabel(x.rho))}${Number.isFinite(x.lo) && x.lo > 0 ? ' · دال' : ''}</td></tr>`).join('')}
+        </tbody></table></div>
+        <p class="small muted">الارتباط الموجب الدال (فترة الثقة كلها فوق الصفر) يعني أن من شعروا بفائدة أكبر حققوا فعلًا كسبًا أو استخدامًا أكبر، فيتسق الإدراك مع الأثر المقيس.
+          المتوقع في الدراسات ارتباط ضعيف إلى متوسط (0.2–0.35)، لأن تقدير الطالب لتعلمه أقل دقة من الاختبار.</p>`}`;
+    } catch (e) { fail(e); }
+  };
 }
 
 // ---------- التقرير المطبوع: وثيقة رسمية مستقلة عن شكل الشاشة (تظهر في الطباعة فقط) ----------

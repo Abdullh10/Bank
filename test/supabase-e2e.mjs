@@ -644,6 +644,55 @@ ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_re
   await asRole(PREP_OWNER, 'select public.prep_delete($1) r', [setId]);
   ok('prep: deleting the set removes its answers', (await pool.query('select count(*)::int n from public.exam_prep_answers where set_id = $1', [setId])).rows[0].n === 0);
 }
+// استبانة الطلاب: يرسلها المالك من «رسائل ومهام»، ويجيب الطالب مرة واحدة، والنتائج مجمّعة دون أسماء بعد الإغلاق ومن 5 إجابات
+{
+  const OWN = '55555555-5555-5555-5555-555555555555';
+  const tmpIds = [];
+  for (let i = 1; i <= 6; i++) {
+    const { rows: [u] } = await pool.query(`insert into auth.users (email) values ($1) on conflict (email) do update set email = excluded.email returning id`, [`svst0${i}@chem21.local`]);
+    await pool.query(`update public.profiles set role = 'student', managed = true, section = 'س', display_name = $2 where user_id = $1`, [u.id, 'طالب استبانة ' + i]);
+    tmpIds.push(u.id);
+  }
+  const sent = await asRole(OWN, 'select public.staff_send_comm($1::jsonb) r', [JSON.stringify({ kind: 'survey', title: 'استبانة رأيك في منصة إتقان', days: 7, target: { mode: 'students', students: [sid, ...tmpIds] } })]);
+  const commId = Number(sent.data?.id);
+  ok('survey: owner sends a survey to 7 students', sent.data?.n === 7, JSON.stringify(sent.error));
+  await p.goto(BASE + '#/inbox'); await p.waitForSelector('[data-survey]');
+  await p.click('[data-survey]'); await p.waitForSelector('#sv-go');
+  ok('survey: confidentiality note shown before starting', (await p.locator('main').innerText()).includes('سرية'));
+  await p.click('#sv-go');
+  for (let pg = 0; pg < 10; pg++) {
+    if (await p.locator('#sv-o0').count()) break;
+    const n = await p.locator('.sv-item').count();
+    for (let k = 0; k < n; k++) {
+      const it = p.locator('.sv-item').nth(k), att = (await it.locator('legend').innerText()).includes('للتأكد');
+      await it.locator(`label:has(input[value="${att ? 2 : 4}"])`).click();
+    }
+    await p.click('#sv-next');
+  }
+  await p.screenshot({ path: `${OUT}/student-survey-open.png`, fullPage: true });
+  await p.fill('#sv-o0', 'التفسير بعد كل سؤال'); await p.click('#sv-next');
+  await p.waitForSelector('.in-list');
+  const mine = (await pool.query('select answers, open1 from public.survey_responses where comm_id = $1 and student_id = $2', [commId, sid])).rows[0];
+  ok('survey: student answer stored once with 17 values', mine?.answers.length === 17 && mine.answers[9] === 2 && mine.open1 === 'التفسير بعد كل سؤال');
+  ok('survey: inbox shows it was sent', (await p.locator('.in-list').innerText()).includes('أرسلت إجابتك'));
+  ok('survey: second submission rejected', /أرسلت إجابتك من قبل/.test((await asRole(sid, 'select public.student_submit_survey($1, $2::int[]) r', [commId, mine.answers])).error?.message || ''));
+  ok('survey: incomplete answers rejected', /أجب عن كل العبارات/.test((await asRole(tmpIds[0], 'select public.student_submit_survey($1, $2::int[]) r', [commId, [4, 4, 4]])).error?.message || ''));
+  for (const [k, id] of tmpIds.entries()) {
+    const a = Array.from({ length: 17 }, (_, i) => (i === 9 ? 2 : 1 + ((i + k) % 5)));
+    await asRole(id, 'select public.student_submit_survey($1, $2::int[], $3, null, 200) r', [commId, a, k === 0 ? 'التصحيح الفوري' : null]);
+  }
+  const whileOpen = (await asRole(OWN, 'select public.survey_results($1) r', [commId])).data;
+  ok('survey: results hidden while the survey is open', whileOpen.open === true && whileOpen.responses === 7 && whileOpen.rows.length === 0);
+  ok('survey: a student cannot read results', !!(await asRole(sid, 'select public.survey_results($1) r', [commId])).error);
+  await asRole(OWN, 'select public.staff_cancel_comm($1) r', [commId]);
+  const res = (await asRole(OWN, 'select public.survey_results($1) r', [commId])).data;
+  const js = JSON.stringify(res);
+  ok('survey: after closing, 7 anonymous rows (no ids or names)', res.rows.length === 7 && !js.includes(sid) && !tmpIds.some(t => js.includes(t)) && !js.includes('طالب') && res.open1.length === 2, js.slice(0, 200));
+  ok('survey: impact link is owner-only', /لمالك المشروع|بانتظار التفعيل/.test((await asRole(sid, 'select public.impact_survey(1, $1) r', [commId])).error?.message || '')
+    && (await asRole(OWN, 'select public.impact_survey_list() r')).data.some(x => Number(x.id) === commId));
+  await pool.query('delete from public.comms where id = $1', [commId]);
+  await pool.query(`delete from auth.users where email like 'svst0_@chem21.local'`);
+}
 // رسائل ومهام المعلم: المالك يرسل للطالب، والطالب يقرأ ويرد، والمهمة تُحتسب من تدريبه
 const OWNER = '55555555-5555-5555-5555-555555555555';
 const taskLesson = (await pool.query("select o.lesson_id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 1 and q.type = 'mcq' group by 1 order by count(*) desc limit 1")).rows[0].lesson_id;

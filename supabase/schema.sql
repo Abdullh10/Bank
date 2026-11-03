@@ -2371,6 +2371,9 @@ create table if not exists public.comms (
   lesson_id bigint, n_questions int, min_accuracy int, due_at timestamptz
 );
 alter table public.comms add column if not exists reward_points int not null default 0 check (reward_points between 0 and 500);
+-- 2026-11-03: نوع ثالث «استبانة»
+alter table public.comms drop constraint if exists comms_kind_check;
+alter table public.comms add constraint comms_kind_check check (kind in ('message', 'task', 'survey'));
 create index if not exists comms_sender_idx on public.comms (sender_id, created_at desc);
 create table if not exists public.comm_recipients (
   comm_id bigint not null references public.comms(id) on delete cascade,
@@ -2460,7 +2463,8 @@ begin
         'read', cr.read_at is not null, 'reply', cr.reply_code,
         'task', case when c.kind = 'task' then jsonb_build_object('lessonId', c.lesson_id, 'lesson', (select l.title from lessons l where l.id = c.lesson_id),
           'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at, 'status', cr.status, 'valid', cr.valid_cnt, 'correct', cr.correct_cnt,
-          'reward', c.reward_points, 'rewardGot', cr.reward_pts) end) j
+          'reward', c.reward_points, 'rewardGot', cr.reward_pts) end,
+        'survey', case when c.kind = 'survey' then jsonb_build_object('done', cr.status = 'done', 'closesAt', c.expires_at) end) j
       from comm_recipients cr join comms c on c.id = cr.comm_id
       where cr.student_id = auth.uid() and c.status = 'active' and c.expires_at > now()
       order by c.created_at desc limit 50) x));
@@ -2526,7 +2530,7 @@ begin
   perform public._require_comm_staff();
   if v_kind = 'task' then perform public._require_course(v_course); else v_course := coalesce(v_course, 0); end if;
   select * into g from grade_settings where id = 1;
-  if v_kind not in ('message', 'task') then raise exception 'نوع غير صالح'; end if;
+  if v_kind not in ('message', 'task', 'survey') then raise exception 'نوع غير صالح'; end if;
   if length(v_title) < 2 or length(v_title) > 80 then raise exception 'العنوان بين 2 و80 حرفًا'; end if;
   if length(coalesce(v_body, '')) > 500 then raise exception 'النص طويل (500 حرف كحد أقصى)'; end if;
   if v_title ~ bad or coalesce(v_body, '') ~ bad then raise exception 'النص يحوي رموزًا غير مسموحة'; end if;
@@ -2543,7 +2547,7 @@ begin
   end if;
   select array_agg(pr.user_id) into v_ids from profiles pr
     where pr.role = 'student' and pr.managed and public._visible_student(pr.user_id)
-      and (v_kind = 'message' or exists (select 1 from course_enrollments e where e.user_id = pr.user_id and e.course_id = v_course))
+      and (v_kind <> 'task' or exists (select 1 from course_enrollments e where e.user_id = pr.user_id and e.course_id = v_course))
       and (v_grade is null or pr.grade = v_grade) and (v_section is null or pr.section = v_section)
       and (v_mode in ('all', 'section') or (v_mode = 'students' and pr.user_id = any(v_list)));
   v_n := coalesce(cardinality(v_ids), 0);
@@ -2580,9 +2584,12 @@ begin
              and status = 'active' and created_at > now() - interval '1 hour') then
     raise exception 'أرسلت الرسالة نفسها للمستلمين أنفسهم قبل قليل';
   end if;
-  insert into comms (kind, sender_id, sender_name, course_id, title, body, audience, n_recipients, lesson_id, n_questions, min_accuracy, due_at, reward_points)
+  -- الاستبانة: مفتوحة من 3 إلى 30 يومًا (10 افتراضيًا) ثم تُغلق وتختفي من صندوق الطالب
+  if v_kind = 'survey' and coalesce(nullif(p->>'days', '')::int, 10) not between 3 and 30 then raise exception 'مدة الاستبانة بين 3 و30 يومًا'; end if;
+  insert into comms (kind, sender_id, sender_name, course_id, title, body, audience, n_recipients, lesson_id, n_questions, min_accuracy, due_at, reward_points, expires_at)
   values (v_kind, auth.uid(), (select display_name from profiles where user_id = auth.uid()), v_course, v_title, v_body,
-    case when v_mode = 'students' then v_aud || jsonb_build_object('students', to_jsonb(v_list)) else v_aud end, v_n, v_lesson, v_nq, v_acc, v_due, v_reward)
+    case when v_mode = 'students' then v_aud || jsonb_build_object('students', to_jsonb(v_list)) else v_aud end, v_n, v_lesson, v_nq, v_acc, v_due, v_reward,
+    case when v_kind = 'survey' then now() + make_interval(days => coalesce(nullif(p->>'days', '')::int, 10)) else now() + interval '60 days' end)
   returning id into v_id;
   insert into comm_recipients (comm_id, student_id) select v_id, u from unnest(v_ids) u;
   return jsonb_build_object('id', v_id, 'n', v_n);
@@ -2601,7 +2608,9 @@ begin
       'task', case when c.kind = 'task' then jsonb_build_object('lesson', (select l.title from lessons l where l.id = c.lesson_id), 'n', c.n_questions, 'minAccuracy', c.min_accuracy, 'dueAt', c.due_at, 'reward', c.reward_points,
          'done', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'done'),
          'open', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'open'),
-         'missed', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'missed')) end)
+         'missed', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'missed')) end,
+      'survey', case when c.kind = 'survey' then jsonb_build_object('closesAt', c.expires_at, 'open', c.expires_at > now(),
+         'responses', (select count(*) from comm_recipients cr where cr.comm_id = c.id and cr.status = 'done')) end)
     order by c.created_at desc), '[]')
     from (select * from comms where (v_role = 'admin' or sender_id = auth.uid()) order by created_at desc limit 50) c);
 end $$;
@@ -3173,3 +3182,95 @@ grant execute on function public.prep_list(bigint), public.prep_save(bigint, jso
   public.student_prep_answer(bigint, bigint, int), public.student_prep_restart(bigint) to authenticated;
 revoke execute on function public._prep_questions(bigint), public._prep_open(public.exam_prep_sets, uuid), public._prep_progress(bigint, uuid),
   public._prep_set_json(public.exam_prep_sets), public._prep_own(bigint), public._prep_student_set(bigint) from authenticated;
+
+-- =====================================================================
+-- 2026-11-03: استبانة الطلاب (نوع «survey» في «رسائل ومهام»)
+-- أداة ثابتة «itqan-v1»: 16 عبارة ليكرت خماسية + عبارة انتباه + سؤالان مفتوحان، مقتبسة ومعدّلة عن
+-- Davis (1989) وPintrich et al. (1991) وRovai et al. (2009). الإجابات سرية مرتبطة بالطالب:
+-- المعلم يرى النتائج مجمّعة دون أسماء (من 5 إجابات فأكثر)، والمالك وحده يربطها بقياس الأثر.
+-- =====================================================================
+create table if not exists public.survey_responses (
+  comm_id bigint not null references public.comms(id) on delete cascade,
+  student_id uuid not null references auth.users(id) on delete cascade,
+  version text not null default 'itqan-v1',
+  answers smallint[] not null,
+  open1 text check (length(open1) <= 300),
+  open2 text check (length(open2) <= 300),
+  duration_s int,
+  submitted_at timestamptz not null default now(),
+  primary key (comm_id, student_id)
+);
+alter table public.survey_responses enable row level security;
+revoke all on public.survey_responses from anon, authenticated;
+
+-- إرسال الإجابة: مرة واحدة ولا تُعدَّل. answers = 17 قيمة من 1 إلى 5 بترتيب الأداة (العبارة العاشرة عبارة الانتباه)
+create or replace function public.student_submit_survey(p_id bigint, p_answers int[], p_open1 text default null, p_open2 text default null, p_duration int default null) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.comms; bad constant text := '[\x01-\x08\x0b\x0c\x0e-\x1f‪-‮⁦-⁩]';
+  v_o1 text := nullif(trim(coalesce(p_open1, '')), ''); v_o2 text := nullif(trim(coalesce(p_open2, '')), '');
+begin
+  perform public._require_student();
+  select * into c from comms where id = p_id and kind = 'survey';
+  if not found or not exists (select 1 from comm_recipients where comm_id = p_id and student_id = auth.uid()) then raise exception 'الاستبانة غير موجودة'; end if;
+  if c.status <> 'active' or c.expires_at <= now() then raise exception 'أُغلقت هذه الاستبانة'; end if;
+  if exists (select 1 from survey_responses where comm_id = p_id and student_id = auth.uid()) then raise exception 'أرسلت إجابتك من قبل؛ شكرًا لك'; end if;
+  if coalesce(cardinality(p_answers), 0) <> 17 or exists (select 1 from unnest(p_answers) x where x is null or x not between 1 and 5) then
+    raise exception 'أجب عن كل العبارات';
+  end if;
+  if length(coalesce(v_o1, '')) > 300 or length(coalesce(v_o2, '')) > 300 then raise exception 'الإجابة المفتوحة 300 حرف كحد أقصى'; end if;
+  if coalesce(v_o1, '') ~ bad or coalesce(v_o2, '') ~ bad then raise exception 'النص يحوي رموزًا غير مسموحة'; end if;
+  insert into survey_responses (comm_id, student_id, answers, open1, open2, duration_s)
+  values (p_id, auth.uid(), p_answers::smallint[], v_o1, v_o2, case when p_duration between 0 and 86400 then p_duration end);
+  update comm_recipients set status = 'done', done_at = now(), read_at = coalesce(read_at, now()) where comm_id = p_id and student_id = auth.uid();
+end $$;
+
+-- نتائج الاستبانة للمرسل والمالك: دون أسماء ولا معرّفات، بترتيب عشوائي، ولا تُعرض إلا بعد إغلاق الاستبانة ومن 5 إجابات فأكثر
+-- (العرض أثناء فتحها يسمح بمقارنة النتائج قبل إجابة طالب معيّن وبعدها فيُستدل على إجابته)؛
+-- والشعبة تُخفى إذا قلّت إجاباتها عن 5 (حتى لا يُستدل على الطالب).
+create or replace function public.survey_results(p_id bigint) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare c public.comms; v_n int; v_show boolean;
+begin
+  perform public._require_comm_staff();
+  select * into c from comms where id = p_id and kind = 'survey' and (sender_id = auth.uid() or public.my_role() = 'admin');
+  if not found then raise exception 'الاستبانة غير موجودة'; end if;
+  select count(*) into v_n from survey_responses where comm_id = p_id;
+  v_show := v_n >= 5 and not (c.status = 'active' and c.expires_at > now());
+  return jsonb_build_object('id', c.id, 'title', c.title, 'createdAt', c.created_at, 'closesAt', c.expires_at, 'open', c.status = 'active' and c.expires_at > now(),
+    'sent', c.n_recipients, 'responses', v_n,
+    'sectionsSent', (select coalesce(jsonb_object_agg(t.section, t.n), '{}') from (select coalesce(p.section, '—') section, count(*) n from comm_recipients cr
+       join profiles p on p.user_id = cr.student_id where cr.comm_id = p_id group by 1) t),
+    'rows', case when v_show then (select coalesce(jsonb_agg(jsonb_build_object('a', to_jsonb(r.answers), 'd', r.duration_s,
+        's', case when (select count(*) from survey_responses r2 join profiles p2 on p2.user_id = r2.student_id where r2.comm_id = p_id and p2.section is not distinct from pr.section) >= 5 then pr.section end)
+        order by random()), '[]') from survey_responses r join profiles pr on pr.user_id = r.student_id where r.comm_id = p_id) else '[]' end,
+    'open1', case when v_show then (select coalesce(jsonb_agg(open1 order by random()), '[]') from survey_responses where comm_id = p_id and open1 is not null) else '[]' end,
+    'open2', case when v_show then (select coalesce(jsonb_agg(open2 order by random()), '[]') from survey_responses where comm_id = p_id and open2 is not null) else '[]' end);
+end $$;
+
+-- الربط بقياس الأثر (للمالك فقط): إجابات الطالب بالمفتاح نفسه الذي يستعمله impact_get (دون اسم)
+create or replace function public.impact_survey(p_study bigint, p_comm bigint) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_member();
+  if public.my_role() <> 'admin' then raise exception 'ربط الاستبانة بقياس الأثر لمالك المشروع' using errcode = '42501'; end if;
+  if not exists (select 1 from impact_studies where id = p_study) then raise exception 'الدراسة غير موجودة' using errcode = 'P0002'; end if;
+  if not exists (select 1 from comms where id = p_comm and kind = 'survey') then raise exception 'الاستبانة غير موجودة' using errcode = 'P0002'; end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object('key', md5(p_study::text || r.student_id::text), 'a', to_jsonb(r.answers), 'd', r.duration_s)), '[]')
+    from survey_responses r where r.comm_id = p_comm);
+end $$;
+
+-- قائمة الاستبانات للربط (للمالك)
+create or replace function public.impact_survey_list() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_member();
+  if public.my_role() <> 'admin' then return '[]'; end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'title', c.title, 'createdAt', c.created_at,
+      'responses', (select count(*) from survey_responses r where r.comm_id = c.id)) order by c.created_at desc), '[]')
+    from comms c where c.kind = 'survey');
+end $$;
+
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.student_submit_survey(bigint, int[], text, text, int), public.survey_results(bigint),
+  public.impact_survey(bigint, bigint), public.impact_survey_list() to authenticated;
