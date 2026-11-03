@@ -1285,7 +1285,7 @@ fieldset.field legend { font-weight: 600; margin-bottom: .4rem; color: var(--ink
 th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { color: var(--brand-2, var(--brand)); }
 
 /* ---------- تقرير قياس الأثر المطبوع (A4): وثيقة رسمية لا صورة للشاشة ---------- */
-.imp-report { display: none; }
+.imp-report, .pr-report { display: none; }
 @media print {
   @page imp { size: A4 portrait; margin: 14mm 13mm 16mm;
     @bottom-center { content: "منصة إتقان · تقرير قياس الأثر · صفحة " counter(page) " من " counter(pages); font: 8pt "IBM Plex Sans Arabic", sans-serif; color: #6b7686; } }
@@ -1293,11 +1293,17 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
   main:has(.imp-report) { padding: 0; max-width: none; }
   body:has(.imp-report) { background: #fff !important; }
   body:has(.imp-report)::before, body:has(.imp-report)::after { display: none !important; }
-  .imp-report {
+  @page prep { size: A4 portrait; margin: 14mm 13mm 16mm;
+    @bottom-center { content: "منصة إتقان · تقرير الاستعداد للاختبار · صفحة " counter(page) " من " counter(pages); font: 8pt "IBM Plex Sans Arabic", sans-serif; color: #6b7686; } }
+  body.pr-printing > :not(.pr-report) { display: none !important; }
+  body.pr-printing { background: #fff !important; }
+  body.pr-printing::before, body.pr-printing::after { display: none !important; }
+  .imp-report, .pr-report {
     display: block; page: imp; color: #1b2430; font: 10pt/1.65 "IBM Plex Sans Arabic", sans-serif;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  .imp-report * { box-shadow: none !important; }
+  .pr-report { page: prep; }
+  .imp-report *, .pr-report * { box-shadow: none !important; }
   .rp-cover { border: 1px solid #c9d3df; border-top: 5px solid #12305a; border-radius: 6px; padding: 12pt 14pt 10pt; margin-bottom: 12pt; }
   .rp-brand { display: flex; align-items: center; gap: 8pt; padding-bottom: 8pt; border-bottom: 1px solid #e3e8ef; }
   .rp-brand b { display: block; font: 800 12pt "Noto Kufi Arabic", sans-serif; color: #12305a; }
