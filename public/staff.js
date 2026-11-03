@@ -328,6 +328,7 @@ export async function pageTeacherPrep(ctx, editId = null) {
           ${secs.length > 1 ? `<select class="pr-sec" aria-label="الشعبة"><option value="">كل الشعب</option>${secs.map(x => `<option value="${esc(x)}">شعبة ${esc(x)}</option>`).join('')}</select>` : ''}
           <select class="pr-st" aria-label="الحالة">${Object.entries(PREP_STATUS).map(([k, [t]]) => `<option value="${k}">${t}</option>`).join('')}</select>
           <select class="pr-sort" aria-label="الترتيب">${Object.entries(PREP_SORT).map(([k, [t]]) => `<option value="${k}">${t}</option>`).join('')}</select>
+          <button type="button" class="pr-print">${line('print', 17)}طباعة / حفظ PDF</button>
           <button type="button" class="pr-xl">${line('download', 17)}تصدير Excel</button>
           <span class="small muted pr-count" aria-live="polite"></span>
         </div>
@@ -350,6 +351,33 @@ export async function pageTeacherPrep(ctx, editId = null) {
       box.querySelectorAll('.pr-filters input, .pr-filters select').forEach(el => { el.oninput = draw; });
       $('.pr-xl').onclick = () => downloadXlsx(`الاستعداد-${d.set.title}`, ['الطالب', 'اسم المستخدم', 'الشعبة', 'أجاب عن', 'من', 'الصحيح', 'الصحة %', 'الجولة', 'آخر نشاط'],
         shown().map(r => [r.name, r.username, r.section || '', r.covered, r.n, r.correct, r.covered ? pct(r.correct, r.covered) : '', r.cycle, r.lastAt ? hijri(r.lastAt) : ''])).catch(fail);
+      // الطباعة: وثيقة A4 مستقلة بالقائمة المعروضة (بعد التصفية والترتيب)، ومنها «حفظ PDF» في نافذة الطباعة
+      $('.pr-print').onclick = () => {
+        const list = shown(), opt = sel => $(sel)?.selectedOptions[0]?.textContent;
+        const filt = [$('.pr-q').value.trim() && `بحث: ${$('.pr-q').value.trim()}`, $('.pr-sec')?.value && opt('.pr-sec'), $('.pr-st').value !== 'all' && opt('.pr-st'), `الترتيب: ${opt('.pr-sort')}`].filter(Boolean);
+        const set = d.set, done = list.filter(r => r.n && r.covered >= r.n).length, begun = list.filter(r => r.covered).length;
+        const avg = begun ? Math.round(list.filter(r => r.covered).reduce((t, r) => t + (100 * r.correct) / r.covered, 0) / begun) : null;
+        document.querySelector('.pr-report')?.remove();
+        const art = document.createElement('article');
+        art.className = 'pr-report'; art.dir = 'rtl';
+        art.innerHTML = `<header class="rp-cover"><div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="48" height="48"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب في الكيمياء</span></div></div>
+          <div class="rp-title"><span class="rp-kicker">تقرير مشاركة الطلاب · الاستعداد للاختبار</span><h1>${esc(set.title)}</h1><p>${esc(set.lessonTitles.join('، '))}</p></div>
+          <dl class="rp-meta"><div><dt>عدد الأسئلة</dt><dd>${num(set.n)}</dd></div><div><dt>الطلاب في التقرير</dt><dd>${num(list.length)}${list.length !== rows.length ? ` من ${num(rows.length)}` : ''}</dd></div>
+            <div><dt>تاريخ التقرير</dt><dd>${esc(hijri(new Date().toISOString(), true))}</dd></div><div><dt>بدؤوا التدريب</dt><dd>${num(begun)}</dd></div>
+            <div><dt>أكملوا كل الأسئلة</dt><dd>${num(done)}</dd></div><div><dt>متوسط الصحة</dt><dd>${avg == null ? '—' : avg + '%'}</dd></div></dl></header>
+          ${filt.length ? `<p class="rp-small"><b>التصفية:</b> ${esc(filt.join(' · '))}</p>` : ''}
+          ${d.lessons.length ? `<p class="rp-small"><b>أضعف الدروس:</b> ${d.lessons.slice(0, 3).map(l => `${esc(l.lesson)} (${pct(l.correct, l.n)}%)`).join('، ')}</p>` : ''}
+          <table class="rp-t rp-num"><thead><tr><th>م</th><th>الطالب</th><th>الشعبة</th><th>أجاب عن</th><th>نسبة التغطية</th><th>الصحة</th><th>آخر نشاط</th></tr></thead><tbody>
+          ${list.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td><td>${esc(r.section || '—')}</td><td>${num(r.covered)} من ${num(r.n)}${r.cycle > 1 ? ` (جولة ${num(r.cycle)})` : ''}</td>
+            <td>${pct(r.covered, r.n)}%</td><td>${r.covered ? pct(r.correct, r.covered) + '%' : '—'}</td><td>${r.lastAt ? esc(hijri(r.lastAt)) : '—'}</td></tr>`).join('')}</tbody></table>
+          <footer class="rp-sign">${['معلم المادة', 'المشرف التربوي', 'قائد المدرسة'].map(t => `<div><span>${t}</span><p>الاسم: ............................</p><p>التوقيع: ..........................</p></div>`).join('')}</footer>
+          <p class="rp-foot">صدر هذا التقرير من منصة إتقان · تدريب الاستعداد لا يدخل في النقاط ولا الترتيب</p>`;
+        document.body.append(art);
+        document.body.classList.add('pr-printing');
+        const clean = () => { document.body.classList.remove('pr-printing'); art.remove(); window.removeEventListener('afterprint', clean); };
+        window.addEventListener('afterprint', clean);
+        window.print();
+      };
       draw();
     } catch (err) { fail(err); }
   });
