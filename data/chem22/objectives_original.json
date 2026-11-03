@@ -9,10 +9,10 @@
  "source": {
   "file": "ملف أهداف كيمياء 2-2 (نص، 6 فصول و24 درسًا)",
   "structure_basis": "ملف الأهداف المرفق (بقرار المستخدم بتاريخ 2026-11-03)",
-  "content_basis": "الكتاب المدرسي — كيمياء 2-2 (طبعة 1447)؛ الجزء الأول (الفصول 1–3، ص7–117) وصل، والجزء الثاني (الفصول 4–6) بانتظار الإرسال",
+  "content_basis": "الكتاب المدرسي — كيمياء 2-2 (طبعة 1447)، الجزآن: الفصول 1–3 (ص7–117) والفصول 4–6 (ص118–249)؛ الصفحة 216 فارغة في ملف الجزء الثاني",
   "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف. مستوى التفكير الوارد بين قوسين في نهاية بعض الأهداف نُقل إلى thinking_level_source وحُذف من النص.",
   "option_count": 4,
-  "added_objectives": 54
+  "added_objectives": 113
  },
  "chapters": [
   {
@@ -880,6 +880,34 @@
        "text": "أن يعرف الطالب التكسير الحراري.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C4-L1-O12",
+       "text": "أن يوضح الطالب المقصود بالكيمياء العضوية وأصل تسميتها (فكرة القوة الحيوية).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L1-O13",
+       "text": "أن يفسر الطالب استعمال اختبار البروم للتمييز بين الهيدروكربونات المشبعة وغير المشبعة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L1-O14",
+       "text": "أن يربط الطالب بين درجات غليان مكونات النفط ومواقع تكثفها في برج التجزئة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L1-O15",
+       "text": "أن يوضح الطالب المقصود برقم الأوكتان والفرقعة في محركات السيارات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -928,6 +956,48 @@
        "text": "أن يعدد الطالب خصائص الالكانات الفيزيائية والكيميائية.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C4-L2-O08",
+       "text": "أن يستعمل الطالب الصيغة العامة CnH2n+2 لكتابة الصيغة الجزيئية لأي ألكان.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L2-O09",
+       "text": "أن يعرّف الطالب السلسلة المتماثلة ويوضح الوحدة المتكررة فيها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L2-O10",
+       "text": "أن يعرّف الطالب السلسلة الرئيسة والمجموعة البديلة ويسمي مجموعات الألكيل البسيطة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L2-O11",
+       "text": "أن يكتب الطالب الصيغة البنائية لألكان متفرع بمعلومية اسمه النظامي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L2-O12",
+       "text": "أن يحدد الطالب الخطأ في اسم ألكان ويصححه وفق قواعد IUPAC.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L2-O13",
+       "text": "أن يفسر الطالب الفرق في درجات الغليان بين الميثان والماء بالقطبية والروابط الهيدروجينية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -982,6 +1052,34 @@
        "text": "أن يعدد الطالب خصائص الالكاينات وأستعمالاتها.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C4-L3-O09",
+       "text": "أن يقارن الطالب بين نشاط الألكانات والألكينات والألكاينات ويفسر الفرق.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L3-O10",
+       "text": "أن يستعمل الطالب الصيغتين العامتين CnH2n وCnH2n−2 لكتابة صيغ الألكينات والألكاينات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L3-O11",
+       "text": "أن يسمي الطالب الألكينات المحتوية على أكثر من رابطة ثنائية باستعمال البادئات (داي، تراي).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L3-O12",
+       "text": "أن يوضح الطالب أهمية الإيثين في إنضاج الفاكهة وصناعة البولي إيثيلين.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1030,6 +1128,48 @@
        "text": "أن يفسر الطالب تسمية المتشكلات الضوئية بهذا الأسم.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C4-L4-O08",
+       "text": "أن يكتب الطالب المتشكلات البنائية المحتملة لصيغة جزيئية معطاة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L4-O09",
+       "text": "أن يرسم الطالب المتشكلين سيس وترانس لألكين ويميز بينهما.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L4-O10",
+       "text": "أن يفسر الطالب عدم وجود متشكلات هندسية حول الرابطة الأحادية بحرية الدوران.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L4-O11",
+       "text": "أن يحدد الطالب ذرة الكربون غير المتماثلة في صيغة بنائية معطاة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L4-O12",
+       "text": "أن يوضح الطالب أهمية الكيرالية في المخلوقات الحية والأدوية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L4-O13",
+       "text": "أن يوضح الطالب تأثير الدهون المتحولة (ترانس) في الصحة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1090,6 +1230,34 @@
        "text": "أن يشرح الطالب الآثار الضارة المترتبة على التعرض للمركبات الأروماتية.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C4-L5-O10",
+       "text": "أن يقارن الطالب بين خواص الهيدروكربونات الأروماتية والأليفاتية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L5-O11",
+       "text": "أن يوضح الطالب المقصود بالمادة المسرطنة ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L5-O12",
+       "text": "أن يفسر الطالب سبب رفض صيغة كيكولي وصيغ البنزين ذات الروابط الثنائية المتعددة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C4-L5-O13",
+       "text": "أن يعرّف الطالب الحلقات الملتحمة ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1138,6 +1306,34 @@
        "text": "أن يكتب الطالب تفاعلات الاستبدال في المركبات العضوية.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C5-L1-O07",
+       "text": "أن يقارن الطالب بين تراكيب هاليدات الألكيل وهاليدات الأريل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L1-O08",
+       "text": "أن يتوقع الطالب درجة غليان هاليد عضوي مقارنة بالألكان المقابل وبهاليدات أخرى.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L1-O09",
+       "text": "أن يعرّف الطالب الهلجنة ويكتب معادلتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L1-O10",
+       "text": "أن يوضح الطالب أثر مركبات CFCs في طبقة الأوزون واستبدالها بمركبات HFCs.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1216,6 +1412,20 @@
        "text": "أن يكتب الطالب الاسم النظامي للامينات.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C5-L2-O13",
+       "text": "أن يقارن الطالب بين درجات غليان الكحولات والإيثرات وذائبيتها في الماء بمعلومية الروابط الهيدروجينية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L2-O14",
+       "text": "أن يتوقع الطالب تغير ذائبية الكحولات في الماء بزيادة طول السلسلة الكربونية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1288,6 +1498,27 @@
        "text": "أن يكتب الطالب الاسم النظامي للاميدات.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C5-L3-O12",
+       "text": "أن يكتب الطالب معادلة تأين حمض كربوكسيلي في الماء ويفسر خواصه الحمضية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L3-O13",
+       "text": "أن يوضح الطالب دور الإسترات في النكهات والروائح الطبيعية والصناعية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L3-O14",
+       "text": "أن يوضح الطالب تكوّن اليوريا في الجسم واستعمالاتها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1312,6 +1543,34 @@
        "text": "أن يتوقع الطالب نواتج التفاعل للمركبات العضوية.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C5-L4-O04",
+       "text": "أن يميز الطالب بين تفاعلات حذف الهيدروجين وحذف الماء وإضافة الماء والهدرجة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L4-O05",
+       "text": "أن يحدد الطالب نواتج أكسدة الكحولات الأولية والثانوية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L4-O06",
+       "text": "أن يحدد الطالب نوع التفاعل العضوي اللازم لتحويل مركب إلى آخر.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L4-O07",
+       "text": "أن يفسر الطالب استعمال المحفزات في هدرجة الزيوت النباتية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1360,6 +1619,27 @@
        "text": "أن يفسر الطالب وضع رموز على المنتجات البلاستيكية.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C5-L5-O08",
+       "text": "أن يرسم الطالب الصيغة البنائية للبوليمر الناتج عن مونومر معطى، أو المونومر من البوليمر.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L5-O09",
+       "text": "أن يتوقع الطالب خواص البوليمر اعتمادًا على تركيبه الجزيئي ومجموعاته الوظيفية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C5-L5-O10",
+       "text": "أن يذكر الطالب أبرز محطات تطور صناعة البوليمرات.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1396,6 +1676,41 @@
        "text": "أن يتعرف الطالب على الببتيدات وانواعها.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C6-L1-O05",
+       "text": "أن يعرّف الطالب الإنزيم ويشرح كيف يعمل (المادة الخاضعة لفعل الإنزيم والموقع النشط).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L1-O06",
+       "text": "أن يعرّف الطالب تغير الخواص الطبيعية للبروتين ويذكر العوامل المسببة له.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L1-O07",
+       "text": "أن يصف الطالب التركيب ثلاثي الأبعاد للبروتين (الحلزوني والصحيفة المطوية).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L1-O08",
+       "text": "أن يحسب الطالب عدد التتابعات المحتملة لببتيد من عدد معين من الأحماض الأمينية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L1-O09",
+       "text": "أن يصنف الطالب الأحماض الأمينية بحسب سلاسلها الجانبية (قطبية، غير قطبية، حمضية، قاعدية، أروماتية).",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1420,6 +1735,34 @@
        "text": "أن يتعرف الطالب على خواص السكريات بانواعها المختلفة.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C6-L2-O04",
+       "text": "أن يعرّف الطالب الكربوهيدرات ويحدد مجموعاتها الوظيفية.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L2-O05",
+       "text": "أن يقارن الطالب بين الجلوكوز والجالاكتوز والفركتوز من حيث التركيب.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L2-O06",
+       "text": "أن يقارن الطالب بين النشا والسليلوز والجلايكوجين في التركيب والوظيفة وقابلية الهضم.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L2-O07",
+       "text": "أن يحدد الطالب مكونات السكروز واللاكتوز ويكتب معادلة تكوين السكر الثنائي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1450,6 +1793,48 @@
        "text": "أن يعلل الطالب سبب إزالة الصابون للأوساخ.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C6-L3-O05",
+       "text": "أن يصف الطالب تركيب الجليسريدات الثلاثية ويقارن بين الزيوت والدهون.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L3-O06",
+       "text": "أن يعرّف الطالب التصبن ويكتب معادلته.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L3-O07",
+       "text": "أن يربط الطالب بين تركيب الليبيدات الفوسفورية ووظيفة الغشاء الخلوي.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L3-O08",
+       "text": "أن يصف الطالب تركيب الشموع والستيرويدات ويذكر أمثلة عليها.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L3-O09",
+       "text": "أن يفسر الطالب انخفاض درجة انصهار الأحماض الدهنية غير المشبعة مقارنة بالمشبعة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L3-O10",
+       "text": "أن يكتب الطالب معادلة هدرجة حمض دهني غير مشبع.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1486,6 +1871,34 @@
        "text": "أن يتعرف الطالب على تركيب الحمض النووي.",
        "thinking_level_source": "",
        "status": "approved"
+      },
+      {
+       "id": "K22-C6-L4-O06",
+       "text": "أن يوضح الطالب قاعدة تزاوج القواعد في DNA ويكتب تتابع الشريط المكمل.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L4-O07",
+       "text": "أن يقارن الطالب بين DNA وRNA في السكر والقواعد وعدد الأشرطة والوظيفة.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L4-O08",
+       "text": "أن يذكر الطالب دور واطسون وكريك في تحديد تركيب DNA.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
+      },
+      {
+       "id": "K22-C6-L4-O09",
+       "text": "أن يصف الطالب خطوات تضاعف DNA.",
+       "thinking_level_source": "",
+       "status": "pending_review",
+       "added_from_textbook": true
       }
      ]
     }
