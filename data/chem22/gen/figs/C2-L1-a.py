@@ -13,7 +13,7 @@ def circ_num(x, y, n, r=11):
 
 def reaction_profile(name, r, p, peak, w=600, h=330, r_label='المتفاعلات', p_label='النواتج',
                      complex_label=None, ea=None, dh=None, rev_ea=None, nums=None, ticks=None,
-                     title=None, ox=0, standalone=True, panel_label=None, scale=None, hump=(0.30, 0.48, 0.64)):
+                     title=None, ox=0, standalone=True, panel_label=None, scale=None, hump=(0.30, 0.48, 0.64), ea_at=(20, 0.5)):
     """مخطط طاقة التفاعل مع سير التفاعل. r, p, peak: طاقة المتفاعلات والنواتج وقمة المنحنى (وحدات المحور).
     ea / dh / rev_ea: نص سهم طاقة التنشيط / ΔH / طاقة تنشيط التفاعل العكسي (None = لا سهم).
     nums: قاموس {'r','p','peak','ea','dh'} -> رقم في دائرة بدل التسميات. ticks: قيم تُكتب على محور الطاقة."""
@@ -47,8 +47,10 @@ def reaction_profile(name, r, p, peak, w=600, h=330, r_label='المتفاعلا
     # سهم طاقة التنشيط
     if ea is not None or 'ea' in nums:
         b += L(xb, yr, xk + 4, yr, MUTED, 1.2, '4 4') + ARROW(xk, yr - 1, xk, yk + 4, RED, 2.2)
-        if 'ea' in nums: b += circ_num(xk + 20, (yr + yk) / 2, nums['ea'])
-        else: b += T(xk + 8, (yr + yk) / 2 + 5, ea, 13, 'start', RED, 'bold')
+        # ea_at = (إزاحة أفقية عن السهم، موضع رأسي كنسبة من طول السهم)؛ إزاحة سالبة = يسار السهم
+        ey = yr - ea_at[1] * (yr - yk)
+        if 'ea' in nums: b += circ_num(xk + ea_at[0], ey, nums['ea'])
+        else: b += T(xk + (8 if ea_at[0] > 0 else -8), ey + 5, ea, 13, 'start' if ea_at[0] > 0 else 'end', RED, 'bold')
     if rev_ea is not None:
         xr = xk + 0.38 * (xc - xk)
         b += L(xr - 4, yp, xc, yp, MUTED, 1.2, '4 4')
@@ -149,7 +151,7 @@ def conc_time(name, series, xmax, ymax, xstep, ystep, xlabel='الزمن (s)', y
             b += f'<circle cx="{px(t):.1f}" cy="{py(c):.1f}" r="4.5" fill="{col}"/>'
             if show_vals: b += T(px(t) + 7, py(c) - 8, f'{c}', 11, 'start', col)
         t, c = pts[-1]
-        b += T(px(t) + 8, py(c) + 5, lab, 14, 'start', col, 'bold')
+        b += T(px(t) + 8, py(c) + (20 if show_vals else 5), lab, 14, 'start', col, 'bold')
     save(name, svg(w, h, b))
 
 
@@ -164,7 +166,7 @@ if __name__ == '__main__':
     # مخطط ماص مرقّم (1 سهم طاقة التنشيط، 2 المتفاعلات، 3 القمة، 4 النواتج)
     reaction_profile('c2-l1a-profile-numbered-endo.svg', 15, 45, 100, nums={'ea': 1, 'r': 2, 'peak': 3, 'p': 4})
     # مخطط طارد مرقّم (1 القمة، 2 سهم Ea، 3 سهم ΔH، 4 النواتج)
-    reaction_profile('c2-l1a-profile-numbered-exo.svg', 60, 15, 100, nums={'peak': 1, 'ea': 2, 'dh': 3, 'p': 4})
+    reaction_profile('c2-l1a-profile-numbered-exo.svg', 60, 15, 100, nums={'peak': 1, 'ea': 2, 'dh': 3, 'p': 4}, ea_at=(-20, 0.3))
     # مخططات بقيم عددية
     reaction_profile('c2-l1a-profile-values-exo.svg', 150, 40, 210, r_label='المتفاعلات', p_label='النواتج',
                      ticks=[0, 40, 150, 210])
@@ -175,8 +177,8 @@ if __name__ == '__main__':
     b += L(380, 15, 380, 250, MUTED, 1, '4 4')
     save('c2-l1a-profile-two.svg', svg(760, 260, b))
     # لوحتان لتفاعلين طاردين: (س) قمة عالية، (ص) قمة منخفضة، والمتفاعلات والنواتج متساوية المستوى
-    b = reaction_profile('', 50, 20, 110, w=380, h=260, standalone=False, panel_label='(س)', ea='Ea', scale=(15, 110), hump=(0.20, 0.45, 0.70))
-    b += reaction_profile('', 50, 20, 82, w=380, h=260, ox=380, standalone=False, panel_label='(ص)', ea='Ea', scale=(15, 110), hump=(0.20, 0.45, 0.70))
+    b = reaction_profile('', 50, 20, 110, w=380, h=260, standalone=False, panel_label='(س)', ea='Ea', scale=(15, 110), hump=(0.20, 0.45, 0.70), ea_at=(-1, 0.2))
+    b += reaction_profile('', 50, 20, 82, w=380, h=260, ox=380, standalone=False, panel_label='(ص)', ea='Ea', scale=(15, 110), hump=(0.20, 0.45, 0.70), ea_at=(-1, 0.2))
     b += L(380, 15, 380, 250, MUTED, 1, '4 4')
     save('c2-l1a-profile-ea-compare.svg', svg(760, 260, b))
     # اتجاه التصادم ومراحله

@@ -46,7 +46,9 @@ def reaction_profile(r, pk, p, vmin=0, vmax=None, ox=0, oy=0, w=520, h=330, reac
     b += TH(X0 + 0.86 * W, yp + 22 if prod_pos == 'below' else yp - 10, prod, 14)
     if caption: b += T(ox + w / 2, oy + 42, caption, 14, color=MUTED, weight='bold')
     if complex_: b += TH(pkx, ypk - 12, complex_, 14)
-    for kind, lab, col in arrows:
+    for arw in arrows:
+        kind, lab, col = arw[:3]
+        place = arw[3] if len(arw) > 3 else None  # (side 'l'/'r', 'mid'/'top') لتفادي تداخل التسمية مع المنحنى
         if kind == 'ea':
             x = pkx - 0.035 * W
             b += L(bx, yr, x + 8, yr, MUTED, 1.2, '4 4') + ARROW(x, yr, x, ypk + 3, col)
@@ -59,6 +61,11 @@ def reaction_profile(r, pk, p, vmin=0, vmax=None, ox=0, oy=0, w=520, h=330, reac
             x = X0 + 0.80 * W
             b += L(bx, yr, x + 10, yr, MUTED, 1.2, '4 4') + ARROW(x, yr, x, yp + (3 if p < r else -3), col)
             lx, ly, anc = x + 8, (yr + yp) / 2 + 5, 'start'
+        if place:
+            side, where = place
+            ytop = min(yr, ypk) if kind == 'ea' else (min(yp, ypk) if kind == 'ear' else min(yr, yp))
+            lx, anc = (x - 8, 'end') if side == 'l' else (x + 6, 'start')
+            if where == 'top': ly = ytop - 6
         if isinstance(lab, int):
             b += circ_num(lx + (-12 if anc == 'end' else 12), ly - 5, lab, col)
         else:
@@ -171,21 +178,21 @@ if __name__ == '__main__':
     collisions('c2-l1b-collisions.svg')
     # O09: تفاعلان بطاقتي تنشيط مختلفتين
     save('c2-l1b-two-ea.svg', svg(620, 330,
-         reaction_profile(50, 80, 20, vmin=-12, vmax=155, ox=0, w=310, h=330, complex_='', title='التفاعل (أ)', caption='Ea = 30 kJ', react_pos='below', arrows=[('ea', 'Ea', RED)])
-         + reaction_profile(50, 140, 20, vmin=-12, vmax=155, ox=310, w=310, h=330, complex_='', title='التفاعل (ب)', caption='Ea = 90 kJ', react_pos='below', arrows=[('ea', 'Ea', RED)])
+         reaction_profile(50, 80, 20, vmin=-12, vmax=155, ox=0, w=310, h=330, complex_='', title='التفاعل (أ)', caption='Ea = 30 kJ', react_pos='below', arrows=[('ea', 'Ea', RED, ('l', 'top'))])
+         + reaction_profile(50, 140, 20, vmin=-12, vmax=155, ox=310, w=310, h=330, complex_='', title='التفاعل (ب)', caption='Ea = 90 kJ', react_pos='below', arrows=[('ea', 'Ea', RED, ('l', 'top'))])
          + L(310, 10, 310, 320, MUTED, 1, '4 4')))
     three_curves('c2-l1b-three-ea.svg', 40, 20, [('X', 150, RED), ('Y', 90, GREEN), ('Z', 120, BLUE)])
-    save('c2-l1b-ea-vs-dh.svg', svg(640, 360,
-         reaction_profile(170, 290, 20, vmin=-25, vmax=330, ox=0, w=320, h=360, complex_='', title='التفاعل (أ)', caption='Ea = 120 kJ ، ΔH = −150 kJ',
-                          arrows=[('ea', 'Ea', RED), ('dh', 'ΔH', BLUE)])
-         + reaction_profile(170, 205, 150, vmin=-25, vmax=330, ox=320, w=320, h=360, complex_='', title='التفاعل (ب)', caption='Ea = 35 kJ ، ΔH = −20 kJ',
-                            arrows=[('ea', 'Ea', RED), ('dh', 'ΔH', BLUE)])
-         + L(320, 10, 320, 350, MUTED, 1, '4 4')))
+    save('c2-l1b-ea-vs-dh.svg', svg(720, 360,
+         reaction_profile(170, 290, 20, vmin=-25, vmax=330, ox=0, w=360, h=360, complex_='', title='التفاعل (أ)', caption='Ea = 120 kJ ، ΔH = −150 kJ',
+                          react_pos='below', arrows=[('ea', 'Ea', RED, ('l', 'top')), ('dh', 'ΔH', BLUE)])
+         + reaction_profile(170, 205, 150, vmin=-25, vmax=330, ox=360, w=360, h=360, complex_='', title='التفاعل (ب)', caption='Ea = 35 kJ ، ΔH = −20 kJ',
+                            react_pos='below', arrows=[('ea', 'Ea', RED, ('l', 'top')), ('dh', 'ΔH', BLUE, ('r', 'top'))])
+         + L(360, 10, 360, 350, MUTED, 1, '4 4')))
     # O10: التركيز مع الزمن للتفاعل CO + NO₂ → CO₂ + NO
     conc_time('c2-l1b-conc-time.svg',
               [(1, [(0, 0.200), (10, 0.160), (20, 0.140), (30, 0.128), (40, 0.120)], RED),
                (2, [(0, 0.000), (10, 0.040), (20, 0.060), (30, 0.072), (40, 0.080)], BLUE)],
-              notes=[(0, 0.200, '0.200', 10, 16), (20, 0.140, '0.140', 4, -12), (40, 0.120, '0.120', -40, 22),
+              notes=[(0, 0.200, '0.200', 12, -6), (20, 0.140, '0.140', 4, -12), (40, 0.120, '0.120', -40, 22),
                      (20, 0.060, '0.060', 4, 22), (40, 0.080, '0.080', -40, 24)])
     # O11: مخططات الطاقة للتفاعلين الأمامي والعكسي
     profile_file('c2-l1b-co-no2.svg', 110, 250, 30, vmin=-15, vmax=300, react='CO(g) + NO₂(g)', prod='CO₂(g) + NO(g)',

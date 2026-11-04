@@ -40,6 +40,12 @@ def distribution(name, curves, ea=None, ea_label='طاقة التنشيط', shad
     if ea is not None:
         b += L(px(ea), Y0, px(ea), Y1 + 10, INK, 1.6, '6 5') + T(px(ea) + 6, Y1 + 22, ea_label, 13, 'start', INK, 'bold')
     for val, txt in extra_ea:
+        if shade:
+            for lab, kT, col in curves:
+                Es = [i * Emax / 300 for i in range(301)]
+                sp = [(px(E), py(f(E, kT))) for E in Es if E >= val]
+                poly = [(px(val), Y0)] + sp + [(px(Emax), Y0)]
+                b += f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in poly)}" fill="{GREEN}" fill-opacity="0.15" stroke="none"/>'
         b += L(px(val), Y0, px(val), Y1 + 50, GREEN, 1.6, '6 5') + T(px(val) + 6, Y1 + 62, txt, 13, 'start', GREEN, 'bold')
     if note: b += T(X0 + 140, Y1 + 40, note, 15, 'start', INK, 'bold')
     save(name, svg(w, h, b))
@@ -130,13 +136,13 @@ def cube(x, y, s, fill='#d9e6f2'):
     side = f'<polygon points="{x+s},{y} {x+s+d},{y-d} {x+s+d},{y+s-d} {x+s},{y+s}" fill="#b9cfe4" stroke="{INK}" stroke-width="1.6"/>'
     return front + top + side
 
-def cubes2(name, w=560, h=270, big='2 cm', small='1 cm'):
-    b = T(135, 26, '(س) قطعة واحدة', 15, weight='bold') + T(405, 26, '(ص) ثماني قطع منفصلة', 15, weight='bold')
+def cubes2(name, w=640, h=270, big='2 cm', small='1 cm'):
+    b = T(135, 26, '(س) قطعة واحدة', 15, weight='bold') + T(455, 26, '(ص) ثماني قطع منفصلة', 15, weight='bold')
     b += cube(80, 100, 110) + T(135, 245, f'طول الضلع \u2066{big}\u2069', 14, rtl=True)
-    s = 40
-    pos = [(290 + 62 * i, 85 + 80 * j) for j in range(2) for i in range(4)]
+    s = 55
+    pos = [(300 + 80 * i, 80 + 88 * j) for j in range(2) for i in range(4)]
     for x, y in pos: b += cube(x, y, s)
-    b += T(405, 245, f'طول ضلع كل قطعة \u2066{small}\u2069', 14, rtl=True)
+    b += T(455, 245, f'طول ضلع كل قطعة \u2066{small}\u2069', 14, rtl=True)
     b += L(270, 40, 270, 250, MUTED, 1, '4 4')
     save(name, svg(w, h, b))
 
@@ -189,7 +195,7 @@ if __name__ == '__main__':
     # مخطط الطاقة: تفاعل طارد بمحفز ومن دونه
     R, P = 200, 265
     profile('c2-l2a-cat-profile.svg', R, P, [(60, RED, 'تفاعل غير محفز', (300, 50)), (125, BLUE, 'تفاعل محفز', (408, 145))],
-            ea_arrows=[(150, 60, 'Ea غير محفز', RED, 'end'), (468, 125, 'Ea محفز', BLUE, 'start')])
+            ea_arrows=[(172, 60, 'Ea غير محفز', RED, 'end'), (468, 125, 'Ea محفز', BLUE, 'start')])
     profile('c2-l2a-cat-12.svg', R, P, [(60, RED, '(1)', (300, 50)), (125, BLUE, '(2)', (300, 116))])
     profile('c2-l2a-cat-dh.svg', R, P, [(60, RED, 'دون محفز', (300, 50)), (125, BLUE, 'مع محفز', (408, 145))], dh_arrow=(470, 'ΔH'))
     # مثبط يرفع طاقة التنشيط

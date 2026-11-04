@@ -16,7 +16,7 @@ def axes_box(x0, y0, x1, y1, xlabel, ylabel):
     return b
 
 
-def distribution(name, temps, ea_lines, labels=None, colors=None, note=None, shade=True, w=520, h=330):
+def distribution(name, temps, ea_lines, labels=None, colors=None, note=None, shade=True, w=520, h=330, fills=None):
     """منحنى توزيع طاقة الجسيمات: f(E) = E/T² · e^(−E/T) (المساحة نفسها لكل منحنى).
     temps: قيم T النسبية، ea_lines: [(E, نص)]، labels: نص فوق كل منحنى."""
     X0, Y0, X1, Y1 = 70, h - 55, w - 30, 30
@@ -26,7 +26,7 @@ def distribution(name, temps, ea_lines, labels=None, colors=None, note=None, sha
     sy = lambda f: Y0 - f / fmax * (Y0 - Y1 - 10)
     f = lambda e, t: e / t ** 2 * math.exp(-e / t)
     colors = colors or [BLUE, RED, GREEN]
-    fills = [LBLUE, LRED, '#b9dfc9']
+    fills = fills or [LBLUE, LRED, '#b9dfc9']
     b = ''
     if shade and ea_lines:
         ea = ea_lines[0][0]
@@ -155,13 +155,15 @@ if __name__ == '__main__':
     # توزيع الطاقة عند T1 وT2 (مثل الشكل 2-10)
     distribution('c2-l2b-dist-t1t2.svg', [1.0, 1.6], [(3.6, 'طاقة التنشيط')], labels=['T₁', 'T₂'], note='T₂ > T₁')
     # منحنيان (أ) و(ب) دون ذكر أيهما الأعلى حرارة
-    distribution('c2-l2b-dist-ab.svg', [1.0, 1.6], [(3.6, 'Ea')], labels=['(أ)', '(ب)'], colors=[GREEN, ORANGE])
+    distribution('c2-l2b-dist-ab.svg', [1.0, 1.6], [(3.6, 'Ea')], labels=['(أ)', '(ب)'], colors=[GREEN, ORANGE], fills=['#b9dfc9', '#f6cfa6'])
     # منحنى واحد وطاقتا تنشيط لتفاعلين X وY عند درجة الحرارة نفسها
     distribution('c2-l2b-dist-xy.svg', [1.2], [(2.4, 'Ea(X)'), (4.8, 'Ea(Y)')], labels=['T'], shade=False)
     # مخطط تفاعل طارد محفز وغير محفز بقيم
     profile('c2-l2b-cat-exo.svg', 100, 40, [250, 170], ['غير محفَّز', 'محفَّز'], vmax=280)
     # المساران (1) و(2) دون تسمية
     profile('c2-l2b-cat-12.svg', 100, 40, [250, 170], ['المسار (1)', 'المسار (2)'], colors=[GREEN, ORANGE], vmax=280)
+    # تفاعل واحد دون محفز وبمحفزين A وB
+    profile('c2-l2b-cat-ab.svg', 100, 40, [250, 190, 150], ['دون محفز', 'المحفز A', 'المحفز B'], vmax=280)
     # تفاعل ماص محفز وغير محفز
     profile('c2-l2b-cat-endo.svg', 50, 120, [230, 160], ['غير محفَّز', 'محفَّز'], vmax=260)
     # السرعة النسبية مع درجة الحرارة (نقاط الشكل 2-10)
