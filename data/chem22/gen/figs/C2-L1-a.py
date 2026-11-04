@@ -151,7 +151,7 @@ def conc_time(name, series, xmax, ymax, xstep, ystep, xlabel='الزمن (s)', y
             b += f'<circle cx="{px(t):.1f}" cy="{py(c):.1f}" r="4.5" fill="{col}"/>'
             if show_vals: b += T(px(t) + 7, py(c) - 8, f'{c}', 11, 'start', col)
         t, c = pts[-1]
-        b += T(px(t) + 8, py(c) + (20 if show_vals else 5), lab, 14, 'start', col, 'bold')
+        b += T(px(t) + 8, py(c) + (-26 if show_vals else 5), lab, 14, 'start', col, 'bold')
     save(name, svg(w, h, b))
 
 
