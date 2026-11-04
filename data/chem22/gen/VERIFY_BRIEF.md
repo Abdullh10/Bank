@@ -21,3 +21,7 @@ Edit the JSON files in place (keep structure). Keep the key-position spread (no 
 
 ## Report (short)
 Per file: defects found and what you changed (question number, before → after, why). Then a list of residual doubts for the owner. Give counts: MCQs checked, defects fixed (key errors / numeric errors / scientific / wording).
+
+## Figures
+8. For every question with `images`: open the SVG (render it to PNG with Playwright — `require('playwright')`, `chromium.launch()`, `page.goto('file://…svg')`, screenshot — and Read the PNG). Check: the figure is scientifically correct (energy levels, arrow directions and magnitudes consistent with the numbers in stem/options, axes labelled, curves shaped correctly), every label readable and not clipped or overlapping, it agrees with the alt text, and it does NOT give the answer away. The question must be answerable from stem + figure. If a figure is wrong, fix the figure code in `data/chem22/gen/figs/<LESSON>.py`, re-run it, and re-check. Never edit `figures.py`.
+9. Do not add letter references to options («البديل (ب)») in explanations; the app shuffles options.
