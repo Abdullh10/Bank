@@ -47,7 +47,7 @@ for (const id of ids) {
     // 6) ملاحظات الأخطاء تحتوي «صحيح» عن البديل الخاطئ (احتمال خطأ ترتيب)
     q.distractor_notes.forEach((n, j) => { if (j !== k && /^(هذا|هذه)?\s*(هو|هي)?\s*(الإجابة|البديل)\s*الصحيح/.test(strip(n))) flag(id, tag, 'note-says-correct', `ملاحظة البديل «${'أبجد'[j]}» تصفه بالصحيح`); });
     // 7) نص السؤال يحيل إلى شكل غير ظاهر
-    if (/(الشكل|المنحنى|الرسم)\s*(\d|الآتي|المجاور|أعلاه)/.test(q.stem) && !q.stimulus) flag(id, tag, 'invisible-figure', 'يحيل إلى شكل ولا يوجد جدول/معطيات');
+    if (/(الشكل|المنحنى|الرسم|المخطط)\s*(\d|الآتي|المجاور|أعلاه)/.test(q.stem) && !q.stimulus && !q.images?.length) flag(id, tag, 'invisible-figure', 'يحيل إلى شكل ولا يوجد جدول/معطيات');
   });
   d.essay.forEach((q, i) => {
     const tag = `essay${i + 1}`;

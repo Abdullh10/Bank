@@ -74,7 +74,7 @@
    "options": [
     "R = k[H₂O₂]²",
     "R = k[H₂O₂]",
-    "R = k",
+    "R = k[H₂O₂]⁰",
     "R = k[H₂O][O₂]"
    ],
    "correct_index": 1,
