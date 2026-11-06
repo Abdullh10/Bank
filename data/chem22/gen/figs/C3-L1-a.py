@@ -66,7 +66,7 @@ def particle_box(name):
     for x, y in hh: b += molecule(x, y, 'HH')
     for x, y in ii: b += molecule(x, y, 'II')
     for x, y in hi: b += molecule(x, y, 'HI')
-    b += T(170, 285, 'حجم الوعاء:', 14, 'end') + T(176, 285, '1.0 L', 14, 'start')
+    b += T(168, 285, 'حجم الوعاء:', 14, 'start') + T(162, 285, '1.0 L', 14, 'end')
     # المفتاح
     kx = 330
     b += f'<rect x="{kx}" y="40" width="210" height="190" fill="none" stroke="{MUTED}" stroke-width="1" rx="6"/>'
@@ -74,7 +74,7 @@ def particle_box(name):
     for k, (kinds, lab) in enumerate([('HH', 'H₂'), ('II', 'I₂'), ('HI', 'HI')]):
         y = 100 + k * 38
         b += molecule(kx + 40, y, kinds) + T(kx + 110, y + 5, lab, 15, 'start')
-    b += T(kx + 150, 212, 'كل جزيء يمثل', 13, 'end') + T(kx + 156, 212, '0.10 mol', 13, 'start')
+    b += T(kx + 76, 212, 'كل جزيء يمثل', 13, 'start') + T(kx + 70, 212, '0.10 mol', 13, 'end')
     save(name, svg(w, h, b))
 
 
@@ -93,8 +93,8 @@ def flask(name):
         b += f'<circle cx="{x}" cy="{y}" r="7" fill="{ORANGE}" stroke="{INK}" stroke-width="1"/>'
     for x, y in [(130, 270), (170, 285), (215, 268), (260, 288), (300, 268), (335, 280), (190, 300), (240, 300), (285, 298)]:
         b += f'<circle cx="{x}" cy="{y}" r="7" fill="{ORANGE}" stroke="{INK}" stroke-width="1" opacity="0.9"/>'
-    b += ARROW(130, 248, 130, 200, RED, 2.4) + ARROW(335, 200, 335, 246, BLUE, 2.4)
-    b += T(112, 215, 'تبخر', 13, 'end', RED, 'bold') + T(355, 215, 'تكثف', 13, 'start', BLUE, 'bold')
+    b += ARROW(175, 248, 175, 200, RED, 2.4) + ARROW(300, 200, 300, 246, BLUE, 2.4)
+    b += T(184, 230, 'تبخر', 13, 'start', RED, 'bold') + T(291, 230, 'تكثف', 13, 'end', BLUE, 'bold')
     b += T(400, 170, 'C₂H₅OH(g)', 14, 'start') + L(330, 175, 395, 168, MUTED, 1)
     b += T(400, 290, 'C₂H₅OH(l)', 14, 'start') + L(360, 280, 395, 286, MUTED, 1)
     save(name, svg(w + 70, h, b))
@@ -116,10 +116,10 @@ if __name__ == '__main__':
     graph('c3-l1a-rates-xy.svg',
           [('(س)', lambda t: ease(0.0, 0.45, t, TEQ), BLUE), ('(ص)', lambda t: ease(1.0, 0.45, t, TEQ), RED)],
           xmax=10, ymax=1.1, marks=[(TEQ, 't₂')], ylabel='سرعة التفاعل', label_dy={'(س)': 12, '(ص)': -12})
-    # 4) N₂O₄ ⇌ 2NO₂ بقيم عددية: [N₂O₄] 0.100→0.040، [NO₂] 0→0.120، الاتزان عند 60 s
+    # 4) N₂O₄ ⇌ 2NO₂ بقيم عددية: [N₂O₄] 0.100→0.020، [NO₂] 0→0.160، الاتزان عند 60 s
     graph('c3-l1a-conc-n2o4.svg',
-          [('[NO₂]', lambda t: ease(0.0, 0.120, t, 60), BLUE), ('[N₂O₄]', lambda t: ease(0.100, 0.040, t, 60), RED)],
-          xmax=100, ymax=0.14, yticks=[0.02 * k for k in range(8)], xticks=[0, 20, 40, 60, 80, 100], ydec=3,
+          [('[NO₂]', lambda t: ease(0.0, 0.160, t, 60), BLUE), ('[N₂O₄]', lambda t: ease(0.100, 0.020, t, 60), RED)],
+          xmax=100, ymax=0.18, yticks=[0.02 * k for k in range(10)], xticks=[0, 20, 40, 60, 80, 100], ydec=3,
           xlabel='الزمن (s)', w=580)
     # 5) A ⇌ B: منحنيان يتقاطعان قبل الاتزان (t₁ التقاطع، t₂ ما زال يتغير، t₃ ثابت)
     graph('c3-l1a-conc-cross.svg',

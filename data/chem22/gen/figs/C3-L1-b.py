@@ -72,11 +72,15 @@ def flask(cx, cy, R, gas, solid, seed, valve_side=None):
     b += f'<path d="M {cx - half:.1f} {yc:.1f} A {R} {R} 0 0 0 {cx + half:.1f} {yc:.1f} Z" fill="#e3ddd2" stroke="none"/>'
     b += L(cx - half, yc, cx + half, yc, MUTED, 1.2)
     taken = []
-    sol = region((cx - R, yc + 4, cx + R, cy + R - 4), lambda x, y: (x - cx) ** 2 + (y - cy) ** 2 < (R - 8) ** 2 and y > yc + 7)
+    sol = region((cx - R, yc + 4, cx + R, cy + R - 4), lambda x, y: (x - cx) ** 2 + (y - cy) ** 2 < (R - 6) ** 2 and y > yc + 5)
     gasr = region((cx - R, cy - R, cx + R, yc - 6), lambda x, y: (x - cx) ** 2 + (y - cy) ** 2 < (R - 9) ** 2 and y < yc - 8)
-    sp = scatter(rng, len(solid), sol, 5.2, taken)
+    solid = solid[:]; gas = gas[:]; rng.shuffle(solid); rng.shuffle(gas)
+    grid = [(x, y) for r_, y in enumerate(range(int(cy + R - 8), int(yc + 4), -10))
+            for x in [cx - R + 5 + c * 10 + (5 if r_ % 2 else 0) for c in range(int(2 * R / 10) + 1)] if sol(x, y)]
+    grid.sort(key=lambda p: (-p[1], abs(p[0] - cx))); sp = grid[:len(solid)]; taken.extend(sp)
     gp = scatter(rng, len(gas), gasr, 7.5, taken)
-    for (x, y), c in zip(sp, solid): b += dot(x, y, c, 5.5)
+    assert len(sp) == len(solid) and len(gp) == len(gas)
+    for (x, y), c in zip(sp, solid): b += dot(x, y, c, 4.6)
     for (x, y), c in zip(gp, gas): b += dot(x, y, c, 5.5)
     return b
 
@@ -92,11 +96,11 @@ def iodine_flasks(name, w=600, h=430):
         b += L(vx - 10, cy, vx + 10, cy, INK, 3) if open_ else L(vx, cy - 14, vx, cy + 14, INK, 3)
         b += T(vx, cy - 28, 'المحبس مفتوح' if open_ else 'المحبس مغلق', 13, color=GREEN if open_ else RED, weight='bold')
         if open_:
-            gl = [GREY] * 5 + [RED] * 3; sl = [GREY] * 10 + [RED] * 5
-            gr = [RED] * 5 + [GREY] * 3; sr = [RED] * 10 + [GREY] * 5
+            gl = [GREY] * 5 + [RED] * 3; sl = [GREY] * 8 + [RED] * 4
+            gr = [RED] * 5 + [GREY] * 3; sr = [RED] * 8 + [GREY] * 4
             readl = readr = 'عداد الإشعاع: إشعاع'
         else:
-            gl, sl, gr, sr = [GREY] * 8, [GREY] * 15, [RED] * 8, [RED] * 15
+            gl, sl, gr, sr = [GREY] * 8, [GREY] * 12, [RED] * 8, [RED] * 12
             readl, readr = 'عداد الإشعاع: لا إشعاع', 'عداد الإشعاع: إشعاع'
         b += flask(lx, cy, R, gl, sl, seed) + flask(rx, cy, R, gr, sr, seed + 7)
         b += T(lx, cy + R + 22, readl, 13, color=MUTED) + T(rx, cy + R + 22, readr, 13, color=MUTED)
@@ -124,7 +128,8 @@ def ethanol_flask(name, w=440, h=330):
     b += ARROW(cx - 40, yl + 14, cx - 40, yl - 30, GREEN, 2.2) + ARROW(cx + 40, yl - 30, cx + 40, yl + 14, RED, 2.2)
     b += T(305, 95, 'C₂H₅OH(g)', 15, 'start', weight='bold') + L(300, 92, cx + 45, 120, MUTED, 1)
     b += T(305, 268, 'C₂H₅OH(l)', 15, 'start', weight='bold') + L(300, 263, cx + 70, 255, MUTED, 1)
-    b += T(cx - 48, yl - 4, 'تبخر', 14, 'end', GREEN, 'bold') + T(cx + 48, yl - 4, 'تكثف', 14, 'start', RED, 'bold')
+    b += ARROW(318, 182, 318, 156, GREEN, 2.2) + T(332, 175, 'تبخر', 14, 'start', GREEN, 'bold')
+    b += ARROW(318, 200, 318, 226, RED, 2.2) + T(332, 219, 'تكثف', 14, 'start', RED, 'bold')
     save(name, svg(w, h, b))
 
 # ---------- حاويتان مغلقتان فيهما كمية مختلفة من مادة صلبة ----------
