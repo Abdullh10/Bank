@@ -1396,3 +1396,6 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
 .sv-items td:first-child { min-width: 16rem; }
 .sv-open ul { margin: .4rem 0; padding-inline-start: 1.2rem; display: grid; gap: .3rem; }
 .sv-preview ol { margin: .4rem 0; padding-inline-start: 1.4rem; display: grid; gap: .2rem; font-size: .9rem; }
+
+.cm-reopen { display: inline-flex; gap: .4rem; align-items: center; }
+.cm-reopen select { width: auto; }

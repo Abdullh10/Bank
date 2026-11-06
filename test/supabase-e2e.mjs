@@ -690,6 +690,14 @@ ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_re
   ok('survey: after closing, 7 anonymous rows (no ids or names)', res.rows.length === 7 && !js.includes(sid) && !tmpIds.some(t => js.includes(t)) && !js.includes('طالب') && res.open1.length === 2, js.slice(0, 200));
   ok('survey: impact link is owner-only', /لمالك المشروع|بانتظار التفعيل/.test((await asRole(sid, 'select public.impact_survey(1, $1) r', [commId])).error?.message || '')
     && (await asRole(OWN, 'select public.impact_survey_list() r')).data.some(x => Number(x.id) === commId));
+  ok('survey: reopening refused when everyone answered', /أجاب كل من/.test((await asRole(OWN, 'select public.staff_reopen_survey($1, 7) r', [commId])).error?.message || ''));
+  await pool.query('delete from public.survey_responses where comm_id = $1 and student_id = $2', [commId, tmpIds[5]]);
+  await pool.query(`update public.comm_recipients set status = 'open', done_at = null where comm_id = $1 and student_id = $2`, [commId, tmpIds[5]]);
+  const ro = await asRole(OWN, 'select public.staff_reopen_survey($1, 7) r', [commId]);
+  const after = (await asRole(OWN, 'select public.survey_results($1) r', [commId])).data;
+  ok('survey: reopened for non-respondents, results hidden again', ro.data?.pending === 1 && after.open === true && after.rows.length === 0, JSON.stringify(ro));
+  ok('survey: a non-respondent can answer after reopening', !(await asRole(tmpIds[5], 'select public.student_submit_survey($1, $2::int[], null, null, 200) r', [commId, Array.from({ length: 17 }, (_, i) => (i === 9 ? 2 : 4))])).error);
+  ok('survey: a respondent still cannot answer twice', /أرسلت إجابتك من قبل/.test((await asRole(sid, 'select public.student_submit_survey($1, $2::int[]) r', [commId, mine.answers])).error?.message || ''));
   await pool.query('delete from public.comms where id = $1', [commId]);
   await pool.query(`delete from auth.users where email like 'svst0_@chem21.local'`);
 }
