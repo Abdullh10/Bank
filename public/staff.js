@@ -181,15 +181,15 @@ export async function pageTeacherComms(ctx) {
       </div></section>
     <section class="card">${ttl('mail', 'المُرسَل')}
       ${list.length ? `<ul class="cm-list">${list.map(c => {
-        const t = c.task, off = c.status === 'cancelled';
+        const t = c.task, off = c.status === 'cancelled', svOpen = !!(c.survey && c.survey.open && !off); // الإغلاق اليدوي يُبقي موعد الإغلاق مستقبلًا
         return `<li class="cm-item ${off ? 'off' : ''}" data-comm="${c.id}"><div class="in-head"><b>${esc(c.title)}</b>
           <span class="badge ${c.kind === 'message' ? '' : 'brand'}">${{ task: 'مهمة', survey: 'استبانة' }[c.kind] || 'رسالة'}</span>${off ? `<span class="badge">${c.survey ? 'مغلقة' : 'ملغاة'}</span>` : ''}
           <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
           ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
           <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''}${t.reward ? ` · مكافأة ${t.reward} نقطة` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
-          ${c.survey ? `<div class="small muted">استجاب ${c.survey.responses} من ${c.n} · ${c.survey.open ? `تُغلق ${esc(hijri(c.survey.closesAt))}` : 'أُغلقت'}</div>` : ''}
-          <div class="actions">${c.survey ? `<button type="button" class="primary" data-svres="${c.id}">النتائج</button>` : ''}<button type="button" data-detail="${c.id}">التفاصيل</button>${off || (c.survey && !c.survey.open) ? '' : `<button type="button" class="danger" data-cancel="${c.id}" data-kind="${c.kind}">${c.survey ? 'إغلاق الاستبانة' : 'إلغاء'}</button>`}
-            ${c.survey && !c.survey.open && c.survey.responses < c.n ? `<span class="cm-reopen"><select data-reopen-days="${c.id}" aria-label="مدة إعادة الفتح"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يومًا</option></select>
+          ${c.survey ? `<div class="small muted">استجاب ${c.survey.responses} من ${c.n} · ${svOpen ? `تُغلق ${esc(hijri(c.survey.closesAt))}` : 'أُغلقت'}</div>` : ''}
+          <div class="actions">${c.survey ? `<button type="button" class="primary" data-svres="${c.id}">النتائج</button>` : ''}<button type="button" data-detail="${c.id}">التفاصيل</button>${off || (c.survey && !svOpen) ? '' : `<button type="button" class="danger" data-cancel="${c.id}" data-kind="${c.kind}">${c.survey ? 'إغلاق الاستبانة' : 'إلغاء'}</button>`}
+            ${c.survey && !svOpen && c.survey.responses < c.n ? `<span class="cm-reopen"><select data-reopen-days="${c.id}" aria-label="مدة إعادة الفتح"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يومًا</option></select>
               <button type="button" data-reopen="${c.id}">إعادة فتح الاستبانة</button></span>` : ''}</div>
           <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
   const q = s => $app.querySelector(s);
