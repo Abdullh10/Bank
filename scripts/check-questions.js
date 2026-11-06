@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { autoCheck, similarity } from '../server/validate.js';
 
+import { okImage, MAX_IMAGES, MAX_ALT } from '../public/media.js';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
 const ci = args.indexOf('--course');
@@ -36,6 +37,15 @@ for (const id of ids) {
     if (!LEVELS.includes(q.thinking_level)) errs.push(`${tag}: مستوى التفكير غير صالح`);
     if (!DIFF.includes(q.difficulty)) errs.push(`${tag}: الصعوبة غير صالحة`);
     if (!q.source_ref) errs.push(`${tag}: المرجع مفقود`);
+    // الرسوم: ما ترفضه الواجهة (okImage) يُخفى عن الطالب بصمت، فيُرفض هنا قبل الاعتماد
+    if (q.images !== undefined && q.images !== null) {
+      if (!Array.isArray(q.images) || q.images.length > MAX_IMAGES) errs.push(`${tag}: الصور قائمة من ${MAX_IMAGES} على الأكثر`);
+      else for (const im of q.images) {
+        if (String(im?.alt ?? '').length > MAX_ALT) errs.push(`${tag}: وصف الرسم ${String(im.alt).length} حرفًا (الحد ${MAX_ALT}) — يُخفى الرسم في المنصة`);
+        else if (!okImage(im)) errs.push(`${tag}: مصدر الرسم غير مسموح: ${im?.src}`);
+        else if (im.src.startsWith('qimg/') && !fs.existsSync(path.join(root, 'public', im.src))) errs.push(`${tag}: ملف الرسم غير موجود: ${im.src}`);
+      }
+    }
     if (q.stimulus && (!Array.isArray(q.stimulus.headers) || !Array.isArray(q.stimulus.rows))) errs.push(`${tag}: جدول غير صالح`);
     if (q.type === 'mcq') {
       const n = (q.options || []).length;
