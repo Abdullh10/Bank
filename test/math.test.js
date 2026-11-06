@@ -38,7 +38,12 @@ test('مصادر الصور المسموحة فقط', () => {
     'https://x.supabase.co/storage/v1/object/public/question-media/q/a.svg', 'qimg/../config.js', 'qimg/a.png?x=1', 'javascript:alert(1)',
     'data:image/png;base64,AAAA', '/qimg/a.png', 'qimg/a.png" onerror="x'])
     assert.equal(okImage({ src }), false, src);
-  assert.equal(okImage({ src: 'qimg/a.png', alt: 'x'.repeat(201) }), false);
+  assert.equal(okImage({ src: 'qimg/a.png', alt: 'x'.repeat(1001) }), false);
+  // وصف المخطط الكامل (حتى 1000 حرف) مقبول: يُعرض الشكل، والوصف الطويل بديل نصي دون تعليق تحت الصورة
+  const long = qImages([{ src: 'qimg/chem22/c2-l1a-conc-two-curves.svg', alt: 'منحنى '.repeat(60) }]);
+  assert.match(long, /<img src="qimg\/chem22\/c2-l1a-conc-two-curves.svg"/);
+  assert.doesNotMatch(long, /figcaption/);
+  assert.match(qImages([{ src: 'qimg/a.png', alt: 'دائرة' }]), /<figcaption>دائرة<\/figcaption>/);
 });
 test('الصور تُعرض مهرّبة، وغير المسموحة لا تُعرض', () => {
   const html = qImages([{ src: 'qimg/a.png', alt: 'وعاء <b>' }, { src: 'https://evil.example/x.png' }]);
