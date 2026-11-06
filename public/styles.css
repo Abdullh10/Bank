@@ -1303,6 +1303,9 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .pr-report { page: prep; }
+  @page survey { size: A4 portrait; margin: 14mm 13mm 16mm;
+    @bottom-center { content: "منصة إتقان · تقرير نتائج استبانة الطلاب · صفحة " counter(page) " من " counter(pages); font: 8pt "IBM Plex Sans Arabic", sans-serif; color: #6b7686; } }
+  .pr-report.sv-report { page: survey; }
   .imp-report *, .pr-report * { box-shadow: none !important; }
   .rp-cover { border: 1px solid #c9d3df; border-top: 5px solid #12305a; border-radius: 6px; padding: 12pt 14pt 10pt; margin-bottom: 12pt; }
   .rp-brand { display: flex; align-items: center; gap: 8pt; padding-bottom: 8pt; border-bottom: 1px solid #e3e8ef; }
@@ -1353,6 +1356,9 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
   .rp-small { font-size: 8.5pt; color: #4a5565; margin: 3pt 0; }
   .rp-muted { color: #8a94a3; }
   .rp-ltr { white-space: nowrap; unicode-bidi: isolate; }
+  .pr-report .sv-dist { width: 120px; height: 10px; }
+  .pr-report .sv-key { display: inline-block; width: 9px; height: 9px; margin-inline: 6pt 2pt; }
+  .pr-report .rp-figs { grid-template-columns: repeat(4, 1fr); }
   .rp-t.rp-keep { break-inside: avoid; }
   .rp-list { margin: 0; padding-inline-start: 14pt; font-size: 9pt; }
   .rp-list li { margin-bottom: 2pt; }

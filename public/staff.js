@@ -3,7 +3,7 @@ import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
-import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml } from './survey.js';
+import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml, printSurveyReport } from './survey.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -230,7 +230,11 @@ export async function pageTeacherComms(ctx) {
   $app.querySelectorAll('[data-svres]').forEach(b => b.onclick = async () => {
     const box = document.getElementById('cmd-' + b.dataset.svres);
     if (box.dataset.sv) { box.innerHTML = ''; delete box.dataset.sv; return; }
-    try { box.innerHTML = surveyResultsHtml(esc, await api('/staff/comms/survey?id=' + b.dataset.svres)); box.dataset.sv = 1; } catch (err) { fail(err); }
+    try {
+      const d = await api('/staff/comms/survey?id=' + b.dataset.svres);
+      box.innerHTML = surveyResultsHtml(esc, d); box.dataset.sv = 1;
+      box.querySelector('.sv-print')?.addEventListener('click', () => printSurveyReport(esc, d, { sender: list.find(c => String(c.id) === b.dataset.svres)?.sender }));
+    } catch (err) { fail(err); }
   });
   const ST = { open: 'جارية', done: 'أنجز', missed: 'انتهى الموعد' };
   $app.querySelectorAll('[data-detail]').forEach(b => b.onclick = async () => {
