@@ -188,6 +188,60 @@ export function surveyResultsHtml(esc, d) {
     ${secs.length > 1 ? `<p class="small"><b>الاستجابة حسب الشعبة:</b> ${secs.map(([s, n, k]) => `${esc(s)}: ${k >= MIN_SHOW ? `${k} من ${n}` : 'أقل من 5'}`).join(' · ')}</p>` : ''}
     ${[d.open1, d.open2].map((list, k) => list.length ? `<details class="sv-open"><summary>${esc(OPEN[k])} <span class="small muted">(${list.length})</span></summary>
       <ul>${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul></details>` : '').join('')}
+    <div class="actions no-print"><button type="button" class="sv-print">طباعة / حفظ PDF</button></div>
     <p class="small muted">الأداة: مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009)، ليكرت خماسي. المستوى: 1–1.80 منخفض جدًا، 1.81–2.60 منخفض، 2.61–3.40 متوسط، 3.41–4.20 مرتفع، 4.21–5 مرتفع جدًا. العبارات العكسية أُعيد ترميزها. هذه نتائج إدراك الطلاب وتدعم نتائج الاختبار القبلي والبعدي ولا تحل محلها.</p>`}
   </div>`;
+}
+
+// ---------- التقرير المطبوع (A4): وثيقة رسمية بالشعار، تُتاح بعد إغلاق الاستبانة ومن 5 إجابات ----------
+const hdate = (v, long) => new Date(v).toLocaleDateString('ar-SA-u-ca-islamic-umalqura-nu-latn', long ? { day: 'numeric', month: 'long', year: 'numeric' } : undefined);
+export function printSurveyReport(esc, d, meta = {}) {
+  const c = clean(d.rows), a = analyzeSurvey(c.kept), rate = d.sent ? (100 * d.responses) / d.sent : NaN;
+  const removed = c.attention + c.straight + c.speed, today = hdate(Date.now(), true);
+  const secs = Object.entries(d.sectionsSent || {}).map(([sec, n]) => [sec, n, c.kept.filter(r => (r.s ?? '—') === sec).length]);
+  const row = cells => `<tr>${cells.map(x => `<td>${x}</td>`).join('')}</tr>`;
+  const table = (heads, rows, cls = '') => `<table class="rp-t ${cls}"><thead><tr>${heads.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  const best = [...a.dims].sort((x, y) => y.mean - x.mean)[0], low = [...a.items].sort((x, y) => x.mean - y.mean)[0];
+  let n = 0; const sec = t => `<h2 class="rp-h">${++n}. ${esc(t)}</h2>`;
+  document.querySelector('.pr-report')?.remove();
+  const art = document.createElement('article');
+  art.className = 'pr-report sv-report'; art.dir = 'rtl';
+  art.innerHTML = `<header class="rp-cover">
+    <div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="54" height="54"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب في الكيمياء</span></div></div>
+    <div class="rp-title"><span class="rp-kicker">تقرير نتائج استبانة الطلاب</span><h1>${esc(d.title)}</h1><p>استبانة إدراك الطلاب لأثر التدريب على المنصة في تعلّمهم</p></div>
+    <dl class="rp-meta">
+      <div><dt>تاريخ الإرسال</dt><dd>${esc(hdate(d.createdAt))}</dd></div><div><dt>تاريخ الإغلاق</dt><dd>${esc(hdate(d.closesAt))}</dd></div><div><dt>تاريخ التقرير</dt><dd>${esc(today)}</dd></div>
+      <div><dt>أُرسلت إلى</dt><dd>${d.sent} طالبًا</dd></div><div><dt>الاستجابات</dt><dd>${d.responses} (${pc(rate)})</dd></div><div><dt>الإجابات الموثوقة</dt><dd>${a.n}</dd></div>
+    </dl></header>
+  ${sec('الخلاصة')}
+  <div class="rp-figs">${a.dims.map(x => `<div><b>${fmt(x.mean, 2)}</b><span>${esc(x.label)} · ${esc(x.level)}</span></div>`).join('')}</div>
+  <div class="rp-box">استجاب ${d.responses} من ${d.sent} طالبًا (${pc(rate)})${removed ? `، واستُبعدت ${removed} إجابة غير موثوقة (أخطأ في عبارة الانتباه ${c.attention}، والإجابة نفسها لكل العبارات ${c.straight}، وأسرع من دقيقة ${c.speed})` : ''}، فبُني التحليل على ${a.n} إجابة.
+    أعلى الأبعاد «${esc(best.label)}» بمتوسط ${fmt(best.mean, 2)} من 5 (${esc(best.level)})، وأدنى العبارات: «${esc(low.text)}» (${fmt(low.mean, 2)}).
+    ${rate < 50 ? '<b>تنبيه:</b> نسبة الاستجابة أقل من 50%، فقد لا تمثل النتائج كل الطلاب.' : ''}</div>
+  ${sec('نتائج الأبعاد')}
+  ${table(['البعد', 'العبارات', 'المتوسط (من 5)', 'الانحراف المعياري', 'المستوى', 'نسبة المرتفع (≥ 3.5)', 'الثبات (ألفا كرونباخ)'],
+    a.dims.map(x => row([esc(x.label), x.items.length, fmt(x.mean, 2), fmt(x.sd, 2), esc(x.level), pc(x.high), Number.isFinite(x.alpha) ? `${fmt(x.alpha, 2)} · ${esc(alphaLabel(x.alpha))}` : esc(alphaLabel(x.alpha))])), 'rp-num rp-keep')}
+  ${a.n < MIN_ALPHA ? `<p class="rp-small">يُحسب الثبات من ${MIN_ALPHA} إجابة فأكثر.</p>` : ''}
+  ${sec('نتائج العبارات')}
+  ${table(['م', 'العبارة', 'المتوسط', 'الموافقة', 'توزيع الإجابات'], a.items.map((x, k) => row([k + 1, esc(x.text) + (x.rev ? ' <span class="rp-muted">(عكسية)</span>' : ''), fmt(x.mean, 2), pc(x.agree),
+    `<span class="sv-dist">${x.dist.map((p, j) => `<i class="sv-d${j}" style="width:${p}%"></i>`).join('')}</span>`])), 'rp-num')}
+  <p class="rp-small">المتوسط بعد إعادة ترميز العبارات العكسية (كلما ارتفع كان أفضل)؛ أما «الموافقة» فهي نسبة من اختار «أوافق» أو «أوافق بشدة» على نص العبارة كما هو، فانخفاضها في العبارة العكسية نتيجة إيجابية.</p>
+  <p class="rp-legend">${SCALE.map(([, t], k) => `<i class="sv-d${k} sv-key"></i>${t}`).join(' ')}</p>
+  ${secs.length > 1 ? `<p class="rp-small"><b>الاستجابة حسب الشعبة:</b> ${secs.map(([s, nn, k]) => `${esc(s)}: ${k >= MIN_SHOW ? `${k} من ${nn}` : 'أقل من 5'}`).join(' · ')}</p>` : ''}
+  ${(d.open1.length || d.open2.length) ? `${sec('الإجابات المفتوحة')}${[d.open1, d.open2].map((list, k) => list.length ? `<p class="rp-small"><b>${esc(OPEN[k])}</b> (${list.length})</p><ul class="rp-list">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '').join('')}` : ''}
+  ${sec('الأداة والمنهجية')}
+  <ul class="rp-list">
+    <li><b>الأداة:</b> ${ITEMS.length - 1} عبارة بمقياس ليكرت الخماسي في أربعة أبعاد، وعبارة انتباه، وسؤالان مفتوحان؛ مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).</li>
+    <li><b>التطبيق:</b> إلكترونيًا عبر المنصة، إجابة واحدة لكل طالب دون تعديل، وبسرية تامة؛ النتائج مجمّعة دون أسماء.</li>
+    <li><b>التنظيف:</b> استبعاد من أخطأ في عبارة الانتباه، ومن أعطى الإجابة نفسها لكل العبارات، ومن أنهى في أقل من دقيقة.</li>
+    <li><b>التفسير:</b> العبارات العكسية أُعيد ترميزها؛ المستوى: 1–1.80 منخفض جدًا، 1.81–2.60 منخفض، 2.61–3.40 متوسط، 3.41–4.20 مرتفع، 4.21–5 مرتفع جدًا.</li>
+    <li><b>الحدود:</b> نتائج إدراك الطلاب تدعم نتائج الاختبار القبلي والبعدي ولا تحل محلها.</li>
+  </ul>
+  <footer class="rp-sign">${['معلم المادة', 'المشرف التربوي', 'قائد المدرسة'].map(t => `<div><span>${t}</span><p>الاسم: ............................</p><p>التوقيع: ..........................</p></div>`).join('')}</footer>
+  <p class="rp-foot">صدر هذا التقرير من منصة إتقان في ${esc(today)}${meta.sender ? ` · المرسل: ${esc(meta.sender)}` : ''} · رمز الاستبانة ${d.id}</p>`;
+  document.body.append(art);
+  document.body.classList.add('pr-printing');
+  const done = () => { document.body.classList.remove('pr-printing'); art.remove(); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  window.print();
 }
