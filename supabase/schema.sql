@@ -399,7 +399,7 @@ begin
     elsif exists (select 1 from jsonb_array_elements(p->'images') x
         where jsonb_typeof(x) <> 'object'
           or coalesce(x->>'src', '') !~ '^(qimg/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif|svg)|https://[a-z0-9]+\.supabase\.co/storage/v1/object/public/question-media/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif))$'
-          or (x->>'src') like '%..%' or length(coalesce(x->>'alt', '')) > 200) then
+          or (x->>'src') like '%..%' or length(coalesce(x->>'alt', '')) > 1000) then
       errs := array_append(errs, 'مصدر صورة غير مسموح أو وصفها طويل');
     end if;
   end if;
