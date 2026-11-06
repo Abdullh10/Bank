@@ -3274,3 +3274,27 @@ revoke execute on all functions in schema public from anon, public;
 grant execute on function public.get_me() to anon, authenticated;
 grant execute on function public.student_submit_survey(bigint, int[], text, text, int), public.survey_results(bigint),
   public.impact_survey(bigint, bigint), public.impact_survey_list() to authenticated;
+
+-- =====================================================================
+-- 2026-11-06: إعادة فتح الاستبانة بعد إغلاقها لزيادة الاستجابات
+-- يعيد فتحها لمن أُرسلت إليهم أصلًا (3–30 يومًا)؛ من أجاب لا يجيب مرة ثانية، والنتائج تُخفى حتى الإغلاق التالي.
+-- =====================================================================
+create or replace function public.staff_reopen_survey(p_id bigint, p_days int default 7) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.comms;
+begin
+  perform public._require_comm_staff();
+  select * into c from comms where id = p_id and kind = 'survey' and (sender_id = auth.uid() or public.my_role() = 'admin');
+  if not found then raise exception 'الاستبانة غير موجودة'; end if;
+  if c.status = 'active' and c.expires_at > now() then raise exception 'الاستبانة مفتوحة بالفعل'; end if;
+  if p_days is null or p_days not between 3 and 30 then raise exception 'مدة إعادة الفتح بين 3 و30 يومًا'; end if;
+  if not exists (select 1 from comm_recipients where comm_id = p_id and status = 'open') then raise exception 'أجاب كل من أُرسلت إليهم؛ لا حاجة لإعادة الفتح'; end if;
+  update comms set status = 'active', cancelled_by = null, cancelled_at = null, expires_at = now() + make_interval(days => p_days) where id = p_id;
+  -- يظهر من جديد «جديدة» لمن لم يُجب، فيلفت انتباهه في صندوقه
+  update comm_recipients set read_at = null where comm_id = p_id and status = 'open';
+  return jsonb_build_object('closesAt', now() + make_interval(days => p_days),
+    'pending', (select count(*) from comm_recipients where comm_id = p_id and status = 'open'));
+end $$;
+revoke execute on all functions in schema public from anon, public;
+grant execute on function public.get_me() to anon, authenticated;
+grant execute on function public.staff_reopen_survey(bigint, int) to authenticated;

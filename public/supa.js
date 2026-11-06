@@ -251,6 +251,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/staff/comms') return method === 'GET' ? rpc('staff_list_comms', { p_course: course }) : rpc('staff_send_comm', { p: { ...body, course } });
   if (p === '/staff/comms/survey') return rpc('survey_results', { p_id: Number(f.id) });
   if (p === '/staff/comms/detail') return rpc('staff_comm_detail', { p_id: Number(f.id) });
+  if (p === '/staff/comms/reopen') return rpc('staff_reopen_survey', { p_id: Number(body.id), p_days: Number(body.days) || 7 });
   if (p === '/staff/comms/cancel') { await rpc('staff_cancel_comm', { p_id: body.id }); return { ok: true }; }
   if (p === '/staff/prep') return method === 'GET' ? rpc('prep_list', { p_course: course }) : { id: await rpc('prep_save', { p_id: body.id ? Number(body.id) : null, p: body, p_course: course }) };
   if (p === '/staff/prep/visible') { await rpc('prep_set_visible', { p_id: Number(body.id), p_visible: !!body.visible }); return { ok: true }; }
