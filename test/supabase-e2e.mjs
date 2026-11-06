@@ -734,6 +734,16 @@ await p.click('#logout'); await p.waitForSelector('#l-user');
 // مالك المشروع يسند للمعلم طالبًا واحدًا من «حسابات الفريق»
 await p.fill('#l-user', 'owner'); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
 await p.goto(BASE + '#/notes'); await p.waitForSelector('.notes .note');
+// استبانة أُغلقت يدويًا قبل موعدها: تُعرض «مغلقة» ويظهر زر إعادة الفتح لمن لم يُجب
+{
+  const sv = await asRole(OWNER, 'select public.staff_send_comm($1::jsonb) r', [JSON.stringify({ kind: 'survey', title: 'استبانة إغلاق يدوي', days: 7, target: { mode: 'students', students: [sid] } })]);
+  await asRole(OWNER, 'select public.staff_cancel_comm($1) r', [Number(sv.data?.id)]);
+  await p.goto(BASE + '#/comms'); await p.waitForSelector('#cm-send');
+  const item = p.locator('.cm-item', { hasText: 'استبانة إغلاق يدوي' });
+  ok('survey: manually closed before its deadline shows «أُغلقت» and the reopen button', (await item.locator('[data-reopen]').count()) === 1 && (await item.innerText()).includes('أُغلقت') && (await item.locator('[data-cancel]').count()) === 0);
+  await pool.query('delete from public.comms where id = $1', [Number(sv.data?.id)]);
+  await p.goto(BASE + '#/notes'); await p.waitForSelector('.notes .note');
+}
 ok('owner: student report shown in notes with its badge and resolve/delete tools', (await p.locator('.notes .note', { hasText: 'بلاغ طالب' }).count()) === 1 && await p.locator('.notes .note [data-nresolve]').first().isVisible() && await p.locator('.notes .note [data-ndel]').first().isVisible());
 // منشئ الاختبارات: فصل كامل أو دروس منه
 await p.goto(BASE + '#/exam'); await p.waitForSelector('#x-build .ex-ch, .ex-ch');
