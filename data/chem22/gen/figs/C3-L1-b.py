@@ -134,7 +134,9 @@ def ethanol_flask(name, w=440, h=330):
 
 # ---------- حاويتان مغلقتان فيهما كمية مختلفة من مادة صلبة ----------
 def solid_boxes(name, items, gas_col, solid_col, legend, w=560, h=300, seed=2):
-    """items = [(tag, n_gas, n_solid_rows)] حاويات متساوية الحجم عند درجة الحرارة نفسها."""
+    """items = [(tag, n_gas, heap_rows)] حاويات متساوية الحجم عند درجة الحرارة نفسها.
+    الصلب كومة صغيرة في القاع (heap_rows = أعداد الجسيمات في صفوف الكومة من الأسفل)
+    حتى يبقى الحيز الذي يشغله الغاز متساويًا تقريبًا في الحاويات."""
     rng = random.Random(seed)
     bw, bh, gap = 200, 200, 60
     x0 = (w - (len(items) * bw + (len(items) - 1) * gap)) / 2
@@ -143,15 +145,16 @@ def solid_boxes(name, items, gas_col, solid_col, legend, w=560, h=300, seed=2):
         x = x0 + k * (bw + gap); y = 40
         b += T(x + bw / 2, 26, tag, 16, weight='bold')
         b += f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" fill="#f7f9fc" stroke="{INK}" stroke-width="2.5"/>'
-        # الطبقة الصلبة: صفوف متراصة
-        for r in range(rows):
-            for c in range(14):
-                b += f'<circle cx="{x + 9 + c * 14 + (7 if r % 2 else 0):.1f}" cy="{y + bh - 9 - r * 12:.1f}" r="6" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/>' if 9 + c * 14 + (7 if r % 2 else 0) < bw - 6 else ''
-        top = y + bh - 9 - rows * 12
-        reg = region((x + 10, y + 10, x + bw - 10, top - 6), lambda a, c_: True)
+        cx = x + bw / 2
+        for r, n in enumerate(rows):
+            for c in range(n):
+                b += f'<circle cx="{cx + (c - (n - 1) / 2) * 11:.1f}" cy="{y + bh - 8 - r * 10:.1f}" r="5.5" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/>'
+        hw = max(rows) * 11 / 2 + 8; ht = len(rows) * 10 + 10
+        reg = region((x + 12, y + 12, x + bw - 12, y + bh - 12),
+                     lambda a, c_, cx=cx, hw=hw, ht=ht, yb=y + bh: not (abs(a - cx) < hw + 6 and c_ > yb - ht - 10))
         for a, c_ in scatter(rng, ng, reg, 9, []): b += dot(a, c_, gas_col, 6.5)
     b += dot(w / 2 - 90, h - 22, gas_col, 6.5) + T(w / 2 - 78, h - 17, 'I₂(g)', 14, 'start')
-    b += f'<circle cx="{w / 2 + 40}" cy="{h - 22}" r="6" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/><circle cx="{w / 2 + 52}" cy="{h - 22}" r="6" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/>' + T(w / 2 + 64, h - 17, 'I₂(s)', 14, 'start')
+    b += f'<circle cx="{w / 2 + 40}" cy="{h - 22}" r="5.5" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/><circle cx="{w / 2 + 51}" cy="{h - 22}" r="5.5" fill="{solid_col}" stroke="{INK}" stroke-width="0.8"/>' + T(w / 2 + 62, h - 17, 'I₂(s)', 14, 'start')
     save(name, svg(w, h, b))
 
 # ---------- صناديق جسيمات A₂ + B₂ ⇌ 2AB ----------
@@ -234,5 +237,5 @@ if __name__ == '__main__':
     # 10) الإيثانول السائل وبخاره في دورق مغلق
     ethanol_flask('c3-l1b-ethanol-flask.svg')
     # 11) حاويتان فيهما كميتان مختلفتان من اليود الصلب، وعدد جزيئات I₂(g) نفسه
-    solid_boxes('c3-l1b-iodine-amounts.svg', [('(1)', 6, 7), ('(2)', 6, 2)], PURPLE, '#4a3566',
-                'الحاويتان متساويتان في الحجم ودرجة الحرارة؛ الدوائر المتراصة في القاع: I₂(s)، والدوائر المتفرقة: جزيئات I₂(g)')
+    solid_boxes('c3-l1b-iodine-amounts.svg', [('(1)', 6, [11, 10, 9, 8, 7]), ('(2)', 6, [3, 2])], PURPLE, '#4a3566',
+                'الحاويتان متساويتان في الحجم ودرجة الحرارة؛ الكومة في القاع: I₂(s)، والدوائر المتفرقة: جزيئات I₂(g)')

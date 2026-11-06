@@ -16,15 +16,18 @@ def ylab(x, y, s, size=14):
     rtl = ' direction="rtl"' if re.search('[؀-ۿ]', s) else ''
     return f'<text transform="translate({x},{y}) rotate(-90)" text-anchor="middle" font-size="{size}" fill="{INK}" font-weight="bold" {FONT}{rtl}>{esc(s)}</text>'
 
-def conc_time(name, curves, ymax, yticks, title=None, w=560, h=350, t_eq=0.55, eq_label='بلوغ الاتزان'):
+def conc_time(name, curves, ymax, yticks, title=None, w=560, h=350, t_eq=0.55, eq_label='بلوغ الاتزان', show_ticks=True):
     """منحنى التركيز مقابل الزمن حتى الاتزان: كل منحنى يبدأ من start ويقترب أُسّيًّا من end ثم يصبح أفقيًّا.
     curves = [dict(start, end, color, label, value)] — value: النص المكتوب عند الخط الأفقي (قيمة الاتزان أو ؟)."""
     X0, Y0 = 80, h - 55; X1 = w - 150; Y1 = 50 if title else 30
     py = lambda y: Y0 - y / ymax * (Y0 - Y1)
     b = ''
-    for t in yticks: b += L(X0, py(t), X1, py(t), '#e3e7ee', 1)
+    # show_ticks=False: بلا تدريج رقمي حتى لا تُقرأ القيمة المجهولة من الرسم (تُكتب القيم المعلومة بجانب الخطوط فقط)
+    if show_ticks:
+        for t in yticks: b += L(X0, py(t), X1, py(t), '#e3e7ee', 1)
     b += ARROW(X0, Y0, X1 + 15, Y0) + ARROW(X0, Y0, X0, Y1 - 15)
-    for t in yticks: b += L(X0 - 5, py(t), X0, py(t)) + T(X0 - 9, py(t) + 5, f'{t:g}', 13, 'end')
+    if show_ticks:
+        for t in yticks: b += L(X0 - 5, py(t), X0, py(t)) + T(X0 - 9, py(t) + 5, f'{t:g}', 13, 'end')
     b += T(X0 - 9, Y0 + 18, '0', 13, 'end')
     b += T((X0 + X1) / 2, h - 15, 'الزمن', 14, weight='bold')
     b += ylab(22, (Y0 + Y1) / 2, 'التركيز (mol/L)')
@@ -150,18 +153,18 @@ if __name__ == '__main__':
     conc_time('c3-l3a-hi-conctime.svg',
               [dict(start=0.500, end=0.110, color=BLUE, label='H₂ و I₂', value='0.110 M', lw=62),
                dict(start=0.0, end=0.780, color=RED, label='HI', value='؟', lw=34)],
-              0.9, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8], title='H₂(g) + I₂(g) ⇌ 2HI(g)')
+              0.9, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8], title='H₂(g) + I₂(g) ⇌ 2HI(g)', show_ticks=False)
     # 2) N₂O₄ ⇌ 2NO₂: [N₂O₄] من 0.0468 إلى 0.0400، و[NO₂] من 0 إلى ؟ (0.0136)
     conc_time('c3-l3a-n2o4-conctime.svg',
               [dict(start=0.0468, end=0.0400, color=ORANGE, label='N₂O₄', value='0.0400 M', lw=58),
                dict(start=0.0, end=0.0136, color=RED, label='NO₂', value='؟', lw=46)],
-              0.05, [0.01, 0.02, 0.03, 0.04, 0.05], title='N₂O₄(g) ⇌ 2NO₂(g)')
+              0.05, [0.01, 0.02, 0.03, 0.04, 0.05], title='N₂O₄(g) ⇌ 2NO₂(g)', show_ticks=False)
     # 3) PCl₅ ⇌ PCl₃ + Cl₂: [PCl₅] = 0.200، [PCl₃] = 0.100، [Cl₂] = ؟ (0.0900 لكن الرسم لا يفترض أن Cl₂ = PCl₃)
     conc_time('c3-l3a-pcl5-conctime.svg',
               [dict(start=0.290, end=0.200, color=ORANGE, label='PCl₅', value='0.200 M', lw=50),
                dict(start=0.010, end=0.100, color=BLUE, label='PCl₃', value='0.100 M', lw=50, dy=-4),
                dict(start=0.0, end=0.090, color=GREEN, label='Cl₂', value='؟', lw=40, dy=14)],
-              0.35, [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35], title='PCl₅(g) ⇌ PCl₃(g) + Cl₂(g)')
+              0.35, [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35], title='PCl₅(g) ⇌ PCl₃(g) + Cl₂(g)', show_ticks=False)
     # 4) محلول AgI مشبع فوق راسب
     saturated('c3-l3a-agi-saturated.svg', [('Ag⁺', 3, BLUE), ('I⁻', 3, RED)],
               'AgI(s) ⇌ Ag⁺(aq) + I⁻(aq)', 'Ksp = 8.5 × 10⁻¹⁷ (298 K)', solid_label='AgI(s) غير ذائب')
