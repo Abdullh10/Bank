@@ -61,16 +61,16 @@ def sat_beaker(name, solid_label, ions, caption=None, title=None, w=520, h=330, 
     if title: b += T(w / 2, 26, title, 15, weight='bold')
     save(name, svg(w, h, b))
 
-def mix(name, left, right, mixed_label, w=600, h=275, mixed_note=None):
+def mix(name, left, right, mixed_label, w=600, h=275, mixed_note=None, fills=(0.5, 0.5, 0.9)):
     """خلط محلولين: left/right = (الحجم، التركيز والصيغة)؛ والكأس الثالثة الخليط."""
     b = ''
     def one(x, vol, line2, fill):
         bb, ly = beaker(x, 60, 120, 140, fill)
         return bb + T(x + 60, 225, vol, 15, weight='bold') + T(x + 60, 250, line2, 14, color=BLUE, weight='bold')
-    b += one(30, *left, 0.5) + T(180, 140, '+', 30, weight='bold')
-    b += one(210, *right, 0.5)
+    b += one(30, *left, fills[0]) + T(180, 140, '+', 30, weight='bold')
+    b += one(210, *right, fills[1])
     b += ARROW(350, 130, 420, 130, INK, 3)
-    bb, ly = beaker(450, 60, 120, 140, 0.9)
+    bb, ly = beaker(450, 60, 120, 140, fills[2])
     b += bb + T(510, 225, 'الخليط', 15, weight='bold') + T(510, 250, mixed_label, 15, weight='bold')
     if mixed_note: b += T(510, 270, mixed_note, 14, color=MUTED)
     b += T(w / 2, 30, 'خلط محلولين', 15, weight='bold')
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     # 7) خلط محاليل
     mix('c3-l3b-mix-pbcl2.svg', ('50.0 mL', '0.040 M Pb(NO₃)₂'), ('50.0 mL', '0.020 M NaCl'), '100.0 mL')
     mix('c3-l3b-mix-baso4.svg', ('100.0 mL', '0.0020 M BaCl₂'), ('100.0 mL', '0.0010 M Na₂SO₄'), '200.0 mL')
-    mix('c3-l3b-mix-unequal.svg', ('75.0 mL', '0.080 M AgNO₃'), ('25.0 mL', '0.040 M NaCl'), '100.0 mL')
+    mix('c3-l3b-mix-unequal.svg', ('75.0 mL', '0.080 M AgNO₃'), ('25.0 mL', '0.040 M NaCl'), '100.0 mL', fills=(0.6, 0.2, 0.8))
     mix('c3-l3b-mix-caso4.svg', ('25.0 mL', '0.020 M CaCl₂'), ('25.0 mL', '0.020 M Na₂SO₄'), '50.0 mL')
     # 8) الفلوريد والأسنان: قيمتا Ksp على تدريج لوغاريتمي
     ksp_ladder('c3-l3b-apatite-ksp.svg', [('هيدروكسي الأباتيت Ca₅(PO₄)₃OH', 6.8e-37, ('6.8', -37), BLUE),
