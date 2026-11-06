@@ -47,7 +47,7 @@ test('سبيرمان: تام للعلاقة الرتيبة، وفترة الثق
   near(s.rho, 0.9048, 1e-3); assert.ok(s.lo < s.rho && s.rho < s.hi);
 });
 
-test('التحليل: أبعاد بمتوسطاتها، والثبات لا يُحسب تحت 30 إجابة', () => {
+test('التحليل: أبعاد بمتوسطاتها، والثبات لا يُحسب تحت 15 إجابة', () => {
   const rows = Array.from({ length: 12 }, (_, i) => { const r = resp(3 + (i % 3)); r.a[0] = 1 + (i % 5); return r; });
   const a = analyzeSurvey(rows);
   assert.equal(a.dims.length, 4); assert.equal(a.items.length, 16);
@@ -61,4 +61,10 @@ test('عرض النتائج: مخفية أثناء فتح الاستبانة، �
   const rows = Array.from({ length: 8 }, (_, k) => ({ a: ITEMS.map((it, i) => (i === ATT ? 2 : 1 + ((i + k) % 5))), d: 200, s: null }));
   const html = surveyResultsHtml(esc, { open: false, sent: 10, responses: 8, rows, open1: ['أ'], open2: [], sectionsSent: { س: 10 } });
   assert.match(html, /الفائدة المدركة/); assert.match(html, /التحليل على/);
+});
+
+test('الثبات يُحسب من 15 إجابة فأكثر', () => {
+  const rows = Array.from({ length: 15 }, (_, i) => { const v = 1 + (i % 5); const a = ITEMS.map(it => (it.rev ? 6 - v : v)); a[ATT] = 2; a[0] = 1 + ((i + 2) % 5); return { a, d: 200 }; });
+  const a = analyzeSurvey(rows);
+  assert.ok(a.dims.every(d => Number.isFinite(d.alpha)));
 });

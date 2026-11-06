@@ -34,7 +34,8 @@ export const ATT = ITEMS.findIndex(i => i.att);
 export const SCALE = [[5, 'أوافق بشدة'], [4, 'أوافق'], [3, 'محايد'], [2, 'لا أوافق'], [1, 'لا أوافق بشدة']];
 export const OPEN = ['ما أكثر شيء في المنصة ساعدك على تعلّم الكيمياء؟ اذكر مثالًا.', 'ما الذي تقترح تغييره أو إضافته لتصبح المنصة أكثر فائدة لك؟'];
 export const MIN_SHOW = 5;      // أقل عدد إجابات لعرض أي نتيجة
-export const MIN_ALPHA = 30;    // أقل عدد لحساب ثبات ألفا
+export const MIN_ALPHA = 15;    // أقل عدد لحساب ثبات ألفا (بين 15 و29 يُعرض تقديرًا أوليًا)
+export const ALPHA_STABLE = 30; // من هذا العدد يُعدّ ثبات ألفا مستقرًا
 export const MIN_CORR = 20;     // أقل عدد لعرض الارتباطات
 export const MIN_SECONDS = 60;  // الإجابة الأسرع من دقيقة تُستبعد
 
@@ -177,7 +178,7 @@ export function surveyResultsHtml(esc, d) {
       ${a.dims.map(x => `<tr><td><b>${esc(x.label)}</b> <span class="small muted">(${x.items.length} عبارات)</span></td><td>${fmt(x.mean, 2)} <span class="small muted">± ${fmt(x.sd, 2)}</span></td>
         <td>${esc(x.level)}</td><td>${pc(x.high)}</td><td>${Number.isFinite(x.alpha) ? fmt(x.alpha, 2) + ' · ' : ''}<span class="small">${esc(alphaLabel(x.alpha))}</span></td></tr>`).join('')}
     </tbody></table></div>
-    ${a.n < MIN_ALPHA ? `<p class="small muted">الثبات يُحسب من ${MIN_ALPHA} إجابة فأكثر.</p>` : ''}
+    ${a.n < MIN_ALPHA ? `<p class="small muted">الثبات يُحسب من ${MIN_ALPHA} إجابة فأكثر.</p>` : a.n < ALPHA_STABLE ? `<p class="small muted">الثبات محسوب من ${a.n} إجابة؛ يُقرأ تقديرًا أوليًا لأن العينة أقل من ${ALPHA_STABLE}.</p>` : ''}
     <div class="table-wrap"><table class="list sv-items"><thead><tr><th>العبارة</th><th>المتوسط</th><th>الموافقة</th><th>توزيع الإجابات</th></tr></thead><tbody>
       ${a.items.map(x => { const it = a.dims.flatMap(dd => dd.itemTotal).find(t => t.i === x.i);
         return `<tr><td>${esc(x.text)}${x.rev ? ' <span class="badge">عكسية</span>' : ''}${it && Number.isFinite(it.r) && it.r < 0.3 ? ' <span class="badge warn" title="ارتباطها ضعيف بباقي عبارات بعدها">تراجع صياغتها</span>' : ''}</td>
@@ -221,7 +222,7 @@ export function printSurveyReport(esc, d, meta = {}) {
   ${sec('نتائج الأبعاد')}
   ${table(['البعد', 'العبارات', 'المتوسط (من 5)', 'الانحراف المعياري', 'المستوى', 'نسبة المرتفع (≥ 3.5)', 'الثبات (ألفا كرونباخ)'],
     a.dims.map(x => row([esc(x.label), x.items.length, fmt(x.mean, 2), fmt(x.sd, 2), esc(x.level), pc(x.high), Number.isFinite(x.alpha) ? `${fmt(x.alpha, 2)} · ${esc(alphaLabel(x.alpha))}` : esc(alphaLabel(x.alpha))])), 'rp-num rp-keep')}
-  ${a.n < MIN_ALPHA ? `<p class="rp-small">يُحسب الثبات من ${MIN_ALPHA} إجابة فأكثر.</p>` : ''}
+  ${a.n < MIN_ALPHA ? `<p class="rp-small">يُحسب الثبات من ${MIN_ALPHA} إجابة فأكثر.</p>` : a.n < ALPHA_STABLE ? `<p class="rp-small">الثبات محسوب من ${a.n} إجابة موثوقة؛ يُقرأ تقديرًا أوليًا لأن العينة أقل من ${ALPHA_STABLE}.</p>` : ''}
   ${sec('نتائج العبارات')}
   ${table(['م', 'العبارة', 'المتوسط', 'الموافقة', 'توزيع الإجابات'], a.items.map((x, k) => row([k + 1, esc(x.text) + (x.rev ? ' <span class="rp-muted">(عكسية)</span>' : ''), fmt(x.mean, 2), pc(x.agree),
     `<span class="sv-dist">${x.dist.map((p, j) => `<i class="sv-d${j}" style="width:${p}%"></i>`).join('')}</span>`])), 'rp-num')}
