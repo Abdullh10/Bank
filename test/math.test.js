@@ -44,6 +44,10 @@ test('مصادر الصور المسموحة فقط', () => {
   assert.match(long, /<img src="qimg\/chem22\/c2-l1a-conc-two-curves.svg"/);
   assert.doesNotMatch(long, /figcaption/);
   assert.match(qImages([{ src: 'qimg/a.png', alt: 'دائرة' }]), /<figcaption>دائرة<\/figcaption>/);
+  // رسوم كيمياء 2-2: الوصف القصير لا يظهر تحت الصورة (قد يكشف الإجابة) ويبقى نصًا بديلًا
+  const c22 = qImages([{ src: 'qimg/chem22/x.svg', alt: 'ثلاث روابط ثنائية' }]);
+  assert.doesNotMatch(c22, /figcaption/);
+  assert.match(c22, /alt="ثلاث روابط ثنائية"/);
 });
 test('الصور تُعرض مهرّبة، وغير المسموحة لا تُعرض', () => {
   const html = qImages([{ src: 'qimg/a.png', alt: 'وعاء <b>' }, { src: 'https://evil.example/x.png' }]);
