@@ -34,14 +34,14 @@ def chain(x0, y0, orders, s=52):
 
 def fig_sat_unsat():
     """(1) بروبين، (2) بيوتان، (3) بروباين، (4) بروبان — صيغ بنائية كاملة."""
-    w, h = 900, 260; s = 50
+    w, h = 1060, 260; s = 50
     b = ''
-    specs = [(1, [2, 1], 60), (2, [1, 1, 1], 270), (3, [3, 1], 540), (4, [1, 1], 735)]
+    specs = [(1, [2, 1], 60), (2, [1, 1, 1], 320), (3, [3, 1], 640), (4, [1, 1], 870)]
     for k, orders, x0 in specs:
         at, bd = chain(x0, 115, orders, s)
         b += structure(at, bd)
-    for x, lab in [(110, '(1)'), (345, '(2)'), (595, '(3)'), (785, '(4)')]: b += panel_label(x, 240, lab)
-    for x in (205, 480, 680): b += L(x, 25, x, 220, '#d5d9e0', 1, '5 5')
+    for x, lab in [(110, '(1)'), (395, '(2)'), (690, '(3)'), (920, '(4)')]: b += panel_label(x, 240, lab)
+    for x in (240, 555, 795): b += L(x, 25, x, 220, '#d5d9e0', 1, '5 5')
     save('c4-l1b-sat-unsat.svg', svg(w, h, b))
 
 def fig_butane_butene():
@@ -90,15 +90,15 @@ def fig_bromine_bars():
 
 # ---------------------------------------------------------------- برج التقطير التجزيئي
 FRACTIONS = [  # (الاسم، درجة الحرارة، مدى ذرات الكربون)
-    ('غازات', 'أقل من 40°C', 'CH₄ – C₄H₁₀'),
+    ('غازات', 'أقل من|40°C', 'CH₄ – C₄H₁₀'),
     ('الجازولين', '40 – 100°C', 'C₅H₁₂ – C₁₂H₂₆'),
     ('الكيروسين', '105 – 275°C', 'C₁₂H₂₆ – C₁₆H₃₄'),
     ('زيت التسخين', '240 – 300°C', 'C₁₅H₃₂ – C₁₈H₃₈'),
-    ('زيت التزييت والتشحيم', 'فوق 300°C', 'C₁₇H₃₆ – C₂₂H₄₆'),
+    ('زيت التزييت والتشحيم', 'فوق|300°C', 'C₁₇H₃₆ – C₂₂H₄₆'),
     ('المخلفات', '', ''),
 ]
 
-def tower(name, labels, show_bottom_temp=True, gradient=True, furnace_label=True, w=860, h=600):
+def tower(name, labels, show_bottom_temp=True, gradient=True, furnace_label=True, w=920, h=560):
     """برج تجزئة: عمود رأسي، وأطباق، وفرن على اليمين، ومخارج على اليسار (من الأعلى إلى الأسفل).
     labels: قائمة من 6 عناصر، كل عنصر قائمة أسطر نصية تُكتب بجوار المخرج (أو [] للا شيء)."""
     cx, cw = 470, 120              # يسار العمود وعرضه
@@ -116,7 +116,10 @@ def tower(name, labels, show_bottom_temp=True, gradient=True, furnace_label=True
         lines = labels[i]
         for j, t in enumerate(lines):
             yy = y - (len(lines) - 1) * 10 + j * 20 + 5
-            if any('؀' <= ch <= 'ۿ' for ch in t): b += T(cx - 125, yy, t, 15, 'end', weight='bold' if j == 0 else 'normal')
+            if '|' in t:   # نص عربي ثم قيمة لاتينية: «أقل من|40°C»
+                ar, la = t.split('|'); ar_w = {'أقل من': 50, 'فوق': 32}[ar]
+                b += T(cx - 125, yy, ar, 15, 'end') + LT(cx - 125 - ar_w, yy, la, 15, 'end')
+            elif any('؀' <= ch <= 'ۿ' for ch in t): b += T(cx - 125, yy, t, 15, 'end', weight='bold' if j == 0 else 'normal')
             else: b += LT(cx - 125, yy, t, 15, 'end')
     if show_bottom_temp: b += LT(cx + cw / 2, ybot - 60, '400°C', 16, weight='bold', color=RED)
     # الفرن والأنبوب الناقل للبخار
@@ -129,7 +132,7 @@ def tower(name, labels, show_bottom_temp=True, gradient=True, furnace_label=True
     b += ARROW(fx + fw + 45, fy + fh - 30, fx + fw + 4, fy + fh - 30, INK, 2.5)
     if furnace_label:
         b += T(fx + fw / 2, fy + fh + 26, 'فرن', 16, weight='bold')
-        b += T(fx + fw + 22, fy + fh - 42, 'نفط خام', 14)
+        b += T(fx + fw + 28, fy + fh - 42, 'نفط خام', 14)
     b += L(cx - 20, ybot + 2, w - 20, ybot + 2, MUTED, 1.5)
     save(name, svg(w, h, b))
 
@@ -164,7 +167,7 @@ def fig_bp_graph():
     save('c4-l1b-bp-graph.svg', svg(w, h, b))
 
 # ---------------------------------------------------------------- التكسير الحراري
-def carbon_row(x0, y, n, r=11, gap=26, double_at=None):
+def carbon_row(x0, y, n, r=10, gap=30, double_at=None):
     s = ''
     for i in range(n - 1):
         xa, xb = x0 + i * gap, x0 + (i + 1) * gap
@@ -177,17 +180,17 @@ def carbon_row(x0, y, n, r=11, gap=26, double_at=None):
     return s
 
 def fig_cracking(name, arrow_text):
-    w, h = 880, 250
+    w, h = 900, 250
     b = ''
-    b += carbon_row(40, 110, 16)
-    b += LT(40 + 7.5 * 26, 160, 'C₁₆H₃₄', 20, weight='bold')
-    ax0, ax1 = 455, 560
+    b += carbon_row(30, 110, 16)
+    b += LT(30 + 7.5 * 30, 160, 'C₁₆H₃₄', 20, weight='bold')
+    ax0, ax1 = 495, 600
     b += ARROW(ax0, 110, ax1, 110, INK, 3)
     for j, t in enumerate(arrow_text):
         b += T((ax0 + ax1) / 2, 84 - (len(arrow_text) - 1 - j) * 20, t, 14 if t != '؟' else 26, weight='bold')
-    b += carbon_row(600, 75, 8) + LT(600 + 3.5 * 26, 118, 'C₈H₁₈', 20, weight='bold')
-    b += carbon_row(600, 165, 8, double_at=0) + LT(600 + 3.5 * 26, 208, 'C₈H₁₆', 20, weight='bold')
-    b += LT(600 + 7 * 26 + 40, 125, '+', 26, weight='bold') if False else ''
+    b += carbon_row(630, 60, 8) + LT(630 + 3.5 * 30, 98, 'C₈H₁₈', 20, weight='bold')
+    b += LT(630 + 3.5 * 30, 130, '+', 26, weight='bold')
+    b += carbon_row(630, 160, 8, double_at=0) + LT(630 + 3.5 * 30, 198, 'C₈H₁₆', 20, weight='bold')
     b += T(w / 2, 238, 'الكرات تمثل ذرات الكربون فقط (ذرات الهيدروجين غير مرسومة)', 13, color=MUTED)
     save(name, svg(w, h, b))
 
@@ -198,7 +201,7 @@ def fig_octane_scale():
     vmin, vmax = 85, 112
     def px(v): return X0 + (v - vmin) / (vmax - vmin) * (X1 - X0)
     b = ARROW(X0, Y, X1 + 20, Y, INK, 2.5)
-    for v in range(85, 112, 5):
+    for v in (85, 90, 105):
         b += L(px(v), Y - 6, px(v), Y + 6, MUTED, 1.5) + LT(px(v), Y + 26, str(v), 13, color=MUTED)
     marks = [(89, 'جازولين متوسط الدرجة', 'up'), (91, 'جازولين', 'down'), (95, 'جازولين', 'down2'), (100, 'وقود الطائرات', 'up'), (110, 'وقود سيارات السباق', 'up')]
     for v, lab, pos in marks:
@@ -238,9 +241,10 @@ def cylinder(x, y, piston_frac, spark, flame, label, sub):
 
 def fig_knock():
     w, h = 640, 420
-    b = cylinder(100, 60, 0.95, False, (70, 70), '(1)', ['يشتعل الخليط والمكبس ما زال', 'في أسفل الأسطوانة، قبل الشرارة'])
-    b += cylinder(400, 60, 0.05, True, None, '(2)', ['يشتعل الخليط بالشرارة', 'والمكبس في أعلى موضعه'])
-    b += T(w / 2, 26, 'السهم الأزرق: اتجاه حركة المكبس', 13, color=MUTED)
+    w, h = 640, 380
+    b = cylinder(100, 60, 0.95, False, (70, 70), '(1)', [])
+    b += cylinder(400, 60, 0.05, True, None, '(2)', [])
+    b += T(w / 2, 22, 'السهم الأزرق: اتجاه حركة المكبس — الخطوط الصفراء: شرارة شمعة الاحتراق — النجمة البرتقالية: اشتعال الخليط', 12, color=MUTED)
     save('c4-l1b-knock.svg', svg(w, h, b))
 
 # ---------------------------------------------------------------- القوة الحيوية
