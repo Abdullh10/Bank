@@ -171,13 +171,14 @@ def alanine(name):
 
 
 def numbered_chain(name):
-    """3-ميثيل هكسان مع ترقيم ذرات الكربون للسؤال (الرقم 7 لمجموعة الميثيل الفرعية)."""
-    a, bo = branched(55, 150, ['CH3', 'CH2', 'CH', 'CH2', 'CH2', 'CH3'], [(2, 'CH3', 'up')], 92, 70)
+    """3-ميثيل هبتان مع ترقيم ذرات الكربون للسؤال (الرقم 8 لمجموعة الميثيل الفرعية).
+    (لا يُرسم 3-ميثيل هكسان هنا كي لا يكشف إجابة السؤال المقالي س30 في الملف نفسه.)"""
+    a, bo = branched(50, 150, ['CH3', 'CH2', 'CH', 'CH2', 'CH2', 'CH2', 'CH3'], [(2, 'CH3', 'up')], 86, 70)
     b = mol(a, bo)
-    nums = [(a[k][0], 190, str(k + 1)) for k in range(6)] + [(a[6][0] + 38, a[6][1], '7')]
+    nums = [(a[k][0], 190, str(k + 1)) for k in range(7)] + [(a[7][0] + 38, a[7][1], '8')]
     for x, y, s in nums:
         b += f'<circle cx="{x}" cy="{y}" r="12" fill="#eaf2fb" stroke="{BLUE}" stroke-width="1.5"/>' + T(x, y + 5, s, 14, color=BLUE, weight='bold')
-    save(name, svg(580, 215, b))
+    save(name, svg(620, 215, b))
 
 
 def methylpentane(name):
