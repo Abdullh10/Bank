@@ -79,7 +79,10 @@ def zigzag(x, y, n, cis_at=(), blen=46, start=-30):
     return pts
 
 
-def fit(pts, cx, cy):
+def fit(pts, cx, cy, level=False):
+    if level:
+        a = math.atan2(pts[-1][1] - pts[0][1], pts[-1][0] - pts[0][0]); c, sn = math.cos(-a), math.sin(-a)
+        pts = [(px * c - py * sn, px * sn + py * c) for px, py in pts]
     xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
     ox = cx - (min(xs) + max(xs)) / 2; oy = cy - (min(ys) + max(ys)) / 2
     return [(px + ox, py + oy) for px, py in pts]
@@ -93,7 +96,7 @@ def hexene_skeletal(name):
     pos = [(160, 95), (480, 95), (160, 280), (480, 280)]
     b = ''
     for k, ((dbl, cis), (x, y)) in enumerate(zip(specs, pos)):
-        pts = fit(zigzag(0, 0, 6, cis_at=cis, blen=50), x, y - 8)
+        pts = fit(zigzag(0, 0, 6, cis_at=cis, blen=50), x, y - 8, level=bool(cis))
         b += skeletal(pts, dbl) + tag(x, max(p[1] for p in pts) + 32, f'({k + 1})')
     b += hsep(190, w) + divider(320, 20, h - 15)
     save(name, svg(w, h, b))
@@ -207,7 +210,7 @@ def fatty(name, w=700, h=330):
     b = ''
     for k, (cis, y) in enumerate([((6,), 95), ((), 250)]):
         pts = zigzag(0, 0, 14, cis_at=cis, blen=40)
-        pts = fit(pts, 330, y)
+        pts = fit(pts, 330, y, level=bool(cis))
         b += skeletal(pts, (6,))
         x, yy = pts[-1]
         b += label(x + 26, yy, 'COOH', 16, 'l') + L(x, yy, x + 22, yy, INK, 2.6)
