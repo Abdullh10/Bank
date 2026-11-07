@@ -102,7 +102,6 @@ if __name__ == '__main__':
     # --- البنزين ---
     save(P + 'kekule-h.svg', svg(280, 280, ring(140, 140, 'kekule') + hydrogens(140, 140)))
     save(P + 'benzene-circle.svg', svg(220, 200, ring(110, 100, 'circle')))
-    save(P + 'kekule.svg', svg(220, 200, ring(110, 100, 'kekule')))
     # تمثيلان للبنزين جنبًا إلى جنب: (1) كيكولي (2) الدائرة
     save(P + 'two-reps.svg', svg(460, 240, ring(120, 115, 'kekule') + hydrogens(120, 115) + ring(340, 115, 'circle')
          + tag(120, 228, '(1)') + tag(340, 228, '(2)')))
@@ -118,21 +117,12 @@ if __name__ == '__main__':
     b += zigzag(370, 120, 6, 32, 22) + tag(450, 215, '(3)')
     b += zigzag(560, 120, 6, 32, 22, doubles=(0,)) + tag(640, 215, '(4)')
     save(P + 'classify4.svg', svg(740, 235, b))
-    # الصيغة المقترحة عام 1860م (سلسلة) مقابل حلقة كيكولي
     # --- مشتقات البنزين المفردة ---
     single('toluene.svg', [(0, 'CH3')], 240, 240, cy=135)
-    single('ethylbenzene.svg', [(1, 'CH2CH3')], 320, 220, cx=120, cy=120)
-    single('propylbenzene.svg', [(1, 'CH2CH2CH3')], 340, 220, cx=110, cy=120)
-    single('p-xylene.svg', [(0, 'CH3'), (3, 'CH3')], 240, 300)
-    single('o-xylene.svg', [(0, 'CH3'), (1, 'CH3')], 280, 250, cx=125, cy=140)
     single('m-diethyl.svg', [(0, 'CH2CH3'), (2, 'CH2CH3')], 340, 280, cx=130, cy=145)
-    single('o-ethylmethyl.svg', [(0, 'CH3'), (1, 'CH2CH3')], 320, 250, cx=120, cy=140)
     single('p-ethylpropyl.svg', [(0, 'CH2CH2CH3'), (3, 'CH2CH3')], 260, 320)
-    single('ethyl-35-dimethyl.svg', [(0, 'CH3'), (2, 'CH3'), (4, 'CH3CH2')], 360, 280, cx=190, cy=140)
-    single('124-trimethyl.svg', [(0, 'CH3'), (1, 'CH3'), (3, 'CH3')], 280, 310, cx=125, cy=150)
     single('4-ethyl-12-dimethyl.svg', [(0, 'CH3'), (1, 'CH3'), (3, 'CH2CH3')], 290, 310, cx=125, cy=150)
     single('2-ethyl-13-dimethyl.svg', [(0, 'CH2CH3'), (1, 'CH3'), (5, 'CH3')], 360, 260, cx=170, cy=150)
-    single('135-triethyl.svg', [(0, 'CH2CH3'), (2, 'CH2CH3'), (4, 'CH3CH2')], 380, 280, cx=190, cy=140)
     # 1،3-ثنائي بروبيل بنزين مع ترقيمين: (1) صحيح 1و3، (2) 1و5
     def dipropyl(cx, cy, order):
         return ring(cx, cy, 'circle') + sub(cx, cy, 0, 'CH2CH2CH3') + sub(cx, cy, 2, 'CH2CH2CH3') + nums(cx, cy, order)
@@ -150,9 +140,7 @@ if __name__ == '__main__':
     # --- الحلقات الملتحمة ---
     d = R * math.sqrt(3)
     fused('naphthalene.svg', [(0, 0), (1, 0)], 260, 170, dx=130 - d / 2, dy=85)
-    fused('anthracene.svg', [(0, 0), (1, 0), (2, 0)], 340, 170, dx=170 - d, dy=85)
     fused('phenanthrene.svg', [(0, 0), (1, 0), (1, 1)], 300, 250, dx=150 - d * 0.75, dy=165)
-    fused('benzopyrene.svg', [(0, 0), (1, 0), (0, 1), (1, -1), (0, 2)], 320, 360, dx=160 - d * 0.5, dy=240)
     # ثلاث حلقات ملتحمة للمقارنة: (1) نفثالين (2) أنثراسين (3) فينانثرين
     def at(ox, oy, cs):
         out = ''
