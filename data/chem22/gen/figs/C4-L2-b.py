@@ -16,14 +16,14 @@ def skel(carbons, bonds):
     return {k: (x, y, 'C') for k, (x, y) in carbons.items()}, [(a, b, 1) for a, b in bonds]
 
 
-def chain_skel(n, branches, dx=1.0):
+def chain_skel(n, branches, dx=1.2, dy=1.1):
     """سلسلة أفقية من n ذرة C، وفروع رأسية: branches = [(index, dir, length)]."""
     c = {f'm{i}': (i * dx, 0) for i in range(n)}
     b = [(f'm{i}', f'm{i+1}') for i in range(n - 1)]
     for j, (i, d, ln) in enumerate(branches):
         prev = f'm{i}'
         for k in range(1, ln + 1):
-            nid = f'b{j}_{k}'; c[nid] = (i * dx, d * k); b.append((prev, nid)); prev = nid
+            nid = f'b{j}_{k}'; c[nid] = (i * dx, d * k * dy); b.append((prev, nid)); prev = nid
     return skel(c, b)
 
 
@@ -50,10 +50,10 @@ def water_mol(cx, cy, ang, s=34):
     for da in (-0.92, 0.92):
         a = ang + da
         hx, hy = cx + s * math.cos(a), cy + s * math.sin(a)
-        b += L(round(cx + 11 * math.cos(a), 1), round(cy + 11 * math.sin(a), 1), round(hx - 8 * math.cos(a), 1), round(hy - 8 * math.sin(a), 1), INK, 2)
-        b += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="8" fill="#ffffff" stroke="{INK}" stroke-width="1.5"/>' + T(round(hx, 1), round(hy + 5, 1), 'H', 13, weight='bold')
+        b += L(round(cx + 14 * math.cos(a), 1), round(cy + 14 * math.sin(a), 1), round(hx - 10 * math.cos(a), 1), round(hy - 10 * math.sin(a), 1), INK, 2)
+        b += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="10" fill="#ffffff" stroke="{INK}" stroke-width="1.5"/>' + T(round(hx, 1), round(hy + 5, 1), 'H', 14, weight='bold')
         Hs.append((hx, hy))
-    b += f'<circle cx="{cx}" cy="{cy}" r="12" fill="#f6d5d1" stroke="{RED}" stroke-width="1.8"/>' + T(cx, cy + 6, 'O', 16, color=RED, weight='bold')
+    b += f'<circle cx="{cx}" cy="{cy}" r="14" fill="#f6d5d1" stroke="{RED}" stroke-width="1.8"/>' + T(cx, cy + 6, 'O', 17, color=RED, weight='bold')
     return b, Hs
 
 
@@ -62,40 +62,31 @@ def methane_mol(cx, cy, s=30):
     for a in (0, math.pi / 2, math.pi, 3 * math.pi / 2):
         a2 = a + math.pi / 4
         hx, hy = cx + s * math.cos(a2), cy + s * math.sin(a2)
-        b += L(round(cx + 11 * math.cos(a2), 1), round(cy + 11 * math.sin(a2), 1), round(hx - 8 * math.cos(a2), 1), round(hy - 8 * math.sin(a2), 1), INK, 2)
-        b += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="8" fill="#ffffff" stroke="{INK}" stroke-width="1.5"/>' + T(round(hx, 1), round(hy + 5, 1), 'H', 13, weight='bold')
-    b += f'<circle cx="{cx}" cy="{cy}" r="12" fill="#dde3ea" stroke="{INK}" stroke-width="1.8"/>' + T(cx, cy + 6, 'C', 16, weight='bold')
+        b += L(round(cx + 14 * math.cos(a2), 1), round(cy + 14 * math.sin(a2), 1), round(hx - 10 * math.cos(a2), 1), round(hy - 10 * math.sin(a2), 1), INK, 2)
+        b += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="10" fill="#ffffff" stroke="{INK}" stroke-width="1.5"/>' + T(round(hx, 1), round(hy + 5, 1), 'H', 14, weight='bold')
+    b += f'<circle cx="{cx}" cy="{cy}" r="14" fill="#dde3ea" stroke="{INK}" stroke-width="1.8"/>' + T(cx, cy + 6, 'C', 17, weight='bold')
     return b
 
 
 def hbond(name):
-    """(أ) جزيئات ماء بينها خطوط متقطعة (روابط هيدروجينية) من H في جزيء إلى O في جزيء آخر، (ب) جزيئات ميثان متباعدة دون خطوط."""
-    W, H = 640, 300
-    b = L(330, 20, 330, 270, MUTED, 1, '4 4')
-    mols = [(90, 90, 0.35), (215, 80, 2.4), (110, 205, -0.6), (240, 200, 3.6)]
-    Ms = []
-    for cx, cy, a in mols:
-        bd, Hs = water_mol(cx, cy, a); b += bd; Ms.append(((cx, cy), Hs))
-    # روابط هيدروجينية: H من جزيء ← O من جزيء آخر
-    def hb(i, j, k):
-        (hx, hy) = Ms[i][1][j]; (ox, oy) = Ms[k][0]
-        d = math.hypot(ox - hx, oy - hy); ux, uy = (ox - hx) / d, (oy - hy) / d
-        return L(round(hx + ux * 10, 1), round(hy + uy * 10, 1), round(ox - ux * 14, 1), round(oy - uy * 14, 1), BLUE, 2.2, '5 4')
-    pairs = []
-    for i in range(4):
-        for j in range(2):
-            hx, hy = Ms[i][1][j]
-            best = min((math.hypot(Ms[k][0][0] - hx, Ms[k][0][1] - hy), k) for k in range(4) if k != i)
-            if best[0] < 120: pairs.append((best[0], i, j, best[1]))
-    used = set()
-    for d, i, j, k in sorted(pairs):
-        if (i, k) in used or (k, i) in used: continue
-        used.add((i, k)); b += hb(i, j, k)
-    for cx, cy in [(420, 90), (560, 110), (450, 215), (575, 225)]:
-        b += methane_mol(cx, cy)
-    b += T(165, 290, '(أ) الماء', 16, weight='bold') + T(495, 290, '(ب) الميثان', 16, weight='bold')
+    """(أ) أربعة جزيئات ماء، كل جزيء يتجه أحد ذرتي H فيه نحو ذرة O في جزيء مجاور، وبينهما خط متقطع (رابطة هيدروجينية)؛
+    (ب) أربعة جزيئات ميثان متباعدة دون أي خطوط بينها."""
+    W, H = 700, 360
+    b = L(360, 20, 360, 320, MUTED, 1, '4 4')
+    Os = [(80, 90), (250, 75), (95, 255), (265, 245)]
+    target = {0: 1, 1: 3, 3: 2, 2: 0}
+    for i, (cx, cy) in enumerate(Os):
+        tx, ty = Os[target[i]]
+        d = math.atan2(ty - cy, tx - cx)
+        bd, Hs = water_mol(cx, cy, d + 0.92, s=54); b += bd
+        hx, hy = Hs[0]
+        dd = math.hypot(tx - hx, ty - hy); ux, uy = (tx - hx) / dd, (ty - hy) / dd
+        b += L(round(hx + ux * 11, 1), round(hy + uy * 11, 1), round(tx - ux * 15, 1), round(ty - uy * 15, 1), BLUE, 2.5, '6 5')
+    for cx, cy in [(445, 90), (610, 110), (465, 245), (625, 255)]:
+        b += methane_mol(cx, cy, s=46)
+    b += T(175, 348, '(أ) الماء', 17, weight='bold') + T(535, 348, '(ب) الميثان', 17, weight='bold')
     save(name, svg(W, H, b))
-    return used
+    return target
 
 
 def bars(name):
