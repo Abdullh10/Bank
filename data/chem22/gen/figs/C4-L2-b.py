@@ -71,9 +71,9 @@ def methane_mol(cx, cy, s=30):
 def hbond(name):
     """(أ) أربعة جزيئات ماء، كل جزيء يتجه أحد ذرتي H فيه نحو ذرة O في جزيء مجاور، وبينهما خط متقطع (رابطة هيدروجينية)؛
     (ب) أربعة جزيئات ميثان متباعدة دون أي خطوط بينها."""
-    W, H = 700, 360
-    b = L(360, 20, 360, 320, MUTED, 1, '4 4')
-    Os = [(80, 90), (250, 75), (95, 255), (265, 245)]
+    W, H = 760, 400
+    b = L(400, 20, 400, 360, MUTED, 1, '4 4')
+    Os = [(75, 85), (305, 70), (90, 300), (320, 290)]
     target = {0: 1, 1: 3, 3: 2, 2: 0}
     for i, (cx, cy) in enumerate(Os):
         tx, ty = Os[target[i]]
@@ -82,9 +82,9 @@ def hbond(name):
         hx, hy = Hs[0]
         dd = math.hypot(tx - hx, ty - hy); ux, uy = (tx - hx) / dd, (ty - hy) / dd
         b += L(round(hx + ux * 11, 1), round(hy + uy * 11, 1), round(tx - ux * 15, 1), round(ty - uy * 15, 1), BLUE, 2.5, '6 5')
-    for cx, cy in [(445, 90), (610, 110), (465, 245), (625, 255)]:
+    for cx, cy in [(490, 95), (670, 115), (505, 280), (680, 290)]:
         b += methane_mol(cx, cy, s=46)
-    b += T(175, 348, '(أ) الماء', 17, weight='bold') + T(535, 348, '(ب) الميثان', 17, weight='bold')
+    b += T(195, 388, '(أ) الماء', 17, weight='bold') + T(585, 388, '(ب) الميثان', 17, weight='bold')
     save(name, svg(W, H, b))
     return target
 
