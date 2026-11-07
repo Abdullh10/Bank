@@ -30,7 +30,7 @@ def rows(name, items, w=600, rh=120, top=0, step=84, x0=60, numbers=True):
         if len(it) > 2 and it[2] is not None: bo[it[2]] = (it[2], it[2] + 1, 2)
         b += mol(a, bo)
         if numbers: b += tag(w - 35, yy + 6, f'({k + 1})')
-        hgt = (80 if up else 40) + (75 if down else 35)
+        hgt = (80 if up else 40) + (85 if down else 35)
         y += hgt
         if k < len(items) - 1: b += hsep(y, w)
     save(name, svg(w, y + 5, b))
