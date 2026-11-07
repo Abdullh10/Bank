@@ -268,5 +268,4 @@ def fig_vitalism():
 if __name__ == '__main__':
     fig_sat_unsat(); fig_butane_butene(); fig_bromine_tubes(); fig_bromine_bars(); fig_towers(); fig_bp_graph()
     fig_cracking('c4-l1b-cracking-q.svg', ['؟'])
-    fig_cracking('c4-l1b-cracking.svg', ['حرارة + عامل مساعد', 'دون أكسجين'])
     fig_octane_scale(); fig_knock(); fig_vitalism()
