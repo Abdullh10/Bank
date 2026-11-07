@@ -4,6 +4,8 @@ export const IMG_SRC = /^(qimg\/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif|svg)|https
 export const MAX_IMAGES = 4;
 // الوصف البديل قد يصف المخطط كاملًا (لقارئ الشاشة)؛ القصير يُعرض تعليقًا تحت الصورة والطويل يبقى وصفًا بديلًا فقط
 export const MAX_ALT = 1000, CAPTION_MAX = 200;
+// رسوم كيمياء 2-2 (qimg/chem22/) وصفها البديل يصف الشكل كاملًا وقد يكشف الإجابة، فلا يُعرض تعليقًا تحت الصورة أبدًا
+const showCaption = im => !!im.alt && im.alt.length <= CAPTION_MAX && !im.src.startsWith('qimg/chem22/');
 export const okImage = im => !!im && typeof im.src === 'string' && IMG_SRC.test(im.src) && !im.src.includes('..') && String(im.alt ?? '').length <= MAX_ALT;
 
 const escAttr = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -12,5 +14,5 @@ const escAttr = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '
 export function qImages(images, cls = 'q-figs') {
   const list = (Array.isArray(images) ? images : []).filter(okImage);
   if (!list.length) return '';
-  return `<div class="${cls}">${list.map(im => `<figure class="q-fig"><img src="${escAttr(im.src)}" alt="${escAttr(im.alt || 'شكل مرفق بالسؤال')}" decoding="async">${im.alt && im.alt.length <= CAPTION_MAX ? `<figcaption>${escAttr(im.alt)}</figcaption>` : ''}</figure>`).join('')}</div>`;
+  return `<div class="${cls}">${list.map(im => `<figure class="q-fig"><img src="${escAttr(im.src)}" alt="${escAttr(im.alt || 'شكل مرفق بالسؤال')}" decoding="async">${showCaption(im) ? `<figcaption>${escAttr(im.alt)}</figcaption>` : ''}</figure>`).join('')}</div>`;
 }
