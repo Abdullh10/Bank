@@ -34,14 +34,14 @@ def chain(x0, y0, orders, s=52):
 
 def fig_sat_unsat():
     """(1) بروبين، (2) بيوتان، (3) بروباين، (4) بروبان — صيغ بنائية كاملة."""
-    w, h = 1060, 260; s = 50
+    w, h = 1110, 260; s = 50
     b = ''
-    specs = [(1, [2, 1], 60), (2, [1, 1, 1], 320), (3, [3, 1], 640), (4, [1, 1], 870)]
+    specs = [(1, [2, 1], 60), (2, [1, 1, 1], 320), (3, [3, 1], 640), (4, [1, 1], 920)]
     for k, orders, x0 in specs:
         at, bd = chain(x0, 115, orders, s)
         b += structure(at, bd)
-    for x, lab in [(110, '(1)'), (395, '(2)'), (690, '(3)'), (920, '(4)')]: b += panel_label(x, 240, lab)
-    for x in (240, 555, 795): b += L(x, 25, x, 220, '#d5d9e0', 1, '5 5')
+    for x, lab in [(110, '(1)'), (395, '(2)'), (690, '(3)'), (970, '(4)')]: b += panel_label(x, 240, lab)
+    for x in (240, 555, 845): b += L(x, 25, x, 220, '#d5d9e0', 1, '5 5')
     save('c4-l1b-sat-unsat.svg', svg(w, h, b))
 
 def fig_butane_butene():
@@ -167,12 +167,12 @@ def fig_bp_graph():
     save('c4-l1b-bp-graph.svg', svg(w, h, b))
 
 # ---------------------------------------------------------------- التكسير الحراري
-def carbon_row(x0, y, n, r=10, gap=30, double_at=None):
+def carbon_row(x0, y, n, r=9, gap=32, double_at=None):
     s = ''
     for i in range(n - 1):
         xa, xb = x0 + i * gap, x0 + (i + 1) * gap
         if double_at == i:
-            s += L(xa, y - 4, xb, y - 4, INK, 2.2) + L(xa, y + 4, xb, y + 4, INK, 2.2)
+            s += L(xa, y - 4, xb, y - 4, INK, 2.5) + L(xa, y + 4, xb, y + 4, INK, 2.5)
         else:
             s += L(xa, y, xb, y, INK, 2.2)
     for i in range(n):
@@ -182,15 +182,15 @@ def carbon_row(x0, y, n, r=10, gap=30, double_at=None):
 def fig_cracking(name, arrow_text):
     w, h = 900, 250
     b = ''
-    b += carbon_row(30, 110, 16)
-    b += LT(30 + 7.5 * 30, 160, 'C₁₆H₃₄', 20, weight='bold')
-    ax0, ax1 = 495, 600
+    b += carbon_row(25, 110, 16)
+    b += LT(25 + 7.5 * 32, 160, 'C₁₆H₃₄', 20, weight='bold')
+    ax0, ax1 = 520, 610
     b += ARROW(ax0, 110, ax1, 110, INK, 3)
     for j, t in enumerate(arrow_text):
         b += T((ax0 + ax1) / 2, 84 - (len(arrow_text) - 1 - j) * 20, t, 14 if t != '؟' else 26, weight='bold')
-    b += carbon_row(630, 60, 8) + LT(630 + 3.5 * 30, 98, 'C₈H₁₈', 20, weight='bold')
-    b += LT(630 + 3.5 * 30, 130, '+', 26, weight='bold')
-    b += carbon_row(630, 160, 8, double_at=0) + LT(630 + 3.5 * 30, 198, 'C₈H₁₆', 20, weight='bold')
+    b += carbon_row(640, 60, 8) + LT(640 + 3.5 * 32, 98, 'C₈H₁₈', 20, weight='bold')
+    b += LT(640 + 3.5 * 32, 130, '+', 26, weight='bold')
+    b += carbon_row(640, 160, 8, double_at=0) + LT(640 + 3.5 * 32, 198, 'C₈H₁₆', 20, weight='bold')
     b += T(w / 2, 238, 'الكرات تمثل ذرات الكربون فقط (ذرات الهيدروجين غير مرسومة)', 13, color=MUTED)
     save(name, svg(w, h, b))
 
@@ -241,10 +241,11 @@ def cylinder(x, y, piston_frac, spark, flame, label, sub):
 
 def fig_knock():
     w, h = 640, 420
-    w, h = 640, 380
-    b = cylinder(100, 60, 0.95, False, (70, 70), '(1)', [])
-    b += cylinder(400, 60, 0.05, True, None, '(2)', [])
-    b += T(w / 2, 22, 'السهم الأزرق: اتجاه حركة المكبس — الخطوط الصفراء: شرارة شمعة الاحتراق — النجمة البرتقالية: اشتعال الخليط', 12, color=MUTED)
+    w, h = 640, 420
+    b = cylinder(100, 105, 0.95, False, (70, 70), '(1)', [])
+    b += cylinder(400, 105, 0.05, True, None, '(2)', [])
+    b += T(w / 2, 22, 'السهم الأزرق: اتجاه حركة المكبس', 13, color=MUTED)
+    b += T(w / 2, 42, 'الخطوط الصفراء: شرارة شمعة الاحتراق — النجمة البرتقالية: اشتعال الخليط', 13, color=MUTED)
     save('c4-l1b-knock.svg', svg(w, h, b))
 
 # ---------------------------------------------------------------- القوة الحيوية

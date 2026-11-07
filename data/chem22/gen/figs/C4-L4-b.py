@@ -25,12 +25,12 @@ def rows(name, items, w=600, rh=120, top=0, step=84, x0=60, numbers=True):
     for k, it in enumerate(items):
         groups, br = it[0], it[1]
         up = any(d == 'up' for _, _, d in br); down = any(d == 'down' for _, _, d in br)
-        yy = y + (70 if up else 40)
+        yy = y + (80 if up else 40)
         a, bo = branched(x0, yy, groups, br, step)
         if len(it) > 2 and it[2] is not None: bo[it[2]] = (it[2], it[2] + 1, 2)
         b += mol(a, bo)
         if numbers: b += tag(w - 35, yy + 6, f'({k + 1})')
-        hgt = (70 if up else 40) + (75 if down else 35)
+        hgt = (80 if up else 40) + (75 if down else 35)
         y += hgt
         if k < len(items) - 1: b += hsep(y, w)
     save(name, svg(w, y + 5, b))
@@ -69,7 +69,7 @@ def skeletal(pts, dbl=(), color=INK, w=2.6):
 
 def zigzag(x, y, n, cis_at=(), blen=46, start=-30):
     """نقاط سلسلة متعرجة من n ذرة كربون. cis_at: أرقام الروابط (من 0) التي يكون حولها ترتيب سيس."""
-    pts = [(x, y)]; d = start; sign = 1
+    pts = [(x, y)]; d = start; sign = -1
     for k in range(n - 1):
         if k > 0:
             if (k - 1) in cis_at: pass  # اتجاه الانعطاف نفسه مرة ثانية → سيس حول الرابطة k-1
@@ -93,8 +93,8 @@ def hexene_skeletal(name):
     pos = [(160, 95), (480, 95), (160, 280), (480, 280)]
     b = ''
     for k, ((dbl, cis), (x, y)) in enumerate(zip(specs, pos)):
-        pts = fit(zigzag(0, 0, 6, cis_at=cis), x, y)
-        b += skeletal(pts, dbl) + tag(x, y + 78, f'({k + 1})')
+        pts = fit(zigzag(0, 0, 6, cis_at=cis, blen=50), x, y - 8)
+        b += skeletal(pts, dbl) + tag(x, max(p[1] for p in pts) + 32, f'({k + 1})')
     b += hsep(190, w) + divider(320, 20, h - 15)
     save(name, svg(w, h, b))
 
