@@ -91,7 +91,7 @@ BAP = [(0, 0), (1, 0), (0, 1), (1, -1), (0, 2)]   # البنزوبايرين: ا
 
 def benzopyrene():
     d = R * math.sqrt(3)
-    save(P + 'benzopyrene.svg', svg(320, 360, lattice(BAP, 160 - d / 2, 245)))
+    save(P + 'benzopyrene.svg', svg(320, 360, lattice(BAP, 160 - d / 2, 214)))
 
 def fused_or_not():
     d = R * math.sqrt(3)

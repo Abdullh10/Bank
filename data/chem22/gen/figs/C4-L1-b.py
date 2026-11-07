@@ -137,7 +137,9 @@ def tower(name, labels, show_bottom_temp=True, gradient=True, furnace_label=True
     save(name, svg(w, h, b))
 
 def fig_towers():
-    full = [[n, t, r] if t else [n] for n, t, r in FRACTIONS]
+    # مدى درجات الحرارة في الشكل 4-6 متناقض داخليًّا (تداخل 105–275 و240–300، والجازولين حتى C₁₂ ينتهي عند 100°C)،
+    # فلا تُعرض؛ يُكتفى بالترتيب ومدى ذرات الكربون.
+    full = [[n, r] if r else [n] for n, t, r in FRACTIONS]
     full[5] = ['المخلفات']
     tower('c4-l1b-tower-full.svg', full)
     tower('c4-l1b-tower-numbered.svg', [[f'({i + 1})'] for i in range(6)], show_bottom_temp=False, gradient=False)

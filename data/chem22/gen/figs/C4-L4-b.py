@@ -213,7 +213,7 @@ def fatty(name, w=700, h=330):
         pts = fit(pts, 330, y, level=bool(cis))
         b += skeletal(pts, (6,))
         x, yy = pts[-1]
-        b += label(x + 26, yy, 'COOH', 16, 'l') + L(x, yy, x + 22, yy, INK, 2.6)
+        b += label(x + 34, yy, 'COOH', 16, 'l') + L(x, yy, x + 20, yy, INK, 2.6)
         b += tag(40, y + 6, f'({k + 1})')
     b += hsep(170, w)
     save(name, svg(w, h, b))
@@ -260,18 +260,16 @@ if __name__ == '__main__':
     ethane_ethene(P + 'ethane-ethene.svg')
     hexene_bonds(P + 'hexene-bonds.svg')
     # O11
-    numbered(P + 'dmp-numbered.svg', ['CH3', 'CH', 'CH', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (2, 'CH3', 'up')])
+    numbered(P + 'emh-numbered.svg', ['CH3', 'CH', 'CH', 'CH2', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (2, 'CH2CH3', 'up')])
     numbered(P + 'methylpentene.svg', ['CH2', 'CH', 'CH', 'CH2', 'CH3'], [(2, 'CH3', 'up')], dbl=0)
     numbered(P + 'dmh.svg', ['CH3', 'CH2', 'CH', 'CH', 'CH2', 'CH3'], [(2, 'CH3', 'up'), (3, 'CH3', 'up')], nb=False)
     numbered(P + 'decane.svg', ['CH3', 'CH2', 'CH', 'CH2', 'CH', 'CH2', 'CH', 'CH2', 'CH2', 'CH3'],
              [(2, 'CH3', 'up'), (4, 'CH2CH3', 'up'), (6, 'CH3', 'up')], step=74, nb=False)
     numbered(P + '23dmh.svg', ['CH3', 'CH', 'CH', 'CH2', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (2, 'CH3', 'up')], nb=False)
-    rows(P + 'c6h14-five.svg', [
-        (['CH3', 'CH2', 'CH2', 'CH2', 'CH2', 'CH3'], []),
+    rows(P + 'c6h14-three.svg', [
         (['CH3', 'CH', 'CH2', 'CH2', 'CH3'], [(1, 'CH3', 'up')]),
         (['CH3', 'CH2', 'CH', 'CH2', 'CH3'], [(2, 'CH3', 'up')]),
-        (['CH3', 'C', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (1, 'CH3', 'down')]),
-        (['CH3', 'CH', 'CH', 'CH3'], [(1, 'CH3', 'up'), (2, 'CH3', 'up')])])
+        (['CH3', 'C', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (1, 'CH3', 'down')])])
     numbered(P + 'ethylmethylhexane.svg', ['CH3', 'CH', 'CH2', 'CH', 'CH2', 'CH3'], [(1, 'CH3', 'up'), (3, 'CH2CH3', 'up')], nb=False)
     # O12
     enzyme(P + 'enzyme.svg')
