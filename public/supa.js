@@ -233,6 +233,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/answer') return rpc('student_answer', { p_session: body.session, p_question: body.question, p_choice: body.choice });
   if (p === '/student/finish') return rpc('student_finish', { p_session: body.session });
   if (p === '/student/history') return rpc('student_history');
+  if (p === '/student/elite-seen') { await rpc('student_elite_seen'); return { ok: true }; }
   if (p === '/student/rank') return rpc('student_leaderboard', { p_course: f.course ? Number(f.course) : null });
   if (p === '/student/report') { await rpc('student_report_question', { p_question: body.question, p_reason: body.reason, p_body: body.body ?? null }); return { ok: true }; }
   if (p === '/student/coupon') return rpc('student_redeem_coupon', { p_code: body.code, p_course: body.course ? Number(body.course) : null });

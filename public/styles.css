@@ -1403,3 +1403,13 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
 /* مستوى «النخبة» */
 .badge.elite { background: linear-gradient(135deg, #f6e7b0, #e2c15a); color: #5a4300; border-color: #d4b048; }
 .elite-card { border-inline-start: 4px solid #d4b048; }
+
+/* تهنئة دخول «النخبة» */
+.bal-cele.elite-cele .bal-cele-card { border: 2px solid #d4b048; animation: elite-pop .55s cubic-bezier(.2, 1.4, .4, 1) both; }
+.bal-cele.elite-cele .bal-coin { color: #c9a227; animation: elite-glow 1.6s ease-in-out infinite alternate; }
+.elite-cele-badge { justify-self: center; display: inline-block; margin: .2rem 0 .6rem; padding: .3rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #f6e7b0, #e2c15a); color: #5a4300; border: 1px solid #d4b048; }
+.bal-cele.elite-cele > i:nth-child(odd) { background: #e2c15a; }
+@keyframes elite-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes elite-glow { from { filter: drop-shadow(0 0 0 rgba(212, 176, 72, 0)); } to { filter: drop-shadow(0 0 14px rgba(212, 176, 72, .9)); } }
+@media (prefers-reduced-motion: reduce) { .bal-cele.elite-cele .bal-cele-card, .bal-cele.elite-cele .bal-coin { animation: none; } }

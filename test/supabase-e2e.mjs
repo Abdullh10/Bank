@@ -884,14 +884,14 @@ await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);
 
-// مستوى «النخبة»: من حلّ 95% من أسئلة المقرر يُكافأ على المراجعة (بعد 7 أيام من آخر محاولة، 50 في اليوم، 250 = 100 نقطة بصحة 80%)
+// مستوى «النخبة»: من حلّ 80% من أسئلة المقرر يُكافأ على المراجعة (بعد 7 أيام من آخر محاولة، 50 في اليوم، 250 = 100 نقطة بصحة 80%)
 {
   const { rows: [eu] } = await pool.query(`insert into auth.users (email) values ('elite1@chem21.local') returning id`);
   await pool.query(`update public.profiles set role = 'student', managed = true, section = 'نخبة', display_name = 'طالب النخبة' where user_id = $1`, [eu.id]);
   await pool.query(`insert into public.course_enrollments (user_id, course_id) values ($1, 1) on conflict do nothing`, [eu.id]);
   const ids = (await pool.query(`select q.id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
     join public.chapters c on c.id = l.chapter_id where c.course_id = 1 and q.type = 'mcq' and q.status = 'approved' and not q.excluded order by q.id`)).rows.map(r => r.id);
-  const need = Math.ceil(0.95 * ids.length);
+  const need = Math.ceil(0.80 * ids.length);
   const base = (await pool.query(`select greatest(coalesce(max(started_at), now()), now()) + interval '1 hour' b from public.rank_terms`)).rows[0].b;
   const sess = async (at, qids) => (await pool.query(`insert into public.practice_sessions (user_id, settings, question_ids, total, created_at) values ($1, '{"e2e":"elite"}', $2, $3, $4) returning id`,
     [eu.id, qids, qids.length, at])).rows[0].id;
@@ -902,9 +902,14 @@ ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-l
   const s1 = await sess(base, ids.slice(0, need - 1));
   await add(s1, ids.slice(0, need - 1), base, 10, need - 1);
   let me = await elite();
-  ok('elite: below 95% of approved questions is not elite, progress shown', me && me.elite === false && me.eliteHave === need - 1 && me.eliteNeed === need, JSON.stringify(me && { e: me.elite, h: me.eliteHave, n: me.eliteNeed, need }));
+  ok('elite: below 80% of approved questions is not elite, progress shown', me && me.elite === false && me.eliteNew === false && me.eliteHave === need - 1 && me.eliteNeed === need, JSON.stringify(me && { e: me.elite, h: me.eliteHave, n: me.eliteNeed, need }));
   const s2 = await sess(new Date(+base + 6 * 3600e3), [ids[need - 1]]);
   await add(s2, [ids[need - 1]], new Date(+base + 6 * 3600e3 + 20e3), 10, 1);
+  me = await elite();
+  ok('elite: reaching 80% flags the one-time congratulation', me?.elite === true && me.eliteNew === true, JSON.stringify(me && { e: me.elite, n: me.eliteNew }));
+  await asRole(eu.id, 'select public.student_elite_seen()');
+  me = await elite();
+  ok('elite: congratulation is shown once (seen flag stored on the account)', me?.elite === true && me.eliteNew === false);
   // مراجعة بعد يومين فقط: لا تُحتسب (أقل من 7 أيام)
   const early = ids.slice(300, 305);
   const s3 = await sess(new Date(+base + 2 * 86400e3), early);
