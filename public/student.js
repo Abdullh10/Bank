@@ -152,6 +152,7 @@ function courseCards(ctx) {
   // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
   cachedApi(api, '/student/rank').then(d => {
     const box = document.getElementById('st-top5');
+    eliteCelebrate(ctx, d);
     if (!box || !d?.available || !d.top?.length) return;
     box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
       <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.elite ? ELITE_BADGE : ''}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
@@ -498,6 +499,7 @@ export async function pageStudentRank(ctx) {
     return;
   }
   const m = d.me, r = d.rules;
+  eliteCelebrate(ctx, d);
   const bandText = { q3: 'الربع الثالث', q4: 'الربع الرابع' };
   let mine;
   if (m.eligible && m.rank) {
@@ -556,19 +558,33 @@ const RING = 2 * Math.PI * 52;
 const ring = (frac, inner, label = 'تقدمك نحو الدرجة القادمة') => `<div class="bal-ring" role="img" aria-label="${label}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="bal-track"/>
   <circle cx="60" cy="60" r="52" class="bal-fill" style="stroke-dasharray:${RING.toFixed(1)};stroke-dashoffset:${(RING * (1 - Math.min(1, Math.max(0, frac)))).toFixed(1)}"/></svg><div class="bal-ring-in">${inner}</div></div>`;
 
-function celebrate(title, text) {
+function celebrate(title, text, opt = {}) {
   const esc = t => String(t ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   const o = document.createElement('div');
-  o.className = 'bal-cele';
-  o.setAttribute('role', 'status');
-  o.innerHTML = `<div class="bal-cele-card"><div class="bal-coin" aria-hidden="true">${icon('coin', 84)}</div>
-    <h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>
-    <button type="button" class="primary">رائع</button></div>${'<i></i>'.repeat(14)}`;
+  o.className = 'bal-cele' + (opt.cls ? ' ' + opt.cls : '');
+  o.setAttribute('role', opt.dialog ? 'dialog' : 'status');
+  if (opt.dialog) { o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', title); }
+  o.innerHTML = `<div class="bal-cele-card"><div class="bal-coin" aria-hidden="true">${icon(opt.icon || 'coin', 84, opt.tone)}</div>
+    <h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>${opt.extra || ''}
+    <button type="button" class="primary">${esc(opt.btn || 'رائع')}</button></div>${'<i></i>'.repeat(opt.confetti || 14)}`;
   document.body.append(o);
-  const close = () => o.remove();
+  const close = () => { o.remove(); opt.onClose?.(); };
   o.querySelector('button').onclick = close;
+  if (opt.dialog) o.querySelector('button').focus();
   o.addEventListener('click', e => { if (e.target === o) close(); });
-  setTimeout(close, 6000);
+  if (!opt.dialog) setTimeout(close, 6000);
+}
+
+// تهنئة دخول «النخبة»: مرة واحدة (تُسجَّل في الحساب فلا تتكرر على جهاز آخر)
+let eliteShown = false;
+function eliteCelebrate(ctx, d) {
+  if (eliteShown || !d?.available || !d.me?.eliteNew) return;
+  eliteShown = true;
+  const r = d.rules;
+  celebrate('مبروك! دخلت مستوى النخبة', `حللت ${num(r.elitePct)}% من أسئلة المقرر، وهذا إنجاز لا يبلغه إلا المثابرون. من الآن كل ${num(r.eliteBlock)} إجابة مراجعة متقنة تضيف لك ${num(r.eliteReward)} نقطة.`, {
+    cls: 'elite-cele', icon: 'trophy', tone: 'gilt', btn: 'انطلق', dialog: true,
+    extra: `<div class="elite-cele-badge">النخبة</div><p class="small">راجع الأسئلة التي حللتها قبل أسبوع فأكثر، بتأنٍّ وصحة ${num(r.eliteAcc)}% فأكثر.</p>`,
+    onClose: () => { homeCache.delete('/student/rank'); ctx.api('/student/elite-seen', { method: 'POST' }).catch(() => {}); } });
 }
 
 export async function pageStudentBalance(ctx) {

@@ -1830,12 +1830,12 @@ language sql stable security definer set search_path = public, pg_temp as $$
   da as (select z.user_id, count(*)::int n from (select v.user_id, v.d from valid v group by v.user_id, v.d
            having count(*) >= 10 and 2 * count(*) filter (where v.correct) >= count(*)) z group by 1),
   wc as (select wk.user_id, count(*)::int n from wk where wk.n >= 30 and wk.dys >= 3 and 100.0 * wk.c / wk.n > (select f from gf) group by 1),
-  -- «النخبة» (2026-11-10): من حلّ 95% من أسئلة المقرر المعتمدة يُكافأ على إعادة حلّها بعد 7 أيام فأكثر من آخر محاولة في السؤال نفسه
+  -- «النخبة» (2026-11-10، العتبة 80% منذ 2026-11-11): من حلّ 80% من أسئلة المقرر المعتمدة يُكافأ على إعادة حلّها بعد 7 أيام فأكثر من آخر محاولة في السؤال نفسه
   -- (لا الأسرع من 3 ثوانٍ، وأول 50 في اليوم)؛ كل 250 إجابة محتسبة = 100 نقطة إن كانت صحتها في الدفعة 80% فأكثر
   pn as (select count(*) filter (where ok)::int n from cq),
   eh as (select f.user_id, count(*)::int have from first f where f.ok group by 1),
   el as (select z.user_id, z.answered_at t from (select f.user_id, f.answered_at, row_number() over (partition by f.user_id order by f.answered_at) k from first f where f.ok) z, pn
-         where pn.n > 0 and z.k = ceil(0.95 * pn.n)),
+         where pn.n > 0 and z.k = ceil(0.80 * pn.n)),
   ec as (select r.user_id, r.correct, r.answered_at,
            row_number() over (partition by r.user_id, (r.answered_at at time zone 'Asia/Riyadh')::date order by r.answered_at) dn
          from ranked r join el on el.user_id = r.user_id
@@ -1847,7 +1847,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
   agg as (
     select u.user_id, coalesce(wc.n, 0) weeks_kept, coalesce(fa.attempts, 0) attempts, coalesce(va.valid, 0) valid, coalesce(va.correct, 0) correct,
       coalesce(fa.rushed, 0) rushed, coalesce(va.days_any, 0) days_any, coalesce(da.n, 0) days_active, coalesce(rep.n, 0) repeats, coalesce(rep.net, 0) repeat_net, coalesce(va.net, 0) net,
-      (el.user_id is not null) elite, coalesce(eh.have, 0) elite_have, ceil(0.95 * (select n from pn))::int elite_need,
+      (el.user_id is not null) elite, coalesce(eh.have, 0) elite_have, ceil(0.80 * (select n from pn))::int elite_need,
       coalesce(ea.n, 0) elite_n, 100 * coalesce(ea.blocks, 0) elite_bonus, coalesce(ea.cur_k, 0) elite_cur_k
     from unnest(p_ids) as u(user_id)
       left join fa on fa.user_id = u.user_id left join va on va.user_id = u.user_id left join da on da.user_id = u.user_id
@@ -1860,11 +1860,13 @@ language sql stable security definer set search_path = public, pg_temp as $$
 $$;
 
 -- قائمة التميّز للطالب: أفضل 5 في شعبته (بالاسم كاملًا) وترتيبه هو
+-- تهنئة دخول «النخبة» تظهر مرة واحدة لكل فصل دراسي (تُحفظ في الحساب لا في الجهاز)
+alter table public.profiles add column if not exists elite_seen_at timestamptz;
 create or replace function public.student_leaderboard(p_course bigint default null) returns jsonb
 language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare me public.profiles; v_course bigint; v_ids uuid[]; v_res jsonb;
   v_rules jsonb := jsonb_build_object('minValid', 30, 'minDays', 3, 'rushSecs', 3, 'dailyCap', 50, 'dayBonus', 3, 'dayCap', 20, 'dayMin', 10, 'dayAcc', 50, 'weekBonus', 2, 'weekValid', 30, 'weekDays', 3, 'repeatPts', 0.5, 'rushMaxPct', 40,
-    'elitePct', 95, 'eliteGapDays', 7, 'eliteBlock', 250, 'eliteReward', 100, 'eliteAcc', 80, 'eliteDailyCap', 50);
+    'elitePct', 80, 'eliteGapDays', 7, 'eliteBlock', 250, 'eliteReward', 100, 'eliteAcc', 80, 'eliteDailyCap', 50);
 begin
   perform public._require_student();
   select * into me from profiles where user_id = auth.uid();
@@ -1897,6 +1899,8 @@ begin
       'needValid', greatest(0, 30 - coalesce((select valid from mine), 0)), 'needDays', greatest(0, 3 - coalesce((select days_any from mine), 0)),
       'elite', coalesce((select elite from mine), false), 'eliteHave', coalesce((select elite_have from mine), 0), 'eliteNeed', coalesce((select elite_need from mine), 0),
       'eliteN', coalesce((select elite_n from mine), 0), 'eliteBonus', coalesce((select elite_bonus from mine), 0), 'eliteCurK', coalesce((select elite_cur_k from mine), 0),
+      'eliteNew', coalesce((select elite from mine), false) and (me.elite_seen_at is null
+        or me.elite_seen_at < greatest((select max(started_at) from rank_terms), coalesce(me.rank_since, '-infinity'::timestamptz))),
       'pointsToMedian', (select case when band in ('q3', 'q4') then greatest(0.1, round((select score from med) - mine.score + 0.1, 1)) end from mine)),
     'top', (select coalesce(jsonb_agg(jsonb_build_object('rank', t.rnk, 'name', t.nm, 'score', t.score, 'elite', t.elite, 'me', t.user_id = auth.uid()) order by t.rnk), '[]')
       from (select x.rnk, x.score, x.user_id, x.elite,
@@ -1905,6 +1909,15 @@ begin
   into v_res;
   return v_res;
 end $$;
+
+create or replace function public.student_elite_seen() returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform public._require_student();
+  update profiles set elite_seen_at = now() where user_id = auth.uid();
+end $$;
+revoke execute on function public.student_elite_seen() from anon, public;
+grant execute on function public.student_elite_seen() to authenticated;
 
 -- جودة التدريب للمعلم والمالك والمراجع: طلاب المعلم المسندون فقط
 create or replace function public.teacher_training_quality(p_course bigint default null) returns jsonb
