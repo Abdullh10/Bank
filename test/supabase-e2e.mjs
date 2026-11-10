@@ -884,6 +884,59 @@ await p.goto(BASE + '#/objective/C1-L1-O14'); await p.waitForSelector('#mcq-list
 await p.locator('[data-mode="review"]').click(); await p.waitForTimeout(500);
 ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-list .answer:visible').count()) === 7 && (await p.locator('.q-tools, .review-panel, [data-add]').count()) === 0);
 
+// مستوى «النخبة»: من حلّ 95% من أسئلة المقرر يُكافأ على المراجعة (بعد 7 أيام من آخر محاولة، 50 في اليوم، 250 = 100 نقطة بصحة 80%)
+{
+  const { rows: [eu] } = await pool.query(`insert into auth.users (email) values ('elite1@chem21.local') returning id`);
+  await pool.query(`update public.profiles set role = 'student', managed = true, section = 'نخبة', display_name = 'طالب النخبة' where user_id = $1`, [eu.id]);
+  await pool.query(`insert into public.course_enrollments (user_id, course_id) values ($1, 1) on conflict do nothing`, [eu.id]);
+  const ids = (await pool.query(`select q.id from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id
+    join public.chapters c on c.id = l.chapter_id where c.course_id = 1 and q.type = 'mcq' and q.status = 'approved' and not q.excluded order by q.id`)).rows.map(r => r.id);
+  const need = Math.ceil(0.95 * ids.length);
+  const base = (await pool.query(`select greatest(coalesce(max(started_at), now()), now()) + interval '1 hour' b from public.rank_terms`)).rows[0].b;
+  const sess = async (at, qids) => (await pool.query(`insert into public.practice_sessions (user_id, settings, question_ids, total, created_at) values ($1, '{"e2e":"elite"}', $2, $3, $4) returning id`,
+    [eu.id, qids, qids.length, at])).rows[0].id;
+  const add = (s0, qids, at0, gap, correctN) => pool.query(`insert into public.practice_answers (session_id, question_id, choice, correct, answered_at)
+    select $1, q, 0, i <= $4, $2::timestamptz + (i * $3 * interval '1 second') from unnest($5::bigint[]) with ordinality t(q, i)`, [s0, at0, gap, correctN, qids]);
+  const elite = async () => (await asRole(eu.id, 'select public.student_leaderboard(1) r')).data?.me;
+  // أقل من العتبة بسؤال واحد: ليس في النخبة
+  const s1 = await sess(base, ids.slice(0, need - 1));
+  await add(s1, ids.slice(0, need - 1), base, 10, need - 1);
+  let me = await elite();
+  ok('elite: below 95% of approved questions is not elite, progress shown', me && me.elite === false && me.eliteHave === need - 1 && me.eliteNeed === need, JSON.stringify(me && { e: me.elite, h: me.eliteHave, n: me.eliteNeed, need }));
+  const s2 = await sess(new Date(+base + 6 * 3600e3), [ids[need - 1]]);
+  await add(s2, [ids[need - 1]], new Date(+base + 6 * 3600e3 + 20e3), 10, 1);
+  // مراجعة بعد يومين فقط: لا تُحتسب (أقل من 7 أيام)
+  const early = ids.slice(300, 305);
+  const s3 = await sess(new Date(+base + 2 * 86400e3), early);
+  await add(s3, early, new Date(+base + 2 * 86400e3 + 20e3), 10, 5);
+  const before = await elite();
+  // 260 مراجعة بعد 8 أيام فأكثر، 50 في اليوم (والـ 51 في يوم سادس لا تُحتسب)، صحيح منها أول 210
+  const rev = ids.slice(0, 260);
+  for (let d = 0; d < 6; d++) {
+    const part = rev.slice(d * 50, d * 50 + 50); if (!part.length) break;
+    const at = new Date(+base + (8 + d) * 86400e3);
+    const sx = await sess(at, part);
+    await add(sx, part, new Date(+at + 20e3), 10, Math.max(0, Math.min(50, 210 - d * 50)));
+  }
+  // إجابة 51 في اليوم الأول: سؤال آخر (لم يُراجع) لا تُحتسب لتجاوز السقف
+  const extra = ids.slice(400, 401), atx = new Date(+base + 8 * 86400e3 + 3600e3);
+  await add(await sess(atx, extra), extra, new Date(+atx + 20e3), 10, 1);
+  me = await elite();
+  ok('elite: entered; 260 counted reviews (gap < 7 days and the 51st of a day excluded), 1 block rewarded = +100',
+    me?.elite === true && me.eliteN === 260 && me.eliteBonus === 100 && me.eliteCurK === 0 && Math.round((me.score - before.score) * 10) / 10 >= 100,
+    JSON.stringify(me && { e: me.elite, n: me.eliteN, b: me.eliteBonus, k: me.eliteCurK, s: me.score, s0: before?.score }));
+  // دفعة صحتها أقل من 80% لا تُكافأ
+  const low = ids.slice(260, 510);
+  for (let d = 0; d < 5; d++) {
+    const part = low.slice(d * 50, d * 50 + 50), at = new Date(+base + (20 + d) * 86400e3);
+    await add(await sess(at, part), part, new Date(+at + 20e3), 10, d < 4 ? 30 : 30);
+  }
+  me = await elite();
+  ok('elite: a block under 80% accuracy earns nothing', me?.eliteN === 510 && me.eliteBonus === 100, JSON.stringify(me && { n: me.eliteN, b: me.eliteBonus }));
+  await pool.query(`delete from public.practice_sessions where settings @> '{"e2e":"elite"}'`);
+  await pool.query(`delete from auth.users where email = 'elite1@chem21.local'`);
+}
+
 } catch (e) { results.push('FAIL exception: ' + e.message.split('\n')[0]); await p.screenshot({ path: `${OUT}/supa-fail.png` }); }
 console.log(results.join('\n'));
 console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'no console errors');

@@ -154,7 +154,7 @@ function courseCards(ctx) {
     const box = document.getElementById('st-top5');
     if (!box || !d?.available || !d.top?.length) return;
     box.innerHTML = `<div class="st-top5-head">${ttl('trophy', 'المتميزون في شعبتك', 'h2', 30)}<a class="btn" href="#/rank">ترتيبي وكيف تُحسب النقاط ←</a></div>
-      <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
+      <ol class="st-top5-list">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span> ${esc(t.name)}${t.elite ? ELITE_BADGE : ''}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</li>`).join('')}</ol>`;
     box.hidden = false;
   }).catch(() => {});
   // مهمتك الآن: أقرب مهمة مفتوحة من معلمك (استعلام خفيف)
@@ -469,6 +469,25 @@ const cachedApi = (api, path, ttl = 30000) => {
   return api(path).then(data => { homeCache.set(path, { at: Date.now(), data }); return data; });
 };
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
+const ELITE_BADGE = ' <span class="badge elite" title="حلّ أغلب أسئلة المقرر">النخبة</span>';
+
+// بطاقة «النخبة»: من حلّ 95% من أسئلة المقرر يُكافأ على مراجعة ما حلّه (كل 250 إجابة = 100 نقطة)
+function eliteCard(m, r) {
+  if (!m.eliteNeed) return '';
+  if (!m.elite) {
+    if (m.eliteHave < m.eliteNeed * 0.5) return '';
+    return `<section class="card elite-card">${ttl('trophy', 'الطريق إلى النخبة')}
+      <p class="muted">حين تحلّ ${num(r.elitePct)}% من أسئلة المقرر تدخل مستوى «النخبة»، وتُكافأ بعدها على مراجعة ما حللته.</p>
+      ${meter(m.eliteHave, m.eliteNeed, `حللت ${num(Math.min(m.eliteHave, m.eliteNeed))} من ${num(m.eliteNeed)} سؤالًا مختلفًا`)}</section>`;
+  }
+  const cur = m.eliteN % r.eliteBlock, done = Math.floor(m.eliteN / r.eliteBlock), got = m.eliteBonus / r.eliteReward;
+  const acc = cur ? Math.round(100 * m.eliteCurK / cur) : null;
+  return `<section class="card elite-card">${ttl('trophy', 'أنت في مستوى النخبة')}
+    <p>حللت أغلب أسئلة المقرر، فصار لك مستوى خاص: كل <b>${num(r.eliteBlock)}</b> إجابة مراجعة محتسبة تضيف <b>${num(r.eliteReward)}</b> نقطة إن كانت صحتها ${num(r.eliteAcc)}% فأكثر.</p>
+    ${meter(cur, r.eliteBlock, `${num(cur)} من ${num(r.eliteBlock)} حتى المكافأة القادمة${acc != null ? ` · صحتك فيها ${num(acc)}%` : ''}`)}
+    <p class="small muted">مكافآتك حتى الآن: ${num(m.eliteBonus)} نقطة (${num(got)} من ${num(done)} دفعة مكتملة).
+      المراجعة المحتسبة: سؤال سبق أن حللته ومضى على آخر محاولة فيه ${num(r.eliteGapDays)} أيام فأكثر، وبتأنٍّ (لا أسرع من ${num(r.rushSecs)} ثوانٍ)، وأول ${num(r.eliteDailyCap)} في اليوم.</p></section>`;
+}
 export async function pageStudentRank(ctx) {
   const { esc, $app, api } = ctx;
   const d = await api('/student/rank');
@@ -504,11 +523,12 @@ export async function pageStudentRank(ctx) {
       <section class="card">${ttl('trophy', 'ترتيبك')}${mine}</section>
       <section class="card">${ttl('trophy', 'أفضل 5 في شعبتك')}
         ${d.top.length ? `<ol class="rank-top">${d.top.map(t => `<li class="${t.me ? 'me' : ''}"><span class="rank-medal" aria-hidden="true">${MEDALS[t.rank - 1] || t.rank}</span>
-          <span class="rank-name">${esc(t.name)}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</span><span class="ltr small muted">${num(t.score)}</span></li>`).join('')}</ol>`
+          <span class="rank-name">${esc(t.name)}${t.elite ? ELITE_BADGE : ''}${t.me ? ' <span class="badge brand">أنت</span>' : ''}</span><span class="ltr small muted">${num(t.score)}</span></li>`).join('')}</ol>`
           : '<div class="empty">لم يدخل أحد الترتيب بعد؛ كن أول من يدخله بتدريب جاد ومنتظم.</div>'}
         <p class="small muted">يظهر لزملاء شعبتك اسمك ونقاطك إن دخلت أفضل 5.</p>
       </section>
     </div>
+    ${eliteCard(m, r)}
     <section class="card">${ttl('spark', 'كيف تُحسب نقاطي؟')}
       <ul class="rank-rules earn">
         <li><span class="earn-v">+1 / −½</span><span><b>الصافي:</b> +1 لكل إجابة صحيحة، ويُخصم لكل خاطئة ½ في السؤال ذي البدائل الثلاثة و⅓ في ذي الأربعة (أول محاولة لكل سؤال). التخمين العشوائي يعطي صفرًا في المتوسط.</span></li>
@@ -518,6 +538,7 @@ export async function pageStudentRank(ctx) {
         <li><span class="earn-v">+${num(r.dayBonus)}</span><span><b>يوم تدريب جاد:</b> ${num(r.dayMin)} إجابات صالحة فأكثر بصحة ${num(r.dayAcc)}% فأكثر (حتى ${num(r.dayCap)} يومًا).</span></li>
         <li><span class="earn-v">+½ / −½</span><span><b>السؤال المكرر:</b> إن ظهر لك سؤال أجبت عنه من قبل، تُحتسب محاولتك الثانية فيه +½ للصحيحة و−½ للخاطئة، وما بعدها لا يُحتسب. والأسئلة التي لم تُجب عنها تظهر لك أولًا.</span></li>
         <li><span class="earn-v">+${num(r.weekBonus)}</span><span><b>المحافظة على التميّز:</b> كل أسبوع (من الأحد) تجيب فيه ${num(r.weekValid)} إجابة محتسبة في ${num(r.weekDays)} أيام على الأقل وبصحة فوق ${num(r.guessFloor ?? 30)}%.</span></li>
+        <li><span class="earn-v">+${num(r.eliteReward)}</span><span><b>النخبة:</b> من حلّ ${num(r.elitePct)}% من أسئلة المقرر يُكافأ بـ ${num(r.eliteReward)} نقطة عن كل ${num(r.eliteBlock)} إجابة مراجعة محتسبة بصحة ${num(r.eliteAcc)}% فأكثر (سؤال مضى على آخر محاولة فيه ${num(r.eliteGapDays)} أيام، وحتى ${num(r.eliteDailyCap)} في اليوم).</span></li>
         <li><span class="earn-v off">↺</span><span>تبدأ النقاط من الصفر مع كل فصل دراسي جديد، وعند انتقالك إلى صف آخر.</span></li>
       </ul>
     </section>`;
