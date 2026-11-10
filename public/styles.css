@@ -1399,3 +1399,7 @@ th[aria-sort="ascending"] .imp-arrow, th[aria-sort="descending"] .imp-arrow { co
 
 .cm-reopen { display: inline-flex; gap: .4rem; align-items: center; }
 .cm-reopen select { width: auto; }
+
+/* مستوى «النخبة» */
+.badge.elite { background: linear-gradient(135deg, #f6e7b0, #e2c15a); color: #5a4300; border-color: #d4b048; }
+.elite-card { border-inline-start: 4px solid #d4b048; }
