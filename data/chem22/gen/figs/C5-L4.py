@@ -163,7 +163,7 @@ def fig_cycle(name):
     save(name, svg(W, H, b))
 
 def fig_route(name):
-    """2-بروموبروبان ومسارات تحويل مرقمة 1–4."""
+    """2-برومو بروبان ومسارات تحويل مرقمة 1–4."""
     W, H = 900, 400
     b = ''
     def put(n, e, cx, cy, cap):
@@ -174,7 +174,7 @@ def fig_route(name):
     pra = cond(['CH₃', 'CH₂', 'CH₃'])
     p2ol = cond(['CH₃', 'CH', 'CH₃'], branches=[(1, 1, 'OH', 1)])
     p2one = cond(['CH₃', 'C', 'CH₃'], branches=[(1, -1, 'O', 2)])
-    s, bb0 = put(*brp, 450, 70, '2-بروموبروبان'); b += s
+    s, bb0 = put(*brp, 450, 70, '2-برومو بروبان'); b += s
     s, _ = put(*pro, 220, 210, 'بروبين'); b += s
     s, _ = put(*pra, 110, 340, 'بروبان'); b += s
     s, _ = put(*p2ol, 680, 200, '2-بروبانول'); b += s
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     # O03-M1: بنتين حلقي + HBr → ؟
     cp = ring(5, double=(2,))
     scheme(P + 'cyclopentene-hbr.svg', [('m',) + cp + ('بنتين حلقي',), ('t', '+'), ('m', {'a': (0, 0, 'HBr')}, [], 'بروميد الهيدروجين'), ('a', '', '', 70), ('t', '؟')])
-    # O03-M3: 2-كلوروبيوتان + OH⁻ → ؟
+    # O03-M3: 2-كلورو بيوتان + OH⁻ → ؟
     clb = cond(['CH₃', 'CH₂', 'CH', 'CH₃'], branches=[(2, 1, 'Cl', 1)])
     scheme(P + '2-chlorobutane-oh.svg', [('m',) + clb + ('',), ('t', '+'), ('m', {'a': (0, 0, 'OH⁻')}, [], ''), ('a', '', '', 70), ('t', '؟')])
     # O03-M5: 1-بيوتين + ماء
