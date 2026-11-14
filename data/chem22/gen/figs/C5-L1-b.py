@@ -35,6 +35,26 @@ def scheme(name, items, pad=24, gap=22, arrow_len=110):
         x += w + gap
     save(name, svg(round(W), round(H), b))
 
+def naphthalene(subs=None):
+    """النفثالين: حلقتا بنزين ملتحمتان (سداسيان رأساهما إلى أعلى يشتركان في ضلع رأسي)، ودائرة في كل حلقة.
+    subs = {i: X} على رؤوس الحلقة اليسرى غير المشتركة: 0 أعلى (الموقع 1)، 5 أعلى اليسار، 4 أسفل اليسار، 3 أسفل."""
+    import math as _m
+    subs = subs or {}
+    V = [(_m.cos(-_m.pi / 2 + _m.pi / 3 * i), _m.sin(-_m.pi / 2 + _m.pi / 3 * i)) for i in range(6)]
+    dx = _m.sqrt(3)
+    nodes = {f'a{i}': (x, y, '') for i, (x, y) in enumerate(V)}
+    right = {0: 'b0', 1: 'b1', 2: 'b2', 3: 'b3', 4: 'a2', 5: 'a1'}
+    for i in range(4):
+        x, y = V[i]; nodes[f'b{i}'] = (x + dx, y, '')
+    edges = [(f'a{i}', f'a{(i + 1) % 6}', 1) for i in range(6)]
+    edges += [(right[i], right[(i + 1) % 6], 1) for i in range(6) if {right[i], right[(i + 1) % 6]} != {'a1', 'a2'}]
+    for i, s in subs.items():
+        x, y = V[i]; d = _m.hypot(x, y); ux, uy = x / d, y / d
+        hw, hh = A.lab_size(s)
+        t = min(hw / abs(ux) if abs(ux) > 1e-6 else 1e9, hh / abs(uy) if abs(uy) > 1e-6 else 1e9) / U
+        nodes[f's{i}'] = (x + ux * (0.72 + t), y + uy * (0.72 + t), s); edges.append((f'a{i}', f's{i}', 1))
+    return M(nodes, edges, [(0, 0, 0.6), (dx, 0, 0.6)])
+
 def bars_q(name, data, w=620, h=380, ymin=-20, ymax=160, step=20):
     """أعمدة درجات الغليان مع خط الصفر؛ القيمة None تعني عمودًا مجهولًا يُرسم مكانه «؟»."""
     X0, Y0, X1, Y1 = 80, h - 70, w - 20, 30
@@ -66,14 +86,16 @@ if __name__ == '__main__':
     scheme(P + 'bromopropane-nh3.svg', [('m', chain(3, {(1, -1): 'Br'})), ('t', '+'), ('t', 'NH₃'), ('a', ''), ('t', '?')])
     scheme(P + 'methane-route.svg', [('t', 'CH₄'), ('a', 'Br₂'), ('t', 'A'), ('a', 'OH⁻'), ('t', 'B')], arrow_len=100)
     # ===== O07: مقارنة التراكيب =====
-    grid(P + 'cyclo-vs-benzene.svg', [('(أ)', ring(6, {0: 'Cl'})), ('(ب)', ring(6, {0: 'Cl'}, arom=True))])
-    single(P + 'chlorotoluene.svg', ring(6, {0: 'CH₃', 3: 'Cl'}, arom=True))
+    # (أ) 4-كلورو تولوين: الكلور على الحلقة؛ (ب) C₆H₅CH₂Cl: الكلور على CH₂ خارج الحلقة — الصيغة نفسها C₇H₇Cl
+    bz = ring(6, {0: 'CH₂'}, arom=True)
+    x0, y0, _ = bz['nodes']['s0']
+    bz['nodes']['cl'] = (x0, y0 - 1.1, 'Cl'); bz['edges'].append(('s0', 'cl', 1))
+    grid(P + 'c7h7cl-pair.svg', [('(أ)', ring(6, {0: 'CH₃', 3: 'Cl'}, arom=True)), ('(ب)', bz)])
     mx = ring(6, {0: 'CH₂', 3: 'Br'}, arom=True)
     x0, y0, _ = mx['nodes']['s0']
     mx['nodes']['cl'] = (x0, y0 - 1.1, 'Cl'); mx['edges'].append(('s0', 'cl', 1))
     single(P + 'mixed-halide.svg', mx)
-    grid(P + 'classify-essay.svg', [('(أ)', cond(['CH₃', 'CH', 'CH₂', 'CH₃'], [(1, -1, ['Br'])])), ('(ب)', ring(6, {0: 'Br'}, arom=True)),
-                                    ('(ج)', ring(6, {0: 'Br', 2: 'Br'}, arom=True)), ('(د)', ring(5, {0: 'Br'}))])
+    single(P + 'bromonaphthalene.svg', naphthalene({0: 'Br'}))
     # ===== O08: درجات الغليان =====
     bars_q(P + 'butyl-bars.svg', [('C₄H₁₀', -0.5), ('C₄H₉F', 32), ('C₄H₉Cl', 78), ('C₄H₉Br', None), ('C₄H₉I', 131)])
     # ===== O09: الهلجنة =====
