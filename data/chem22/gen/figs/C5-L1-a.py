@@ -228,5 +228,6 @@ if __name__ == '__main__':
 
     # ===== O05: الاستعمالات =====
     ptfe(P + 'ptfe.svg')
-    single(P + 'cfc12.svg', full({'c': (0, 0)}, [], subs={(-1, 0): 'Cl', (1, 0): 'Cl', (0, -1): 'F', (0, 1): 'F'}))
-    single(P + 'hfc134a.svg', chain(2, {(-1, 0): 'F', (0, -1): 'F', (0, 1): 'F', (2, 0): 'F'}))
+    # الكلوروميثان CH₃Cl (المواد اللاصقة) والهالوثان CF₃–CHBrCl (مخدر عام)
+    single(P + 'chloromethane.svg', full({'c': (0, 0)}, [], subs={(-1, 0): 'Cl'}))
+    single(P + 'halothane.svg', chain(2, {(-1, 0): 'F', (0, -1): 'F', (0, 1): 'F', (1, -1): 'Br', (1, 1): 'Cl'}))
