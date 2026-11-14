@@ -24,9 +24,6 @@ def ring_circle(cx=0, cy=0):
     return lambda ox, oy: f'<circle cx="{ox + cx * U:.1f}" cy="{oy + cy * U:.1f}" r="{0.6 * U:.1f}" fill="none" stroke="{INK}" stroke-width="2"/>'
 
 # ---------- O08: المجموعات الوظيفية ----------
-def amide_general():
-    single(P + 'amide-general.svg', *row([('R',), ('C', '=O'), ('N', 'H'), ('R′',)], dx=1.2))
-
 def aspirin():
     n, e = ring6({})
     n['c1'] = (0, -2.0, 'C'); e.append(('r0', 'c1', 1))
@@ -128,8 +125,8 @@ def methyl_propanoate():
 def ethyl_methanoate():
     single(P + 'ethyl-methanoate.svg', *row([('H',), ('C', '=O'), ('O',), ('CH₂',), ('CH₃',)]))
 
-def ethyl_propanoate_rev():
-    single(P + 'ethyl-propanoate-rev.svg', *row([('CH₃',), ('CH₂',), ('O',), ('C', '=O'), ('CH₂',), ('CH₃',)]))
+def pentyl_ethanoate_rev():
+    single(P + 'pentyl-ethanoate-rev.svg', *row([('CH₃CH₂CH₂CH₂CH₂',), ('O',), ('C', '=O'), ('CH₃',)]))
 
 def esters_c6():
     grid(P + 'esters-c6.svg', [
@@ -157,12 +154,12 @@ def hexanamide():
 def ethanamide_full():
     single(P + 'ethanamide-full.svg', *row([('H',), ('C', 'H', 'H'), ('C', '=O'), ('N', None, 'H'), ('H',)], dx=1.15))
 
-def amides_c5():
-    grid(P + 'amides-c5.svg', [
-        ('(1)',) + row([('CH₃CH₂CH₂CH₂',), ('C', '=O'), ('NH₂',)]),
-        ('(2)',) + row([('CH₃CH₂CH₂CH₂CH₂',), ('NH₂',)]),
-        ('(3)',) + row([('CH₃CH₂CH₂',), ('C', '=O'), ('NH₂',)]),
-        ('(4)',) + row([('CH₃CH₂CH₂CH₂CH₂',), ('C', '=O'), ('NH₂',)]),
+def amides_c9():
+    grid(P + 'amides-c9.svg', [
+        ('(1)',) + row([('CH₃(CH₂)₆',), ('C', '=O'), ('NH₂',)]),
+        ('(2)',) + row([('CH₃(CH₂)₇',), ('CH₂',), ('NH₂',)]),
+        ('(3)',) + row([('CH₃(CH₂)₇',), ('C', '=O'), ('NH₂',)]),
+        ('(4)',) + row([('CH₃(CH₂)₈',), ('C', '=O'), ('NH₂',)]),
     ], gapx=50)
 
 def amides_name4():
@@ -206,8 +203,8 @@ def urea():
     single(P + 'urea.svg', *row([('H₂N',), ('C', '=O'), ('NH₂',)], dx=1.3))
 
 if __name__ == '__main__':
-    amide_general(); aspirin(); acetaminophen(); ldopa(); salicylic_aspirin()
+    aspirin(); acetaminophen(); ldopa(); salicylic_aspirin()
     acid_dimer(); acid_water(); propanoic_numbered()
-    methyl_propanoate(); ethyl_methanoate(); ethyl_propanoate_rev(); esters_c6(); esters_name4()
-    propanamide(); hexanamide(); ethanamide_full(); amides_c5(); amides_name4()
+    methyl_propanoate(); ethyl_methanoate(); pentyl_ethanoate_rev(); esters_c6(); esters_name4()
+    propanamide(); hexanamide(); ethanamide_full(); amides_c9(); amides_name4()
     ionization_scheme(); methyl_hexanoate(); urea()
