@@ -36,7 +36,7 @@ def chain(x0, yc, groups, orders=None, size=SZ, bl=30, brackets=False, dots=Fals
         if k < len(groups) - 1:
             s += hbond(x + 4, x + 4 + bl, yc, orders[k]); x += bl + 8
     if brackets:
-        rb = max(x + bl - 10, sub_right + 10)
+        rb = max(x + max(bl, 30) - 4, sub_right + 18)
         s += hbond(x + 4, rb + 14, yc)
         top, bot = ext_top - 6, ext_bot + 6
         s += f'<path d="M{lb + 8},{top} L{lb},{top} L{lb},{bot} L{lb + 8},{bot}" fill="none" stroke="{INK}" stroke-width="2.4"/>'
@@ -148,9 +148,9 @@ def main():
     fig(P + 'pvc.svg', b, xe + 30, bot + 30)
 
     # 3) رسم البوليمر من المونومر والعكس
-    b, xe, _, bot = chain(20, 50, [('CF2', []), ('CF2', [])], [2], pre='n')
-    b += rarrow(xe + 18, 50) + ftext(xe + 105, 50, '?', 30)
-    fig(P + 'tfe.svg', b, xe + 140, 100)
+    b, xe, _, bot = chain(20, 45, [('CH2', []), ('CH', [(1, 'cn', '')])], [2], pre='n')
+    b += rarrow(xe + 18, 45) + ftext(xe + 105, 45, '?', 30)
+    fig(P + 'acrylonitrile.svg', b, xe + 140, bot + 20)
     b, xe, _, bot = chain(20, 45, [('CH2', []), ('CH', [(1, 'ring', '')])], [2], pre='n')
     b += rarrow(xe + 18, 45) + ftext(xe + 105, 45, '?', 30)
     fig(P + 'styrene.svg', b, xe + 140, bot + 20)
