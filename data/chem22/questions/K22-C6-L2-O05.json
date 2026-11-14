@@ -45,7 +45,7 @@
    ],
    "thinking_level": "فهم",
    "question_kind": "تفسير شكل",
-   "difficulty": "متوسط",
+   "difficulty": "سهل",
    "source_ref": "الكتاب ص 217 — الشكل 6-10",
    "images": [
     {
@@ -174,7 +174,7 @@
    ],
    "thinking_level": "فهم",
    "question_kind": "تقويم عبارات",
-   "difficulty": "متوسط",
+   "difficulty": "سهل",
    "source_ref": "الكتاب ص 217 — السكريات الأحادية"
   }
  ],
@@ -340,7 +340,7 @@
      "description": "إجابة صحيحة في معظمها مع نقص عنصر أو عنصرين أو خطأ بسيط"
     },
     {
-     "level": "1–2",
+     "level": "1–2 درجة",
      "description": "إجابة جزئية تتضمن بعض العناصر الصحيحة فقط"
     },
     {
@@ -355,7 +355,7 @@
    ],
    "thinking_level": "تحليل",
    "question_kind": "مقارنة تراكيب",
-   "difficulty": "صعب",
+   "difficulty": "متوسط",
    "source_ref": "الكتاب ص 217، 234 — س80"
   }
  ]

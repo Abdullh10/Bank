@@ -200,12 +200,15 @@ def main():
     save(P + 'sucrose.svg', svg(520, 215, b))
 
     # 8) معادلة تكوين السكروز في سطرين: جلوكوز + فركتوز ← (سهم لأسفل) سكروز + H2O (OH وH مظللتان)
-    def hl(x, y, w): return f'<rect x="{x - w / 2:.1f}" y="{y - 14:.1f}" width="{w}" height="28" rx="5" fill="{HL}"/>'
+    # بلا تظليل: تظليل OH وH يكشف إجابة سؤال «من أين تأتي ذرات الماء؟»
+    def hl(x, y, w): return ''
     g, V = pyranose(105, 110, GLU, skip=(1,))
     x1, y1 = V[1]
     g += line(x1, y1, x1 + 18, y1) + hl(x1 + 36, y1, 40) + ftext(x1 + 21, y1, 'OH', anchor='start')
     f, W = furanose_flipped(x1 + 205, 116, FRU_FLIP, skip=(2,))
     x2, y2 = W[2]
+    # ذرة C2 في الفركتوز المتفاعل: مجموعة CH2OH (ذرة C1) إلى أعلى، ومجموعة OH أفقية نحو الجلوكوز
+    f += subst(x2, y2, 'CH2OH', None, lu=34)
     f += line(x2 - 18, y2, x2, y2) + hl(x2 - 37, y2, 22) + ftext(x2 - 21, y2, 'HO', anchor='end')
     react = g + plus(x1 + 74, 110) + f
     mid = 280
@@ -221,14 +224,16 @@ def main():
     save(P + 'sucrose-eq-q.svg', svg(560, 440, eq_q))
 
     # 10) سكر ثنائي (جلاكتوز – O – جلوكوز) = اللاكتوز، بلا اسم
-    def disacch(name, left_subs, w=520):
+    def disacch(name, left_subs, w=520, beta=False):
         a, V = pyranose(120, 110, left_subs, skip=(1,))
         c, W = pyranose(390, 110, GLU, skip=(4,))
         xa, ya = V[1]; xb, yb = W[4]
-        ox, oy = (xa + xb) / 2, ya + 22
-        bb = a + c + line(xa, ya, ox - 11, oy - 4) + ftext(ox, oy, 'O') + line(ox + 11, oy - 4, xb, yb)
+        # ألفا (المالتوز): الأكسجين الجسري أسفل مستوى الحلقة؛ بيتا (اللاكتوز): أعلاه
+        ox, oy = (xa + xb) / 2, ya + (-22 if beta else 22)
+        dy = 4 if beta else -4
+        bb = a + c + line(xa, ya, ox - 11, oy + dy) + ftext(ox, oy, 'O') + line(ox + 11, oy + dy, xb, yb)
         save(name, svg(w, 215, bb))
-    disacch(P + 'lactose.svg', GAL_B)
+    disacch(P + 'lactose.svg', GAL_B, beta=True)
     disacch(P + 'maltose.svg', GLU)
 
     # 11) نماذج السكريات عديدة التسكر: (أ) سلاسل مستقيمة متوازية متقاطعة، (ب) سلسلة كثيرة التفرع
