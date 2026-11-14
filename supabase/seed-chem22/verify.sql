@@ -4,6 +4,6 @@ select
   (select count(*) from public.lessons l join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 24 as lessons_ok,
   (select count(*) from public.objectives o join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 266 as objectives_ok,
   (select count(*) from public.supplements s join public.objectives o on o.id = s.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 0 as supplements_ok,
-  (select count(*) from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 1760 as questions_ok,
-  (select count(*) from public.question_answers a join public.questions q on q.id = a.question_id join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 1760 as answers_ok,
+  (select count(*) from public.questions q join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 2310 as questions_ok,
+  (select count(*) from public.question_answers a join public.questions q on q.id = a.question_id join public.objectives o on o.id = q.objective_id join public.lessons l on l.id = o.lesson_id join public.chapters c on c.id = l.chapter_id where c.course_id = 3) = 2310 as answers_ok,
   (select status from public.courses where id = 3) = 'preparing' as still_preparing;
