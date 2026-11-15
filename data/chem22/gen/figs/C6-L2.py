@@ -33,6 +33,8 @@ def label_at(x, y, lab, d, anchor='middle', size=SZ):
     """نص طرف رابطة رأسية: d = −1 أعلى، 1 أسفل."""
     if not lab: return ''
     yc = y + d * (size * 0.55)
+    if lab == 'CH2OH' and anchor == 'middle':   # الرابطة تصل إلى ذرة C في CH2OH لا إلى منتصف النص
+        return ftext(x - size * 0.36, yc, lab, size, 'start')
     return ftext(x, yc, lab, size, anchor)
 
 
@@ -64,16 +66,18 @@ def subst(x, y, up, down, lu=34, ld=34, au='middle', ad='middle'):
     return s
 
 
-def pyranose(cx, cy, subs, skip=()):
-    """حلقة سداسية (هاورث). subs: dict رقم الكربون → (أعلى، أسفل). الرؤوس: C1 يمين، C2 أمام-يمين، C3 أمام-يسار، C4 يسار، C5 خلف-يسار، O خلف-يمين."""
-    V = {1: (cx + 72, cy), 2: (cx + 38, cy + 30), 3: (cx - 38, cy + 30), 4: (cx - 72, cy), 5: (cx - 38, cy - 30), 'O': (cx + 38, cy - 30)}
+def pyranose(cx, cy, subs, skip=(), dy=30):
+    """حلقة سداسية (هاورث). subs: dict رقم الكربون → (أعلى، أسفل). الرؤوس: C1 يمين، C2 أمام-يمين، C3 أمام-يسار، C4 يسار، C5 خلف-يسار، O خلف-يمين.
+    dy: نصف ارتفاع الحلقة؛ تُرسم الحلقة أطول (dy=46) عند إظهار ذرات H كما في الشكل 6-9 حتى لا تتداخل H (أسفل C5) وOH (أعلى C3) داخل الحلقة."""
+    V = {1: (cx + 72, cy), 2: (cx + 38, cy + dy), 3: (cx - 38, cy + dy), 4: (cx - 72, cy), 5: (cx - 38, cy - dy), 'O': (cx + 38, cy - dy)}
     verts = [V[5], V['O'], V[1], V[2], V[3], V[4]]
     s = ring(verts, 1, {(2, 3), (3, 4), (4, 5)})
     for c, (u, d) in subs.items():
         if c in skip: continue
         x, y = V[c]
-        lu = 22 if c in (2, 3) else 34
-        s += subst(x, y, u, d, lu=lu)
+        lu = 22 if c in (2, 3) else (30 if c in (1, 4) and dy > 30 else 34)
+        ld = 20 if c == 5 else (28 if dy > 30 else 34)
+        s += subst(x, y, u, d, lu=lu, ld=ld)
     return s, V
 
 
@@ -91,12 +95,24 @@ def furanose(cx, cy, subs, skip=(), flipped=False):
         if c in (3, 4):   # الكربونان الأماميان: النص العلوي داخل الحلقة مائلًا نحو المركز
             s += subst(x, y, u, d, lu=24, ld=30, au='end' if right(c) else 'start')
         else:             # الكربونان الجانبيان: الرابطة السفلية أطول والنص نحو الخارج
-            s += subst(x, y, u, d, lu=34, ld=48, ad='start' if right(c) else 'end')
+            s += subst(x, y, u, d, lu=56 if u == 'CH2OH' else 34, ld=48, ad='start' if right(c) else 'end')
     return s, V
 
 
 def furanose_flipped(cx, cy, subs, skip=()):
     return furanose(cx, cy, subs, skip, flipped=True)
+
+
+# كما في الشكل 6-9 (مع ذرات H): الجلوكوز والجلاكتوز يختلفان في C4 فقط؛ والفركتوز الحلقي مرسوم والأكسجين في الأعلى،
+# وذرة C2 (عليها CH2OH إلى أعلى وHO إلى أسفل) على اليسار، وC5 (عليها H إلى أعلى وCH2OH إلى أسفل) على اليمين.
+GLU_H = {1: ('H', 'OH'), 2: ('H', 'OH'), 3: ('OH', 'H'), 4: ('H', 'HO'), 5: ('CH2OH', 'H')}
+GAL_H = {1: ('H', 'OH'), 2: ('H', 'OH'), 3: ('OH', 'H'), 4: ('HO', 'H'), 5: ('CH2OH', 'H')}
+FRU_H = {2: ('CH2OH', 'HO'), 3: ('H', 'OH'), 4: ('HO', 'H'), 5: ('H', 'CH2OH')}
+
+
+def glu_ring(cx, cy): return pyranose(cx, cy, GLU_H, dy=46)
+def gal_ring(cx, cy): return pyranose(cx, cy, GAL_H, dy=46)
+def fru_ring(cx, cy): return furanose_flipped(cx, cy, FRU_H)
 
 
 GLU = {1: (None, 'OH'), 2: (None, 'OH'), 3: ('OH', None), 4: (None, 'HO'), 5: ('CH2OH', None)}
@@ -114,9 +130,12 @@ def plus(x, y): return ftext(x, y, '+', 26)
 
 
 # ---------- السلاسل المفتوحة (إسقاط فيشر مبسط) ----------
-def fischer(cx, top, rows, step=46):
-    """rows: قائمة صفوف؛ كل صف (يسار، مركز، يمين، رابطة_يمين) — مركز 'C' أو نص طرفي مثل 'CH2OH'. يُرجع الرسم وآخر y."""
+def fischer(cx, top, rows, step=46, cap_top=None, cap_bot=None):
+    """rows: قائمة صفوف؛ كل صف (يسار، مركز، يمين، رابطة_يمين). cap_top/cap_bot: ذرة H طرفية رأسية فوق أول كربون وتحت آخر كربون
+    كما في الشكل 6-9 (H فوق C=O في الألدهيد، وH تحت آخر H–C–OH). يُرجع الرسم وy أسفل عنصر مرسوم."""
     s = ''; y = top; prev = None
+    if cap_top:
+        s += ftext(cx, y, cap_top, SZ); prev = y; y += step - 6
     for k, (lft, ctr, rgt, order) in enumerate(rows):
         if prev is not None:
             s += line(cx, prev + 13, cx, y - 13)
@@ -131,12 +150,20 @@ def fischer(cx, top, rows, step=46):
                 s += line(cx + hw + 4, y, cx + 40, y)
             s += ftext(cx + 44, y, rgt, SZ, 'start')
         prev = y; y += step
+    if cap_bot:
+        y = prev + step - 6
+        s += line(cx, prev + 13, cx, y - 13) + ftext(cx, y, cap_bot, SZ); prev = y
     return s, prev
 
 
-GLU_OPEN = [('H', 'C', 'O', 2), ('H', 'C', 'OH', 1), ('HO', 'C', 'H', 1), ('H', 'C', 'OH', 1), ('H', 'C', 'OH', 1), (None, 'CH2OH', None, 1)]
-GAL_OPEN = [('H', 'C', 'O', 2), ('H', 'C', 'OH', 1), ('HO', 'C', 'H', 1), ('HO', 'C', 'H', 1), ('H', 'C', 'OH', 1), (None, 'CH2OH', None, 1)]
-FRU_OPEN = [(None, 'CH2OH', None, 1), (None, 'C', 'O', 2), ('HO', 'C', 'H', 1), ('H', 'C', 'OH', 1), ('H', 'C', 'OH', 1), (None, 'CH2OH', None, 1)]
+# كما في الشكل 6-9: كل ذرات الكربون الست مكتوبة (H–C–OH في الطرف بدل CH2OH)
+CHOH = ('H', 'C', 'OH', 1); HOCH = ('HO', 'C', 'H', 1); CO = (None, 'C', 'O', 2)
+GLU_OPEN = [CO, CHOH, HOCH, CHOH, CHOH, CHOH]
+GAL_OPEN = [CO, CHOH, HOCH, HOCH, CHOH, CHOH]
+FRU_OPEN = [CHOH, CO, HOCH, CHOH, CHOH, CHOH]
+
+
+def open_chain(cx, top, rows): return fischer(cx, top, rows, cap_top='H', cap_bot='H')
 
 
 # ---------- رموز مبسطة للوحدات (سداسي صغير) ----------
@@ -160,32 +187,32 @@ def hchain(x0, y, n, gap=34, dots=False):
 def main():
     os.makedirs(OUT, exist_ok=True)
 
-    # 1) الجلوكوز الحلقي وحده
-    b, _ = pyranose(150, 105, GLU)
-    save(P + 'glucose-ring.svg', svg(300, 205, b))
+    # 1) الجلوكوز الحلقي وحده (كما في الشكل 6-9 بذرات H)
+    b, _ = glu_ring(160, 130)
+    save(P + 'glucose-ring.svg', svg(320, 255, b))
 
     # 2) ثلاثة سكريات أحادية حلقية بلا أسماء: (أ) جلوكوز (ب) فركتوز (ج) جلاكتوز
-    b1, _ = pyranose(130, 115, GLU); b2, _ = furanose(400, 115, FRU); b3, _ = pyranose(650, 115, GAL)
-    b = b1 + b2 + b3 + tag(130, 215, '(أ)') + tag(400, 215, '(ب)') + tag(650, 215, '(ج)')
-    save(P + 'three-rings.svg', svg(780, 230, b))
+    b1, _ = glu_ring(140, 135); b2, _ = fru_ring(420, 140); b3, _ = gal_ring(700, 135)
+    b = b1 + b2 + b3 + tag(140, 268, '(أ)') + tag(420, 268, '(ب)') + tag(700, 268, '(ج)')
+    save(P + 'three-rings.svg', svg(840, 285, b))
 
     # 3) الجلوكوز والجلاكتوز الحلقيان جنبًا إلى جنب (س، ص)
-    b1, _ = pyranose(140, 110, GLU); b2, _ = pyranose(440, 110, GAL)
-    b = b1 + b2 + tag(140, 210, '(س)') + tag(440, 210, '(ص)') + line(290, 20, 290, 200, 1, MUTED)
-    save(P + 'glu-gal-rings.svg', svg(580, 225, b))
+    b1, _ = glu_ring(150, 130); b2, _ = gal_ring(450, 130)
+    b = b1 + b2 + tag(150, 262, '(س)') + tag(450, 262, '(ص)') + line(300, 20, 300, 250, 1, MUTED)
+    save(P + 'glu-gal-rings.svg', svg(600, 280, b))
 
     # 4) السلاسل المفتوحة الثلاث (أ، ب، ج) — جلوكوز، جلاكتوز، فركتوز
-    s1, yb = fischer(110, 40, GLU_OPEN); s2, _ = fischer(330, 40, GAL_OPEN); s3, _ = fischer(550, 40, FRU_OPEN)
-    b = s1 + s2 + s3 + tag(110, yb + 40, '(أ)') + tag(330, yb + 40, '(ب)') + tag(550, yb + 40, '(ج)')
-    save(P + 'open-three.svg', svg(660, yb + 55, b))
+    s1, yb = open_chain(110, 30, GLU_OPEN); s2, _ = open_chain(330, 30, GAL_OPEN); s3, _ = open_chain(550, 30, FRU_OPEN)
+    b = s1 + s2 + s3 + tag(110, yb + 42, '(أ)') + tag(330, yb + 42, '(ب)') + tag(550, yb + 42, '(ج)')
+    save(P + 'open-three.svg', svg(660, yb + 57, b))
 
     # 5) الجلوكوز والفركتوز مفتوحا السلسلة (س، ص)
-    s1, yb = fischer(120, 40, GLU_OPEN); s2, _ = fischer(360, 40, FRU_OPEN)
-    b = s1 + s2 + tag(120, yb + 40, '(س)') + tag(360, yb + 40, '(ص)')
-    save(P + 'open-glu-fru.svg', svg(480, yb + 55, b))
+    s1, yb = open_chain(120, 30, GLU_OPEN); s2, _ = open_chain(360, 30, FRU_OPEN)
+    b = s1 + s2 + tag(120, yb + 42, '(س)') + tag(360, yb + 42, '(ص)')
+    save(P + 'open-glu-fru.svg', svg(480, yb + 57, b))
 
     # 6) الجلوكوز مفتوح السلسلة وحده
-    s1, yb = fischer(120, 40, GLU_OPEN)
+    s1, yb = open_chain(120, 30, GLU_OPEN)
     save(P + 'glucose-open.svg', svg(240, yb + 30, s1))
 
     # 7) سكر ثنائي: جلوكوز – O – فركتوز (السكروز) بلا اسم
@@ -208,7 +235,7 @@ def main():
     f, W = furanose_flipped(x1 + 205, 116, FRU_FLIP, skip=(2,))
     x2, y2 = W[2]
     # ذرة C2 في الفركتوز المتفاعل: مجموعة CH2OH (ذرة C1) إلى أعلى، ومجموعة OH أفقية نحو الجلوكوز
-    f += subst(x2, y2, 'CH2OH', None, lu=34)
+    f += subst(x2, y2, 'CH2OH', None, lu=56)
     f += line(x2 - 18, y2, x2, y2) + hl(x2 - 37, y2, 22) + ftext(x2 - 21, y2, 'HO', anchor='end')
     react = g + plus(x1 + 74, 110) + f
     mid = 280
@@ -263,15 +290,15 @@ def main():
     b += line(130, 20, 130, 135, 1, MUTED) + line(305, 20, 305, 135, 1, MUTED)
     save(P + 'unit-counts.svg', svg(760, 145, b))
 
-    # 13) الفركتوز الحلقي وحده
-    b, _ = furanose(150, 110, FRU)
-    save(P + 'fructose-ring.svg', svg(300, 205, b))
+    # 13) الفركتوز الحلقي وحده (كما في الشكل 6-9)
+    b, _ = fru_ring(160, 120)
+    save(P + 'fructose-ring.svg', svg(320, 235, b))
 
-    # 14) الحلقة والسلسلة المفتوحة للجلوكوز (س ⇌ ص)
-    r, _ = pyranose(130, 150, GLU)
-    s1, yb = fischer(430, 40, GLU_OPEN)
-    b = r + tag(130, 260, '(س)') + s1 + tag(430, yb + 40, '(ص)') + T(280, 158, '⇌', 34, weight='bold')
-    save(P + 'glu-ring-open.svg', svg(540, yb + 55, b))
+    # 14) الحلقة والسلسلة المفتوحة للجلوكوز (س ⇌ ص) كما في الشكل 6-9
+    r, _ = glu_ring(140, 185)
+    s1, yb = open_chain(450, 30, GLU_OPEN)
+    b = r + tag(140, 318, '(س)') + s1 + tag(450, yb + 42, '(ص)') + T(300, 196, '⇌', 34, weight='bold')
+    save(P + 'glu-ring-open.svg', svg(560, yb + 57, b))
 
 
 if __name__ == '__main__':
