@@ -15,10 +15,10 @@
   <meta name="theme-color" content="#12305a" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#081322" media="(prefers-color-scheme: dark)">
   <!-- version:start (يُولَّد بـ scripts/stamp-version.js؛ لا تعدّله يدويًا) -->
-  <meta name="itqan-version" content="fa3cbb73bd">
-  <script type="importmap">{"imports":{"./app.js":"./app.js?v=fa3cbb73bd","./bidi.js":"./bidi.js?v=fa3cbb73bd","./config.js":"./config.js?v=fa3cbb73bd","./courses.js":"./courses.js?v=fa3cbb73bd","./dashboard.js":"./dashboard.js?v=fa3cbb73bd","./dates.js":"./dates.js?v=fa3cbb73bd","./exam-docx.js":"./exam-docx.js?v=fa3cbb73bd","./exam.js":"./exam.js?v=fa3cbb73bd","./icons.js":"./icons.js?v=fa3cbb73bd","./impact-stats.js":"./impact-stats.js?v=fa3cbb73bd","./impact.js":"./impact.js?v=fa3cbb73bd","./math.js":"./math.js?v=fa3cbb73bd","./media.js":"./media.js?v=fa3cbb73bd","./notes.js":"./notes.js?v=fa3cbb73bd","./roles.js":"./roles.js?v=fa3cbb73bd","./staff.js":"./staff.js?v=fa3cbb73bd","./student.js":"./student.js?v=fa3cbb73bd","./supa.js":"./supa.js?v=fa3cbb73bd","./survey.js":"./survey.js?v=fa3cbb73bd","./validate.js":"./validate.js?v=fa3cbb73bd"}}</script>
-  <link rel="stylesheet" href="styles.css?v=fa3cbb73bd">
-  <script type="module" src="app.js?v=fa3cbb73bd"></script>
+  <meta name="itqan-version" content="bd56d95e48">
+  <script type="importmap">{"imports":{"./app.js":"./app.js?v=bd56d95e48","./bidi.js":"./bidi.js?v=bd56d95e48","./config.js":"./config.js?v=bd56d95e48","./courses.js":"./courses.js?v=bd56d95e48","./dashboard.js":"./dashboard.js?v=bd56d95e48","./dates.js":"./dates.js?v=bd56d95e48","./exam-docx.js":"./exam-docx.js?v=bd56d95e48","./exam.js":"./exam.js?v=bd56d95e48","./icons.js":"./icons.js?v=bd56d95e48","./impact-stats.js":"./impact-stats.js?v=bd56d95e48","./impact.js":"./impact.js?v=bd56d95e48","./math.js":"./math.js?v=bd56d95e48","./media.js":"./media.js?v=bd56d95e48","./notes.js":"./notes.js?v=bd56d95e48","./roles.js":"./roles.js?v=bd56d95e48","./staff.js":"./staff.js?v=bd56d95e48","./student.js":"./student.js?v=bd56d95e48","./subjects.js":"./subjects.js?v=bd56d95e48","./supa.js":"./supa.js?v=bd56d95e48","./survey.js":"./survey.js?v=bd56d95e48","./validate.js":"./validate.js?v=bd56d95e48"}}</script>
+  <link rel="stylesheet" href="styles.css?v=bd56d95e48">
+  <script type="module" src="app.js?v=bd56d95e48"></script>
   <!-- version:end -->
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" crossorigin>
 </head>
@@ -28,8 +28,9 @@
       <button type="button" class="menu-btn" id="menu-btn" aria-label="القائمة" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><b class="menu-dot" id="menu-dot" hidden></b></button>
       <a class="brand" href="#/">
         <img class="logo-light" src="assets/itqan-mark.svg" alt="" width="44" height="44"><img class="logo-dark" src="assets/itqan-mark-dark.svg" alt="" width="44" height="44">
-        <span>إتقان <em>منصة بنك الأسئلة والتدريب في الكيمياء</em><small id="brand-sub">مقررات الكيمياء · المرحلة الثانوية</small></span>
+        <span>إتقان <em>منصة بنك الأسئلة والتدريب في الكيمياء</em><small id="brand-sub">مقررات الكيمياء · المرحلة الثانوية</small><small class="brand-tag">منصة بنك الأسئلة والتدريب</small></span>
       </a>
+      <div class="ctx" id="ctx" hidden></div>
       <div class="userbox" id="userbox"></div>
     </div>
   </header>

@@ -10,6 +10,7 @@ import os from 'node:os';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { subjectsSteps } from './subjects-e2e-steps.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
@@ -284,10 +285,12 @@ ok('admin: students nav visible', await navShown('students'));
   await p.evaluate(h => { location.hash = h; }, back || '#/');
 }
 // مالك المشروع: يفتح المقرر «قيد الإعداد» ليتابعه، والتبديل بين المقررات يغيّر البنك والترويسة
-await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
-await p.goto(BASE + '#/');  await p.waitForSelector('.course-card');
-// قيد الإعداد: كيمياء 1 و2-2 و3 و«الاستعداد للتحصيلي»
-ok('owner: preparing courses openable', (await p.locator('.course-card.preparing [data-course]').count()) === 4);
+// رئيسية المالك «المواد» (2026-11-15): المقررات في صفحة المادة، والتحصيلي في «برامج مشتركة»
+await p.goto(BASE + '#/'); await p.waitForSelector('.scard');
+ok('owner: shared programme (tahsili, preparing) openable from «المواد»', (await p.locator('.program [data-course="5"]').count()) === 1);
+await p.goto(BASE + '#/subject/chem'); await p.waitForSelector('.crow');
+// قيد الإعداد: كيمياء 1 و2-2 و3
+ok('owner: preparing courses openable', (await p.locator('.crow:has(.badge.warn) [data-course]').count()) === 3);
 await p.locator('[data-course="3"]').click(); await p.waitForSelector('.notice.warn');
 ok('owner: 2-2 home shows preparing notice + header', (await p.locator('main').innerText()).includes('قيد الإعداد') && (await p.locator('#brand-sub').innerText()).includes('كيمياء 2-2 · الصف الثاني الثانوي · الفصل الدراسي الثاني'));
 await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
@@ -941,6 +944,9 @@ ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-l
   await pool.query(`delete from public.practice_sessions where settings @> '{"e2e":"elite"}'`);
   await pool.query(`delete from auth.users where email = 'elite1@chem21.local'`);
 }
+
+// ---------- تعدد المواد (test/subjects-e2e-steps.mjs) ----------
+await subjectsSteps({ p, ok, pool, asRole, BASE, OUT });
 
 } catch (e) { results.push('FAIL exception: ' + e.message.split('\n')[0]); await p.screenshot({ path: `${OUT}/supa-fail.png` }); }
 console.log(results.join('\n'));
