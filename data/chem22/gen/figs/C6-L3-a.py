@@ -163,7 +163,7 @@ def soap():
     def brace(x1, x2, lab):
         return (L(x1, yb, x2, yb, BLUE, 2) + L(x1, yb, x1, yb - 8, BLUE, 2) + L(x2, yb, x2, yb - 8, BLUE, 2)
                 + T((x1 + x2) / 2, yb + 26, lab, 18, 'middle', BLUE, 'bold'))
-    body = bd + brace(round(bb2[0]), round(c1x + 8), '(ب)') + brace(round(c1x + 22), round(bb2[2]), '(أ)')
+    body = bd + brace(round(bb2[0]), round(c1x + 8), '(ص)') + brace(round(c1x + 22), round(bb2[2]), '(س)')
     save(P + 'soap.svg', svg(W, H, body))
 
 # ---------------- 6) جزيئات صابون حول قطرة زيت في الماء ----------------
@@ -206,7 +206,6 @@ def bilayer():
                     pts.append((x + dx + (2.5 if k % 2 else -2.5), yy))
                 body += '<polyline fill="none" stroke="#5b6676" stroke-width="2" points="' + ' '.join(f'{p[0]:.1f},{p[1]:.1f}' for p in pts) + '"/>'
             body += f'<circle cx="{x}" cy="{yh}" r="12" fill="{BLUE}" stroke="#1d4f80"/>'
-    body += T(W - 24, 76, 'رأس', 15, 'end', INK) + T(W - 24, 156, 'ذيلان', 15, 'end', INK)
     save(P + 'bilayer.svg', svg(W, H, body))
 
 # ---------------- 8) التركيب الأساسي للستيرويد (أربع حلقات) ----------------

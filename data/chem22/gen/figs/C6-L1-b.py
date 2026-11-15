@@ -130,7 +130,7 @@ def main():
     s = axes(x0, y0, x0 + W + 30, y0 - H - 30)
     for t in range(0, 61, 10):
         s += L(X(t), y0, X(t), y0 + 6, INK, 1.5) + T(X(t), y0 + 26, str(t), 16)
-    s += T(x0 + W / 2, y0 + 56, 'درجة الحرارة (°C)', 18, weight='bold')
+    s += T(x0 + W / 2, y0 + 56, 'درجة الحرارة (\u2066°C\u2069)', 18, weight='bold')
     s += f'<text transform="translate({x0 - 30},{y0 - H / 2}) rotate(-90)" text-anchor="middle" font-size="18" fill="{INK}" font-weight="bold" {FONT}>سرعة التفاعل</text>'
     pts = []
     for i in range(0, 121):

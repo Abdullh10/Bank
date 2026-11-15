@@ -68,7 +68,7 @@ def phospholipid():
                 + T((x1 + x2) / 2, yb + 28, lab, 19, 'middle', BLUE, 'bold'))
     xP = ox + 1.1 * U  # ذرة O الجسرية
     xk = ox + 4.7 * U
-    body = bd + brace(round(bb2[0]), round(xP + 10), '(أ)') + brace(round(xk - 6), round(bb2[2]), '(ب)')
+    body = bd + brace(round(bb2[0]), round(xP + 10), '(س)') + brace(round(xk - 6), round(bb2[2]), '(ص)')
     save(P + 'phospholipid.svg', svg(W, H, body))
 
 # ---------------- 4) مناطق الطبقة الثنائية مرقمة 1–4 ----------------
@@ -102,7 +102,7 @@ def beeswax():
     def brace(x1, x2_, lab):
         return (L(x1, yb, x2_, yb, BLUE, 2) + L(x1, yb, x1, yb - 8, BLUE, 2) + L(x2_, yb, x2_, yb - 8, BLUE, 2)
                 + T((x1 + x2_) / 2, yb + 28, lab, 19, 'middle', BLUE, 'bold'))
-    body += brace(x, x2 + 44, '(أ)') + brace(x2 + 72, x2 + 238, '(ب)')
+    body += brace(x, x2 + 44, '(س)') + brace(x2 + 72, x2 + 238, '(ص)')
     save(P + 'beeswax.svg', svg(400, 160, body))
 
 # ---------------- 6) الكولسترول بصيغة هيكلية ----------------
