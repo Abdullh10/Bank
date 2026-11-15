@@ -161,6 +161,13 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   }
   if (p === '/logout') { await client.auth.signOut({ scope: 'local' }); return { ok: true }; } // الخروج من هذا الجهاز فقط
   if (p === '/courses') return rpc('get_courses');
+  // ---------- المواد (تعدد المواد) ----------
+  if (p === '/subjects') return rpc('get_subjects');
+  if (p === '/admin/totals') return rpc('admin_platform_totals');
+  if (p === '/admin/teachers') return rpc('admin_list_teachers');
+  if (p === '/admin/subjects/save') return rpc('admin_save_subject', { p: body });
+  if (p === '/admin/courses/save') return rpc('admin_save_course', { p: body });
+  if (p === '/admin/subjects/teacher') return { n: await rpc('admin_assign_teacher_subject', { p_teacher: body.teacher, p_subject: body.subject, p_mode: body.mode || 'add' }) };
   if (p === '/stats') return rpc('get_stats', { p_course: course });
   if (p === '/chapters') return rpc('get_chapters', { p_course: course });
   if ((m = p.match(/^\/chapters\/(\d+)$/))) return rpc('get_chapter', { p_number: Number(m[1]), p_course: course });

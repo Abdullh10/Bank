@@ -4,6 +4,7 @@ import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
 import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml, printSurveyReport } from './survey.js';
+import { courseOptions, groupCourses, enrollDialog } from './subjects.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -552,7 +553,7 @@ export async function pageAdminStudents(ctx) {
   const courses = ctx.state?.supabase ? (ctx.state.courses || []) : [];
   const cur = ctx.state?.course;
   const courseName = id => courses.find(c => c.id === id)?.code || '';
-  const courseOpts = sel => courses.map(c => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${esc(c.code)}${c.status === 'ready' ? '' : ' (قيد الإعداد)'}</option>`).join('');
+  const courseOpts = sel => courseOptions(courses, ctx.state?.subjects, sel, esc);
   const grades = [...new Set(all.map(s => s.grade).filter(Boolean))].sort();
   if (adminFilter.grade && !grades.includes(adminFilter.grade)) adminFilter.grade = '';
   const sections = [...new Set(all.filter(s => !adminFilter.grade || s.grade === adminFilter.grade).map(s => s.section).filter(Boolean))].sort();
@@ -608,6 +609,7 @@ export async function pageAdminStudents(ctx) {
         <select id="af-sec" aria-label="الشعبة"><option value="">كل الشعب</option>${sections.map(g => `<option ${g === adminFilter.section ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select>
         <input id="af-q" placeholder="بحث بالاسم" value="${esc(adminFilter.q)}" style="max-width:11rem">
         <button type="button" id="as-export">${line('download', 17)}تصدير Excel</button>
+        ${ctx.state?.subjects?.length ? '<button type="button" id="as-enroll-sec">إسناد شعبة لمقرر</button>' : ''}
       </div></div>
       ${list.length ? `<div class="as-bulk" id="as-bulk">
         <label class="st-radio"><input type="checkbox" id="as-all"> تحديد الكل المعروض (${list.length})</label>
@@ -709,6 +711,7 @@ export async function pageAdminStudents(ctx) {
       try { const t = await api('/admin/rank/term', { method: 'POST', body: {} }); info.textContent = `بدأ فصل جديد في ${fmtD(t.startedAt)}.`; toast('بدأ فصل دراسي جديد'); } catch (err) { fail(err); } finally { b.disabled = false; }
     };
   }
+  document.getElementById('as-enroll-sec')?.addEventListener('click', () => enrollDialog({ ...ctx, refresh: async () => refilter() }, { students: all }));
   document.getElementById('af-grade').onchange = e => { adminFilter.grade = e.target.value; adminFilter.section = ''; refilter(); };
   document.getElementById('af-sec').onchange = e => { adminFilter.section = e.target.value; refilter(); };
   document.getElementById('af-q').onchange = e => { adminFilter.q = e.target.value.trim(); refilter(); };
@@ -867,13 +870,13 @@ export async function pageAdminTeam(ctx) {
     row.innerHTML = `<td colspan="5"><div class="tm-assign-box">
       <h3>إسناد «${esc(tr.querySelector('.tm-n').value)}»</h3>
       <fieldset class="tm-courses"><legend>المقررات التي يراها المعلم</legend>
-        ${courses.map(c => `<label class="tm-chk"><input type="checkbox" class="tm-c" value="${c.id}" ${selC.has(c.id) ? 'checked' : ''}> ${esc(c.code)}${c.status === 'ready' ? '' : ' <span class="small muted">(قيد الإعداد: لا يظهر له حتى يصير متاحًا)</span>'}</label>`).join('')}
+        ${groupCourses(courses, ctx.state?.subjects).map(([name, cs]) => `${name ? `<h4 class="tm-subj">${esc(name)}</h4>` : ''}${cs.map(c => `<label class="tm-chk"><input type="checkbox" class="tm-c" value="${c.id}" ${selC.has(c.id) ? 'checked' : ''}> ${esc(c.code)}${c.status === 'ready' ? '' : ' <span class="small muted">(قيد الإعداد: لا يظهر له حتى يصير متاحًا)</span>'}</label>`).join('')}`).join('')}
       </fieldset>
       <fieldset class="tm-studs"><legend>الطلاب الذين يتابع تقدمهم (<span class="tm-count">0</span> مسندًا)</legend>
         <div class="as-filters">
           <select class="tm-fg" aria-label="الصف"><option value="">كل الصفوف</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select>
           <select class="tm-fs" aria-label="الشعبة"><option value="">كل الشعب</option>${sections.map(g => `<option>${esc(g)}</option>`).join('')}</select>
-          <select class="tm-fc" aria-label="المقرر"><option value="">كل المقررات</option>${courses.map(c => `<option value="${c.id}">${esc(c.code)}</option>`).join('')}</select>
+          <select class="tm-fc" aria-label="المقرر"><option value="">كل المقررات</option>${courseOptions(courses, ctx.state?.subjects, null, esc, { status: false })}</select>
           <input class="tm-fq" type="search" placeholder="بحث بالاسم أو اسم المستخدم" aria-label="بحث">
           <button type="button" class="tm-all">تحديد المعروض</button><button type="button" class="tm-none">إلغاء تحديد المعروض</button></div>
         <div class="tm-pick" role="group" aria-label="الطلاب"></div>

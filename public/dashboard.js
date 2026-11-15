@@ -141,7 +141,7 @@ export async function pageDashboard(ctx) {
   document.getElementById('d-print').onclick = () => window.print();
   if (can('review')) {
     const NAMES = { create: 'إنشاء', edit: 'تعديل', status: 'تغيير الحالة', exclude: 'استبعاد', restore: 'إرجاع', duplicate: 'نسخ', approve: 'اعتماد', return: 'إعادة', reset: 'إلغاء الاعتماد' };
-    const ENT = { question: 'سؤال', objective: 'هدف', supplement: 'محتوى مكمّل' };
+    const ENT = { question: 'سؤال', objective: 'هدف', supplement: 'محتوى مكمّل', course: 'مقرر', subject: 'مادة', teacher_subject: 'إسناد معلم لمادة' };
     try {
       const rows = await api('/revisions?limit=30');
       const el = document.getElementById('revs');

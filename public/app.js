@@ -9,13 +9,14 @@ import { pageImpact } from './impact.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
 import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
+import { pageSubjects, pageSubject, renderContext, pushRecent } from './subjects.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 import { startBidi } from './bidi.js';
 import { startMath } from './math.js';
 import { qImages, okImage, MAX_IMAGES } from './media.js';
 const $app = document.getElementById('app');
 const $dlg = document.getElementById('dlg');
-const state = { user: null, selection: new Set(), courses: null, course: null };
+const state = { user: null, selection: new Set(), courses: null, course: null, subjects: null };
 
 // ---------- لمسات العرض ----------
 hydrateIcons(document);
@@ -149,11 +150,16 @@ const BRAND_DEFAULT = $brandSub?.textContent || '';
 function showCourseLine() {
   const c = state.user?.role === 'student' ? state.user.courses?.[0] : state.course;
   if ($brandSub) $brandSub.textContent = c ? courseLine(c) : BRAND_DEFAULT;
+  renderContext({ esc, state, isOwner: can('edit'), choose: switchCourse });
 }
 // قائمة المقررات (مرة بعد الدخول). الخادم المحلي القديم لا يعرف المقررات: مقرر واحد من /stats.
 async function ensureCourses() {
   if (!state.courses) {
-    try { if (!state.supabase) throw 0; state.courses = await apiRaw('/courses'); }
+    try {
+      if (!state.supabase) throw 0;
+      // المواد (لمبدّل السياق ورئيسية المالك). قاعدة لم تُرقَّ بعد إلى المواد: تبقى الواجهة على المقررات وحدها
+      [state.courses, state.subjects] = await Promise.all([apiRaw('/courses'), apiRaw('/subjects').catch(() => [])]);
+    }
     catch {
       const s = await apiRaw('/stats');
       state.courses = [{ id: s.course?.id || 1, code: s.course?.code || 'كيمياء 2-1', title: s.course?.title, grade: s.course?.grade || 'الثاني الثانوي',
@@ -169,10 +175,28 @@ function setCourse(id, go) {
   if (state.course?.id !== c.id) {
     state.course = c; bankCache = null; state.selection.clear(); resetExam();
     for (const k in bankFilter) delete bankFilter[k];
-    supa?.setCourse(c.id); rememberCourse(c.id);
+    supa?.setCourse(c.id); rememberCourse(c.id); pushRecent(c.id);
   }
   showCourseLine();
   if (go) { if (location.hash === '#/course') route(); else location.hash = '#/course'; }
+}
+// التبديل من مبدّل الترويسة: يتغير المقرر وتبقى الصفحة نفسها (البنك يبقى بنكًا). صفحات عنصر بعينه من المقرر السابق
+// (فصل، هدف، دراسة أثر) تنتقل إلى قائمتها في المقرر الجديد.
+function switchCourse(id) {
+  if (state.course?.id === id) return;
+  setCourse(id, false);
+  const [, page, arg] = (location.hash.replace(/^#/, '') || '/').split('/');
+  if (page === 'chapter' || page === 'objective') location.hash = '#/chapters';
+  else if (page === 'impact' && arg) location.hash = '#/impact';
+  else route();
+}
+// بعد إضافة مادة أو مقرر أو تغيير إسناد: تُعاد قراءة المقررات والمواد، ثم يُفتح الرابط المطلوب أو تُعاد الصفحة الحالية
+async function refreshCourses(hash) {
+  const cur = state.course?.id;
+  state.courses = null; state.subjects = null; state.course = null;
+  await ensureCourses();
+  if (cur && state.courses.some(c => c.id === cur)) setCourse(cur, false);
+  if (hash && location.hash !== hash) location.hash = hash; else route();
 }
 
 const OBJ_STATUS = { pending: ['بانتظار المراجعة', ''], approved: ['معتمد', 'ok'], returned: ['أُعيد للتعديل', 'bad'] };
@@ -245,7 +269,7 @@ async function pageHome() {
       <div class="actions no-print">
         <a class="btn primary" href="#/chapters">${icon('chapters', 22, 'navy')}تصفح الفصول</a>
         ${can('bank') ? '<a class="btn" href="#/bank">بنك الأسئلة</a>' : ''}
-        <a class="btn" href="#/">${line('prev', 16)}كل المقررات</a>
+        <a class="btn" href="${can('edit') && state.course?.subjectId && state.subjects?.length ? '#/subject/' + encodeURIComponent(state.course.subjectId) : '#/'}">${line('prev', 16)}كل المقررات</a>
       </div>
     </div>
     ${s.course?.status === 'preparing' ? `<p class="notice warn">هذا المقرر <b>قيد الإعداد</b> ولا يظهر لغير مالك المشروع. تُضاف أهدافه وأسئلته في مرحلة المحتوى.</p>` : ''}
@@ -333,7 +357,7 @@ function signedOut() {
   state.selection.clear();
   Object.assign(objState, { mode: 'test', answers: {} });
   if ($dlg.open) $dlg.close();
-  state.user = null; state.courses = null; state.course = null; supa?.setCourse(null); showCourseLine(); renderUserbox();
+  state.user = null; state.courses = null; state.course = null; state.subjects = null; supa?.setCourse(null); showCourseLine(); renderUserbox();
   if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
 }
 
@@ -1016,7 +1040,7 @@ async function route() {
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
     a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))
-    || (a.dataset.nav === 'students' && page === 'team') || (a.dataset.nav === 'home' && page === 'course')));
+    || (a.dataset.nav === 'students' && page === 'team') || (a.dataset.nav === 'home' && ['course', 'subject'].includes(page))));
   document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
   // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
   const locked = !state.user || state.user.role === 'pending';
@@ -1059,7 +1083,11 @@ async function route() {
       $app.innerHTML = `<div class="empty"><h2>لا يوجد مقرر مسند لحسابك بعد</h2><p>يسند مالك المشروع المقررات والطلاب للمعلم من «حسابات الفريق»؛ تواصل معه ثم أعد فتح الصفحة.</p></div>`;
       return;
     }
-    if (!page) pageCourses({ esc, $app, courses: state.courses, current: state.course, isOwner: can('edit'), select: setCourse });
+    // رئيسية مالك المشروع: «المواد» (تبقى صفحة المقررات لغيره، وللقاعدة التي لم تُرقَّ بعد إلى المواد)
+    const sctx = { esc, $app, state, api, fail, toast, select: setCourse, refresh: refreshCourses };
+    if (!page && can('edit') && state.subjects?.length) await pageSubjects(sctx);
+    else if (!page) pageCourses({ esc, $app, courses: state.courses, current: state.course, isOwner: can('edit'), select: setCourse });
+    else if (page === 'subject' && can('edit') && state.subjects?.length) await pageSubject(sctx, decodeURIComponent(arg || ''));
     else if (page === 'course') await pageHome();
     else if (page === 'chapters') await pageChapters();
     else if (page === 'chapter') await pageChapter(arg);

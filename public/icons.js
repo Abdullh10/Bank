@@ -109,6 +109,17 @@ export function icon(name, size = 24, tone = TONE[name] || 'navy', cls = '') {
 
 // أيقونات خطية صغيرة بلون النص (للأزرار والحقول)
 const LINES = {
+  // رموز المواد (تُرسم بيضاء داخل بلاطة بلون المادة؛ القائمة نفسها في admin_save_subject بقاعدة البيانات)
+  flask: '<path d="M9 3h6M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.2 15h9.6"/>',
+  atom: '<ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(-60 12 12)"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+  leaf: '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19l8-8"/>',
+  sigma: '<path d="M17 5H7l6 7-6 7h10"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.2-3.6-8.5S9.6 5.9 12 3.5z"/>',
+  book: '<path d="M12 6.5c-2.4-1.8-5.2-2.2-8-1.8v13c2.8-.4 5.6 0 8 1.8 2.4-1.8 5.2-2.2 8-1.8v-13c-2.8-.4-5.6 0-8 1.8z"/><path d="M12 6.5v13"/>',
+  dna: '<path d="M7 3c0 6 10 6 10 12s-10 3-10 6M17 3c0 6-10 6-10 12s10 3 10 6"/><path d="M8.5 7h7M8.5 17h7"/>',
+  calc: '<rect x="5.5" y="3" width="13" height="18" rx="2.4"/><path d="M8.5 6.5h7v3h-7zM9 13h.01M12 13h.01M15 13h.01M9 17h.01M12 17h.01M15 17h.01"/>',
+  swap: '<path d="M7 4 4 7l3 3M4 7h12M17 20l3-3-3-3M20 17H8"/>',
+  chev: '<path d="m7 10 5 5 5-5"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   user: '<circle cx="12" cy="8.5" r="3.8"/><path d="M4.8 20c.6-3.9 3.6-6.4 7.2-6.4s6.6 2.5 7.2 6.4"/>',
   lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8.3 10.5V8a3.7 3.7 0 0 1 7.4 0v2.5"/>',
