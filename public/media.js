@@ -4,8 +4,8 @@ export const IMG_SRC = /^(qimg\/[A-Za-z0-9._/-]+\.(png|jpe?g|webp|gif|svg)|https
 export const MAX_IMAGES = 4;
 // الوصف البديل قد يصف المخطط كاملًا (لقارئ الشاشة)؛ القصير يُعرض تعليقًا تحت الصورة والطويل يبقى وصفًا بديلًا فقط
 export const MAX_ALT = 1000, CAPTION_MAX = 200;
-// رسوم كيمياء 2-2 (qimg/chem22/) وصفها البديل يصف الشكل كاملًا وقد يكشف الإجابة، فلا يُعرض تعليقًا تحت الصورة أبدًا
-const showCaption = im => !!im.alt && im.alt.length <= CAPTION_MAX && !im.src.startsWith('qimg/chem22/');
+// رسوم كيمياء 2-2 وفيزياء 1 (qimg/chem22/، qimg/phys1/) وصفها البديل يصف الشكل كاملًا وقد يكشف الإجابة، فلا يُعرض تعليقًا تحت الصورة أبدًا
+const showCaption = im => !!im.alt && im.alt.length <= CAPTION_MAX && !/^qimg\/(chem22|phys1)\//.test(im.src);
 export const okImage = im => !!im && typeof im.src === 'string' && IMG_SRC.test(im.src) && !im.src.includes('..') && String(im.alt ?? '').length <= MAX_ALT;
 
 const escAttr = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
