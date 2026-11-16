@@ -71,7 +71,7 @@ graph('c2l3-o01-start.svg', [{'pts': [(0, 20), (6, 50)]}], (0, 6), (0, 60), TL, 
 panels('c2l3-o02-panels.svg', [
     dict(series=[{'pts': [(0, 30), (4, 10)]}], xr=(0, 4), yr=(0, 40), xs=1, ys=10),
     dict(series=[{'pts': [(0, 10), (4, 30)]}], xr=(0, 4), yr=(0, 40), xs=1, ys=10),
-    dict(series=[{'pts': [(10, 0), (30, 4)]}], xr=(0, 40), yr=(0, 4), xs=10, ys=1, xlabel=DL, ylabel='الزمن t (s)'),
+    dict(series=[{'pts': [(10, 0), (30, 4)]}], xr=(0, 40), yr=(0, 4), xs=10, ys=1, xlabel=DL, ylabel=TL),
     dict(series=[{'pts': [(0, 0), (4, 20)]}], xr=(0, 4), yr=(0, 40), xs=1, ys=10),
 ])
 
@@ -165,7 +165,7 @@ def three(name, ts, ds, ystep, ymax):
     tx, ty, cw, rh = 20, 30, 80, 30
     b += T(tx + cw, 20, 'جدول البيانات', 14, weight='bold')
     b += RECT(tx, ty, cw, rh, fill='#e3ecf6') + RECT(tx + cw, ty, cw, rh, fill='#e3ecf6')
-    b += T(tx + cw / 2, ty + 20, 't (s)', 14) + T(tx + cw * 1.5, ty + 20, 'd (m)', 14)
+    b += T(tx + cw / 2, ty + 20, 'الزمن (s)', 13) + T(tx + cw * 1.5, ty + 20, 'الموقع (m)', 13)
     for i, (t, d) in enumerate(zip(ts, ds)):
         yy = ty + rh * (i + 1)
         b += RECT(tx, yy, cw, rh, fill='#fff') + RECT(tx + cw, yy, cw, rh, fill='#fff')
