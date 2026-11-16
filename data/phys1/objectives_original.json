@@ -9,9 +9,10 @@
  "source": {
   "file": "أهداف مادة الفيزياء 1 مسارات (PDF، 6 وحدات و18 درسًا)",
   "structure_basis": "ملف الأهداف المرفق من المستخدم بتاريخ 2026-11-16",
-  "content_basis": "",
+  "content_basis": "كتاب الطالب فيزياء 1 (نظام المسارات، طبعة 1447)، ص8–183",
   "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف.",
-  "option_count": 4
+  "option_count": 4,
+  "added_objectives": 57
  },
  "chapters": [
   {
@@ -141,6 +142,34 @@
        "text": "ان يستخدم الطالب الخارطة المفاهيمية لوصف خطوات حل المشكلة.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O21",
+       "text": "أن يقوّم الطالب الجواب العددي لمسألة فيزيائية من حيث صحة الوحدات ومنطقية القيمة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L1-O22",
+       "text": "أن يقارن الطالب بين القانون العلمي والنظرية العلمية، وبين الفرضية والنظرية العلمية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L1-O23",
+       "text": "أن يفسّر الطالب سبب مراجعة النماذج والنظريات العلمية أو تعديلها عند ظهور مشاهدات وبيانات جديدة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L1-O24",
+       "text": "أن يمثّل الطالب بيانات تجربة بيانيًا، ويرسم خط المواءمة الأفضل، ويستخدمه لكتابة معادلة تربط المتغيرين والتوقع بقيم جديدة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -255,6 +284,34 @@
        "text": "ان يعلل الطالب تأثير اختلاف زاوية النظر في دقة القياسات التي يجريها.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O19",
+       "text": "أن يميّز الطالب بين الدقة والضبط في القياس.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L2-O20",
+       "text": "أن يعبّر الطالب عن نتيجة القياس متضمنة خطأ القياس، مثل (14.6 ± 0.2) cm.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L2-O21",
+       "text": "أن يستخدم الطالب تحليل الوحدات للتحقق من صحة المعادلة أو الإجابة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C1-L2-O22",
+       "text": "أن يعرّف الطالب تحليل الوحدات ومعامل التحويل.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -303,6 +360,20 @@
        "text": "ان يصف الطالب حالة الجسم المتحرك من خلال نموذج الجسيم النقطي.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O07",
+       "text": "أن يمثّل الطالب حركة جسم بالمخطط التوضيحي للحركة من صور متتابعة ملتقطة في فترات زمنية متساوية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C2-L1-O08",
+       "text": "أن يحدد الطالب شرط استخدام نموذج الجسيم النقطي لتمثيل حركة جسم.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -417,6 +488,13 @@
        "text": "ان يحدد الطالب المحصلة على الرسم",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O19",
+       "text": "أن يوضّح الطالب أن النظام الإحداثي المختار يؤثر في إشارة مواقع الأجسام، ولا يغيّر مقدار متجه الإزاحة واتجاهه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -471,6 +549,20 @@
        "text": "ان يستخدم الطالب منحنى ( الموقع – الزمن ) في دراسة حركة عدة اجسام",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O09",
+       "text": "أن يحدد الطالب إزاحة جسم خلال فترة زمنية معينة من منحنى (الموقع – الزمن).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C2-L3-O10",
+       "text": "أن يفسّر الطالب أن منحنى (الموقع – الزمن) لا يمثل مسار حركة الجسم، وأن تقاطع خطّي جسمين فيه يعني وجودهما في الموقع نفسه ولا يعني بالضرورة تصادمهما.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -555,6 +647,27 @@
        "text": "ان يوضح الطالب استخدام معادلة الحركة",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O14",
+       "text": "أن يمثّل الطالب السرعة المتجهة المتوسطة على المخطط التوضيحي للحركة بمتجهات تتناسب أطوالها مع مقدارها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C2-L4-O15",
+       "text": "أن يحدد الطالب الموقع الابتدائي لجسم من نقطة تقاطع منحنى (الموقع – الزمن) مع محور الموقع.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C2-L4-O16",
+       "text": "أن يصمّم الطالب تمثيلات تصويرية وفيزيائية ورياضية لمسائل الحركة قبل حلها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -627,6 +740,20 @@
        "text": "أن يبين الطالب ما يمثله ميل الخط البياني لمنحنى ( السرعة المتجهة –الزمن.)",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O11",
+       "text": "أن يصف الطالب التغيرات في السرعة المتجهة لجسم وفي تسارعه من منحنى (السرعة المتجهة – الزمن).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L1-O12",
+       "text": "أن يستنتج الطالب أن تغيّر اتجاه حركة الجسم يُكسبه تسارعًا، ويحسب التسارع المتوسط في هذه الحالة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -693,6 +820,27 @@
        "text": "أن يطبق الطالب معادلات الحركة بتسارع ثابت",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O11",
+       "text": "أن يفسّر الطالب منحنى (الموقع – الزمن) للحركة بتسارع ثابت، ويستخدم ميول مماساته لرسم منحنى (السرعة المتجهة – الزمن) المقابل.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L2-O12",
+       "text": "أن يشتق الطالب معادلتي الحركة بتسارع ثابت Δd = v_i t + ½ ā t² و v_f² = v_i² + 2 ā Δd من المساحة تحت منحنى (السرعة المتجهة – الزمن) وبحذف الزمن.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L2-O13",
+       "text": "أن يحل الطالب مسائل حركة متعددة المراحل (سرعة منتظمة ثم تسارع ثابت) مثل حساب مسافتي الاستجابة والفرملة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -717,6 +865,41 @@
        "text": "أن يميز الطالب بين تسارع الجاذبية الأرضية الموجب والسالب.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C3-L3-O04",
+       "text": "أن يعرّف الطالب التسارع الناتج عن الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L3-O05",
+       "text": "أن يستنتج الطالب أن جميع الأجسام التي تسقط سقوطًا حرًا لها التسارع نفسه بغض النظر عن كتلتها أو نوع مادتها، ويفسّر اختلاف سقوط الأجسام الخفيفة المنبسطة بتأثير مقاومة الهواء.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L3-O06",
+       "text": "أن يحل الطالب مسائل تتضمن أجسامًا تسقط سقوطًا حرًا أو تُقذف رأسيًا باستخدام معادلات الحركة بتسارع ثابت.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L3-O07",
+       "text": "أن يستنتج الطالب أن السرعة المتجهة لجسم مقذوف رأسيًا إلى أعلى تساوي صفرًا عند أقصى ارتفاع، بينما يبقى تسارعه مساويًا g في اتجاه الأسفل.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C3-L3-O08",
+       "text": "أن يعيّن الطالب تجريبيًا قيمة التسارع الناتج عن الجاذبية الأرضية g باستخدام المؤقت ذي الشريط والتمثيل البياني، ويحسب الخطأ النسبي في القيمة التجريبية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -927,6 +1110,34 @@
        "text": "أن يستنتج الطالب صيغة قانون نيوتن الثاني عندما تؤثر فيه قوة الجاذبية الأرضية.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O34",
+       "text": "أن يرسم الطالب مخطط الجسم الحر لجسم ما، محددًا النظام وجميع القوى المؤثرة فيه ومسبباتها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L1-O35",
+       "text": "أن يصنّف الطالب القوى إلى قوى تلامس وقوى مجال، ويميّز الكميات التي ليست قوى (مثل الكتلة والقصور الذاتي والتسارع).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L1-O36",
+       "text": "أن يستنتج الطالب العلاقة العكسية بين تسارع الجسم وكتلته عند ثبات القوة المحصلة، ويفسّر ميل منحنى (التسارع – القوة) بأنه مقلوب الكتلة (1/m).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L1-O37",
+       "text": "أن يستقصي الطالب تجريبيًا العلاقة بين القوة المحصلة المؤثرة في جسم ينزلق وكتلته، بحساب تسارعه المتوسط وتمثيل النتائج بيانيًا.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1005,6 +1216,27 @@
        "text": "أن يعرف الطالب السرعة الحدية.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O13",
+       "text": "أن يحسب الطالب قراءة الميزان (الوزن الظاهري) لشخص يقف على ميزان داخل مصعد متسارع إلى أعلى أو إلى أسفل، باستخدام مخطط الجسم الحر وقانون نيوتن الثاني.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L2-O14",
+       "text": "أن يوضّح الطالب أن الميزان المنزلي (النابضي) يقيس الوزن لا الكتلة، من خلال اتزان قوة النابض F_sp مع الوزن F_g.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L2-O15",
+       "text": "أن يفسّر الطالب وصول جسم ساقط في الهواء إلى السرعة الحدّية بتزايد القوة المعيقة حتى تساوي وزنه فتنعدم القوة المحصلة وتسارعه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1071,6 +1303,27 @@
        "text": "أن يبين الطالب أن القوة العمودية دائما يكون اتجاهها عموديا على مستوى التلامس.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O11",
+       "text": "أن يحدد الطالب مقدار القوة العمودية المؤثرة في جسم بتطبيق قانون نيوتن الثاني، ويستنتج أنها لا تساوي وزن الجسم دائمًا.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L3-O12",
+       "text": "أن يميّز الطالب بين قوتَي زوجَي التأثير المتبادل وقوتين متعاكستين تؤثران في الجسم نفسه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C4-L3-O13",
+       "text": "أن يفسّر الطالب عدم ملاحظة تسارع الأرض الناتج عن تأثير جسم صغير فيها، رغم تساوي قوتَي زوجَي التأثير المتبادل بينهما.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1119,6 +1372,41 @@
        "text": "أن يطبق الطالب في أمثلة ومسائل لجمع المتجهات جبريا لايجاد المتجه المحصل.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O07",
+       "text": "أن يجمع الطالب متجهين أو أكثر في بُعدين بطريقة الرسم بوضع ذيل كل متجه عند رأس المتجه السابق، ثم يقيس مقدار المتجه المحصل واتجاهه بالمسطرة والمنقلة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L1-O08",
+       "text": "أن يحلّل الطالب متجهًا إلى مركّبتيه الأفقية والرأسية باستعمال العلاقتين A_x = A cos θ و A_y = A sin θ.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L1-O09",
+       "text": "أن يعرّف الطالب كلًّا من: مركّبتي المتجه، وتحليل المتجه، وزاوية المتجه المحصل.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L1-O10",
+       "text": "أن يحدّد الطالب إشارة كل من مركّبتي المتجه وفق الربع الذي يقع فيه المتجه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L1-O11",
+       "text": "أن يختار الطالب نظامًا إحداثيًّا مناسبًا (نقطة الأصل واتجاها المحورين x و y) لتحليل مسألة في بُعدين، ويقيس اتجاه المتجه بالزاوية التي يصنعها مع محور x الموجب في عكس اتجاه حركة عقارب الساعة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1173,6 +1461,27 @@
        "text": "أن يحل الطالب مسائل حسابية على الاحتكاك.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O09",
+       "text": "أن يحدّد الطالب العوامل التي تعتمد عليها قوة الاحتكاك (نوع مادتي السطحين والقوة العمودية بينهما)، ويبيّن أنها لا تعتمد على مساحة سطحي التلامس ولا على سرعة الحركة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L2-O10",
+       "text": "أن يقارن الطالب بين الاحتكاك السكوني والاحتكاك الحركي من حيث شرط النشوء والعلاقة الرياضية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L2-O11",
+       "text": "أن يحدّد الطالب عمليًا معاملي الاحتكاك السكوني والحركي لجسم على سطح أفقي باستعمال الميزان النابضي، ويقارن قيمة tan θ لزاوية بدء الانزلاق على سطح مائل بمعامل الاحتكاك السكوني.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1209,6 +1518,27 @@
        "text": "أن يحل الطالب مسائل حسابية على حركة جسم على سطح مائل أملس أو خشن.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C5-L3-O06",
+       "text": "أن يحلّل الطالب وزن جسم موضوع على سطح مائل إلى مركّبتين: موازية للسطح F_gx = F_g sin θ وعمودية عليه F_gy = F_g cos θ.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L3-O07",
+       "text": "أن يرسم الطالب مخطط الجسم الحر لجسم على سطح مائل، مختارًا نظامًا إحداثيًّا يكون فيه المحور x موازيًا للسطح والمحور y عموديًا عليه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C5-L3-O08",
+       "text": "أن يفسّر الطالب لماذا لا تساوي القوة العمودية بين جسم وسطح مائل وزن الجسم، ويحسبها من العلاقة F_N = mg cos θ.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1299,6 +1629,34 @@
        "text": "أن يوضح الطالب أثر مقاومة الهواء في حركة المقذوفات.",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O14",
+       "text": "أن يوضّح الطالب أن الحركتين الأفقية والرأسية للمقذوف مستقلتان، مستشهدًا بمقارنة كرة مقذوفة أفقيًا بأخرى تسقط سقوطًا حرًّا من الارتفاع نفسه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L1-O15",
+       "text": "أن يعرّف الطالب كلًّا من: مسار المقذوف، والمدى الأفقي، وزمن التحليق.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L1-O16",
+       "text": "أن يستنتج الطالب تماثل حركة المقذوف الذي يعود إلى مستوى إطلاقه: زمن الصعود يساوي زمن النزول، ومقدار السرعة الرأسية متساوٍ عند الارتفاع نفسه صعودًا ونزولًا.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L1-O17",
+       "text": "أن يفسّر الطالب كيف يعتمد شكل مسار المقذوف على الإطار المرجعي الذي يُلاحَظ منه.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1371,6 +1729,27 @@
        "text": "ان يوضح الطالب المقصود بقوة الطرد المركزي",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O12",
+       "text": "أن يعرّف الطالب الزمن الدوري ويحسب مقدار سرعة جسم يتحرك حركة دائرية منتظمة من العلاقة v = 2πr/T.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L2-O13",
+       "text": "أن يحدّد الطالب اتجاه متجه السرعة (مماسي للمسار وعمودي على متجه الموقع) واتجاه متجه التسارع (نحو المركز) لجسم يتحرك حركة دائرية منتظمة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L2-O14",
+       "text": "أن يطبّق الطالب القانون الثاني لنيوتن في الحركة الدائرية (F_محصلة = m a_c) باختيار محورين: مركزي (c) ومماسي (tang).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1389,6 +1768,27 @@
        "text": "ان يوضح الطالب السرعة النسبية المتجهة لجسم باستخدام رسم متجهات السرعة",
        "thinking_level_source": "",
        "status": "pending"
+      },
+      {
+       "id": "P1-C6-L3-O03",
+       "text": "أن يكتب الطالب معادلة السرعة المتجهة النسبية v_a/c = v_a/b + v_b/c ويفسّر دلالة رموزها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L3-O04",
+       "text": "أن يحسب الطالب السرعة المتجهة النسبية في بُعد واحد بالجمع عندما تكون الحركتان في الاتجاه نفسه، وبالطرح عندما تكونان متعاكستين.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P1-C6-L3-O05",
+       "text": "أن يحلّل الطالب حالات يكون فيها نظام المحاور (الإطار المرجعي) متحركًا، مثل قارب في نهر جارٍ أو طائرة تهب عليها رياح.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
