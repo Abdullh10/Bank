@@ -1,0 +1,1398 @@
+{
+ "course": {
+  "subject": "الفيزياء",
+  "code": "فيزياء 1",
+  "grade": "الأول الثانوي",
+  "term": "الثاني",
+  "country": "السعودية"
+ },
+ "source": {
+  "file": "أهداف مادة الفيزياء 1 مسارات (PDF، 6 وحدات و18 درسًا)",
+  "structure_basis": "ملف الأهداف المرفق من المستخدم بتاريخ 2026-11-16",
+  "content_basis": "",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف.",
+  "option_count": 4
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "مدخل إلى علم الفيزياء",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الرياضيات والفيزياء",
+     "objectives": [
+      {
+       "id": "P1-C1-L1-O01",
+       "text": "ان يعرف الطالب الفيزياء",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O02",
+       "text": "ان يذكر الطالب مجالات الدراسة لعلماء الفيزياء",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O03",
+       "text": "ان يعدد الطالب مجالات ومهن دارسو الفيزياء",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O04",
+       "text": "ان يوضح الطالب كيفية استخدام الفيزياء للرياضيات",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O05",
+       "text": "ان يجري الطالب العمليات الحسابية وفقا للقوانين الفيزيائية ، واستخدام التعبير العلمي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O06",
+       "text": "ان يكتب الطالب المعادلات الرياضية في الفيزياء بدلالات مختلفة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O07",
+       "text": "ان يوضح الطالب المقصود بالطريقة العلمية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O08",
+       "text": "ان يعرف الطالب الفرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O09",
+       "text": "ان يحدد الطالب نوع العلاقة( طردية او عكسية ) بين الكميات الفيزيائية في علاقة ما",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O10",
+       "text": "ان يحدد الطالب المتغير المستقل والمتغير التابع في تجربة عملية ما.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O11",
+       "text": "ان يوضح الطالب خطوات اختبار صحة الفرضية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O12",
+       "text": "ان يوضح الطالب المقصود بالنماذج العلمية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O13",
+       "text": "ان يعرف الطالب القانون العلمي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O14",
+       "text": "ان يوضح الطالب المقصود بالنظرية العلمية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O15",
+       "text": "ان يذكر الطالب امثلة على قوانين علمية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O16",
+       "text": "ان يوضح الطالب سمات القانون العلمي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O17",
+       "text": "ان يذكر الطالب أمثلة على النظرية العلمية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O18",
+       "text": "ان يعدد الطالب عناصر البناء العلمي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O19",
+       "text": "ان يوضح الطالب سمات النظرية العلمية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L1-O20",
+       "text": "ان يستخدم الطالب الخارطة المفاهيمية لوصف خطوات حل المشكلة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "القياس",
+     "objectives": [
+      {
+       "id": "P1-C1-L2-O01",
+       "text": "ان يوضح الطالب المقصود بالقياس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O02",
+       "text": "ان يعلل الطالب وجود النظام الدولي للوحدات",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O03",
+       "text": "ان يذكر الطالب الكميات الأساسية في النظام الدولي للوحدات",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O04",
+       "text": "ان يذكر الطالب وحدات القياس للكميات الأساسية في النظام الدولي للوحدات",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O05",
+       "text": "ان يفرق الطالب بين الكميات الأساسية والكميات المشتقة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O06",
+       "text": "ان يوضح الطالب البادئات المستخدمة مع وحدات النظام الدولي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O07",
+       "text": "ان يستخدم الطالب تحليل الوحدات للتحويل من وحدة الى أخرى.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O08",
+       "text": "ان يوضح الطالب المقصود بدقة القياس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O09",
+       "text": "ان يحدد الطالب العوامل المؤثرة في دقة القياس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O10",
+       "text": "ان يحسب الطالب دقة القياس لاداة قياس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O11",
+       "text": "ان يحدد الطالب القياس الأكثر دقة في تجربة ما.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O12",
+       "text": "ان يوضح الطالب المقصود بالضبط.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O13",
+       "text": "ان يوضح الطالب المقصود بالقيمة المقبولة في القياس",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O14",
+       "text": "ان يوضح الطالب المقصود بمعايرة النقطتين عند ضبط أجهزة القياس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O15",
+       "text": "ان يعلل الطالب ضرورة اجراء الضبط الدوري لأجهزة القياس في المختبر.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O16",
+       "text": "ان يصف الطالب الطريقة الصحيحة في القياس",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O17",
+       "text": "ان يحدد الطالب القياسات الأكثر ضبطا في تجربة ما.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C1-L2-O18",
+       "text": "ان يعلل الطالب تأثير اختلاف زاوية النظر في دقة القياسات التي يجريها.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "تمثيل الحركة",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "تصوير الحركة",
+     "objectives": [
+      {
+       "id": "P1-C2-L1-O01",
+       "text": "ان يذكر الطالب أنواع الحركة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O02",
+       "text": "ان يوضح الطالب المحددات التي يرتبط بها وصف الحركة لجسم ما.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O03",
+       "text": "ان يوضح الطالب المقصود بالمخطط التوضيحي للحركة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O04",
+       "text": "ان يعرف الطالب نموذج الجسيم النقطي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O05",
+       "text": "ان يستخدم الطالب نموذج الجسيم النقطي للتعبير عن حركة جسم ساكن ، يتحرك بسرعة ثابتة ، يتحرك بسرعة متغيرة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L1-O06",
+       "text": "ان يصف الطالب حالة الجسم المتحرك من خلال نموذج الجسيم النقطي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الموقع والزمن",
+     "objectives": [
+      {
+       "id": "P1-C2-L2-O01",
+       "text": "ان يوضح الطالب المقصود بالنظام الاحداثي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O02",
+       "text": "ان يعرف الطالب نقطة الأصل في النظام الاحداثي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O03",
+       "text": "ان يوضح الطالب المقصود بالموقع.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O04",
+       "text": "ان يوضح الطالب المقصود بالكميات الفيزيائية المتجهة والكميات الفيزيائية القياسية ( العددية)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O05",
+       "text": "ان يذكر الطالب امثلة على كميات فيزيائية متجهة وكميات فيزيائية قياسية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O06",
+       "text": "ان يوضح الطالب كيفية تمثيل الكميات الفيزيائية المتجهة بالرسم.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O07",
+       "text": "ان يعرف الطالب الازاحة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O08",
+       "text": "ان يعرف الطالب المسافة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O09",
+       "text": "ان يوضح الطالب كيفية جمع ( متجهين ) ازاحتين بيانيا ( بالرسم)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O10",
+       "text": "ان يعرف الطالب المحصلة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O11",
+       "text": "ان يوضح الطالب المقصود بالفترة الزمنية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O12",
+       "text": "ان يحسب الطالب الفترة الزمنية لحركة جسم.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O13",
+       "text": "ان يفرق الطالب بين المسافة والازاحة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O14",
+       "text": "ان يحسب الطالب الازاحة والمسافة لجسم متحرك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O15",
+       "text": "ان يرسم الطالب متجهات الازاحة على نموذج الجسيم النقطي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O16",
+       "text": "ان يوضح الطالب كيف تطرح الكميات المتجهة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O17",
+       "text": "ان يوضح الطالب شروط نقل المتجه",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L2-O18",
+       "text": "ان يحدد الطالب المحصلة على الرسم",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "منحنى (الموقع – الزمن)",
+     "objectives": [
+      {
+       "id": "P1-C2-L3-O01",
+       "text": "ان يوضح الطالب المقصود بمنحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O02",
+       "text": "ان يرسم الطالب منحنى ( الموقع – الزمن ) لجسم ما.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O03",
+       "text": "ان يوضح الطالب المقصود بالموقع اللحظي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O04",
+       "text": "ان يستنتج الطالب موقع الجسم من خلال منحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O05",
+       "text": "ان يصف الطالب حركة جسم من خلال منحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O06",
+       "text": "ان يصف الطالب حركة جسم باستخدام التمثيلات المتكافئة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O07",
+       "text": "ان يوضح الطالب المقصود بالتمثيلات المتكافئة لوصف حركة جسم.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L3-O08",
+       "text": "ان يستخدم الطالب منحنى ( الموقع – الزمن ) في دراسة حركة عدة اجسام",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 4,
+     "title": "السرعة المتجهة",
+     "objectives": [
+      {
+       "id": "P1-C2-L4-O01",
+       "text": "ان يعرف الطالب السرعة المتجهة المتوسطة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O02",
+       "text": "ان يوضح الطالب المقصود بان يتحرك جسم أسرع من جسم آخر وفق مفهوم السرعة المتجهة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O03",
+       "text": "ان يبين الطالب ما يمثله ميل الخط البياني لمنحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O04",
+       "text": "ان يحسب الطالب السرعة المتجهة المتوسطة من منحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O05",
+       "text": "ان يوضح الطالب دلالات انحدار منحنى ( الموقع – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O06",
+       "text": "ان يعرف الطالب السرعة المتوسطة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O07",
+       "text": "ان يقارن الطالب بين مفهومي السرعة المتجهة المتوسطة والسرعة المتوسطة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O08",
+       "text": "ان يرتب الطالب منحنيات ( الموقع – الزمن ) لعدة اجسام وفق السرعة المتجهة المتوسطة والسرعة المتوسطة لها.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O09",
+       "text": "ان يرتب الطالب منحنيات ( الموقع – الزمن ) لعدة اجسام وفق السرعة المتوسطة لها.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O10",
+       "text": "ان يوضح الطالب المقصود بالسرعة المتجهة اللحظية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O11",
+       "text": "ان يوضح الطالب متى تكون حركة جسم ما منتظمة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O12",
+       "text": "ان يكتب الطالب معادلة الحركة بدلالة السرعة المتجهة المتوسطة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C2-L4-O13",
+       "text": "ان يوضح الطالب استخدام معادلة الحركة",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "الحركة المتسارعة",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "التسارع (العجلة)",
+     "objectives": [
+      {
+       "id": "P1-C3-L1-O01",
+       "text": "أن يعرف الطالب التسارع (العجلة)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O02",
+       "text": "أن يستنتج الطالب وحدة قياس التسارع",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O03",
+       "text": "أن يبين الطالب العلاقة بين السرعة المتجهة والتسارع",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O04",
+       "text": "أن يفرق الطالب بين أنواع التسارع من حيث الاتجاه",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O05",
+       "text": "أن يميز الطالب بين الحركة المنتظمة والحركة الغير منتظمة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O06",
+       "text": "أن يصف الطالب حركة جسم تتغير سرعته باستخدام نموذج الجسيم النقطي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O07",
+       "text": "أن يستنتج الطالب الحالة الحركية لجسم من نموذج الجسيم النقطي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O08",
+       "text": "أن يوضح الطالب المقصود بمنحنى ( السرعة المتجهة – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O09",
+       "text": "أن يرسم الطالب منحنى (السرعة المتجهة – الزمن) لجسم ما",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L1-O10",
+       "text": "أن يبين الطالب ما يمثله ميل الخط البياني لمنحنى ( السرعة المتجهة –الزمن.)",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الحركة بتسارع ثابت",
+     "objectives": [
+      {
+       "id": "P1-C3-L2-O01",
+       "text": "أن يوضح الطالب ماذا يعني أن الجسم يتحرك بتسارع ثابت.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O02",
+       "text": "أن يعرف الطالب التسارع المتوسط",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O03",
+       "text": "أن يعرف الطالب التسارع اللحظي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O04",
+       "text": "أن يحسب الطالب التسارع اللحظي من منحنى ( السرعة المتجهة – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O05",
+       "text": "أن يحل الطالب مسائل على التسارع المتوسط",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O06",
+       "text": "أن يوضح الطالب ما تمثله المساحة تحت منحنى ( السرعة المتجهة – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O07",
+       "text": "أن يحسب الطالب الإزاحة من منحنى ( السرعة المتجهة – الزمن)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O08",
+       "text": "أن يستنتج الطالب أن المساحة تحت منحنى ( التسارع – الزمن ) تساوي سرعة الجسم",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O09",
+       "text": "أن يستنتج الطالب العلاقة بين السرعة المتجهة بدلالة التسارع المتوسط",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L2-O10",
+       "text": "أن يطبق الطالب معادلات الحركة بتسارع ثابت",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "السقوط الحر",
+     "objectives": [
+      {
+       "id": "P1-C3-L3-O01",
+       "text": "أن يعرف الطالب السقوط الحر .",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L3-O02",
+       "text": "أن يعرف الطالب الرمز المستخدم في تسارع الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C3-L3-O03",
+       "text": "أن يميز الطالب بين تسارع الجاذبية الأرضية الموجب والسالب.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "القوى في بعد واحد",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "القوة والحركة",
+     "objectives": [
+      {
+       "id": "P1-C4-L1-O01",
+       "text": "أن يعرف الطالب القوة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O02",
+       "text": "أن يوضح الطالب ما يحدث لجسم ما عندما تؤثر فيه قوة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O03",
+       "text": "أن يفرق الطالب بين النظام ومحيط النظام ( الخارجي. )",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O04",
+       "text": "أن يعرف الطالب قوى التلامس ( التماس. )",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O05",
+       "text": "أن يعرف الطالب قوة المجال.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O06",
+       "text": "أن يستنتج الطالب العلاقة بين القوة والتسارع.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O07",
+       "text": "أن يعرف الطالب النيوتن.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O08",
+       "text": "أن يستنتج الطالب كيفية جمع القوى.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O09",
+       "text": "أن يعرف الطالب قانون نيوتن الثاني.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O10",
+       "text": "أن يطبق الطالب في العلاقة الرياضية لقانون نيوتن الثاني.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O11",
+       "text": "أن يعرف الطالب قانون نيوتن الأول.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O12",
+       "text": "أن يعرف الطالب القصور الذاتي وعلاقته بقانون نيوتن الأول.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O13",
+       "text": "أن يطبق الطالب في قانون القصور الذاتي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O14",
+       "text": "أن يعرف الطالب الاتزان.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O15",
+       "text": "أن يعرف الطالب قوة الاحتكاك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O16",
+       "text": "أن يحدد الطالب اتجاه قوة الاحتكاك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O17",
+       "text": "أن يذكرالطالب رمز قوة الاحتكاك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O18",
+       "text": "أن يعرف الطالب القوة العمودية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O19",
+       "text": "أن يحدد الطالب اتجاه القوة العمودية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O20",
+       "text": "أن يذكر الطالب رمز القوة العمودية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O21",
+       "text": "أن يعرف الطالب قوة النابض.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O22",
+       "text": "أن يحدد الطالب اتجاه قوة النابض.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O23",
+       "text": "أن يذكر الطالب رمز قوة النابض .",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O24",
+       "text": "أن يعرف الطالب قوة الشد.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O25",
+       "text": "أن يحدد الطالب اتجاه قوة الشد.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O26",
+       "text": "أن يذكر الطالب رمز قوة الشد.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O27",
+       "text": "أن يعرف الطالب قوة الدفع.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O28",
+       "text": "أن يحدد الطالب اتجاه قوة الدفع.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O29",
+       "text": "أن يذكر الطالب رمز قوة الدفع.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O30",
+       "text": "أن يعرف الطالب قوة الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O31",
+       "text": "أن يحدد الطالب اتجاه قوة الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O32",
+       "text": "أن يذكر الطالب رمز قوة الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L1-O33",
+       "text": "أن يستنتج الطالب صيغة قانون نيوتن الثاني عندما تؤثر فيه قوة الجاذبية الأرضية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "استخدام قوانين نيوتن",
+     "objectives": [
+      {
+       "id": "P1-C4-L2-O01",
+       "text": "أن يستنتج الطالب أن الأوزان تتغير بسبب تغير الجاذبية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O02",
+       "text": "أن يستنتج الطالب أن كتلة الأجسام ثابتة لا تتغير.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O03",
+       "text": "أن يطبق الطالب ويحل مسائل في قانون نيوتن الثاني بتأثير الجاذبية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O04",
+       "text": "أن يعرف الطالب الوزن الظاهري.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O05",
+       "text": "أن يفرق الطالب بين الوزن الحقيقي والوزن الظاهري.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O06",
+       "text": "أن يستنتج الطالب أن وزن الجسم الظاهري يتغير في حالة الهبوط ( النزول ) بواسطة مصعد كهربائي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O07",
+       "text": "أن يعرف الطالب القوة المعيقة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O08",
+       "text": "أن يستنتج الطالب علاقة القوة المعيقة بحركة الجسم.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O09",
+       "text": "أن يستنتج الطالب علاقة القوة المعيقة بخصائص الجسم.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O10",
+       "text": "أن يحدد الطالب خصائص المائع المؤثرة في القوة المعيقة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O11",
+       "text": "أن يتعرف الطالب على رمز القوة المعيقة واتجاهها.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L2-O12",
+       "text": "أن يعرف الطالب السرعة الحدية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "قوى التأثير المتبادل",
+     "objectives": [
+      {
+       "id": "P1-C4-L3-O01",
+       "text": "أن يعرف الطالب قانون نيوتن الثالث.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O02",
+       "text": "أن يستنتج الطالب قوتا زوجي التأثير المتبادل.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O03",
+       "text": "أن يتعرف الطالب على الصيغة الرياضية لقانون نيوتن الثالث.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O04",
+       "text": "أن يبين الطالب من خلال مثال قوى زوجي التأثير المتبادل.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O05",
+       "text": "أن يحل الطالب مسائل على قوتي زوجي التأثير المتبادل.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O06",
+       "text": "أن يستنتج الطالب علاقة قوة الشد في الحبال والخيوط.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O07",
+       "text": "أن يستنتج الطالب سبب اتزان دلو معلق بواسطة حبل.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O08",
+       "text": "أن يذكر الطالب مثال لجسم تؤثر فيه قوة أكبر من قوة الشد ومالذي يحدث.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O09",
+       "text": "أن يحل الطالب مسائل على قانون نيوتن الثالث لدلو معلق تؤثر عليه قوة الشد.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C4-L3-O10",
+       "text": "أن يبين الطالب أن القوة العمودية دائما يكون اتجاهها عموديا على مستوى التلامس.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "title": "القوى في بعدين",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "المتجهات",
+     "objectives": [
+      {
+       "id": "P1-C5-L1-O01",
+       "text": "أن يطبق الطالب آلية جمع المتجهات في بعدين باستعمال علم المثلثات لايجاد طول المتجه المحصل واتجاهه.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O02",
+       "text": "أن يتعرف الطالب على قانون جيب التمام وآلية تطبيقه عند جمع متجهين في بعدين.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O03",
+       "text": "أن يستنتج الطالب الحالات التي يستطيع تطبيق قانون جيب التمام وقانون الجيب فيها.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O04",
+       "text": "أن يطبق الطالب قانون جيب التمام في حل مسائل حسابية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O05",
+       "text": "أن يتعرف الطالب على إمكانية جمع المتجهات جبريا.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L1-O06",
+       "text": "أن يطبق الطالب في أمثلة ومسائل لجمع المتجهات جبريا لايجاد المتجه المحصل.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الاحتكاك",
+     "objectives": [
+      {
+       "id": "P1-C5-L2-O01",
+       "text": "أن يعرف الطالب قوة الاحتكاك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O02",
+       "text": "أن يعرف الطالب الاحتكاك السكوني.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O03",
+       "text": "أن يعرف الطالب الاحتكاك الحركي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O04",
+       "text": "أن يبين الطالب مايمثله ميل العلاقة بين القوة العمودية وقوة الاحتكاك الحركي .",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O05",
+       "text": "أن يعرف الطالب معامل الاحتكاك الحركي.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O06",
+       "text": "أن يعرف الطالب معامل الاحتكاك السكوني.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O07",
+       "text": "أن يوضح الطالب العلاقة بين القوة المؤثرة على جسم وقوة الاحتكاك السكوني",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L2-O08",
+       "text": "أن يحل الطالب مسائل حسابية على الاحتكاك.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "القوة والحركة في بعدين",
+     "objectives": [
+      {
+       "id": "P1-C5-L3-O01",
+       "text": "أن يوضح الطالب المقصود بحالة الاتزان.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L3-O02",
+       "text": "ان يوضح الطالب المقصود بالقوة الموازنة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L3-O03",
+       "text": "ان يوضح الطالب متى يتزن الجسم عندما تؤثر عليه عدة قوى . ( جميع الطرق المستخدمة)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L3-O04",
+       "text": "أن يحل الطالب مسائل حسابية على إيجاد القوة الموازنة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C5-L3-O05",
+       "text": "أن يحل الطالب مسائل حسابية على حركة جسم على سطح مائل أملس أو خشن.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "title": "الحركة في بعدين",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "حركة المقذوف",
+     "objectives": [
+      {
+       "id": "P1-C6-L1-O01",
+       "text": "أن يعرف الطالب المقذوف.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O02",
+       "text": "أن يحدد الطالب القوى المؤثرة في المقذوف بعد اطلاقه.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O03",
+       "text": "أن يرسم الطالب مخطط الجسم الحر لحركة المقذوف بعد إطلاقه.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O04",
+       "text": "أن يصف الطالب شكل المسار لحركة المقذوف.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O05",
+       "text": "أن يتعرف الطالب لسبب سرعة المقذوف في الاتجاه الأفقي تكون ثابتة.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O06",
+       "text": "أن يحل الطالب مسائل حسابية على حركة المقذوفات.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O07",
+       "text": "أن يوضح الطالب حركة المقذوفات التي تطلق بزاوية بالرسم",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O08",
+       "text": "أن يذكر الطالب أمثلة على المقذوفات التي تطلق بزاوية.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O09",
+       "text": "أن يوضح الطالب مركبات كل من السرعة والتسارع في المقذوفات التي تطلق بزاوية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O10",
+       "text": "أن يتعرف الطالب أن المقذوف عند أعلى نقطة تكون له سرعة أفقية فقط.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O11",
+       "text": "أن يرسم الطالب مقذوف ويحدد عليه مسار المقذوف وزاوية اطلاقه واقصى ارتفاع يصل إليه والمدى الأفقي له وزمن التحليق ويحلل عند كل نقطة مركبتيه ( السرعة والتسارع.)",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O12",
+       "text": "أن يحل الطالب مسائل حسابية على المقذوفات التي تطلق بزاوية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L1-O13",
+       "text": "أن يوضح الطالب أثر مقاومة الهواء في حركة المقذوفات.",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الحركة الدائرية",
+     "objectives": [
+      {
+       "id": "P1-C6-L2-O01",
+       "text": "ان يوضح الطالب الحركة الدائرية المنتظمة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O02",
+       "text": "ان يوضح الطالب المقصود بالتسارع المركزي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O03",
+       "text": "ان يستنتج الطالب قانون حساب التسارع المركزي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O04",
+       "text": "ان يفسر الطالب تسارع الجسم الذي يتحرك بسرعة ثابتة المقدار في مسار دائري.",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O05",
+       "text": "ان يصف الطالب كيف يعتمد مقدار التسارع المركزي على سرعة الجسم ونصف قطر مساره الدائري",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O06",
+       "text": "ان يستنتج الطالب قانون حساب التسارع المركزي بدلالة الزمن الدوري",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O07",
+       "text": "ان يوضح الطالب المقصود بالقوة المركزية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O08",
+       "text": "ان يحدد الطالب كيفية حركة جسم يتحرك حركة دائرية عند اختفاء القوة المركزية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O09",
+       "text": "ان يحل الطالب مسائل حسابية على الحركة الدائرية",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O10",
+       "text": "ان يذكر الطالب امثلة حياتية على القوة المركزية المسببة للتسارع المركزي",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L2-O11",
+       "text": "ان يوضح الطالب المقصود بقوة الطرد المركزي",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "السرعة المتجهة النسبية",
+     "objectives": [
+      {
+       "id": "P1-C6-L3-O01",
+       "text": "ان يحل الطالب مسائل تتعلق بالسرعة النسبية باستخدام رسم متجهات السرعة",
+       "thinking_level_source": "",
+       "status": "pending"
+      },
+      {
+       "id": "P1-C6-L3-O02",
+       "text": "ان يوضح الطالب السرعة النسبية المتجهة لجسم باستخدام رسم متجهات السرعة",
+       "thinking_level_source": "",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
