@@ -5,6 +5,8 @@ import os, re, math
 OUT = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'public', 'qimg', 'phys1')
 INK = '#1f2a44'; MUTED = '#5b6676'; GRID = '#d9dee7'; BLUE = '#2a6fb0'; RED = '#b03a2e'; GREEN = '#1f7a4d'; ORANGE = '#c46a10'; PURPLE = '#6b3fa0'
 SERIES = [BLUE, RED, GREEN, ORANGE, PURPLE]
+# ألوان الكتاب الثابتة للمتجهات: القوة أزرق، السرعة أحمر، الإزاحة أخضر، التسارع بنفسجي
+C_FORCE = '#1f5fa8'; C_VEL = '#c0392b'; C_DISP = '#1e8449'; C_ACC = '#7d3c98'
 FONT = "font-family=\"'IBM Plex Sans Arabic','Noto Naskh Arabic',Tahoma,Arial,sans-serif\""
 MATHFONT = "font-family=\"'Times New Roman',Times,serif\""
 
@@ -27,6 +29,9 @@ def T(x, y, s, size=15, anchor='middle', color=INK, weight='normal', italic=Fals
             body += f'<tspan dy="{dy}em" font-size="{int(size * 0.72)}" font-style="normal">{esc(v)}</tspan><tspan dy="{-dy}em"></tspan>'
         else: body += esc(part)
     return f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}" font-size="{size}" fill="{color}" font-weight="{weight}"{st} {f}{d}{tr}>{body}</text>'
+def V(x, y, s, color=INK, size=17, anchor='middle'):
+    """رمز كمية متجهة كما في الكتاب: خط عريض مائل (F_g، v_i، a). الكميات القياسية استعمل T(..., italic=True) بخط عادي."""
+    return T(x, y, s, size, anchor, color, 'bold', True)
 def L(x1, y1, x2, y2, color=INK, w=2, dash=''):
     da = f' stroke-dasharray="{dash}"' if dash else ''
     return f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{color}" stroke-width="{w}" stroke-linecap="round"{da}/>'
@@ -93,10 +98,10 @@ def motion_diagram(name, rows, w=560, row_h=70, x0=40, x1=None, axis_label=None,
         for k, x in enumerate(r['xs']):
             b += DOT(x, y, 6, c)
             if (r.get('vel', vel)) and k + 1 < len(r['xs']) and r['xs'][k + 1] != x:
-                b += ARROW(x, y - 16, x + 0.85 * (r['xs'][k + 1] - x), y - 16, BLUE, 2.2, 9)
+                b += ARROW(x, y - 16, x + 0.85 * (r['xs'][k + 1] - x), y - 16, C_VEL, 2.2, 9)
         if r.get('acc'):
             ax = (min(r['xs']) + max(r['xs'])) / 2; d = 40 if r['acc'] == '→' else -40
-            b += ARROW(ax - d / 2, y - 36, ax + d / 2, y - 36, RED, 2.5) + T(ax + d / 2 + (10 if d > 0 else -10), y - 31, 'a', 15, 'start' if d > 0 else 'end', RED, 'bold', True)
+            b += ARROW(ax - d / 2, y - 36, ax + d / 2, y - 36, C_ACC, 2.5) + T(ax + d / 2 + (10 if d > 0 else -10), y - 31, 'a', 15, 'start' if d > 0 else 'end', C_ACC, 'bold', True)
     if axis_label:
         ya = H - 22; b += ARROW(x0, ya, x1, ya, INK, 1.8) + T(x1 + 2, ya - 8, axis_label, 14, 'end', italic=True)
         if origin is not None: b += L(origin, ya - 6, origin, ya + 6) + T(origin, ya + 18, '0', 13)
@@ -110,7 +115,7 @@ def vectors(name, vecs, w=440, h=360, unit=40, origin=(220, 180), grid=True, axe
         for gy in range(-int(oy // unit), int((h - oy) // unit) + 1): b += L(0, oy + gy * unit, w, oy + gy * unit, GRID, 1)
     if axes: b += ARROW(8, oy, w - 8, oy, MUTED, 1.6) + ARROW(ox, h - 8, ox, 8, MUTED, 1.6) + T(w - 12, oy + 20, xl, 15, italic=True, color=MUTED) + T(ox + 14, 20, yl, 15, italic=True, color=MUTED)
     for v in vecs:
-        (x1, y1), (x2, y2) = P(v['from']), P(v['to']); c = v.get('color', BLUE)
+        (x1, y1), (x2, y2) = P(v['from']), P(v['to']); c = v.get('color', C_DISP)
         if v.get('dash'): b += L(x1, y1, x2, y2, c, 2, '6 5')
         else: b += ARROW(x1, y1, x2, y2, c, 3)
         dx, dy = v.get('lpos', (10, -10))
@@ -126,7 +131,7 @@ def fbd(name, forces, w=380, h=340, body='dot', body_label=None, axes=None, extr
     for f in forces:
         a = math.radians(f['angle']); r0 = 0 if body == 'dot' else 26
         x1, y1 = cx + r0 * math.cos(a), cy - r0 * math.sin(a); x2, y2 = cx + (r0 + f['length']) * math.cos(a), cy - (r0 + f['length']) * math.sin(a)
-        c = f.get('color', RED); b += ARROW(x1, y1, x2, y2, c, 3)
+        c = f.get('color', C_FORCE); b += ARROW(x1, y1, x2, y2, c, 3)
         lx, ly = cx + (r0 + f['length'] + 22) * math.cos(a), cy - (r0 + f['length'] + 22) * math.sin(a) + 6
         if f.get('label'): b += T(lx, ly, f['label'], 17, 'middle', c, 'bold', True)
     save(name, svg(w, h, b + extra))
@@ -144,7 +149,7 @@ def incline(name, angle=30, w=480, h=300, forces=(), angle_label='θ', box=True,
     if box: b += RECT(cx - 28, cy - 24, 56, 48, rot=-angle, cx=cx, cy=cy)
     dirs = {'down': -90, 'normal': 90 + angle, 'up-slope': angle, 'down-slope': 180 + angle}
     for f in forces:
-        d = math.radians(dirs.get(f['dir'], f['dir'])); c = f.get('color', RED)
+        d = math.radians(dirs.get(f['dir'], f['dir'])); c = f.get('color', C_FORCE)
         x2, y2 = cx + f['length'] * math.cos(d), cy - f['length'] * math.sin(d)
         b += ARROW(cx, cy, x2, y2, c, 3) + T(cx + (f['length'] + 20) * math.cos(d), cy - (f['length'] + 20) * math.sin(d) + 6, f.get('label', ''), 16, 'middle', c, 'bold', True)
     save(name, svg(w, h, b + extra))
@@ -154,5 +159,5 @@ if __name__ == '__main__':
           (0, 6), (0, 8), 'الزمن t (s)', 'الموقع d (m)', 1, 2)
     motion_diagram('_demo-motion.svg', [{'label': 'يتسارع', 'xs': [60, 90, 140, 210, 300, 410], 'vel': True, 'acc': '→'}, {'label': 'ساكن', 'xs': [250]}], axis_label='d')
     vectors('_demo-vec.svg', [{'from': (0, 0), 'to': (3, 0), 'label': 'A'}, {'from': (3, 0), 'to': (3, 2), 'label': 'B', 'color': GREEN, 'lpos': (16, 0)}, {'from': (0, 0), 'to': (3, 2), 'label': 'R', 'color': RED, 'lpos': (-14, -12)}], origin=(100, 260))
-    fbd('_demo-fbd.svg', [{'angle': 90, 'length': 90, 'label': 'F_N', 'color': BLUE}, {'angle': -90, 'length': 90, 'label': 'F_g'}, {'angle': 0, 'length': 70, 'label': 'F_{appl}', 'color': GREEN}, {'angle': 180, 'length': 50, 'label': 'f_f', 'color': ORANGE}], body='box')
-    incline('_demo-incline.svg', 30, forces=[{'dir': 'down', 'length': 90, 'label': 'F_g'}, {'dir': 'normal', 'length': 80, 'label': 'F_N', 'color': BLUE}, {'dir': 'up-slope', 'length': 60, 'label': 'f_f', 'color': ORANGE}])
+    fbd('_demo-fbd.svg', [{'angle': 90, 'length': 90, 'label': 'F_N'}, {'angle': -90, 'length': 90, 'label': 'F_g'}, {'angle': 0, 'length': 70, 'label': 'F_{appl}'}, {'angle': 180, 'length': 50, 'label': 'F_f'}], body='dot')
+    incline('_demo-incline.svg', 30, forces=[{'dir': 'down', 'length': 90, 'label': 'F_g'}, {'dir': 'normal', 'length': 80, 'label': 'F_N'}, {'dir': 'up-slope', 'length': 60, 'label': 'F_f'}])
