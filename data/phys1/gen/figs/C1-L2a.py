@@ -6,7 +6,7 @@ WOOD = '#f4e7c6'; METAL = '#eef1f5'; LIQ = '#cfe3f5'; THERMO = '#c0392b'; PENCIL
 
 def ruler(x0, y0, length, minor, px, labels_every=1, h=48, unit='cm', fill=METAL):
     """مسطرة أفقية: الصفر عند x0، أصغر تدريج minor (بوحدة unit)، px بكسل لكل وحدة. التدريجات تنزل من الحافة العليا."""
-    b = RECT(x0 - 16, y0, length * px + 32, h, INK, fill, 1.8)
+    b = RECT(x0 - 16, y0, length * px + 50, h, INK, fill, 1.8)
     n = round(length / minor)
     for k in range(n + 1):
         v = k * minor; x = x0 + v * px
@@ -15,7 +15,7 @@ def ruler(x0, y0, length, minor, px, labels_every=1, h=48, unit='cm', fill=METAL
         else: ln = 9
         b += L(x, y0, x, y0 + ln, INK, 1.3 if ln < 20 else 1.8)
         if ln == 20: b += T(x, y0 + 37, fmt(round(v, 6)), 14)
-    b += T(x0 + length * px + 4, y0 + h - 6, unit, 12, 'start', MUTED)
+    b += T(x0 + length * px + 22, y0 + h - 8, unit, 13, 'middle', MUTED)
     return b
 
 
@@ -29,7 +29,7 @@ def pencil(x0, y0, length_px, th=16):
 
 
 def single_ruler(name, length, minor, px, obj=None, w=None):
-    w = w or int(length * px + 90); x0 = 45
+    w = w or int(length * px + 110); x0 = 45
     b = ''
     if obj is not None: b += pencil(x0, 50, obj * px) + L(x0, 50, x0, 62, MUTED, 1, '3 3')
     b += ruler(x0, 62, length, minor, px)
@@ -37,7 +37,7 @@ def single_ruler(name, length, minor, px, obj=None, w=None):
 
 
 def two_rulers(name, length, minors, px, obj, tags=('A', 'B')):
-    w = int(length * px + 120); x0 = 70; b = ''
+    w = int(length * px + 140); x0 = 70; b = ''
     b += T(22, 92, tags[0], 18, weight='bold', color=BLUE) + ruler(x0, 70, length, minors[0], px)
     b += pencil(x0, 60, obj * px)
     b += T(22, 192, tags[1], 18, weight='bold', color=BLUE) + ruler(x0, 170, length, minors[1], px)
@@ -125,7 +125,7 @@ def spring_balance(name, vmax, minor, major, value, unit='N'):
         if maj: b += T(104 - ln - 5, y + 4.5, fmt(round(v, 6)), 13, 'end')
     yp = top + value * ppu
     b += f'<polygon points="104,{yp:.1f} 128,{yp - 6:.1f} 128,{yp + 6:.1f}" fill="{RED}"/>' + L(128, yp, 142, yp, RED, 2)
-    b += T(110, 395, unit, 15) + L(110, 370, 110, 384, INK, 2) + L(110, 384, 104, 392, INK, 2)
+    b += T(134, 62, unit, 16) + L(110, 370, 110, 392, INK, 2) + L(110, 392, 102, 402, INK, 2)
     save(name, svg(w, h, b))
 
 
@@ -149,7 +149,7 @@ def errorbars(name, data, yr, ystep, ylabel, xlabel='الطالب', accepted=Non
     b += T((L0 + R0) / 2, h - 10, xlabel, 14)
     b += T(20, (T0 + B0) / 2, ylabel, 14, rotate=-90)
     if accepted is not None:
-        b += T(R0 - 4, Y(accepted) - 7, 'القيمة المقبولة', 13, 'end', C_DISP, 'bold')
+        b += T(L0 + 6, Y(accepted) - 7, 'القيمة المقبولة', 13, 'start', C_DISP, 'bold')
     save(name, svg(w, h, b))
 
 
