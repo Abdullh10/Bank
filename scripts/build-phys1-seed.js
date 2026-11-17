@@ -16,6 +16,9 @@ const reviewsFile = read('objective_reviews.json');
 const reviews = Object.fromEntries(reviewsFile.items.map(r => [r.id, r]));
 const sups = Object.fromEntries(read('supplements.json').items.map(s => [s.id, s]));
 const COURSE = 101;
+const chi = process.argv.indexOf('--chapters');
+const ONLY = chi > 0 ? process.argv[chi + 1].split(',').map(Number) : null;
+const inScope = id => !ONLY || ONLY.includes(Number(/-C(\d+)-/.exec(id)[1]));
 // معرفات ثابتة خاصة بالمقرر 101 (فصول 10101…، دروس 101011…، أهداف 10101101…) لا تتقاطع مع غيرها
 const chId = c => COURSE * 100 + c;                       // 301…
 const lsId = (c, l) => COURSE * 1000 + c * 10 + l;        // 3011…
@@ -76,7 +79,7 @@ from public.objectives o where o.code like 'P1-%' and o.review_status = 'approve
 // الأسئلة: بحالة «مولدة» دون معرف ثابت (معرف تلقائي)، وإجاباتها في question_answers بالربط على (الهدف، النوع، الرقم)
 const qdir = path.join(src, 'questions');
 const codes = new Set(structure.chapters.flatMap(c => c.lessons.flatMap(l => l.objectives.map(o => o.id))));
-for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(f => f.endsWith('.json')).sort() : []) {
+for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(f => f.endsWith('.json') && inScope(f)).sort() : []) {
   const set = JSON.parse(fs.readFileSync(path.join(qdir, f), 'utf8'));
   if (!codes.has(set.objective)) throw new Error(`هدف غير موجود في ${f}: ${set.objective}`);
   const all = [...set.mcq.map(q => ({ ...q, type: 'mcq' })), ...set.essay.map(q => ({ ...q, type: 'essay' }))];
@@ -104,7 +107,8 @@ on conflict (question_id) do nothing;`);
 }
 
 const MAX = 900 * 1024;
-const outDir = path.join(root, 'supabase', 'seed-phys1');
+const outName = ONLY ? `seed-phys1-ch${ONLY.join('-')}` : 'seed-phys1';
+const outDir = path.join(root, 'supabase', outName);
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 const parts = [];
@@ -125,9 +129,9 @@ select
   (select count(*) from public.lessons l join public.chapters c on c.id = l.chapter_id where c.course_id = ${COURSE}) = ${counts.lessons} as lessons_ok,
   (select count(*) from public.objectives o ${inCourse}) = ${counts.objectives} as objectives_ok,
   (select count(*) from public.supplements s join public.objectives o on o.id = s.objective_id ${inCourse}) = ${counts.supplements} as supplements_ok,
-  (select count(*) from public.questions q join public.objectives o on o.id = q.objective_id ${inCourse}) = ${counts.questions} as questions_ok,
-  (select count(*) from public.question_answers a join public.questions q on q.id = a.question_id join public.objectives o on o.id = q.objective_id ${inCourse}) = ${counts.questions} as answers_ok,
+  (select count(*) from public.questions q join public.objectives o on o.id = q.objective_id ${inCourse}${ONLY ? ` and c.number in (${ONLY})` : ''}) = ${counts.questions} as questions_ok,
+  (select count(*) from public.question_answers a join public.questions q on q.id = a.question_id join public.objectives o on o.id = q.objective_id ${inCourse}${ONLY ? ` and c.number in (${ONLY})` : ''}) = ${counts.questions} as answers_ok,
   (select status from public.courses where id = ${COURSE}) = 'preparing' as still_preparing;
 `);
-console.log(`${parts.length} أجزاء في supabase/seed-phys1`, counts);
+console.log(`${parts.length} أجزاء في supabase/${outName}`, counts);
 for (const f of fs.readdirSync(outDir)) console.log(f, Math.round(fs.statSync(path.join(outDir, f)).size / 1024) + 'KB');
