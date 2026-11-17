@@ -70,20 +70,20 @@
       "source_ref": "الكتاب ص 18 — تحليل الوحدات"
     },
     {
-      "stem": "تُحسب القوة المغناطيسية المؤثرة في شحنة متحركة من العلاقة $F = Bqv$، حيث $F$ بوحدة $\\text{N} = \\text{kg}\\cdot\\text{m/s}^2$، و$q$ بوحدة $\\text{A}\\cdot\\text{s}$، و$v$ بوحدة m/s. ما وحدة $B$ التي تجعل المعادلة صحيحة من حيث الوحدات؟",
+      "stem": "تُحسب القوة المغناطيسية المؤثرة في شحنة متحركة من العلاقة $\\boldsymbol{F} = Bqv$، حيث $F$ بوحدة $\\text{N} = \\text{kg}\\cdot\\text{m/s}^2$، و$q$ بوحدة $\\text{A}\\cdot\\text{s}$، و$v$ بوحدة m/s. ما وحدة $B$ التي تجعل المعادلة صحيحة من حيث الوحدات؟",
       "options": [
-        "$\\text{kg}\\cdot\\text{m/(A}\\cdot\\text{s)}$",
+        "$\\text{kg}\\cdot\\text{m/(A}\\cdot\\text{s}^3)$",
         "$\\text{kg/(A}\\cdot\\text{s)}$",
         "$\\text{kg/(A}\\cdot\\text{s}^2)$",
-        "$\\text{kg}\\cdot\\text{m}^2/(\\text{A}\\cdot\\text{s}^3)$"
+        "$\\text{kg}\\cdot\\text{m}^2/(\\text{A}\\cdot\\text{s}^4)$"
       ],
       "correct_index": 2,
       "explanation": "$B = \\frac{F}{qv}$، فوحدتها $\\frac{\\text{kg}\\cdot\\text{m/s}^2}{(\\text{A}\\cdot\\text{s})(\\text{m/s})} = \\frac{\\text{kg}\\cdot\\text{m/s}^2}{\\text{A}\\cdot\\text{m}} = \\text{kg/(A}\\cdot\\text{s}^2)$.",
       "distractor_notes": [
         "نتجت من قسمة وحدة القوة على وحدة الشحنة فقط دون القسمة على وحدة السرعة.",
-        "نقص في قوة الثانية؛ فالقسمة على m/s تضيف ثانية إلى البسط.",
+        "شُطبت ثانية زائدة؛ فحاصل ضرب وحدتي الشحنة والسرعة $(\\text{A}\\cdot\\text{s})(\\text{m/s}) = \\text{A}\\cdot\\text{m}$، فتبقى $\\text{s}^2$ من وحدة القوة في المقام.",
         "",
-        "ضُربت وحدة القوة في وحدة السرعة بدل القسمة عليها."
+        "ضُربت وحدة القوة في وحدة السرعة بدل القسمة عليها: $\\frac{(\\text{kg}\\cdot\\text{m/s}^2)(\\text{m/s})}{\\text{A}\\cdot\\text{s}}$."
       ],
       "thinking_level": "تطبيق",
       "question_kind": "استنتاج وحدة",
@@ -208,7 +208,7 @@
       "source_ref": "الكتاب ص 18 — تحليل الوحدات"
     },
     {
-      "stem": "بروتون شحنته $1.6 \\times 10^{-19}\\ \\text{A}\\cdot\\text{s}$ يتحرك بسرعة $2.4 \\times 10^5\\ \\text{m/s}$ عموديًّا على مجال مغناطيسي شدته 4.5 T، حيث $1\\ \\text{T} = 1\\ \\text{kg/(A}\\cdot\\text{s}^2)$. (أ) عوّض بالقيم في المعادلة $F = Bqv$، وتحقق من صحة المعادلة بتعويض الوحدات في طرفيها. (ب) احسب مقدار القوة المغناطيسية المؤثرة في البروتون.",
+      "stem": "بروتون شحنته $1.6 \\times 10^{-19}\\ \\text{A}\\cdot\\text{s}$ يتحرك بسرعة $2.4 \\times 10^5\\ \\text{m/s}$ عموديًّا على مجال مغناطيسي شدته 4.5 T، حيث $1\\ \\text{T} = 1\\ \\text{kg/(A}\\cdot\\text{s}^2)$. (أ) عوّض بالقيم في المعادلة $\\boldsymbol{F} = Bqv$، وتحقق من صحة المعادلة بتعويض الوحدات في طرفيها. (ب) احسب مقدار القوة المغناطيسية المؤثرة في البروتون.",
       "model_answer": "(أ) الوحدات: $\\frac{\\text{kg}}{\\text{A}\\cdot\\text{s}^2} \\cdot \\text{A}\\cdot\\text{s} \\cdot \\frac{\\text{m}}{\\text{s}} = \\frac{\\text{kg}\\cdot\\text{m}}{\\text{s}^2} = \\text{N}$، وهي وحدة القوة؛ فالمعادلة صحيحة. (ب) $F = (4.5)(1.6 \\times 10^{-19})(2.4 \\times 10^5) \\approx 1.7 \\times 10^{-13}\\ \\text{N}$.",
       "answer_elements": [
         "التعويض بالقيم",
