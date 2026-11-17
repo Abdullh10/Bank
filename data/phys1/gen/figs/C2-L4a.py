@@ -1,7 +1,7 @@
 import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..')); from figures import *
 # رسوم الدرس 2-4 (السرعة المتجهة) — الأهداف O01–O08
 
-XL = 'الزمن t (s)'; YL = 'الموقع d (m)'
+XL = 'الزمن (s)'; YL = 'الموقع (m)'
 
 def mapper(xr, yr, w=520, h=360, title=False):
     """نفس تحويل graph() لاستعماله في extra قبل الاستدعاء."""
@@ -33,8 +33,8 @@ lines('c2l4-o02-essay.svg', [S([(0, 0), (3, 6)], 'A', BLUE), S([(0, 0), (3, 3)],
 # ---------- O03 ----------
 X, Y = mapper((0, 6), (0, 14))
 tri = (L(X(1), Y(4), X(5), Y(4), MUTED, 2, '6 5') + L(X(5), Y(4), X(5), Y(12), MUTED, 2, '6 5')
-       + T((X(1) + X(5)) / 2, Y(4) + 20, 'Δt', 17, color=GREEN, weight='bold', italic=True)
-       + T(X(5) + 26, (Y(4) + Y(12)) / 2 + 5, 'Δd', 17, color=GREEN, weight='bold', italic=True))
+       + T((X(1) + X(5)) / 2, Y(4) + 22, 'Δt', 17, color=INK, italic=True)
+       + T(X(5) + 14, (Y(4) + Y(12)) / 2 + 5, 'Δ', 17, color=C_DISP, anchor='start') + V(X(5) + 26, (Y(4) + Y(12)) / 2 + 5, 'd', C_DISP, anchor='start'))
 lines('c2l4-o03-triangle.svg', [S([(0, 2), (6, 14)], color=BLUE)], (0, 6), (0, 14), 1, 2, dots=False, extra=tri + DOT(X(1), Y(4), 4.5, INK) + DOT(X(5), Y(12), 4.5, INK))
 lines('c2l4-o03-negline.svg', [S([(0, 15), (5, 0)], color=BLUE)], (0, 5), (0, 16), 1, 2)
 lines('c2l4-o03-essay.svg', [S([(0, 2), (6, 14)], color=BLUE)], (0, 6), (0, 14), 1, 2)
@@ -43,7 +43,7 @@ lines('c2l4-o03-parallel.svg', [S([(0, 2), (5, 12)], 'E', BLUE), S([(0, 8), (5, 
 # ---------- O04 ----------
 lines('c2l4-o04-skate.svg', [S([(0, 2), (8, 14)], color=GREEN)], (0, 8), (0, 16), 1, 2)
 lines('c2l4-o04-neg.svg', [S([(0, 12), (5, -3)], color=GREEN)], (0, 5), (-4, 12), 1, 2)
-lines('c2l4-o04-bike.svg', [S([(0, 0), (40, 24)], color=GREEN)], (0, 40), (0, 24), 5, 4, xl='الزمن t (min)', yl='الموقع d (km)')
+lines('c2l4-o04-bike.svg', [S([(0, 0), (40, 24)], color=GREEN)], (0, 40), (0, 24), 5, 4, xl='الزمن (min)', yl='الموقع (km)')
 lines('c2l4-o04-piecewise.svg', [S([(0, 0), (2, 6), (5, 6), (6, 9)], color=GREEN)], (0, 6), (0, 10), 1, 1)
 lines('c2l4-o04-boat.svg', [S([(0, 30), (6, 0)], color=GREEN)], (0, 6), (0, 30), 1, 5)
 lines('c2l4-o04-essay1.svg', [S([(0, 4), (10, 24)], color=GREEN)], (0, 10), (0, 24), 1, 2, w=560)
