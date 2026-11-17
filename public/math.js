@@ -54,11 +54,13 @@ export function texToText(tex) {
     t = t.replace(new RegExp(`\\\\[dt]?frac${arg}${arg}`, 'g'), (_, a, b) => `(${a})/(${b})`)
       .replace(new RegExp(`\\\\sqrt\\[([^\\]]+)\\]${arg}`, 'g'), (_, n, a) => `${n}√(${a})`)
       .replace(new RegExp(`\\\\sqrt${arg}`, 'g'), (_, a) => `√(${a})`)
-      .replace(new RegExp(`\\\\(?:text|mathrm|mathbf|operatorname)${arg}`, 'g'), (_, a) => a);
+      .replace(new RegExp(`\\\\(?:text|mathrm|mathbf|mathit|boldsymbol|bm|operatorname)${arg}`, 'g'), (_, a) => a)
+      .replace(new RegExp(`\\\\(?:bar|overline)${arg}`, 'g'), (_, a) => `${a}\u0304`)
+      .replace(new RegExp(`\\\\vec${arg}`, 'g'), (_, a) => `${a}\u20D7`);
   }
   const conv = (m, map) => ([...m].every(c => map[c]) ? [...m].map(c => map[c]).join('') : null);
   // الأوامر أولًا (حتى يصير ^\circ رمزًا قبل معالجة الأس)
-  t = t.replace(/\\left|\\right|\\!/g, '').replace(/\\[,;:]|~/g, ' ')
+  t = t.replace(/\\left|\\right|\\!/g, '').replace(/\\[,;: ]|~/g, ' ')
     .replace(/\\([A-Za-z]+)/g, (m, w) => SYM[w] ?? w)
     .replace(/\^\{([^{}]*)\}|\^(.)/g, (_, a, b) => { const v = a ?? b; return conv(v, SUP) ?? `^(${v})`; })
     .replace(/_\{([^{}]*)\}|_(.)/g, (_, a, b) => { const v = a ?? b; return conv(v, SUB) ?? `_(${v})`; })
