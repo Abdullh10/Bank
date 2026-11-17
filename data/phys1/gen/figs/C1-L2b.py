@@ -176,35 +176,53 @@ if __name__ == '__main__':
     targets('c1l2-tgt-four.svg', [SC_OFF, CL_OFF, SC_C, CL_C], ['الهدف 1', 'الهدف 2', 'الهدف 3', 'الهدف 4'])
     targets('c1l2-tgt-order.svg', [CL_OFF, CL_C, SC_OFF, SC_C], ['الهدف 1', 'الهدف 2', 'الهدف 3', 'الهدف 4'])
     targets('c1l2-tgt-single.svg', [CL_OFF], [''])
-    targets('c1l2-tgt-scatter.svg', [SC_C], [''])
+    targets('c1l2-tgt-four2.svg', [CL_C, SC_OFF, CL_OFF, SC_C], ['الهدف 1', 'الهدف 2', 'الهدف 3', 'الهدف 4'])
     # O17: مجموعات تقيس g مع القيمة المقبولة
     errbars('c1l2-eb-g.svg', [('A', 9.62, 0.03), ('B', 9.79, 0.04), ('C', 9.92, 0.02), ('D', 9.70, 0.25)], (9.4, 10.1), 0.1,
             'g (m/s²)', 'المجموعة', accepted=9.80)
     # O19: زمن دورة بندول، القيمة المقبولة 2.00 s
     errbars('c1l2-eb-pend.svg', [('A', 2.10, 0.01), ('B', 1.99, 0.08), ('C', 2.01, 0.02)], (1.80, 2.20), 0.05,
             'زمن الدورة (s)', 'الطالب', accepted=2.00)
+    errbars('c1l2-eb-pend2.svg', [('A', 2.10, 0.01), ('B', 1.99, 0.08), ('C', 2.01, 0.02)], (1.80, 2.20), 0.05,
+            'زمن الدورة (s)', 'الطالب', accepted=2.00)
+    errbars('c1l2-eb-pend3.svg', [('A', 2.10, 0.01), ('B', 1.99, 0.08), ('C', 2.01, 0.02)], (1.80, 2.20), 0.05,
+            'زمن الدورة (s)', 'الطالب', accepted=2.00)
+    errbars('c1l2-eb-mass2.svg', [('A', 48.6, 0.2), ('B', 50.1, 0.2), ('C', 51.2, 0.2), ('D', 49.0, 0.2)], (47.5, 52.0), 0.5,
+            'الكتلة (g)', 'الطالب', accepted=50.0)
     # O12: نتائج أربعة طلاب لكتلة مقبولة 50.0 g
     errbars('c1l2-eb-mass.svg', [('A', 48.6, 0.2), ('B', 50.1, 0.2), ('C', 51.2, 0.2), ('D', 49.0, 0.2)], (47.5, 52.0), 0.5,
             'الكتلة (g)', 'الطالب', accepted=50.0)
     # O14: المعايرة بالنقطتين
     b = balance(150, 230, '0.0 g', caption='الخطوة الأولى: الكفة فارغة') + balance(430, 230, '200.0 g', '200.0 g', caption='الخطوة الثانية: كتلة معيارية')
     save('c1l2-cal-steps.svg', svg(580, 280, b))
+    save('c1l2-cal-steps2.svg', svg(580, 280, b))
+    save('c1l2-cal-std2.svg', svg(300, 280, balance(150, 230, '497.0 g', '500.0 g', caption='كتلة معيارية')))
     save('c1l2-cal-zero.svg', svg(300, 280, balance(150, 230, '2.5 g', caption='الكفة فارغة')))
     save('c1l2-cal-std.svg', svg(300, 280, balance(150, 230, '497.0 g', '500.0 g', caption='كتلة معيارية')))
     save('c1l2-cal-o12.svg', svg(580, 280, balance(150, 230, '100.0 g', '100.0 g', caption='الميزان 1') + balance(430, 230, '103.4 g', '100.0 g', caption='الميزان 2')))
     # O15: انحراف قراءة الميزان لكتلة معيارية 100.0 g مع الزمن
+    for nm in ('c1l2-cal-drift2.svg', 'c1l2-cal-drift3.svg'):
+        graph(nm, [{'pts': [(0, 100.0), (1, 100.4), (2, 100.9), (3, 101.3), (4, 101.8)], 'color': BLUE, 'dots': True},
+                   {'pts': [(0, 100.0), (4, 100.0)], 'color': GREEN, 'dash': '8 5', 'w': 2, 'label': 'القيمة المعتمدة', 'at': (2.4, 100.0), 'dy': 20}],
+              (0, 4), (99.5, 102.0), 'الزمن منذ آخر معايرة (شهر)', 'قراءة الميزان (g)', 1, 0.5)
     graph('c1l2-cal-drift.svg', [{'pts': [(0, 100.0), (1, 100.4), (2, 100.9), (3, 101.3), (4, 101.8)], 'color': BLUE, 'dots': True},
                                  {'pts': [(0, 100.0), (4, 100.0)], 'color': GREEN, 'dash': '8 5', 'w': 2, 'label': 'القيمة المعتمدة', 'at': (2.4, 100.0), 'dy': 20}],
           (0, 4), (99.5, 102.0), 'الزمن منذ آخر معايرة (شهر)', 'قراءة الميزان (g)', 1, 0.5)
     # O18 / O16: اختلاف زاوية النظر
     parallax('c1l2-plx-eyes.svg', [(2.0, 115, '1'), (3.0, 140, '2'), (4.0, 115, '3')])
     parallax('c1l2-plx-left.svg', [(2.0, 115, '')])
+    parallax('c1l2-plx-eyes3.svg', [(2.0, 115, '1'), (3.0, 140, '2'), (4.0, 115, '3')])
+    parallax('c1l2-plx-right.svg', [(3.5, 115, '')], pointer=2.5)
     parallax('c1l2-plx-o16.svg', [(3.0, 140, '1'), (4.0, 115, '2')])
     # O17 / O16: مسطرة صفرها بعد حافتها بـ 0.5 cm
     ruler('c1l2-rul-edge.svg', 0, 6, 0.5, ppc=80, obj=('edge', 4.0), zero_offset=0.5, h=190)
+    ruler('c1l2-rul-edge2.svg', 0, 6, 0.5, ppc=80, obj=('edge', 4.0), zero_offset=0.5, h=190)
+    ruler('c1l2-rul-edge3.svg', 0, 6, 0.5, ppc=80, obj=('edge', 4.0), zero_offset=0.5, h=190)
     # O20: مساطر للتعبير عن نتيجة القياس مع خطئه
     ruler('c1l2-rul-mm.svg', 0, 5, 0.1, ppc=100, obj=(0, 3.65), h=190)
     ruler('c1l2-rul-half.svg', 0, 6, 0.5, ppc=80, obj=(0, 3.5), h=190)
     ruler('c1l2-rul-mm2.svg', 0, 5, 0.1, ppc=100, obj=(0, 4.25), h=190)
     dial('c1l2-dial-amm.svg', 0, 5, 0.2, 3.6)
+    dial('c1l2-dial-volt.svg', 0, 10, 0.5, 7.5, unit='V')
+    ruler('c1l2-rul-o20e.svg', 0, 8, 0.1, ppc=90, obj=(0, 6.45), h=190)
     spring_scale('c1l2-spring-n.svg', 5, 0.5, 3.5)
