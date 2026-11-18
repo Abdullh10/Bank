@@ -72,7 +72,7 @@ def mini(X0, Y0, pw, ph, pts, xr, yr, yt, title):
     for y in yt: b += L(L0, Y(y), R0, Y(y), GRID, 1)
     b += ARROW(L0, Y(0), R0 + 8, Y(0), INK, 1.6, 8) + ARROW(L0, B0, L0, T0 - 10, INK, 1.6, 8)
     for y in yt: b += L(L0 - 4, Y(y), L0, Y(y), INK, 1.2) + T(L0 - 7, Y(y) + 4, fmt(y), 12, 'end', MUTED)
-    b += T(R0 + 4, Y(0) + 18, 't (s)', 12, 'end', MUTED, italic=True) + T(L0 + 6, T0 - 14, 'a (m/s^2)', 12, 'start', MUTED, italic=True)
+    b += T(R0 + 4, Y(0) + 18, 'الزمن (s)', 12, 'end', MUTED) + T(L0 + 6, T0 - 14, 'التسارع (m/s²)', 12, 'start', MUTED)
     p = ' '.join(f'{X(x):.1f},{Y(y):.1f}' for x, y in pts)
     b += f'<polyline points="{p}" fill="none" stroke="{C_ACC}" stroke-width="3" stroke-linejoin="round"/>'
     b += T(X0 + pw - 16, Y0 + 24, title, 16, 'end', INK, 'bold')
@@ -139,7 +139,13 @@ def o07_essay_vt():
           (0, 4.5), (-24.5, 24.5), XL, VL, 0.5, 4.9, h=400)
 
 # ================= O08 =================
-YL8 = 'd_{f} / t_{f} (m/s)'
+YL8 = ' '
+def ylab8(h=360):
+    # عنوان المحور الرأسي: d_f متجه (عريض مائل)، t_f قياسي (مائل)، الوحدة قائمة
+    cy = (18 + h - 52) / 2
+    sub = lambda c: f'<tspan dy="0.3em" font-size="10" font-style="italic">{c}</tspan><tspan dy="-0.3em"></tspan>'
+    return (f'<text x="20" y="{cy:.1f}" text-anchor="middle" font-size="14" fill="{INK}" {MATHFONT} transform="rotate(-90 20 {cy:.1f})">'
+            f'<tspan font-weight="bold" font-style="italic">d</tspan>{sub("f")}<tspan> / </tspan><tspan font-style="italic">t</tspan>{sub("f")}<tspan> (m/s)</tspan></text>')
 def o08_graph1():
     data = [(0.10, 1.00), (0.15, 1.20), (0.20, 1.48), (0.25, 1.73), (0.30, 1.94), (0.35, 2.21)]
     X, Y = graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': BLUE, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
@@ -149,7 +155,7 @@ def o08_graph1():
     extra = ''.join(f'<circle cx="{X(x):.1f}" cy="{Y(y):.1f}" r="4" fill="#fff" stroke="{INK}" stroke-width="1.6"/>' for x, y in data)
     extra += T(X(0.40) - 8, Y(2.44) - 12, '(0.40, 2.44)', 14, 'end')
     graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': BLUE, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
-          marks=[(0, 0.50, ''), (0.40, 2.44, '')], extra=extra + T(X(0) + 12, Y(0.50) + 20, '(0, 0.50)', 14, 'start'))
+          marks=[(0, 0.50, ''), (0.40, 2.44, '')], extra=extra + T(X(0) + 12, Y(0.50) + 20, '(0, 0.50)', 14, 'start') + ylab8())
 
 def o08_tape():
     w, h = 640, 135; b = ''
@@ -165,7 +171,7 @@ def o08_essay_graph():
     data = [(0.10, 0.80), (0.20, 1.23), (0.30, 1.76), (0.40, 2.20), (0.50, 2.69)]
     X, Y = graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': BLUE, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3)
     extra = ''.join(f'<circle cx="{X(x):.1f}" cy="{Y(y):.1f}" r="4" fill="#fff" stroke="{INK}" stroke-width="1.6"/>' for x, y in data)
-    graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': BLUE, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3, extra=extra)
+    graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': BLUE, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3, extra=extra + ylab8())
 
 if __name__ == '__main__':
     two_drops(); o02_vt(); o03_axis_up(); o03_egg(); o03_vt(); o04_motion(); o04_panels(); o05_tube(); o06_window()

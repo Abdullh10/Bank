@@ -105,7 +105,7 @@
    ],
    "thinking_level": "تحليل",
    "question_kind": "قراءة منحنيات",
-   "difficulty": "متوسط",
+   "difficulty": "سهل",
    "source_ref": "الكتاب ص 66 — منحنيات العدائين",
    "images": [
     {
@@ -207,9 +207,9 @@
     "16–18 s تباطؤ هبوطًا بتسارع موجب"
    ],
    "solution_steps": [
-    "$a_{0\\to2} = \\frac{3 - 0}{2} = +1.5\\ \\text{m/s}^2$",
-    "$a_{8\\to12} = \\frac{-3 - 3}{12 - 8} = -1.5\\ \\text{m/s}^2$",
-    "$a_{16\\to18} = \\frac{0 - (-3)}{2} = +1.5\\ \\text{m/s}^2$"
+    "$\\boldsymbol{a}_{0\\to2} = \\frac{3 - 0}{2} = +1.5\\ \\text{m/s}^2$",
+    "$\\boldsymbol{a}_{8\\to12} = \\frac{-3 - 3}{12 - 8} = -1.5\\ \\text{m/s}^2$",
+    "$\\boldsymbol{a}_{16\\to18} = \\frac{0 - (-3)}{2} = +1.5\\ \\text{m/s}^2$"
    ],
    "marks": [
     {
@@ -281,9 +281,9 @@
     "S صحيح مع ملاحظة التسارع الموجب مع التباطؤ"
    ],
    "solution_steps": [
-    "$a_Q = \\frac{8 - 2}{10} = 0.60\\ \\text{m/s}^2$",
-    "$a_R = \\frac{1 - 9}{10} = -0.80\\ \\text{m/s}^2$",
-    "$a_S = \\frac{-2 - (-8)}{10} = +0.60\\ \\text{m/s}^2$"
+    "$\\boldsymbol{a}_Q = \\frac{8 - 2}{10} = 0.60\\ \\text{m/s}^2$",
+    "$\\boldsymbol{a}_R = \\frac{1 - 9}{10} = -0.80\\ \\text{m/s}^2$",
+    "$\\boldsymbol{a}_S = \\frac{-2 - (-8)}{10} = +0.60\\ \\text{m/s}^2$"
    ],
    "marks": [
     {
@@ -346,8 +346,8 @@
     "التسارع 1.5 m/s²"
    ],
    "solution_steps": [
-    "$a_{4\\to10} = \\frac{0 - 15}{6} = -2.5\\ \\text{m/s}^2$",
-    "$a_{14\\to20} = \\frac{9 - 0}{6} = 1.5\\ \\text{m/s}^2$"
+    "$\\boldsymbol{a}_{4\\to10} = \\frac{0 - 15}{6} = -2.5\\ \\text{m/s}^2$",
+    "$\\boldsymbol{a}_{14\\to20} = \\frac{9 - 0}{6} = 1.5\\ \\text{m/s}^2$"
    ],
    "marks": [
     {
