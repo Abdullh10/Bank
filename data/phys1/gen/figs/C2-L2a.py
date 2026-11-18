@@ -172,12 +172,28 @@ def arrange():
     save('c2l2-o09-arrange.svg', svg(2 * pw, 110 + 2 * ph, b))
 arrange()
 
-def east_west():
+def three_1d():
+    # ثلاث إزاحات منفصلة: A خمسة مربعات شرقًا، B ثمانية مربعات غربًا، C مربعان شرقًا (المحصلة مربع واحد غربًا)
     u = 34
-    vecs = [dict(frm=(1, 3), to=(6, 3), sym='A'), dict(frm=(9, 1), to=(6, 1), sym='B')]
-    b = grid_panel(0, 0, 11, 4, u, vecs) + compass(430, 120)
-    save('c2l2-o09-ew.svg', svg(520, 170, b))
-east_west()
+    vecs = [dict(frm=(1, 4), to=(6, 4), sym='A'), dict(frm=(12, 2.5), to=(4, 2.5), sym='B'), dict(frm=(8, 1), to=(10, 1), sym='C')]
+    b = grid_panel(0, 0, 13, 5, u, vecs) + compass(500, 150)
+    save('c2l2-o09-three.svg', svg(590, 200, b))
+three_1d()
+
+def complete():
+    # A من O خمسة مربعات شرقًا؛ النقاط P, Q, R, S أسفل الشبكة عند -3, -2, +2, +8 مربعات من O
+    u = 34; cols, rows = 13, 3; o = 4   # O عند العمود 4
+    vecs = [dict(frm=(o, 2), to=(o + 5, 2), sym='A')]
+    b = grid_panel(0, 0, cols, rows, u, vecs)
+    gx, gy = 20, 14
+    b += DOT(gx + o * u, gy + 1 * u, 5, INK) + T(gx + o * u - 12, gy + 1 * u + 5, 'O', 15, 'end', INK, 'bold')
+    yb = gy + rows * u
+    for k, lab in [(-3, 'P'), (-2, 'Q'), (2, 'R'), (8, 'S')]:
+        x = gx + (o + k) * u
+        b += DOT(x, yb, 4.5, INK) + T(x, yb + 22, lab, 15, 'middle', INK, 'bold')
+    b += compass(500, 80)
+    save('c2l2-o09-complete.svg', svg(590, 150, b))
+complete()
 
 def essay_grid():
     u = 34
@@ -185,29 +201,3 @@ def essay_grid():
     b = grid_panel(0, 0, 12, 3, u, vecs) + compass(470, 125)
     save('c2l2-o09-essay.svg', svg(560, 150, b))
 essay_grid()
-
-def maze():
-    # مسار المتاهة بمقياس: كل مربع = 0.1 m. البداية (1,1): 1.0 m شمالًا، 0.3 m شرقًا، 0.8 m جنوبًا، 0.4 m شرقًا
-    u = 30; cols, rows = 11, 12
-    pts = [(1, 1), (1, 11), (4, 11), (4, 3), (8, 3)]
-    vecs = [dict(frm=pts[k], to=pts[k + 1]) for k in range(4)]
-    b = grid_panel(0, 0, cols, rows, u, vecs)
-    gx, gy = 20, 14
-    Pp = lambda p: (gx + p[0] * u, gy + (rows - p[1]) * u)
-    sx, sy = Pp(pts[0]); ex, ey = Pp(pts[-1])
-    b += DOT(sx, sy, 5, INK) + T(sx - 4, sy + 22, 'البداية', 13, weight='bold') + DOT(ex, ey, 5, INK) + T(ex, ey + 22, 'النهاية', 13, weight='bold')
-    b += compass(390, 330)
-    save('c2l2-o09-maze.svg', svg(470, 400, b))
-maze()
-
-# ================= O10 المحصلة =================
-def which_resultant():
-    u = 40; cols, rows = 8, 6
-    vecs = [dict(frm=(1, 1), to=(5, 1), sym='A', lpos=(0, 20)), dict(frm=(5, 1), to=(5, 4), sym='B', lpos=(14, 0)),
-            dict(frm=(1, 4), to=(5, 1), dash=True, color=MUTED),
-            dict(frm=(1, 1), to=(5, 4), dash=True, color=MUTED),
-            dict(frm=(1, 4), to=(5, 4), dash=True, label='(3)', lpos=(0, -9), color=MUTED),
-            dict(frm=(1, 1), to=(1, 4), dash=True, label='(4)', lpos=(-16, 0), color=MUTED)]
-    tag = lambda x, y, t: f'<rect x="{x - 15}" y="{y - 13}" width="30" height="19" fill="#fff"/>' + T(x, y + 1, t, 14, color=MUTED, weight='bold')
-    save('c2l2-o10-which.svg', svg(380, 280, grid_panel(0, 0, cols, rows, u, vecs) + tag(108, 130, '(1)') + tag(108, 182, '(2)')))
-which_resultant()
