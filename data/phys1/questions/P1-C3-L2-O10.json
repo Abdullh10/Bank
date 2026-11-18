@@ -53,8 +53,8 @@
    "options": [
     "$4.5 \\times 10^2\\ \\text{m}$",
     "$9.0 \\times 10^2\\ \\text{m}$",
-    "7.5 m",
-    "15 m"
+    "$7.5\\ \\text{m}$",
+    "$15\\ \\text{m}$"
    ],
    "correct_index": 0,
    "explanation": "من $v_f^2 = v_i^2 + 2\\boldsymbol{\\bar{a}}\\Delta\\boldsymbol{d}$ مع $v_i = 0$: $\\Delta d = \\frac{v_f^2}{2\\bar{a}} = \\frac{(60\\ \\text{m/s})^2}{2(4.0\\ \\text{m/s}^2)} = 4.5 \\times 10^2\\ \\text{m}$.",
