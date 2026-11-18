@@ -36,7 +36,7 @@ tri = (L(X(1), Y(4), X(5), Y(4), MUTED, 2, '6 5') + L(X(5), Y(4), X(5), Y(12), M
        + T((X(1) + X(5)) / 2, Y(4) + 22, 'Δt', 17, color=INK, italic=True)
        + T(X(5) + 14, (Y(4) + Y(12)) / 2 + 5, 'Δ', 17, color=C_DISP, anchor='start') + V(X(5) + 26, (Y(4) + Y(12)) / 2 + 5, 'd', C_DISP, anchor='start'))
 lines('c2l4-o03-triangle.svg', [S([(0, 2), (6, 14)], color=BLUE)], (0, 6), (0, 14), 1, 2, dots=False, extra=tri + DOT(X(1), Y(4), 4.5, INK) + DOT(X(5), Y(12), 4.5, INK))
-lines('c2l4-o03-negline.svg', [S([(0, 15), (5, 0)], color=BLUE)], (0, 5), (0, 16), 1, 2)
+lines('c2l4-o03-negline.svg', [S([(0, 15), (5, 0)], color=BLUE)], (0, 5), (0, 18), 1, 3)
 lines('c2l4-o03-essay.svg', [S([(0, 2), (6, 14)], color=BLUE)], (0, 6), (0, 14), 1, 2)
 lines('c2l4-o03-parallel.svg', [S([(0, 2), (5, 12)], 'E', BLUE), S([(0, 8), (5, 18)], 'F', RED)], (0, 5), (0, 20), 1, 2)
 
