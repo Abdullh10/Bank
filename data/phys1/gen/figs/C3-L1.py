@@ -1,8 +1,8 @@
 import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..')); from figures import *
 # رسوم الدرس 3-1 (التسارع) — الأهداف O01–O12
 
-XL = 'الزمن t (s)'; VL = 'السرعة المتجهة v (m/s)'; DL = 'الموقع d (m)'
-VIOLET = PURPLE
+XL = 'الزمن (s)'; VL = 'السرعة المتجهة (m/s)'; DL = 'الموقع (m)'
+VIOLET = C_ACC
 
 def mapper(xr, yr, w=520, h=360, title=False):
     L0, R0, T0, B0 = 78, w - 26, 34 if title else 18, h - 52
@@ -32,14 +32,14 @@ def pm(name, rows, w=600, row_h=78, plus=True, top=44):
         for k, x in enumerate(xs):
             b += DOT(x, y, 5.5, c)
             if r.get('vel') and k + 1 < len(xs) and xs[k + 1] != x:
-                b += ARROW(x, y - 14, x + 0.86 * (xs[k + 1] - x), y - 14, RED, 2.2, 9)
+                b += ARROW(x, y - 14, x + 0.86 * (xs[k + 1] - x), y - 14, C_VEL, 2.2, 9)
         if r.get('start'):
             b += T(xs[0], y + 26, 'البداية', 13, color=MUTED)
         if r.get('times'):
             for k, x in enumerate(xs): b += T(x, y + 24, r['times'][k], 12, color=MUTED)
         if r.get('acc'):
             ax = sum(xs) / len(xs); d = 44 if r['acc'] == '→' else -44
-            b += ARROW(ax - d / 2, y - 40, ax + d / 2, y - 40, VIOLET, 2.6) + T(ax + d / 2 + (12 if d > 0 else -12), y - 35, 'a', 16, 'start' if d > 0 else 'end', VIOLET, 'bold', True)
+            b += ARROW(ax - d / 2, y - 40, ax + d / 2, y - 40, VIOLET, 2.6) + V(ax + d / 2 + (12 if d > 0 else -12), y - 35, 'a', VIOLET, 16, 'start' if d > 0 else 'end')
     if plus:
         ya = H - 18; b += ARROW(30, ya, 150, ya, INK, 1.8) + T(160, ya + 5, '+x', 15, 'start', italic=True)
     save(name, svg(w, H, b))
@@ -57,13 +57,13 @@ def hv(name, rows, unit=34, cols=14, w=None, scale_val='1 m/s', x0=1, extra=''):
         b += ARROW(x1, y, x2, y, c, 3.2, 13)
         lx = (x1 + x2) / 2
         b += f'<rect x="{lx - 26:.1f}" y="{y - 30:.1f}" width="52" height="22" fill="#fff" opacity="0.85"/>'
-        b += T(lx, y - 13, lab, 18, 'middle', c, 'bold', True)
+        b += V(lx, y - 13, lab, c, 18)
     yb = oy + (nrows * 2 + 1) * unit + 26
     b += T(ox + cols * unit, yb, 'كل مربع يمثل', 14, 'end', MUTED) + T(ox + cols * unit - 92, yb, scale_val, 14, 'end', INK)
     b += ARROW(ox, yb - 5, ox + 90, yb - 5, INK, 1.8) + T(ox + 98, yb, '+x', 14, 'start', italic=True)
     save(name, svg(w, h, b + extra))
 
-def mini(X0, Y0, pw, ph, ser, xr, yr, xt, yt, title, color=BLUE, xl='t (s)', yl='v (m/s)'):
+def mini(X0, Y0, pw, ph, ser, xr, yr, xt, yt, title, color=BLUE, xl='الزمن (s)', yl='السرعة المتجهة (m/s)'):
     """رسم صغير داخل لوحة: ser = [[(x,y),...], ...]."""
     L0, R0, T0, B0 = X0 + 46, X0 + pw - 14, Y0 + 30, Y0 + ph - 34
     X = lambda x: L0 + (x - xr[0]) / (xr[1] - xr[0]) * (R0 - L0)
@@ -75,7 +75,7 @@ def mini(X0, Y0, pw, ph, ser, xr, yr, xt, yt, title, color=BLUE, xl='t (s)', yl=
     b += ARROW(L0, Y(y0), R0 + 8, Y(y0), INK, 1.6, 8) + ARROW(L0, B0, L0, T0 - 8, INK, 1.6, 8)
     for x in xt: b += T(X(x), B0 + 15, fmt(x), 11, color=MUTED)
     for y in yt: b += T(L0 - 6, Y(y) + 4, fmt(y), 11, 'end', MUTED)
-    b += T(R0 - 2, B0 + 29, xl, 11, 'end', MUTED, italic=True) + T(L0 + 4, T0 - 12, yl, 11, 'start', MUTED, italic=True)
+    b += T(R0 - 2, B0 + 29, xl, 11, 'end', MUTED) + T(L0 + 4, T0 - 12, yl, 11, 'start', MUTED)
     for pts in ser:
         p = ' '.join(f'{X(x):.1f},{Y(y):.1f}' for x, y in pts)
         b += f'<polyline points="{p}" fill="none" stroke="{color}" stroke-width="2.6" stroke-linejoin="round"/>'
@@ -98,8 +98,8 @@ vt('c3l1-rel-train-car.svg', [S([(0, 25), (5, 25)], 'A', BLUE, at=(4.4, 25), dx=
 # ================= O04 =================
 pm('c3l1-sign-left-speedup.svg', [{'xs': [530, 495, 440, 365, 270, 155][::-1][::-1], 'vel': True}], row_h=70)
 s = ''
-s += ARROW(80, 70, 260, 70, RED, 3.2, 13) + T(170, 55, 'v', 19, color=RED, weight='bold', italic=True)
-s += ARROW(220, 130, 130, 130, PURPLE, 3.2, 13) + T(175, 115, 'a', 19, color=PURPLE, weight='bold', italic=True)
+s += ARROW(80, 70, 260, 70, C_VEL, 3.2, 13) + V(170, 55, 'v', C_VEL, 19)
+s += ARROW(220, 130, 130, 130, C_ACC, 3.2, 13) + V(175, 115, 'a', C_ACC, 19)
 s += ARROW(30, 185, 140, 185, INK, 1.8) + T(150, 190, '+x', 15, 'start', italic=True)
 save('c3l1-sign-vectors.svg', svg(320, 210, s))
 vt('c3l1-sign-vt-cross.svg', [S([(0, -6), (6, 6)], color=BLUE)], (0, 6), (-8, 8), 1, 2)
@@ -126,21 +126,21 @@ for i, (lab, xs) in enumerate([('السيارة 1', [40 + 50 * k for k in range(
 save('c3l1-unif-tapes.svg', svg(580, 210, s))
 
 # ================= O06 =================
-hv('c3l1-pm-vec-speedup.svg', [('v_i', 1, 3, RED), ('v_f', 1, 5, RED)], cols=9)
+hv('c3l1-pm-vec-speedup.svg', [('v_i', 1, 3, C_VEL), ('v_f', 1, 5, C_VEL)], cols=9)
 pm('c3l1-pm-cat-models.svg', [
     {'label': '(1)', 'xs': [40, 140, 220, 280, 320, 340], 'vel': True, 'acc': '←'},
     {'label': '(2)', 'xs': [40, 140, 220, 280, 320, 340], 'vel': True, 'acc': '→'},
     {'label': '(3)', 'xs': [40, 60, 100, 160, 240, 340], 'vel': True, 'acc': '←'},
     {'label': '(4)', 'xs': [40, 100, 160, 220, 280, 340], 'vel': True, 'acc': '←'}], w=430, row_h=84)
-hv('c3l1-pm-vec-slow.svg', [('v_i', 1, 6, RED), ('v_f', 1, 2, RED)], cols=9)
+hv('c3l1-pm-vec-slow.svg', [('v_i', 1, 6, C_VEL), ('v_f', 1, 2, C_VEL)], cols=9)
 s = ''; X = lambda m: 40 + m * 50
 s += L(X(0), 90, X(10), 90, INK, 2)
 for m in range(11): s += L(X(m), 84, X(m), 96, INK, 1.5) + T(X(m), 114, str(m), 13, color=MUTED)
-s += T(X(10) + 30, 114, 'd (m)', 13, 'start', MUTED, italic=True)
-for k, m in enumerate([0, 1, 3, 6, 10]): s += DOT(X(m), 70, 6, BLUE) + T(X(m), 48, f't = {k} s', 13, color=INK)
+s += T(X(10) + 22, 114, 'd', 14, 'start', MUTED, italic=True) + T(X(10) + 34, 114, '(m)', 13, 'start', MUTED)
+for k, m in enumerate([0, 1, 3, 6, 10]): s += DOT(X(m), 70, 6, BLUE) + T(X(m) - 12, 48, 't', 13, 'end', INK, italic=True) + T(X(m) - 10, 48, f'= {k} s', 13, 'start', INK)
 s += ARROW(30, 150, 140, 150, INK, 1.8) + T(150, 155, '+x', 15, 'start', italic=True)
 save('c3l1-pm-ruler.svg', svg(620, 170, s))
-hv('c3l1-pm-vec-essay.svg', [('v_i', 1, 2, RED), ('v_f', 1, 6, RED)], cols=9)
+hv('c3l1-pm-vec-essay.svg', [('v_i', 1, 2, C_VEL), ('v_f', 1, 6, C_VEL)], cols=9)
 vt('c3l1-pm-vt-trip.svg', [S([(0, 12), (2, 12), (3, 6), (5, 6), (6, 0), (7, 0), (8, 15), (10, 15)], color=BLUE)], (0, 10), (0, 16), 1, 2, w=560)
 
 # ================= O07 =================
@@ -204,10 +204,10 @@ vt('c3l1-desc-runners-essay.svg', [S([(0, 6), (10, 6)], 'P', BLUE, at=(1, 6), dx
 vt('c3l1-desc-redlight.svg', [S([(0, 15), (4, 15), (10, 0), (14, 0), (20, 9)], color=BLUE)], (0, 20), (0, 16), 2, 2, w=580)
 
 # ================= O12 =================
-hv('c3l1-dir-vectors.svg', [('v_i', 5, 4, RED), ('v_f', 9, -4, RED)], cols=12)
+hv('c3l1-dir-vectors.svg', [('v_i', 5, 4, C_VEL), ('v_f', 9, -4, C_VEL)], cols=12)
 vt('c3l1-dir-vt.svg', [S([(0, 6), (4, -6)], color=BLUE)], (0, 4), (-8, 8), 1, 2)
 s = RECT(520, 20, 26, 170, INK, '#d8d2c4', 2) + T(533, 210, 'الجدار', 14)
-s += ARROW(120, 70, 420, 70, RED, 3.2, 13) + T(270, 55, 'قبل الارتداد', 15, color=RED, weight='bold') + T(270, 92, '3.0 m/s', 15, color=RED)
-s += ARROW(420, 140, 120, 140, RED, 3.2, 13) + T(270, 125, 'بعد الارتداد', 15, color=RED, weight='bold') + T(270, 162, '3.0 m/s', 15, color=RED)
+s += ARROW(120, 70, 420, 70, C_VEL, 3.2, 13) + T(270, 55, 'قبل الارتداد', 15, color=C_VEL, weight='bold') + T(270, 92, '3.0 m/s', 15, color=C_VEL)
+s += ARROW(420, 140, 120, 140, C_VEL, 3.2, 13) + T(270, 125, 'بعد الارتداد', 15, color=C_VEL, weight='bold') + T(270, 162, '3.0 m/s', 15, color=C_VEL)
 s += ARROW(30, 205, 140, 205, INK, 1.8) + T(150, 210, '+x', 15, 'start', italic=True)
 save('c3l1-dir-wall.svg', svg(580, 225, s))
