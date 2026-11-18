@@ -64,16 +64,16 @@ def ruler_dots(name, pos, xmax, step, w=600, vecs=None, label=None, x_left=0, do
     for p in pos: b += DOT(X(p), yd, 6.5, dot_color)
     for (x0, ln) in (vecs or []):
         if ln: b += ARROW(X(x0), yd - 22, X(x0 + ln), yd - 22, C_VEL, 2.6, 10)
-    if label: b += T(w / 2, 22, label, 14, color=MUTED)
+    if label: b += T(w / 2, 24, label, 15, color=MUTED, italic=True)
     if extra_fn: b += extra_fn(X)
     save(name, svg(w, H, b))
 
 # ---------- O12 ----------
 lines('c2l4-o12-line1.svg', [S([(0, 6), (5, 16)], color=GREEN)], (0, 5), (0, 18), 1, 2)
 lines('c2l4-o12-line2.svg', [S([(0, 15), (5, -5)], color=GREEN)], (0, 5), (-6, 16), 1, 2, h=380)
-ruler_dots('c2l4-o12-dots.svg', [2, 5, 8, 11, 14], 16, 1, w=620, label='الفترة الزمنية بين كل نقطتين متتاليتين 1.0 s')
+ruler_dots('c2l4-o12-dots.svg', [2, 5, 8, 11, 14], 16, 1, w=620, label='Δt = 1.0 s')
 lines('c2l4-o12-essay2.svg', [S([(0, -6), (6, 12)], color=GREEN)], (0, 6), (-8, 14), 1, 2, h=380)
-ruler_dots('c2l4-o12-essay3.svg', [24, 20, 16, 12, 8, 4], 28, 2, w=620, label='الفترة الزمنية بين كل نقطتين متتاليتين 0.50 s')
+ruler_dots('c2l4-o12-essay3.svg', [24, 20, 16, 12, 8, 4], 28, 2, w=620, label='Δt = 0.50 s')
 
 # ---------- O13 ----------
 lines('c2l4-o13-line.svg', [S([(0, 4), (4, 16)], color=GREEN)], (0, 4), (0, 18), 1, 2)
@@ -98,8 +98,8 @@ motion_diagram('c2l4-o14-twocars.svg', [
     {'label': 'السيارة A', 'xs': [50 + 40 * k for k in range(6)], 'color': BLUE},
     {'label': 'السيارة B', 'xs': [50 + 80 * k for k in range(6)], 'color': RED}], w=520)
 vec_rows('c2l4-o14-wrong.svg', [{'label': '', 'xs': [40, 70, 120, 190, 280, 390], 'arrows': [(x, 24) for x in [40, 70, 120, 190, 280]]}], w=460)
-ruler_dots('c2l4-o14-essay1.svg', [0, 3, 6, 9, 12], 14, 1, w=600, label='الفترة الزمنية بين كل نقطتين متتاليتين 0.50 s')
-ruler_dots('c2l4-o14-essay3.svg', [0, 8, 14, 18, 20, 20], 22, 2, w=600, label='الفترة الزمنية بين كل نقطتين متتاليتين 1.0 s')
+ruler_dots('c2l4-o14-essay1.svg', [0, 3, 6, 9, 12], 14, 1, w=600, label='Δt = 0.50 s')
+ruler_dots('c2l4-o14-essay3.svg', [0, 8, 14, 18, 20, 20], 22, 2, w=600, label='Δt = 1.0 s')
 
 # ---------- O15 ----------
 lines('c2l4-o15-line1.svg', [S([(0, 8), (5, 18)], color=GREEN)], (0, 5), (0, 20), 1, 2)
