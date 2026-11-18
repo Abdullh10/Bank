@@ -29,7 +29,7 @@ def two_drops():
 
 # ================= O02: (v–t) لحجر يسقط، الموجب لأسفل =================
 def o02_vt():
-    graph('c3l3-o02-vt-stone.svg', [{'pts': [(0, 0), (1, 9.8), (2, 19.6), (3, 29.4)], 'color': BLUE, 'dots': True}],
+    graph('c3l3-o02-vt-stone.svg', [{'pts': [(0, 0), (1, 9.8), (2, 19.6), (3, 29.4)], 'color': C_VEL, 'dots': True}],
           (0, 3.5), (0, 39.2), XL, VL, 0.5, 9.8)
 
 # ================= O03 =================
@@ -49,7 +49,7 @@ def o03_egg():
     save('c3l3-o03-egg-strobe.svg', svg(w, h, b))
 
 def o03_vt():
-    graph('c3l3-o03-vt-updown.svg', [{'pts': [(0, 14.7), (3, -14.7)], 'color': BLUE}],
+    graph('c3l3-o03-vt-updown.svg', [{'pts': [(0, 14.7), (3, -14.7)], 'color': C_VEL}],
           (0, 3.5), (-19.6, 19.6), XL, VL, 0.5, 4.9)
 
 # ================= O04 =================
@@ -114,7 +114,7 @@ def o06_window():
 
 # ================= O07 =================
 def o07_vt():
-    graph('c3l3-o07-vt-top.svg', [{'pts': [(0, 24.5), (5, -24.5)], 'color': BLUE}],
+    graph('c3l3-o07-vt-top.svg', [{'pts': [(0, 24.5), (5, -24.5)], 'color': C_VEL}],
           (0, 5.5), (-29.4, 29.4), XL, VL, 0.5, 4.9, h=400)
 
 def o07_path():
@@ -135,7 +135,7 @@ def o07_dt():
           marks=[(2.0, 19.6, '(2.0, 19.6)')])
 
 def o07_essay_vt():
-    graph('c3l3-o07-essay-vt.svg', [{'pts': [(0, 19.6), (4, -19.6)], 'color': BLUE}],
+    graph('c3l3-o07-essay-vt.svg', [{'pts': [(0, 19.6), (4, -19.6)], 'color': C_VEL}],
           (0, 4.5), (-24.5, 24.5), XL, VL, 0.5, 4.9, h=400)
 
 # ================= O08 =================
@@ -148,13 +148,13 @@ def ylab8(h=360):
             f'<tspan font-weight="bold" font-style="italic">d</tspan>{sub("f")}<tspan> / </tspan><tspan font-style="italic">t</tspan>{sub("f")}<tspan> (m/s)</tspan></text>')
 def o08_graph1():
     data = [(0.10, 1.00), (0.15, 1.20), (0.20, 1.48), (0.25, 1.73), (0.30, 1.94), (0.35, 2.21)]
-    X, Y = graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': BLUE, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
+    X, Y = graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': INK, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
                  marks=[(0, 0.50, '(0, 0.50)'), (0.40, 2.44, '')],
                  extra='')
     # إعادة الرسم مع النقاط المقيسة وتسمية النقطة الثانية
     extra = ''.join(f'<circle cx="{X(x):.1f}" cy="{Y(y):.1f}" r="4" fill="#fff" stroke="{INK}" stroke-width="1.6"/>' for x, y in data)
     extra += T(X(0.40) - 8, Y(2.44) - 12, '(0.40, 2.44)', 14, 'end')
-    graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': BLUE, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
+    graph('c3l3-o08-fit1.svg', [{'pts': [(0, 0.50), (0.40, 2.44)], 'color': INK, 'w': 2.5}], (0, 0.45), (0, 3.0), XL, YL8, 0.05, 0.5,
           marks=[(0, 0.50, ''), (0.40, 2.44, '')], extra=extra + T(X(0) + 12, Y(0.50) + 20, '(0, 0.50)', 14, 'start') + ylab8())
 
 def o08_tape():
@@ -169,9 +169,9 @@ def o08_tape():
 
 def o08_essay_graph():
     data = [(0.10, 0.80), (0.20, 1.23), (0.30, 1.76), (0.40, 2.20), (0.50, 2.69)]
-    X, Y = graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': BLUE, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3)
+    X, Y = graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': INK, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3)
     extra = ''.join(f'<circle cx="{X(x):.1f}" cy="{Y(y):.1f}" r="4" fill="#fff" stroke="{INK}" stroke-width="1.6"/>' for x, y in data)
-    graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': BLUE, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3, extra=extra + ylab8())
+    graph('c3l3-o08-fit2.svg', [{'pts': [(0, 0.30), (0.50, 2.70)], 'color': INK, 'w': 2.5}], (0, 0.55), (0, 3.0), XL, YL8, 0.05, 0.3, extra=extra + ylab8())
 
 if __name__ == '__main__':
     two_drops(); o02_vt(); o03_axis_up(); o03_egg(); o03_vt(); o04_motion(); o04_panels(); o05_tube(); o06_window()

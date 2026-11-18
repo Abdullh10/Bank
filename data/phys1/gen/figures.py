@@ -26,7 +26,9 @@ def T(x, y, s, size=15, anchor='middle', color=INK, weight='normal', italic=Fals
         if part[0] in '_^':
             v = part[2:-1] if part[1] == '{' else part[1:]
             dy = 0.3 if part[0] == '_' else -0.45
-            body += f'<tspan dy="{dy}em" font-size="{int(size * 0.72)}" font-style="normal">{esc(v)}</tspan><tspan dy="{-dy}em"></tspan>'
+            # الحرف السفلي المفرد (i، f، g، N…) مائل كالرمز في الكتاب، والكلمة (net، appl) قائمة؛ ولا يُعرَّض
+            fs = '' if (len(v) == 1 and v.isalpha()) else ' font-style="normal"'
+            body += f'<tspan dy="{dy}em" font-size="{int(size * 0.72)}" font-weight="normal"{fs}>{esc(v)}</tspan><tspan dy="{-dy}em"></tspan>'
         else: body += esc(part)
     return f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}" font-size="{size}" fill="{color}" font-weight="{weight}"{st} {f}{d}{tr}>{body}</text>'
 def V(x, y, s, color=INK, size=17, anchor='middle'):

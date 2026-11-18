@@ -14,7 +14,7 @@ def poly(X, Y, pts, fill, op=1):
     p = ' '.join(f'{X(x):.1f},{Y(y):.1f}' for x, y in pts)
     return f'<polygon points="{p}" fill="{fill}" opacity="{op}" stroke="none"/>'
 
-def S(pts, color=BLUE, dots=False, dash=None, w=3):
+def S(pts, color=INK, dots=False, dash=None, w=3):
     d = {'pts': pts, 'color': color, 'dots': dots, 'w': w}
     if dash: d['dash'] = dash
     return d
@@ -50,10 +50,10 @@ graph('c3l2-o08-compare.svg', [S([(0, 4.0), (2, 4.0)], C_ACC), S([(0, 2.0), (4, 
       (0, 5), (0, 5), XL, AL, 1, 1, w=540, h=380,
       labels=[(1, 4.35, 'A', C_ACC), (2, 2.35, 'B', C_ACC)])
 at_graph('c3l2-o08-essay2.svg', [(0, 2, 3.0), (2, 5, 0.0), (5, 7, -2.0)], (0, 8), (-3, 4), 1, 1)
-graph('c3l2-o08-essay3.svg', [S([(0, 4), (6, 16)], BLUE, True)], (0, 7), (0, 18), XL, VL, 1, 2, w=540, h=380)
+graph('c3l2-o08-essay3.svg', [S([(0, 4), (6, 16)], C_VEL, True)], (0, 7), (0, 18), XL, VL, 1, 2, w=540, h=380)
 
 # ================= O09 (v_f = v_i + ā Δt) =================
-graph('c3l2-o09-line.svg', [S([(0, 6), (4, 18)], BLUE, True)], (0, 5), (0, 20), XL, VL, 1, 2, w=540, h=380)
+graph('c3l2-o09-line.svg', [S([(0, 6), (4, 18)], C_VEL, True)], (0, 5), (0, 20), XL, VL, 1, 2, w=540, h=380)
 
 # ================= O10 (تطبيق المعادلات) =================
 def axis_obj(name):
@@ -81,7 +81,7 @@ def mini(X0, Y0, pw, ph, pts, title, xl='t (s)', yl='d (m)'):
     b += ARROW(L0, B0, R0 + 8, B0, INK, 1.6, 8) + ARROW(L0, B0, L0, T0 - 10, INK, 1.6, 8)
     b += T(R0 + 4, B0 + 18, xl, 12, 'end', MUTED, italic=True) + T(L0 + 6, T0 - 12, yl, 12, 'start', MUTED, italic=True)
     p = ' '.join(f'{Xm(x):.1f},{Ym(y):.1f}' for x, y in pts)
-    b += f'<polyline points="{p}" fill="none" stroke="{BLUE}" stroke-width="2.8" stroke-linejoin="round"/>'
+    b += f'<polyline points="{p}" fill="none" stroke="{C_DISP}" stroke-width="2.8" stroke-linejoin="round"/>'
     b += T(X0 + pw - 14, Y0 + 24, title, 15, 'end', INK, 'bold')
     return b
 
@@ -98,24 +98,24 @@ panels('c3l2-o11-shapes.svg', [
     [(0, 9), (4, 9)]])
 
 # مماس عند t = 2 s للمنحنى d = 1.5 t²
-graph('c3l2-o11-tan2.svg', [S(curve(lambda t: 1.5 * t * t, 0, 4), BLUE),
+graph('c3l2-o11-tan2.svg', [S(curve(lambda t: 1.5 * t * t, 0, 4), C_DISP),
                             S([(1, 0), (3, 12)], TAN, False, '8 5', 2.4)],
       (0, 4), (0, 24), XL, DL, 0.5, 2, w=540, h=400,
       marks=[(2, 6, ''), (1, 0, ''), (3, 12, '')])
 
-graph('c3l2-o11-slowing.svg', [S(curve(lambda t: 12 * t - 1.5 * t * t, 0, 4), BLUE),
-                               S([(4, 24), (5, 24)], BLUE)], (0, 5), (0, 28), XL, DL, 1, 4, w=540, h=380)
+graph('c3l2-o11-slowing.svg', [S(curve(lambda t: 12 * t - 1.5 * t * t, 0, 4), C_DISP),
+                               S([(4, 24), (5, 24)], C_DISP)], (0, 5), (0, 28), XL, DL, 1, 4, w=540, h=380)
 
 # مماسان عند t = 1 s و t = 3 s للمنحنى d = 2.0 t² (إحداثيات النقاط في نص السؤال)
-graph('c3l2-o11-twotan.svg', [S(curve(lambda t: 2 * t * t, 0, 4), BLUE),
+graph('c3l2-o11-twotan.svg', [S(curve(lambda t: 2 * t * t, 0, 4), C_DISP),
                               S([(0.5, 0), (2, 6)], TAN, False, '8 5', 2.4), S([(1.5, 0), (4, 30)], TAN, False, '8 5', 2.4)],
       (0, 4), (0, 32), XL, DL, 0.5, 4, w=560, h=420,
       marks=[(1, 2, ''), (3, 18, ''), (0.5, 0, ''), (2, 6, ''), (1.5, 0, ''), (4, 30, '')])
 
-graph('c3l2-o11-negfast.svg', [S(curve(lambda t: 20 - 1.25 * t * t, 0, 4), BLUE)], (0, 4), (0, 24), XL, DL, 1, 4, w=540, h=380)
+graph('c3l2-o11-negfast.svg', [S(curve(lambda t: 20 - 1.25 * t * t, 0, 4), C_DISP)], (0, 4), (0, 24), XL, DL, 1, 4, w=540, h=380)
 
 # المقالي 1: d = 1.5 t² مع مماسين عند 2 s و 4 s
-graph('c3l2-o11-essay1.svg', [S(curve(lambda t: 1.5 * t * t, 0, 5), BLUE),
+graph('c3l2-o11-essay1.svg', [S(curve(lambda t: 1.5 * t * t, 0, 5), C_DISP),
                               S([(1, 0), (3, 12)], TAN, False, '8 5', 2.4), S([(3, 12), (5, 36)], TAN, False, '8 5', 2.4)],
       (0, 5), (0, 40), XL, DL, 0.5, 4, w=580, h=440,
       marks=[(0, 0, ''), (1, 1.5, ''), (2, 6, ''), (3, 13.5, ''), (4, 24, ''), (5, 37.5, ''), (1, 0, ''), (3, 12, ''), (5, 36, '')])
@@ -126,7 +126,7 @@ def runner(t):
     if t <= 10: return 12 + 6 * (t - 4)
     if t <= 14: u = t - 10; return 48 + 6 * u - 0.75 * u * u
     return 60
-graph('c3l2-o11-essay2.svg', [S(curve(runner, 0, 16, 160), BLUE)], (0, 16), (0, 64), XL, DL, 2, 8, w=600, h=400,
+graph('c3l2-o11-essay2.svg', [S(curve(runner, 0, 16, 160), C_DISP)], (0, 16), (0, 64), XL, DL, 2, 8, w=600, h=400,
       marks=[(4, 12, ''), (10, 48, ''), (14, 60, '')])
 
 # ================= O12 (اشتقاق المعادلات من المساحة) =================
@@ -138,7 +138,7 @@ def area_generic(name, tlabel='t', show_nums=False):
     b += ARROW(L0, B0, R0 + 20, B0, INK, 2) + ARROW(L0, B0, L0, T0 - 10, INK, 2)
     b += L(L0, vf_y, tx, vf_y, MUTED, 1.2, '5 4') + L(tx, B0, tx, vf_y, MUTED, 1.2, '5 4')
     b += L(L0, vi_y, R0 - 20, vi_y, MUTED, 1.2, '5 4')
-    b += L(L0, vi_y, tx, vf_y, BLUE, 3)
+    b += L(L0, vi_y, tx, vf_y, C_VEL, 3)
     b += V(L0 - 12, vi_y + 6, 'v_i', C_VEL, 17, 'end') + V(L0 - 12, vf_y + 6, 'v_f', C_VEL, 17, 'end')
     b += T(L0, B0 + 22, '0', 14, color=MUTED) + T(tx, B0 + 24, tlabel, 17, italic=True)
     b += T((L0 + tx) / 2, (B0 + vi_y) / 2 + 6, '(1)', 17, weight='bold') + T(tx - 70, vi_y - 24, '(2)', 17, weight='bold')
@@ -146,7 +146,7 @@ def area_generic(name, tlabel='t', show_nums=False):
     save(name, svg(w, h, b))
 area_generic('c3l2-o12-areas.svg')
 area_generic('c3l2-o12-essay1.svg')
-shaded_graph('c3l2-o12-num.svg', [S([(0, 2), (5, 12)], BLUE, True)], (0, 6), (0, 14), 1, 2, XL, VL,
+shaded_graph('c3l2-o12-num.svg', [S([(0, 2), (5, 12)], C_VEL, True)], (0, 6), (0, 14), 1, 2, XL, VL,
              under=[([(0, 0), (5, 0), (5, 2), (0, 2)], SHADE), ([(0, 2), (5, 2), (5, 12)], SHADE2)],
              extra='')
 
