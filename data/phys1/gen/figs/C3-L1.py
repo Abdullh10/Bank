@@ -3,6 +3,7 @@ import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..')
 
 XL = 'الزمن (s)'; VL = 'السرعة المتجهة (m/s)'; DL = 'الموقع (m)'
 VIOLET = C_ACC
+BROWN = '#8a5a2b'; SLATE = '#5d6d7e'
 
 def mapper(xr, yr, w=520, h=360, title=False):
     L0, R0, T0, B0 = 78, w - 26, 34 if title else 18, h - 52
@@ -93,7 +94,7 @@ def panels(name, items, xr, yr, xt, yt, pw=300, ph=210):
 vt('c3l1-unit-slope.svg', [S([(0, 0), (4, 12)], color=C_VEL)], (0, 5), (0, 15), 1, 3)
 
 # ================= O03 =================
-vt('c3l1-rel-train-car.svg', [S([(0, 25), (5, 25)], 'A', BLUE, at=(4.4, 25), dx=0, dy=-10), S([(0, 0), (5, 10)], 'B', RED, at=(4.4, 8.8), dx=0, dy=-12)], (0, 5), (0, 30), 1, 5)
+vt('c3l1-rel-train-car.svg', [S([(0, 25), (5, 25)], 'A', INK, at=(4.4, 25), dx=0, dy=-10), S([(0, 0), (5, 10)], 'B', RED, at=(4.4, 8.8), dx=0, dy=-12)], (0, 5), (0, 30), 1, 5)
 
 # ================= O04 =================
 pm('c3l1-sign-left-speedup.svg', [{'xs': [530, 495, 440, 365, 270, 155][::-1][::-1], 'vel': True}], row_h=70)
@@ -114,7 +115,7 @@ pm('c3l1-unif-rows.svg', [
     {'label': '(1)', 'xs': [40, 60, 100, 160, 240, 340]},
     {'label': '(2)', 'xs': [40, 100, 160, 220, 280, 340]},
     {'label': '(3)', 'xs': [40, 140, 220, 280, 320, 340]}], w=430, row_h=60, plus=False, top=10)
-vt('c3l1-unif-dt.svg', [S([(0, 0), (5, 20)], 'A', BLUE, at=(4.5, 18), dx=-22, dy=-4, dots=False),
+vt('c3l1-unif-dt.svg', [S([(0, 0), (5, 20)], 'A', INK, at=(4.5, 18), dx=-22, dy=-4, dots=False),
                         S([(t / 10, 0.8 * (t / 10) ** 2) for t in range(0, 51)], 'B', RED, at=(4.5, 16.2), dx=10, dy=12, dots=False)],
    (0, 5), (0, 20), 1, 4, dots=False, yl=DL)
 s = ''
@@ -175,8 +176,8 @@ vt('c3l1-draw-student.svg', [S([(0, 2), (1, 5), (2, 8), (3, 13), (4, 14)], color
 
 # ================= O10 =================
 vt('c3l1-slope-a.svg', [S([(0, 2), (6, 14)], color=C_VEL)], (0, 6), (0, 16), 1, 2)
-vt('c3l1-slope-three.svg', [S([(0, 0), (5, 20)], 'A', BLUE, at=(2, 8), dx=-22, dy=-4), S([(0, 10), (5, 20)], 'B', RED, at=(1, 12), dx=0, dy=-12),
-                            S([(0, 5), (5, 10)], 'C', GREEN, at=(4, 9), dx=0, dy=-12)], (0, 5), (0, 24), 1, 4)
+vt('c3l1-slope-three.svg', [S([(0, 0), (5, 20)], 'A', INK, at=(2, 8), dx=-22, dy=-4), S([(0, 10), (5, 20)], 'B', RED, at=(1, 12), dx=0, dy=-12),
+                            S([(0, 5), (5, 10)], 'C', ORANGE, at=(4, 9), dx=0, dy=-12)], (0, 5), (0, 24), 1, 4)
 vt('c3l1-slope-neg.svg', [S([(0, 12), (4, 0)], color=C_VEL)], (0, 5), (0, 14), 1, 2)
 vt('c3l1-slope-trip.svg', [S([(0, 0), (4, 20), (8, 20), (12, 12), (16, 12), (20, 0)], color=C_VEL)], (0, 20), (0, 24), 2, 4, w=560)
 vt('c3l1-slope-essay.svg', [S([(0, 3), (5, 18)], color=C_VEL)], (0, 5), (0, 20), 1, 2)
@@ -188,17 +189,17 @@ vt('c3l1-desc-runner.svg', [S([(t / 10, 10 * (1 - _m.exp(-t / 10 / 1.2))) for t 
 trn = [(0, 0), (4, 12), (12, 12), (16, 4), (28, 4), (36, 0)]
 vt('c3l1-desc-train.svg', [S(trn, color=C_VEL)], (0, 40), (0, 14), 4, 2, w=580)
 vt('c3l1-desc-train2.svg', [S(trn, color=C_VEL)], (0, 40), (0, 14), 4, 2, w=580)
-vt('c3l1-desc-runners.svg', [S([(0, 8), (10, 8)], 'A', BLUE, at=(9, 8), dx=0, dy=-10, dots=False),
-                             S([(0, 0), (10, 6)], 'B', GREEN, at=(9, 5.4), dx=0, dy=-12, dots=False),
+vt('c3l1-desc-runners.svg', [S([(0, 8), (10, 8)], 'A', INK, at=(9, 8), dx=0, dy=-10, dots=False),
+                             S([(0, 0), (10, 6)], 'B', BROWN, at=(9, 5.4), dx=0, dy=-12, dots=False),
                              S([(0, 7), (4, 0)], 'C', RED, at=(1, 5.25), dx=14, dy=0, dots=False),
                              S([(0, -4), (10, 4)], 'D', ORANGE, at=(9, 3.2), dx=0, dy=20, dots=False),
-                             S([(0, -6), (10, -6)], 'E', PURPLE, at=(9, -6), dx=0, dy=-10, dots=False)], (0, 10), (-8, 10), 1, 2, dots=False)
+                             S([(0, -6), (10, -6)], 'E', SLATE, at=(9, -6), dx=0, dy=-10, dots=False)], (0, 10), (-8, 10), 1, 2, dots=False)
 vt('c3l1-desc-reverse.svg', [S([(0, 8), (4, 8), (8, 0), (12, -8)], color=C_VEL)], (0, 12), (-10, 10), 1, 2, w=560)
 vt('c3l1-desc-concave.svg', [S([(t / 10, 0.5 * (t / 10) ** 2) for t in range(0, 61)], color=RED, dots=False)], (0, 6), (0, 20), 1, 2, dots=False)
 vt('c3l1-desc-stop.svg', [S([(0, 10), (3, 10), (7, 0), (10, 0)], color=C_VEL)], (0, 10), (0, 12), 1, 2)
 vt('c3l1-desc-elevator.svg', [S([(0, 0), (2, 3), (8, 3), (10, 0), (12, -3), (16, -3), (18, 0)], color=C_VEL)], (0, 18), (-4, 4), 2, 1, w=580)
-vt('c3l1-desc-runners-essay.svg', [S([(0, 6), (10, 6)], 'P', BLUE, at=(1, 6), dx=0, dy=-10, dots=False),
-                                   S([(0, 2), (10, 8)], 'Q', GREEN, at=(9, 7.4), dx=0, dy=-12, dots=False),
+vt('c3l1-desc-runners-essay.svg', [S([(0, 6), (10, 6)], 'P', INK, at=(1, 6), dx=0, dy=-10, dots=False),
+                                   S([(0, 2), (10, 8)], 'Q', BROWN, at=(9, 7.4), dx=0, dy=-12, dots=False),
                                    S([(0, 9), (10, 1)], 'R', RED, at=(9, 1.8), dx=0, dy=-12, dots=False),
                                    S([(0, -8), (10, -2)], 'S', ORANGE, at=(9, -2.6), dx=0, dy=-12, dots=False)], (0, 10), (-10, 10), 1, 2, dots=False)
 vt('c3l1-desc-redlight.svg', [S([(0, 15), (4, 15), (10, 0), (14, 0), (20, 9)], color=C_VEL)], (0, 20), (0, 16), 2, 2, w=580)
