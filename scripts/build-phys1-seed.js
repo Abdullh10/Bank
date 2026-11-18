@@ -131,7 +131,7 @@ select
   (select count(*) from public.supplements s join public.objectives o on o.id = s.objective_id ${inCourse}) = ${counts.supplements} as supplements_ok,
   (select count(*) from public.questions q join public.objectives o on o.id = q.objective_id ${inCourse}${ONLY ? ` and c.number in (${ONLY})` : ''}) = ${counts.questions} as questions_ok,
   (select count(*) from public.question_answers a join public.questions q on q.id = a.question_id join public.objectives o on o.id = q.objective_id ${inCourse}${ONLY ? ` and c.number in (${ONLY})` : ''}) = ${counts.questions} as answers_ok,
-  (select status from public.courses where id = ${COURSE}) = 'preparing' as still_preparing;
+  ${ONLY ? `(select count(*) from public.questions q join public.objectives o on o.id = q.objective_id ${inCourse} and c.number in (${ONLY}) and q.status <> 'generated') = 0 as all_generated;` : `(select status from public.courses where id = ${COURSE}) = 'preparing' as still_preparing;`}
 `);
 console.log(`${parts.length} أجزاء في supabase/${outName}`, counts);
 for (const f of fs.readdirSync(outDir)) console.log(f, Math.round(fs.statSync(path.join(outDir, f)).size / 1024) + 'KB');
