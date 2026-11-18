@@ -15,7 +15,7 @@
     "$30\\ \\text{m}$"
    ],
    "correct_index": 1,
-   "explanation": "السرعة ثابتة 15 m/s، والمساحة تحت المنحنى من 0 إلى 4.0 s مستطيل: $\\Delta d = v\\Delta t = 15 \\times 4.0 = 60\\ \\text{m}$.",
+   "explanation": "السرعة ثابتة 15 m/s، والمساحة تحت المنحنى من 0 إلى 4.0 s مستطيل: $\\Delta\\boldsymbol{d} = \\boldsymbol{v}\\Delta t = 15 \\times 4.0 = 60\\ \\text{m}$.",
    "distractor_notes": [
     "هذا ناتج $15 \\times 8$؛ استُعملت الفترة الظاهرة في الرسم كله (8 s) بدل 4.0 s.",
     "",
@@ -42,7 +42,7 @@
     "$36\\ \\text{m}$"
    ],
    "correct_index": 3,
-   "explanation": "المساحة تحت المنحنى مثلث قاعدته 6.0 s وارتفاعه 12 m/s: $\\Delta d = \\frac{1}{2} \\times 6.0 \\times 12 = 36\\ \\text{m}$.",
+   "explanation": "المساحة تحت المنحنى مثلث قاعدته 6.0 s وارتفاعه 12 m/s: $\\Delta\\boldsymbol{d} = \\frac{1}{2} \\times 6.0 \\times 12 = 36\\ \\text{m}$.",
    "distractor_notes": [
     "هذا ناتج $6.0 \\times 12$؛ نُسي الضرب في $\\frac{1}{2}$ في مساحة المثلث.",
     "هذا ناتج $\\frac{12}{6.0}$، وهو الميل (التسارع) لا المساحة.",
@@ -133,7 +133,7 @@
    "thinking_level": "تحليل",
    "question_kind": "حساب من رسم بياني",
    "difficulty": "صعب",
-   "source_ref": "الكتاب ص 93 — اختبار مقنن 7: الإزاحة الكلية للشاحنة",
+   "source_ref": "الكتاب ص 93 — على نمط اختبار مقنن 7: الإزاحة الكلية للشاحنة",
    "images": [
     {
      "src": "qimg/phys1/c3l2-o07-north.svg",
@@ -150,7 +150,7 @@
     "$48\\ \\text{m}$"
    ],
    "correct_index": 1,
-   "explanation": "آخر 2.0 s هي الفترة من 4.0 إلى 6.0 s. السرعة عند 4.0 s تساوي 6.0 m/s، والمساحة مثلث: $\\Delta d = \\frac{1}{2} \\times 2.0 \\times 6.0 = 6.0\\ \\text{m}$.",
+   "explanation": "آخر 2.0 s هي الفترة من 4.0 إلى 6.0 s. السرعة عند 4.0 s تساوي 6.0 m/s، والمساحة مثلث: $\\Delta\\boldsymbol{d} = \\frac{1}{2} \\times 2.0 \\times 6.0 = 6.0\\ \\text{m}$.",
    "distractor_notes": [
     "هذا ناتج $2.0 \\times 6.0$؛ نُسي الضرب في $\\frac{1}{2}$.",
     "",
@@ -207,10 +207,10 @@
     "144 m للحركة كلها"
    ],
    "solution_steps": [
-    "$\\Delta d_1 = \\frac{1}{2}(4 - 0)(16) = 32\\ \\text{m}$",
-    "$\\Delta d_2 = (9 - 4)(16) = 80\\ \\text{m}$",
-    "$\\Delta d_3 = \\frac{1}{2}(13 - 9)(16) = 32\\ \\text{m}$",
-    "$\\Delta d = 32 + 80 + 32 = 144\\ \\text{m}$"
+    "$\\Delta\\boldsymbol{d}_1 = \\frac{1}{2}(4 - 0)(16) = 32\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d}_2 = (9 - 4)(16) = 80\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d}_3 = \\frac{1}{2}(13 - 9)(16) = 32\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d} = 32 + 80 + 32 = 144\\ \\text{m}$"
    ],
    "marks": [
     {
@@ -276,7 +276,7 @@
    "solution_steps": [
     "مساحة المثلث (0–4 s): $\\frac{1}{2}(4)(12) = 24\\ \\text{m}$",
     "مساحة المستطيل (4–7 s): $12 \\times (7 - 4) = 36\\ \\text{m}$",
-    "$\\Delta d = 24 + 36 = 60\\ \\text{m}$"
+    "$\\Delta\\boldsymbol{d} = 24 + 36 = 60\\ \\text{m}$"
    ],
    "marks": [
     {
@@ -366,7 +366,7 @@
   },
   {
    "stem": "يمثل المنحنى الآتي (السرعة المتجهة – الزمن) لمصعد يصعد من الطابق الأرضي إلى طابق أعلى ثم يتوقف.\n(أ) احسب إزاحة المصعد في كل مرحلة من مراحل حركته الثلاث، ثم إزاحته الكلية.\n(ب) احسب السرعة المتجهة المتوسطة للمصعد خلال الرحلة.\n(ج) إذا كان ارتفاع كل طابق 4.0 m، فإلى أيّ طابق وصل المصعد؟",
-   "model_answer": "(أ) التسارع (0–2 s): $\\frac{1}{2} \\times 2 \\times 4 = 4.0\\ \\text{m}$، والسرعة المنتظمة (2–8 s): $4 \\times 6 = 24\\ \\text{m}$، والتباطؤ (8–10 s): $\\frac{1}{2} \\times 2 \\times 4 = 4.0\\ \\text{m}$؛ الإزاحة الكلية 32 m إلى أعلى. (ب) $\\bar{v} = \\frac{\\Delta d}{\\Delta t} = \\frac{32}{10} = 3.2\\ \\text{m/s}$ إلى أعلى. (ج) $\\frac{32}{4.0} = 8$، فيصل إلى الطابق الثامن.",
+   "model_answer": "(أ) التسارع (0–2 s): $\\frac{1}{2} \\times 2 \\times 4 = 4.0\\ \\text{m}$، والسرعة المنتظمة (2–8 s): $4 \\times 6 = 24\\ \\text{m}$، والتباطؤ (8–10 s): $\\frac{1}{2} \\times 2 \\times 4 = 4.0\\ \\text{m}$؛ الإزاحة الكلية 32 m إلى أعلى. (ب) $\\boldsymbol{\\bar{v}} = \\frac{\\Delta\\boldsymbol{d}}{\\Delta t} = \\frac{32}{10} = 3.2\\ \\text{m/s}$ إلى أعلى. (ج) $\\frac{32}{4.0} = 8$، فيصل إلى الطابق الثامن.",
    "answer_elements": [
     "4.0 m و24 m و4.0 m",
     "الإزاحة الكلية 32 m",
@@ -374,10 +374,10 @@
     "الطابق الثامن"
    ],
    "solution_steps": [
-    "$\\Delta d_1 = \\frac{1}{2}(2)(4) = 4.0\\ \\text{m}$",
-    "$\\Delta d_2 = 4 \\times (8 - 2) = 24\\ \\text{m}$",
-    "$\\Delta d_3 = \\frac{1}{2}(10 - 8)(4) = 4.0\\ \\text{m}$",
-    "$\\Delta d = 32\\ \\text{m}$، $\\bar{v} = \\frac{32}{10} = 3.2\\ \\text{m/s}$",
+    "$\\Delta\\boldsymbol{d}_1 = \\frac{1}{2}(2)(4) = 4.0\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d}_2 = 4 \\times (8 - 2) = 24\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d}_3 = \\frac{1}{2}(10 - 8)(4) = 4.0\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d} = 32\\ \\text{m}$، $\\boldsymbol{\\bar{v}} = \\frac{32}{10} = 3.2\\ \\text{m/s}$",
     "عدد الطوابق $= \\frac{32}{4.0} = 8$"
    ],
    "marks": [

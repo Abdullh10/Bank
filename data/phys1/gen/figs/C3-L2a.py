@@ -111,6 +111,10 @@ if __name__ == '__main__':
     f7 = lambda t: 0.5 * t * t
     vt('c3l2-o04-tan-axis.svg', [S(curve(f7, 0, 6)), S([(2, 0), (6.5, 18)], color=TAN, dash='7 5', w=2)], (0, 7), (0, 20), 1, 2,
        extra_fn=lambda X, Y: tangent_dots(X, Y, [(2, 0), (6, 16)]) + DOT(X(4), Y(8), 5, C_VEL))
+    # Q7 (بعد المراجعة): v = 2 + 6t - 0.5t² ؛ المماس عند 4 s: v = 10 + 2t يمر بنقطتي الشبكة (0, 10) و(5, 20) دون تعليمهما
+    f8 = lambda t: 2 + 6 * t - 0.5 * t * t
+    vt('c3l2-o04-tan-read.svg', [S(curve(f8, 0, 6)), S([(0, 10), (6.5, 23)], color=TAN, dash='7 5', w=2)], (0, 7), (0, 24), 1, 2,
+       extra_fn=lambda X, Y: DOT(X(4), Y(18), 5, C_VEL))
     # E1: عدّاء v = 3t - 0.25t² حتى 6 s ثم 9 m/s ثابتة ؛ المماس عند 2 s: v = 1 + 2t ، وعند 7 s أفقي
     fe1 = lambda t: 3 * t - 0.25 * t * t if t <= 6 else 9
     vt('c3l2-o04-essay-runner.svg', [S(curve(fe1, 0, 9, 180)), S([(0, 1), (4.5, 10)], color=TAN, dash='7 5', w=2)], (0, 9), (0, 10), 1, 1,
