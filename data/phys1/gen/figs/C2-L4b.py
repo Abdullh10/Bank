@@ -57,7 +57,7 @@ def ruler_dots(name, pos, xmax, step, w=600, vecs=None, label=None, x_left=0, do
     """نقاط عند مواقع pos (m) فوق محور مدرّج من x_left إلى xmax. vecs: [(x_from, length_m)] أسهم سرعة حمراء فوق النقاط."""
     L0, R0 = 40, w - 40; X = lambda x: L0 + (x - x_left) / (xmax - x_left) * (R0 - L0)
     H = 150; ya = 110; yd = 70; b = ''
-    b += ARROW(L0 - 10, ya, R0 + 22, ya, INK, 1.8) + T(R0 + 26, ya - 10, 'd (m)', 14, 'end', italic=True)
+    b += ARROW(L0 - 10, ya, R0 + 22, ya, INK, 1.8) + T(R0 + 26, ya - 10, '(m)', 14, 'end') + T(R0 - 2, ya - 10, 'd', 15, 'end', italic=True)
     x = x_left
     while x <= xmax + 1e-9:
         b += L(X(x), ya - 5, X(x), ya + 5, INK, 1.5) + T(X(x), ya + 22, fmt(round(x, 6)), 13, color=MUTED); x += step
@@ -110,7 +110,6 @@ lines('c2l4-o15-runners.svg', [S([(0, 6), (6, 12)], 'A', BLUE, dash='8 6'), S([(
 lines('c2l4-o15-segment.svg', [S([(2, 10), (6, 22)], color=GREEN)], (0, 6), (0, 24), 1, 2, h=380)
 lines('c2l4-o15-essay1.svg', [S([(0, 10), (5, 20)], 'P', BLUE), S([(0, -14), (5, 6)], 'Q', RED), S([(0, -2), (5, -12)], 'R', GREEN)],
       (0, 5), (-14, 20), 1, 2, w=540, h=460)
-lines('c2l4-o15-essay2.svg', [S([(0, -12), (6, 6)], color=GREEN)], (0, 6), (-14, 8), 1, 2, h=380)
 
 # ---------- O16 ----------
 def sketch(name, student_m):
