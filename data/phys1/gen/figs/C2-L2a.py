@@ -99,9 +99,9 @@ def compass(x, y):
 # نظامان للطريق نفسه: (1) نقطة الأصل عند المنزل والقيم تتزايد يمينًا؛ (2) نقطة الأصل عند عمود الإنارة والقيم تتزايد يسارًا.
 def two_systems():
     w = 640; x0, x1 = 60, w - 60
-    # المنزل عند 0 والعمود عند 30 في النظام (1)
+    # المنزل عند 0 والشجرة عند 10 والعمود عند 30 في النظام (1)
     P1 = lambda v: x0 + v / 30 * (x1 - x0)
-    b = icon('house', P1(0), 100) + T(P1(0), 40, 'المنزل', 13, weight='bold') + icon('tree', P1(12), 100) + T(P1(12), 34, 'الشجرة', 13, weight='bold')
+    b = icon('house', P1(0), 100) + T(P1(0), 40, 'المنزل', 13, weight='bold') + icon('tree', P1(10), 100) + T(P1(10), 34, 'الشجرة', 13, weight='bold')
     b += icon('pole', P1(30), 100) + T(P1(30), 34, 'عمود الإنارة', 13, weight='bold')
     b += L(20, 100, w - 20, 100, '#9aa3ad', 6)
     for k, (ya, rev, lab) in enumerate([(160, False, 'النظام (1)'), (250, True, 'النظام (2)')]):
@@ -121,7 +121,7 @@ numline('c2l2-o01-axis.svg', 0, 40, 5, reverse=True, landmarks=[(0, 'tree', 'ا�
 numline('c2l2-o02-origin.svg', -20, 60, 10, landmarks=[(-20, 'house', 'المنزل'), (0, 'mosque', 'المسجد'), (30, 'shop', 'البقالة'), (60, 'school', 'المدرسة')], w=660)
 
 # ================= O03 الموقع =================
-numline('c2l2-o03-negative.svg', -10, 30, 5, landmarks=[(4, 'tree', 'الشجرة')], dots=[(-5, 'الكرة', RED)])
+numline('c2l2-o03-negative.svg', -15, 30, 5, landmarks=[(5, 'tree', 'الشجرة')], dots=[(-10, 'الكرة', RED)])
 numline('c2l2-o03-arrows.svg', 0, 30, 5, dots=[(20, 'العدّاء', RED)], arrows=[
     dict(frm=20, to=0, label='(1)', row=0), dict(frm=10, to=20, label='(2)', row=1),
     dict(frm=0, to=20, label='(3)', row=2), dict(frm=0, to=30, label='(4)', row=3)], w=620)

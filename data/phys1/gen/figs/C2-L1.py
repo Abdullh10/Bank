@@ -265,7 +265,7 @@ plane = px([0, 0.3, 0.9, 1.8, 3.0, 4.5, 6.3], 0, 6.3, 50, 550)
 dot_rows('c2l1-o06-plane.svg', [{'xs': plane, 'arrow': '→'}], w=600, top=46)
 # حركة نحو اليسار مع متجهات السرعة: التباعد يتناقص في اتجاه الحركة
 left = px([6.0, 4.0, 2.4, 1.2, 0.4, 0.0], 0, 6, 70, 540)
-dot_rows('c2l1-o06-left.svg', [{'xs': left, 'vel': True}], w=600, top=36)
+dot_rows('c2l1-o06-left.svg', [{'xs': left, 'arrow': '←'}], w=600, top=46)
 # متجهات سرعة يمينًا متزايدة (للمقالي)
 right_vel = px([0, 0.5, 1.4, 2.7, 4.4, 6.5], 0, 6.5, 50, 520)
 dot_rows('c2l1-o06-right-vel.svg', [{'xs': right_vel, 'vel': True}], w=600, top=36)
