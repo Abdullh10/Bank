@@ -1,0 +1,348 @@
+{
+ "objective": "P1-C2-L2-O16",
+ "meta": {
+  "origin": "مولدة بالذكاء الاصطناعي",
+  "basis": "كتاب الطالب فيزياء 1 — نظام المسارات (طبعة 1447)",
+  "status_note": "مسودة مولدة: الحسابات متحقق منها بـ Python، ولم يراجعها خبير بشري بعد"
+ },
+ "mcq": [
+  {
+   "stem": "كيف يُطرح المتجه $\\boldsymbol{B}$ من المتجه $\\boldsymbol{A}$ بيانيًّا؟",
+   "options": [
+    "يُطرح طول $\\boldsymbol{B}$ من طول $\\boldsymbol{A}$ دائمًا ويبقى الاتجاه اتجاه $\\boldsymbol{A}$",
+    "يُعكس اتجاه $\\boldsymbol{A}$ ثم يُجمع مع $\\boldsymbol{B}$ كما هو",
+    "يُعكس اتجاه $\\boldsymbol{B}$ ثم يُجمع مع $\\boldsymbol{A}$",
+    "يوضع ذيل $\\boldsymbol{B}$ عند رأس $\\boldsymbol{A}$ ثم يُرسم المتجه من ذيل الأول إلى رأس الثاني"
+   ],
+   "correct_index": 2,
+   "explanation": "لطرح متجه من آخر نعكس اتجاه المتجه المراد طرحه ثم نجمعهما: $\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$.",
+   "distractor_notes": [
+    "هذا يصلح فقط عندما يكون المتجهان في الاتجاه نفسه، ولا يمثل الطريقة العامة للطرح.",
+    "هذا يعطي $\\boldsymbol{B} - \\boldsymbol{A}$ لا $\\boldsymbol{A} - \\boldsymbol{B}$.",
+    "",
+    "هذه طريقة جمع $\\boldsymbol{A} + \\boldsymbol{B}$، دون عكس اتجاه $\\boldsymbol{B}$."
+   ],
+   "thinking_level": "تذكر",
+   "question_kind": "تذكر إجراء",
+   "difficulty": "سهل",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  },
+  {
+   "stem": "في الشكل الآتي، ما المتجه $\\boldsymbol{A} - \\boldsymbol{B}$؟",
+   "options": [
+    "7 m شرقًا",
+    "3 m غربًا",
+    "7 m غربًا",
+    "3 m شرقًا"
+   ],
+   "correct_index": 3,
+   "explanation": "$\\boldsymbol{A}$ = 5 مربعات شرقًا = 5 m شرقًا، و$\\boldsymbol{B}$ = 2 m شرقًا، فيكون $-\\boldsymbol{B}$ = 2 m غربًا، و$\\boldsymbol{A} + (-\\boldsymbol{B})$ = 3 m شرقًا.",
+   "distractor_notes": [
+    "جمع المتجهين ($\\boldsymbol{A} + \\boldsymbol{B}$) دون عكس اتجاه $\\boldsymbol{B}$.",
+    "هذا $\\boldsymbol{B} - \\boldsymbol{A}$؛ المقدار صحيح والاتجاه معكوس.",
+    "جمع المقدارين وعكس الاتجاه معًا.",
+    ""
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "قراءة رسم",
+   "difficulty": "سهل",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)",
+   "images": [
+    {
+     "src": "qimg/phys1/c2l2-o16-AB.svg",
+     "alt": "شبكة مربعات، وتحتها «ضلع المربع يمثل 1 m» وسهم مكتوب بجانبه «شرق» يشير إلى اليمين. متجه أخضر A أفقي نحو اليمين طوله 5 مربعات، وتحته متجه أخضر B أفقي نحو اليمين طوله مربعان، يبدأ المتجهان من الموضع الأفقي نفسه."
+    }
+   ]
+  },
+  {
+   "stem": "يبيّن الشكل الآتي المتجهين $\\boldsymbol{A}$ و$\\boldsymbol{B}$، وأربعة رسوم مرقمة رُسم في كلٍّ منها متجه محصلة بخط متقطع. أيّ الرسوم يمثّل إيجاد $\\boldsymbol{A} - \\boldsymbol{B}$ بطريقة صحيحة؟",
+   "options": [
+    "الرسم (1)",
+    "الرسم (2)",
+    "الرسم (3)",
+    "الرسم (4)"
+   ],
+   "correct_index": 0,
+   "explanation": "في الرسم (1) عُكس اتجاه $\\boldsymbol{B}$ فصار $-\\boldsymbol{B}$ (إلى أسفل)، ووُضع ذيله عند رأس $\\boldsymbol{A}$، ورُسمت المحصلة من ذيل $\\boldsymbol{A}$ إلى رأس $-\\boldsymbol{B}$، أي $\\boldsymbol{A} + (-\\boldsymbol{B})$.",
+   "distractor_notes": [
+    "",
+    "لم يُعكس اتجاه $\\boldsymbol{B}$، فالمحصلة المرسومة تمثل $\\boldsymbol{A} + \\boldsymbol{B}$.",
+    "عُكس اتجاه $\\boldsymbol{A}$ بدل $\\boldsymbol{B}$، فالمحصلة تمثل $\\boldsymbol{B} - \\boldsymbol{A}$.",
+    "وُضع $-\\boldsymbol{B}$ وذيله عند ذيل $\\boldsymbol{A}$ لا عند رأسه، ورُسم المتقطع بين الرأسين، فلا يمثل $\\boldsymbol{A} + (-\\boldsymbol{B})$ بطريقة الرأس للذيل."
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "اختيار رسم",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)",
+   "images": [
+    {
+     "src": "qimg/phys1/c2l2-o16-panels.svg",
+     "alt": "في الأعلى «المتجهان الأصليان»: متجه أخضر A أفقي نحو اليمين طوله 4 وحدات، ومتجه أخضر B رأسي إلى أعلى طوله وحدتان. وتحتهما أربعة رسوم: (1) A نحو اليمين ثم من رأسه متجه −B إلى أسفل، وخط متقطع من ذيل A إلى رأس −B. (2) A نحو اليمين ثم من رأسه B إلى أعلى، وخط متقطع من ذيل A إلى رأس B. (3) −A نحو اليسار ثم من رأسه B إلى أعلى، وخط متقطع من ذيل −A إلى رأس B. (4) A نحو اليمين و−B إلى أسفل يبدآن من النقطة نفسها، وخط متقطع من رأس A إلى رأس −B."
+    }
+   ]
+  },
+  {
+   "stem": "ما المتجه $-\\boldsymbol{B}$؟",
+   "options": [
+    "متجه اتجاهه اتجاه $\\boldsymbol{B}$ نفسه، ومقداره سالب",
+    "متجه له مقدار $\\boldsymbol{B}$ نفسه، واتجاهه عكس اتجاه $\\boldsymbol{B}$",
+    "متجه مقداره صفر؛ لأنه يُلغي المتجه $\\boldsymbol{B}$",
+    "متجه اتجاهه عمودي على $\\boldsymbol{B}$، وله المقدار نفسه"
+   ],
+   "correct_index": 1,
+   "explanation": "$-\\boldsymbol{B}$ متجه يساوي $\\boldsymbol{B}$ في المقدار ويعاكسه في الاتجاه، ويُستعمل لتحويل الطرح إلى جمع.",
+   "distractor_notes": [
+    "مقدار المتجه (طوله) لا يكون سالبًا؛ الإشارة السالبة تعني عكس الاتجاه.",
+    "",
+    "$-\\boldsymbol{B}$ له مقدار $\\boldsymbol{B}$ نفسه؛ ومجموعه مع $\\boldsymbol{B}$ هو الذي يساوي صفرًا.",
+    "عكس الاتجاه يعني دورانه نصف دورة لا ربع دورة."
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "مفهوم",
+   "difficulty": "سهل",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  },
+  {
+   "stem": "رُسم متجها إزاحة $\\boldsymbol{A}$ و$\\boldsymbol{B}$ بمقياس رسم على الشبكة الآتية. إذا طُرح $\\boldsymbol{B}$ من $\\boldsymbol{A}$، فما مقدار الناتج واتجاهه بالمتر؟",
+   "options": [
+    "50 m شرقًا",
+    "10 m شرقًا",
+    "50 m غربًا",
+    "10 m غربًا"
+   ],
+   "correct_index": 0,
+   "explanation": "$\\boldsymbol{A}$ = 3 مربعات شرقًا = 30 m شرقًا، و$\\boldsymbol{B}$ = 20 m غربًا، فيكون $-\\boldsymbol{B}$ = 20 m شرقًا، و$\\boldsymbol{A} + (-\\boldsymbol{B})$ = 50 m شرقًا.",
+   "distractor_notes": [
+    "",
+    "جمع $\\boldsymbol{A} + \\boldsymbol{B}$ (30 m شرقًا مع 20 m غربًا) دون عكس اتجاه $\\boldsymbol{B}$.",
+    "هذا $\\boldsymbol{B} - \\boldsymbol{A}$؛ المقدار صحيح والاتجاه معكوس.",
+    "طرح المقدارين وعكس الاتجاه، دون اتباع قاعدة عكس المتجه المطروح."
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "قراءة رسم",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)",
+   "images": [
+    {
+     "src": "qimg/phys1/c2l2-o16-west.svg",
+     "alt": "شبكة مربعات، وتحتها «ضلع المربع يمثل 10 m» وسهم مكتوب بجانبه «شرق» يشير إلى اليمين. متجه أخضر A أفقي نحو اليمين طوله 3 مربعات، وتحته متجه أخضر B أفقي نحو اليسار طوله مربعان."
+    }
+   ]
+  },
+  {
+   "stem": "يبيّن الشكل الآتي متجهَي الموقع الابتدائي $\\boldsymbol{d}_i$ والنهائي $\\boldsymbol{d}_f$ لجسم. كيف يُرسم متجه الإزاحة $\\Delta\\boldsymbol{d} = \\boldsymbol{d}_f - \\boldsymbol{d}_i$ بيانيًّا؟",
+   "options": [
+    "يوضع ذيل $\\boldsymbol{d}_i$ عند رأس $\\boldsymbol{d}_f$ دون عكسه، ثم يُرسم المتجه من ذيل $\\boldsymbol{d}_f$ إلى رأس $\\boldsymbol{d}_i$",
+    "يُعكس $\\boldsymbol{d}_f$، ويوضع ذيل $-\\boldsymbol{d}_f$ عند رأس $\\boldsymbol{d}_i$، ثم يُرسم المتجه من ذيل $\\boldsymbol{d}_i$ إلى رأس $-\\boldsymbol{d}_f$",
+    "يُعكس $\\boldsymbol{d}_i$، ويوضع ذيل $-\\boldsymbol{d}_i$ عند رأس $\\boldsymbol{d}_f$، ثم يُرسم المتجه من ذيل $\\boldsymbol{d}_f$ إلى رأس $-\\boldsymbol{d}_i$",
+    "يُرسم المتجه من نقطة الأصل إلى رأس $\\boldsymbol{d}_f$ مباشرة؛ لأنه يمثل الإزاحة"
+   ],
+   "correct_index": 2,
+   "explanation": "الإزاحة $\\boldsymbol{d}_f - \\boldsymbol{d}_i = \\boldsymbol{d}_f + (-\\boldsymbol{d}_i)$؛ فنعكس $\\boldsymbol{d}_i$ وننقله بحيث يكون ذيله عند رأس $\\boldsymbol{d}_f$ ثم نجمعهما، فينتج متجه طوله 6 m في الاتجاه الموجب.",
+   "distractor_notes": [
+    "هذا جمع $\\boldsymbol{d}_f + \\boldsymbol{d}_i$ لا طرحهما.",
+    "هذا يعطي $\\boldsymbol{d}_i - \\boldsymbol{d}_f$، أي الإزاحة معكوسة الاتجاه.",
+    "",
+    "هذا متجه الموقع النهائي $\\boldsymbol{d}_f$ نفسه، ويهمل أن الجسم لم يبدأ من نقطة الأصل."
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "إجراء",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)",
+   "images": [
+    {
+     "src": "qimg/phys1/c2l2-o16-dfdi.svg",
+     "alt": "محور أفقي للموقع d بالمتر مدرّج من 0 إلى 12 كل 1 m، ومكتوب عند الصفر «نقطة الأصل»، ونقطتان على المحور عند 4 m و10 m. فوق المحور متجه أخضر d_i يبدأ من الصفر وينتهي عند 4 m، وفوقه متجه أخضر d_f يبدأ من الصفر وينتهي عند 10 m، وكلاهما يشير إلى اليمين."
+    }
+   ]
+  },
+  {
+   "stem": "ما العلاقة بين المتجهين $\\boldsymbol{A} - \\boldsymbol{B}$ و$\\boldsymbol{B} - \\boldsymbol{A}$ لأي متجهين $\\boldsymbol{A}$ و$\\boldsymbol{B}$؟",
+   "options": [
+    "متساويان في المقدار والاتجاه؛ لأن ترتيب الطرح لا يؤثر",
+    "مقدار الأول أكبر دائمًا، ولهما الاتجاه نفسه",
+    "متعامدان، ولهما المقدار نفسه",
+    "لهما المقدار نفسه، واتجاهاهما متعاكسان"
+   ],
+   "correct_index": 3,
+   "explanation": "$\\boldsymbol{B} - \\boldsymbol{A} = -(\\boldsymbol{A} - \\boldsymbol{B})$؛ فعكس ترتيب الطرح يعكس اتجاه الناتج ويبقي مقداره كما هو، أي أن لهما المقدار نفسه واتجاهاهما متعاكسان.",
+   "distractor_notes": [
+    "ترتيب الطرح يؤثر؛ فعكسه يعكس اتجاه الناتج، بخلاف الجمع.",
+    "المقداران متساويان، والاتجاهان متعاكسان لا متماثلان.",
+    "الناتجان على خط واحد بعكس الاتجاه، لا متعامدان.",
+    ""
+   ],
+   "thinking_level": "تحليل",
+   "question_kind": "استنتاج",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  }
+ ],
+ "essay": [
+  {
+   "stem": "المتجه $\\boldsymbol{A}$ طوله 6 cm ويتجه شرقًا، والمتجه $\\boldsymbol{B}$ طوله 2 cm ويتجه شرقًا أيضًا. وضّح بالخطوات كيف تجد $\\boldsymbol{A} - \\boldsymbol{B}$ بيانيًّا، وحدّد مقدار الناتج واتجاهه.",
+   "model_answer": "نكتب الطرح على صورة جمع: $\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$. نرسم $\\boldsymbol{A}$ بطول 6 cm نحو الشرق، ثم نرسم $-\\boldsymbol{B}$ بطول 2 cm نحو الغرب (عكس اتجاه $\\boldsymbol{B}$) بحيث يكون ذيله عند رأس $\\boldsymbol{A}$، ثم نرسم المحصلة من ذيل $\\boldsymbol{A}$ إلى رأس $-\\boldsymbol{B}$، فيكون طولها 4 cm نحو الشرق.",
+   "answer_elements": [
+    "$\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$",
+    "$-\\boldsymbol{B}$: 2 cm غربًا",
+    "ذيل $-\\boldsymbol{B}$ عند رأس $\\boldsymbol{A}$",
+    "المحصلة 4 cm شرقًا"
+   ],
+   "solution_steps": [],
+   "marks": [
+    {
+     "element": "تحويل الطرح إلى جمع",
+     "marks": 1
+    },
+    {
+     "element": "عكس $\\boldsymbol{B}$ ووضعه رأسًا لذيل",
+     "marks": 1
+    },
+    {
+     "element": "الناتج مقدارًا واتجاهًا",
+     "marks": 1
+    }
+   ],
+   "rubric": [
+    {
+     "level": "3 درجات",
+     "description": "خطوات صحيحة وناتج صحيح"
+    },
+    {
+     "level": "2 درجتان",
+     "description": "خطوات صحيحة مع خطأ في الاتجاه أو المقدار"
+    },
+    {
+     "level": "1 درجة",
+     "description": "عنصر واحد صحيح"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "جمع $\\boldsymbol{A}$ و$\\boldsymbol{B}$ فيكون الناتج 8 cm",
+    "كتابة الناتج 4 cm دون اتجاه",
+    "عكس اتجاه $\\boldsymbol{A}$ بدل $\\boldsymbol{B}$"
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "شرح إجراء",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  },
+  {
+   "stem": "نقطة الأصل لمحور موقع أفقي في منتصف ممر، والاتجاه الموجب نحو اليمين. تحرك جسم من الموقع $\\boldsymbol{d}_i = +3\\ \\text{m}$ إلى الموقع $\\boldsymbol{d}_f = -5\\ \\text{m}$.\n(أ) صِف متجهي الموقع $\\boldsymbol{d}_i$ و$\\boldsymbol{d}_f$.\n(ب) وضّح كيف تجد $\\Delta\\boldsymbol{d} = \\boldsymbol{d}_f - \\boldsymbol{d}_i$ بالرسم.\n(ج) احسب $\\Delta\\boldsymbol{d}$ وتحقق من أن الناتج يتفق مع الرسم.",
+   "model_answer": "(أ) $\\boldsymbol{d}_i$ سهم ذيله عند نقطة الأصل ورأسه عند 3 m إلى اليمين، و$\\boldsymbol{d}_f$ سهم ذيله عند نقطة الأصل ورأسه عند 5 m إلى اليسار. (ب) نعكس $\\boldsymbol{d}_i$ فنحصل على $-\\boldsymbol{d}_i$ (3 m نحو اليسار)، وننقله بحيث يكون ذيله عند رأس $\\boldsymbol{d}_f$، ثم نرسم المحصلة من ذيل $\\boldsymbol{d}_f$ (نقطة الأصل) إلى رأس $-\\boldsymbol{d}_i$، فتنتهي عند $-8\\ \\text{m}$. (ج) $\\Delta\\boldsymbol{d} = -5\\ \\text{m} - (+3\\ \\text{m}) = -8\\ \\text{m}$، أي 8 m نحو اليسار، وهو طول المحصلة واتجاهها في الرسم، ويطابق انتقال الجسم من 3 m يمين الأصل إلى 5 m يساره.",
+   "answer_elements": [
+    "وصف متجهي الموقع",
+    "عكس $\\boldsymbol{d}_i$ ووضعه رأسًا لذيل مع $\\boldsymbol{d}_f$",
+    "$\\Delta\\boldsymbol{d} = -8\\ \\text{m}$",
+    "اتفاق الحساب مع الرسم"
+   ],
+   "solution_steps": [
+    "$-\\boldsymbol{d}_i = -3\\ \\text{m}$",
+    "$\\Delta\\boldsymbol{d} = \\boldsymbol{d}_f + (-\\boldsymbol{d}_i) = -5 + (-3) = -8\\ \\text{m}$"
+   ],
+   "marks": [
+    {
+     "element": "متجها الموقع",
+     "marks": 1
+    },
+    {
+     "element": "خطوات الرسم",
+     "marks": 1
+    },
+    {
+     "element": "الحساب",
+     "marks": 1
+    },
+    {
+     "element": "التحقق",
+     "marks": 1
+    }
+   ],
+   "rubric": [
+    {
+     "level": "4 درجات",
+     "description": "جميع العناصر صحيحة"
+    },
+    {
+     "level": "2–3 درجات",
+     "description": "حساب صحيح مع نقص في وصف الرسم أو العكس"
+    },
+    {
+     "level": "1 درجة",
+     "description": "عنصر واحد صحيح"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "حساب $-5 - 3$ على أنه $-2$",
+    "نسيان عكس اتجاه $\\boldsymbol{d}_i$",
+    "كتابة الإزاحة $+8\\ \\text{m}$"
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "رسم وحساب",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  },
+  {
+   "stem": "قال طالب: «$\\boldsymbol{A} - \\boldsymbol{B}$ هو نفسه $\\boldsymbol{B} - \\boldsymbol{A}$؛ لأننا في الحالتين نطرح الطول الأصغر من الأكبر». قوّم قوله باستعمال مثال: $\\boldsymbol{A}$ = 5 m شرقًا، و$\\boldsymbol{B}$ = 3 m شرقًا.",
+   "model_answer": "القول غير صحيح. $\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$ = 5 m شرقًا + 3 m غربًا = 2 m شرقًا. أما $\\boldsymbol{B} - \\boldsymbol{A} = \\boldsymbol{B} + (-\\boldsymbol{A})$ = 3 m شرقًا + 5 m غربًا = 2 m غربًا. الناتجان متساويان في المقدار ومتعاكسان في الاتجاه؛ لأن طرح المتجهات يعتمد على عكس اتجاه المتجه المطروح، والمتجه لا يُحدَّد بمقداره فقط بل بمقداره واتجاهه معًا.",
+   "answer_elements": [
+    "$\\boldsymbol{A} - \\boldsymbol{B}$ = 2 m شرقًا",
+    "$\\boldsymbol{B} - \\boldsymbol{A}$ = 2 m غربًا",
+    "الناتجان متعاكسان فالقول خطأ",
+    "التعليل: المتجه مقدار واتجاه"
+   ],
+   "solution_steps": [
+    "$\\boldsymbol{A} + (-\\boldsymbol{B})$: 5 m شرقًا + 3 m غربًا = 2 m شرقًا",
+    "$\\boldsymbol{B} + (-\\boldsymbol{A})$: 3 m شرقًا + 5 m غربًا = 2 m غربًا"
+   ],
+   "marks": [
+    {
+     "element": "حساب $\\boldsymbol{A} - \\boldsymbol{B}$",
+     "marks": 1
+    },
+    {
+     "element": "حساب $\\boldsymbol{B} - \\boldsymbol{A}$",
+     "marks": 1
+    },
+    {
+     "element": "الحكم مع التعليل",
+     "marks": 2
+    }
+   ],
+   "rubric": [
+    {
+     "level": "4 درجات",
+     "description": "حسابان صحيحان وحكم معلل"
+    },
+    {
+     "level": "2–3 درجات",
+     "description": "حسابان صحيحان مع تعليل ناقص"
+    },
+    {
+     "level": "1 درجة",
+     "description": "حكم صحيح دون أدلة"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "الاكتفاء بالمقدار 2 m في الحالتين",
+    "قبول قول الطالب"
+   ],
+   "thinking_level": "تقويم",
+   "question_kind": "تقويم عبارة",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
+  }
+ ]
+}

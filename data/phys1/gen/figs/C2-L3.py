@@ -107,7 +107,7 @@ misplot()
 dots_axis('c2l3-o02-e2.svg', [0, 3, 6, 9, 12, 15], 0, 15, 3, 'الموقع (m)')
 
 # ---------- O03
-graph('c2l3-o03-e1.svg', [{'pts': [(0, 0), (5, 40)]}], (0, 5), (0, 40), TL, DL, 0.5, 5)
+graph('c2l3-o03-e1.svg', [{'pts': [(0, 0), (5, 40)]}], (0, 5), (0, 40), TL, DL, 0.5, 4)
 
 # ---------- O04
 for n in ('a1', 'a2'):
@@ -127,7 +127,7 @@ graph('c2l3-o05-ab.svg', [{'pts': [(0, -40), (10, 40)], 'label': 'A', 'color': B
                           {'pts': [(0, 60), (10, -20)], 'label': 'B', 'color': RED, 'at': (10, -20), 'dx': -22, 'dy': -8}],
       (0, 10), (-60, 80), TL, DL, 1, 20)
 graph('c2l3-o05-return.svg', [{'pts': [(0, 0), (4, 20), (8, 20), (12, 0)]}], (0, 12), (0, 30), TL, DL, 1, 5)
-graph('c2l3-o05-steep.svg', [{'pts': [(0, 0), (4, 8), (6, 28), (10, 36)]}], (0, 10), (0, 40), TL, DL, 1, 4)
+graph('c2l3-o05-cross.svg', [{'pts': [(0, 20), (4, -20), (8, -20)]}], (0, 8), (-30, 30), TL, DL, 1, 10)
 graph('c2l3-o05-e1.svg', [{'pts': [(0, 0), (10, 10), (25, 10), (35, 20), (40, 20), (55, 5), (60, 5), (65, 0)]}], (0, 70), (0, 25), TL, DL, 5, 5, w=600)
 graph('c2l3-o05-e3.svg', [{'pts': [(0, 0), (3, 3)]}], (0, 3), (0, 3), TL, DL, 0.5, 0.5)
 
@@ -165,11 +165,11 @@ def three(name, ts, ds, ystep, ymax):
     tx, ty, cw, rh = 20, 30, 80, 30
     b += T(tx + cw, 20, 'جدول البيانات', 14, weight='bold')
     b += RECT(tx, ty, cw, rh, fill='#e3ecf6') + RECT(tx + cw, ty, cw, rh, fill='#e3ecf6')
-    b += T(tx + cw / 2, ty + 20, 'الزمن (s)', 13) + T(tx + cw * 1.5, ty + 20, 'الموقع (m)', 13)
+    b += T(tx + cw * 1.5, ty + 20, 'الزمن (s)', 13) + T(tx + cw / 2, ty + 20, 'الموقع (m)', 13)
     for i, (t, d) in enumerate(zip(ts, ds)):
         yy = ty + rh * (i + 1)
         b += RECT(tx, yy, cw, rh, fill='#fff') + RECT(tx + cw, yy, cw, rh, fill='#fff')
-        b += T(tx + cw / 2, yy + 20, f'{t:.1f}', 14) + T(tx + cw * 1.5, yy + 20, f'{d:.1f}', 14)
+        b += T(tx + cw * 1.5, yy + 20, f'{t:.1f}', 14) + T(tx + cw / 2, yy + 20, f'{d:.1f}', 14)
     # منحنى
     b += mini_graph(200, 0, 330, 270, [{'pts': list(zip(ts, ds))}], (0, ts[-1]), (0, ymax), 1, ystep, title='منحنى (الموقع – الزمن)')
     # نموذج الجسيم
