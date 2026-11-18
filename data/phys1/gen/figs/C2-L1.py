@@ -16,6 +16,11 @@ def car(x, y, op=1.0, color=CAR, sc=1.0):
     return g
 
 
+def TL(x, y, s, size=15, color=INK):
+    """نص زمن مثل 't = 0.1 s' مع t مائلة (كمية قياسية) والوحدة قائمة."""
+    return T(x, y, s, size, color=color).replace('>t =', '><tspan font-style="italic">t</tspan> =')
+
+
 def tree(x, y):
     return RECT(x - 5, y - 45, 10, 45, TRUNK, TRUNK, 1) + f'<circle cx="{x}" cy="{y - 62}" r="26" fill="{TREE}" opacity="0.9"/>'
 
@@ -142,7 +147,7 @@ def road_positions(name, times=None):
     b += car(P(20) - 35, 150, 0.4) + car(P(60) - 35, 150, 1.0)
     b += L(P(20), 150, P(20), 162, INK, 1.2, '3 3') + L(P(60), 150, P(60), 162, INK, 1.2, '3 3')
     if times:
-        b += T(P(20), 92, times[0], 15, color=INK) + T(P(60), 92, times[1], 15, color=INK)
+        b += TL(P(20), 92, times[0], 15) + TL(P(60), 92, times[1], 15)
     else:
         b += T(P(20), 92, 'الموقع الأول', 14, color=MUTED) + T(P(60), 92, 'الموقع الثاني', 14, color=MUTED)
     save(name, svg(w, h, b))
@@ -174,7 +179,7 @@ def car_diagram(name, xs, light=True, w=600, h=170, times=None, opac=True):
     for k, x in enumerate(xs):
         op = (0.3 + 0.7 * k / (n - 1)) if opac else 1
         b += car(x, 150, op)
-        if times: b += T(x + 35, 105, times[k], 13, color=MUTED)
+        if times: b += TL(x + 35, 105, times[k], 13, MUTED)
     return b
 
 
@@ -258,7 +263,7 @@ dot_rows('c2l1-o05-rows-speedup.svg', [R(1, eq), R(2, dec), R(3, mix), R(4, inc)
 data_inc = [0, 2, 6, 12, 20, 30]
 cand = [data_inc, [0, 10, 18, 24, 28, 30], [0, 6, 12, 18, 24, 30], [0, 2, 6, 12, 20, 22]]
 order = [1, 3, 0, 2]  # الصف (3) هو الصحيح
-dot_rows('c2l1-o05-table.svg', [R(i + 1, px(cand[order[i]], 0, 30, 50, 550)) for i in range(4)], w=600, scale=(0, 30, 5, 'الموقع (cm)'))
+dot_rows('c2l1-o05-table.svg', [R(i + 1, px(cand[order[i]], 0, 30, 40, 570)) for i in range(4)], w=640, x1=570, scale=(0, 30, 5, 'الموقع (cm)'))
 
 # ================= O06 وصف الحالة من تباعد النقاط =================
 plane = px([0, 0.3, 0.9, 1.8, 3.0, 4.5, 6.3], 0, 6.3, 50, 550)
@@ -266,12 +271,12 @@ dot_rows('c2l1-o06-plane.svg', [{'xs': plane, 'arrow': '→'}], w=600, top=46)
 # حركة نحو اليسار مع متجهات السرعة: التباعد يتناقص في اتجاه الحركة
 left = px([6.0, 4.0, 2.4, 1.2, 0.4, 0.0], 0, 6, 70, 540)
 dot_rows('c2l1-o06-left.svg', [{'xs': left, 'arrow': '←'}], w=600, top=46)
-# متجهات سرعة يمينًا متزايدة (للمقالي)
-right_vel = px([0, 0.5, 1.4, 2.7, 4.4, 6.5], 0, 6.5, 50, 520)
-dot_rows('c2l1-o06-right-vel.svg', [{'xs': right_vel, 'vel': True}], w=600, top=36)
+# للمقالي: نقاط نحو اليمين يتزايد تباعدها (نقاط مجردة كما في الدرس 2-1، بلا متجهات)
+right_inc = px([0, 0.5, 1.4, 2.7, 4.4, 6.5], 0, 6.5, 50, 520)
+dot_rows('c2l1-o06-right.svg', [{'xs': right_inc, 'arrow': '→'}], w=600, top=46)
 # جسمان A وB
-dot_rows('c2l1-o06-two.svg', [{'title': 'الجسم A', 'xs': px([0, 1, 2, 3, 4, 5], 0, 10, 50, 550), 'color': BLUE},
-                              {'title': 'الجسم B', 'xs': px([0, 2, 4, 6, 8, 10], 0, 10, 50, 550), 'color': RED}], w=600, row_h=70)
+dot_rows('c2l1-o06-two.svg', [{'title': 'الجسم A', 'xs': px([0, 1, 2, 3, 4, 5], 0, 10, 50, 480)},
+                              {'title': 'الجسم B', 'xs': px([0, 2, 4, 6, 8, 10], 0, 10, 50, 480)}], w=600, row_h=70)
 # تزايد ثم ثبات ثم تناقص
 mixed = px([0, 0.5, 1.5, 3, 4.5, 6, 7.5, 8.5, 9.0], 0, 9, 40, 560)
 dot_rows('c2l1-o06-mixed.svg', [{'xs': mixed, 'arrow': '→'}], w=600, top=46)
@@ -289,7 +294,7 @@ def tire_marks(name):
 tire_marks('c2l1-o06-tire.svg')
 # للمقالي: نقاط بمقياس متري (cm) — فترة 0.1 s
 ess = [0, 4, 8, 12, 15, 17, 18]
-dot_rows('c2l1-o06-essay.svg', [{'xs': px(ess, 0, 20, 50, 550), 'arrow': '→'}], w=600, top=46, scale=(0, 20, 2, 'الموقع (cm)'))
+dot_rows('c2l1-o06-essay.svg', [{'xs': px(ess, 0, 20, 40, 570), 'arrow': '→'}], w=600, top=46, scale=(0, 20, 2, 'الموقع (cm)'))
 
 # ================= O07 إنشاء المخطط التوضيحي من صور متتابعة =================
 def frames(name, positions, times, vmax=100, step=10, w=600):
@@ -301,12 +306,11 @@ def frames(name, positions, times, vmax=100, step=10, w=600):
         r, P = ruler(110, w - 50, oy + 52, 0, vmax, step, 1, 'cm')
         b += r + car(P(p) - 35, oy + 50, 1.0)
         b += L(P(p), oy + 46, P(p), oy + 58, RED, 2)
-        b += T(56, oy + 30, f'اللقطة {i + 1}', 13, color=INK, weight='bold') + T(56, oy + 54, t, 13, color=MUTED)
+        b += T(56, oy + 30, f'اللقطة {i + 1}', 13, color=INK, weight='bold') + TL(56, oy + 54, t, 13, MUTED)
     save(name, svg(w, fh * len(positions) + 4, b))
 
 
 frames('c2l1-o07-frames.svg', [10, 30, 50, 70], ['t = 0.0 s', 't = 0.1 s', 't = 0.2 s', 't = 0.3 s'])
-frames('c2l1-o07-unequal.svg', [10, 25, 55, 70], ['t = 0.0 s', 't = 0.1 s', 't = 0.3 s', 't = 0.4 s'])
 
 
 def runner_frames(name):
@@ -350,7 +354,7 @@ def two_scenes(name):
         b += T(ox + pw - 22, 26, f'({i + 1})', 15, weight='bold')
     # (1) سيارة تدخل مرآبًا طوله 6 m
     b += RECT(130, 60, 140, 80, MUTED, '#efe7d6', 1.5) + L(130, 60, 130, 140, '#fff', 3)
-    b += car(150, 136) + L(20, 136, 280, 136, INK, 1.5)
+    b += car(145, 136, sc=1.5) + L(20, 136, 280, 136, INK, 1.5)
     b += ARROW(130, 160, 270, 160, MUTED, 1.5, 8) + ARROW(270, 160, 130, 160, MUTED, 1.5, 8) + T(200, 155, '6 m', 13, color=INK)
     b += T(65, 125, 'مرآب', 13, color=MUTED)
     # (2) سيارة على طريق بين مدينتين 400 km

@@ -11,7 +11,7 @@
    "options": [
     "يُطرح طول $\\boldsymbol{B}$ من طول $\\boldsymbol{A}$ دائمًا ويبقى الاتجاه اتجاه $\\boldsymbol{A}$",
     "يُعكس اتجاه $\\boldsymbol{A}$ ثم يُجمع مع $\\boldsymbol{B}$ كما هو",
-    "يُعكس اتجاه $\\boldsymbol{B}$ ثم يُجمع مع $\\boldsymbol{A}$؛ لأن $\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$",
+    "يُعكس اتجاه $\\boldsymbol{B}$ ثم يُجمع مع $\\boldsymbol{A}$",
     "يوضع ذيل $\\boldsymbol{B}$ عند رأس $\\boldsymbol{A}$ ثم يُرسم المتجه من ذيل الأول إلى رأس الثاني"
    ],
    "correct_index": 2,
@@ -185,7 +185,7 @@
    "answer_elements": [
     "$\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$",
     "$-\\boldsymbol{B}$: 2 cm غربًا",
-    "ذيل −B عند رأس A",
+    "ذيل $-\\boldsymbol{B}$ عند رأس $\\boldsymbol{A}$",
     "المحصلة 4 cm شرقًا"
    ],
    "solution_steps": [],
@@ -195,7 +195,7 @@
      "marks": 1
     },
     {
-     "element": "عكس B ووضعه رأسًا لذيل",
+     "element": "عكس $\\boldsymbol{B}$ ووضعه رأسًا لذيل",
      "marks": 1
     },
     {
@@ -222,9 +222,9 @@
     }
    ],
    "common_errors": [
-    "جمع A وB فيكون الناتج 8 cm",
+    "جمع $\\boldsymbol{A}$ و$\\boldsymbol{B}$ فيكون الناتج 8 cm",
     "كتابة الناتج 4 cm دون اتجاه",
-    "عكس اتجاه A بدل B"
+    "عكس اتجاه $\\boldsymbol{A}$ بدل $\\boldsymbol{B}$"
    ],
    "thinking_level": "فهم",
    "question_kind": "شرح إجراء",
@@ -232,7 +232,7 @@
    "source_ref": "الكتاب ص 37 — طرح المتجهات (الشكلان 2-10 و2-11)"
   },
   {
-   "stem": "نقطة الأصل لمحور موقع أفقي في منتصف ممر، والاتجاه الموجب نحو اليمين. تحرك جسم من الموقع $\\boldsymbol{d}_i = +3\\ \\text{m}$ إلى الموقع $\\boldsymbol{d}_f = -5\\ \\text{m}$.\\n(أ) صِف متجهي الموقع $\\boldsymbol{d}_i$ و$\\boldsymbol{d}_f$.\\n(ب) وضّح كيف تجد $\\Delta\\boldsymbol{d} = \\boldsymbol{d}_f - \\boldsymbol{d}_i$ بالرسم.\\n(ج) احسب $\\Delta\\boldsymbol{d}$ وتحقق من أن الناتج يتفق مع الرسم.",
+   "stem": "نقطة الأصل لمحور موقع أفقي في منتصف ممر، والاتجاه الموجب نحو اليمين. تحرك جسم من الموقع $\\boldsymbol{d}_i = +3\\ \\text{m}$ إلى الموقع $\\boldsymbol{d}_f = -5\\ \\text{m}$.\n(أ) صِف متجهي الموقع $\\boldsymbol{d}_i$ و$\\boldsymbol{d}_f$.\n(ب) وضّح كيف تجد $\\Delta\\boldsymbol{d} = \\boldsymbol{d}_f - \\boldsymbol{d}_i$ بالرسم.\n(ج) احسب $\\Delta\\boldsymbol{d}$ وتحقق من أن الناتج يتفق مع الرسم.",
    "model_answer": "(أ) $\\boldsymbol{d}_i$ سهم ذيله عند نقطة الأصل ورأسه عند 3 m إلى اليمين، و$\\boldsymbol{d}_f$ سهم ذيله عند نقطة الأصل ورأسه عند 5 m إلى اليسار. (ب) نعكس $\\boldsymbol{d}_i$ فنحصل على $-\\boldsymbol{d}_i$ (3 m نحو اليسار)، وننقله بحيث يكون ذيله عند رأس $\\boldsymbol{d}_f$، ثم نرسم المحصلة من ذيل $\\boldsymbol{d}_f$ (نقطة الأصل) إلى رأس $-\\boldsymbol{d}_i$، فتنتهي عند $-8\\ \\text{m}$. (ج) $\\Delta\\boldsymbol{d} = -5\\ \\text{m} - (+3\\ \\text{m}) = -8\\ \\text{m}$، أي 8 m نحو اليسار، وهو طول المحصلة واتجاهها في الرسم، ويطابق انتقال الجسم من 3 m يمين الأصل إلى 5 m يساره.",
    "answer_elements": [
     "وصف متجهي الموقع",
@@ -282,7 +282,7 @@
    ],
    "common_errors": [
     "حساب $-5 - 3$ على أنه $-2$",
-    "نسيان عكس اتجاه d_i",
+    "نسيان عكس اتجاه $\\boldsymbol{d}_i$",
     "كتابة الإزاحة $+8\\ \\text{m}$"
    ],
    "thinking_level": "تطبيق",
@@ -294,8 +294,8 @@
    "stem": "قال طالب: «$\\boldsymbol{A} - \\boldsymbol{B}$ هو نفسه $\\boldsymbol{B} - \\boldsymbol{A}$؛ لأننا في الحالتين نطرح الطول الأصغر من الأكبر». قوّم قوله باستعمال مثال: $\\boldsymbol{A}$ = 5 m شرقًا، و$\\boldsymbol{B}$ = 3 m شرقًا.",
    "model_answer": "القول غير صحيح. $\\boldsymbol{A} - \\boldsymbol{B} = \\boldsymbol{A} + (-\\boldsymbol{B})$ = 5 m شرقًا + 3 m غربًا = 2 m شرقًا. أما $\\boldsymbol{B} - \\boldsymbol{A} = \\boldsymbol{B} + (-\\boldsymbol{A})$ = 3 m شرقًا + 5 m غربًا = 2 m غربًا. الناتجان متساويان في المقدار ومتعاكسان في الاتجاه؛ لأن طرح المتجهات يعتمد على عكس اتجاه المتجه المطروح، والمتجه لا يُحدَّد بمقداره فقط بل بمقداره واتجاهه معًا.",
    "answer_elements": [
-    "A − B = 2 m شرقًا",
-    "B − A = 2 m غربًا",
+    "$\\boldsymbol{A} - \\boldsymbol{B}$ = 2 m شرقًا",
+    "$\\boldsymbol{B} - \\boldsymbol{A}$ = 2 m غربًا",
     "الناتجان متعاكسان فالقول خطأ",
     "التعليل: المتجه مقدار واتجاه"
    ],
@@ -305,11 +305,11 @@
    ],
    "marks": [
     {
-     "element": "حساب A − B",
+     "element": "حساب $\\boldsymbol{A} - \\boldsymbol{B}$",
      "marks": 1
     },
     {
-     "element": "حساب B − A",
+     "element": "حساب $\\boldsymbol{B} - \\boldsymbol{A}$",
      "marks": 1
     },
     {
