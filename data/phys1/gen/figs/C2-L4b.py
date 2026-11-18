@@ -64,7 +64,7 @@ def ruler_dots(name, pos, xmax, step, w=600, vecs=None, label=None, x_left=0, do
     for p in pos: b += DOT(X(p), yd, 6.5, dot_color)
     for (x0, ln) in (vecs or []):
         if ln: b += ARROW(X(x0), yd - 22, X(x0 + ln), yd - 22, C_VEL, 2.6, 10)
-    if label: b += T(w / 2, 24, label, 15, color=MUTED, italic=True)
+    if label: b += T(w / 2 - 6, 24, 'Δt', 15, 'end', MUTED, italic=True) + T(w / 2, 24, label.replace('Δt ', ''), 15, 'start', MUTED)
     if extra_fn: b += extra_fn(X)
     save(name, svg(w, H, b))
 
