@@ -191,13 +191,14 @@ def ladder():
     w, h = 420, 340; b = ''
     b += ground(20, 400, 300)
     b += RECT(300, 20, 24, 280, INK, '#dcd6c8', 2)  # الجدار على اليمين
-    x1, y1, x2, y2 = 120, 300, 300, 80   # السلم من الأرض إلى الجدار
+    x1, y1, x2, y2 = 130, 300, 300, 130   # السلم من الأرض إلى الجدار
     b += L(x1, y1, x2, y2, '#8a6d3b', 7) + L(x1 + 14, y1, x2 + 0, y2 + 17, '#8a6d3b', 0)
-    cx, cy = 300, 80
+    cx, cy = 300, 130
     b += DOT(cx, cy, 5, INK)
     arrows = [(180, 1), (90, 2), (math.degrees(math.atan2(y1 - y2, -(x1 - x2))) + 180, 3), (270, 4)]
     # 1: أفقي بعيدًا عن الجدار (يسار)، 2: رأسي لأعلى، 3: على امتداد السلم إلى أسفل، 4: رأسي لأسفل
-    dirs = [(-1, 0), (0, -1), ((x1 - x2) / math.hypot(x1 - x2, y1 - y2), (y1 - y2) / math.hypot(x1 - x2, y1 - y2)), (0, 1)]
+    nl = math.hypot(x1 - x2, y1 - y2)
+    dirs = [(-1, 0), (0, -1), (-(y1 - y2) / nl, (x1 - x2) / nl), (0, 1)]
     for (dx, dy), n in zip(dirs, (1, 2, 3, 4)):
         ln = 70
         b += ARROW(cx, cy, cx + dx * ln, cy + dy * ln, C_FORCE, 3) + NUM(cx + dx * (ln + 20), cy + dy * (ln + 20), n)
@@ -261,7 +262,7 @@ def rank_four():
 
 # ---------------- O12: كتاب على طاولة — مخططا الجسم الحر لكل منهما ----------------
 def book_table_fbds():
-    w, h = 560, 330; b = ''
+    w, h = 560, 340; b = ''
     # الكتاب (يسار)
     cx, cy = 140, 165
     b += RECT(cx - 40, cy - 12, 80, 24, INK, '#c0504d', 2) + T(cx, 300, 'الكتاب', 15, color=MUTED)
@@ -271,23 +272,23 @@ def book_table_fbds():
     # الطاولة (يمين)
     tx, ty = 420, 150
     b += RECT(tx - 90, ty, 180, 16, INK, '#d8c3a5', 2) + RECT(tx - 78, ty + 16, 12, 70, INK, '#d8c3a5', 2) + RECT(tx + 66, ty + 16, 12, 70, INK, '#d8c3a5', 2)
-    b += T(tx, 300, 'الطاولة', 15, color=MUTED)
-    b += ARROW(tx, ty - 70, tx, ty, C_FORCE, 3) + NUM(tx + 24, ty - 50, 3)
-    b += ARROW(tx - 110, ty + 86, tx - 110, ty + 26, C_FORCE, 3) + NUM(tx - 134, ty + 40, 4)
-    b += ARROW(tx + 110, ty + 20, tx + 110, ty + 100, C_FORCE, 3) + NUM(tx + 134, ty + 80, 5)
+    b += T(tx - 10, 310, 'الطاولة', 15, color=MUTED)
+    b += ARROW(tx, ty, tx, ty + 70, C_FORCE, 3) + NUM(tx + 22, ty + 55, 3)
+    b += ARROW(tx - 70, ty, tx - 70, ty - 90, C_FORCE, 3) + NUM(tx - 92, ty - 70, 4)
+    b += ARROW(tx + 72, ty + 86, tx + 72, ty + 136, C_FORCE, 3) + NUM(tx + 50, ty + 125, 5)
     save('c4l3-o12-book-table.svg', svg(w, h, b))
 
 
 # ---------------- O13: الكرة والأرض كنظامين (مثال تسارع الأرض) ----------------
 def ball_earth():
-    w, h = 440, 330; b = ''
-    b += f'<circle cx="150" cy="230" r="85" fill="#7fb2d9" stroke="{INK}" stroke-width="2"/>' + T(150, 236, 'الأرض', 16)
-    b += T(150, 290, '6.0 × 10^{24} kg', 13)
-    b += f'<circle cx="150" cy="40" r="14" fill="#f3f3f3" stroke="{INK}" stroke-width="1.8"/>' + T(200, 46, 'الكرة 0.18 kg', 14, 'start')
-    b += ARROW(150, 54, 150, 105, C_FORCE, 3) + T(120, 90, '1', 15, color=C_FORCE, weight='bold')
-    b += ARROW(150, 145, 150, 125, C_FORCE, 3) + T(120, 140, '2', 15, color=C_FORCE, weight='bold')
-    b += f'<path d="M 140 80 Q 95 110 140 138" fill="none" stroke="{MUTED}" stroke-width="1.5" stroke-dasharray="5 4"/>'
-    b += plus_arrow(330, 150, 80)
+    w, h = 440, 350; b = ''
+    b += f'<circle cx="150" cy="260" r="85" fill="#7fb2d9" stroke="{INK}" stroke-width="2"/>' + T(150, 266, 'الأرض', 16)
+    b += T(150, 320, '6.0 × 10^{24} kg', 13)
+    b += f'<circle cx="150" cy="30" r="14" fill="#f3f3f3" stroke="{INK}" stroke-width="1.8"/>' + T(190, 36, 'الكرة', 14, 'start') + T(255, 36, '0.18 kg', 14, 'start')
+    b += ARROW(150, 44, 150, 94, C_FORCE, 3) + T(126, 78, '1', 15, color=C_FORCE, weight='bold')
+    b += ARROW(150, 175, 150, 125, C_FORCE, 3) + T(126, 150, '2', 15, color=C_FORCE, weight='bold')
+    b += f'<path d="M 140 70 Q 90 110 140 150" fill="none" stroke="{MUTED}" stroke-width="1.5" stroke-dasharray="5 4"/>'
+    b += plus_arrow(330, 160, 80)
     save('c4l3-o13-ball-earth.svg', svg(w, h, b))
 
 
