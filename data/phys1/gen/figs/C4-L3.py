@@ -78,7 +78,7 @@ def pair_unknown():
     w, h = 520, 210; b = ''
     b += ground(20, 500, 150)
     b += BOX(160, 115, 90, 70, 'A') + BOX(360, 115, 90, 70, 'B')
-    b += ARROW(405, 115, 485, 115, C_FORCE, 3.5) + FS(445, 100, 'A في B', tail=' = 24 N')
+    b += ARROW(405, 115, 485, 115, C_FORCE, 3.5) + FS(445, 62, 'A في B', tail=' = 24 N')
     b += T(85, 120, '?', 26, color=C_FORCE, weight='bold')
     b += plus_x(30, 190, 60)
     save('c4l3-o03-pair.svg', svg(w, h, b))
@@ -88,17 +88,17 @@ def pair_unknown():
 def ball_table_numbered():
     w, h = 520, 400; b = ''
     # الكرة
-    bx, by = 260, 70
+    bx, by = 260, 90
     b += f'<circle cx="{bx}" cy="{by}" r="22" fill="#f3d36b" stroke="{INK}" stroke-width="1.8"/>' + T(330, by + 5, 'الكرة', 15, color=MUTED)
-    b += ARROW(bx - 40, by, bx - 40, by - 55, C_FORCE, 3) + NUM(bx - 62, by - 40, 1)
-    b += ARROW(bx + 40, by, bx + 40, by + 55, C_FORCE, 3) + NUM(bx + 62, by + 40, 2)
+    b += ARROW(bx, by - 22, bx, by - 70, C_FORCE, 3) + NUM(bx - 24, by - 55, 1)
+    b += ARROW(bx, by + 22, bx, by + 75, C_FORCE, 3) + NUM(bx - 24, by + 62, 2)
     # الطاولة
-    ty = 220
+    ty = 235
     b += RECT(170, ty - 10, 180, 16, INK, '#d8c3a5', 2) + RECT(185, ty + 6, 12, 70, INK, '#d8c3a5', 2) + RECT(323, ty + 6, 12, 70, INK, '#d8c3a5', 2)
     b += T(410, ty + 5, 'الطاولة', 15, color=MUTED)
     b += ARROW(260, ty - 10, 260, ty + 50, C_FORCE, 3) + NUM(282, ty + 34, 3)
-    b += ARROW(150, ty + 76, 150, ty + 16, C_FORCE, 3) + NUM(128, ty + 30, 4)
-    b += ARROW(370, ty + 20, 370, ty + 85, C_FORCE, 3) + NUM(392, ty + 70, 5)
+    b += ARROW(180, ty - 10, 180, ty - 65, C_FORCE, 3) + NUM(158, ty - 50, 4)
+    b += ARROW(340, ty + 6, 340, ty + 75, C_FORCE, 3) + NUM(362, ty + 60, 5)
     # الأرض
     b += f'<path d="M 60 390 Q 260 330 460 390 Z" fill="#cfe3d2" stroke="{INK}" stroke-width="1.8"/>' + T(260, 382, 'الأرض', 15, color=MUTED)
     save('c4l3-o04-ball-table.svg', svg(w, h, b))
@@ -139,11 +139,11 @@ def rope_points():
 def hanging_points():
     w, h = 300, 330; b = ''
     b += ceiling(60, 240, 30)
-    b += L(150, 30, 150, 228, '#8a6d3b', 3.5)
+    b += L(150, 30, 150, 246, '#8a6d3b', 3.5)
     for yy, n in ((70, 'X'), (140, 'Y'), (210, 'Z')):
         b += DOT(150, yy, 5, INK) + T(168, yy + 5, n, 16, 'start', italic=True)
     b += bucket(150, 262)
-    b += T(225, 300, 'الوزن 120 N', 14, color=MUTED)
+    b += T(205, 300, 'الوزن:', 14, 'start', MUTED) + T(230, 320, '120 N', 14, color=MUTED)
     save('c4l3-o06-hanging.svg', svg(w, h, b))
 
 
