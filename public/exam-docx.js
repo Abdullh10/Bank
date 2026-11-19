@@ -157,7 +157,7 @@ export function buildExamDocx(D, { exam, header: h, opts: o, kind, logo, letters
   if (kind !== 'student') exam.models.forEach(m => pages.push(key(m)));
   const children = pages.flatMap((pg, i) => (i ? [new Paragraph({ children: [new PageBreak()] }), ...pg] : pg));
   return new Document({
-    creator: 'إتقان · بنك أسئلة الكيمياء', title: h.title || 'اختبار', description: 'اختبار مولّد من منصة إتقان',
+    creator: 'إتقان · بنك الأسئلة', title: h.title || 'اختبار', description: 'اختبار مولّد من منصة إتقان',
     styles: { default: { document: { run: { font: FONT, size: 24, sizeComplexScript: 24, rightToLeft: true } } } },
     sections: [{
       properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 567, bottom: 794, left: 567, right: 567 } } },

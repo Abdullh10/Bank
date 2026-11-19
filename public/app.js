@@ -260,8 +260,8 @@ async function pageHome() {
       <div class="hero-ic">
         <img class="banner-mark" src="assets/itqan-mark.svg" alt="" width="74" height="74">
         <div>
-          <span class="eyebrow">${icon('spark', 18)} إتقان · منصة بنك الأسئلة والتدريب في الكيمياء</span>
-          <h1>${esc(s.course?.title || 'كيمياء 2-1')}</h1>
+          <span class="eyebrow">${icon('spark', 18)} إتقان · منصة بنك الأسئلة والتدريب</span>
+          <h1>${esc(s.course?.title || s.course?.code || 'المقرر')}</h1>
           <p class="muted">${esc(s.course?.grade)} · الفصل الدراسي ${esc(s.course?.term)} · ${esc(s.course?.country)}</p>
           ${s.course?.id === 1 ? `<p class="small muted">بنية المقرر: ${esc(s.course?.structure_source)}<br>مصدر المحتوى: الكتاب المدرسي — كيمياء 2-1، الصف الثاني الثانوي، الفصل الدراسي الأول 1448هـ</p>` : ''}
         </div>
@@ -473,7 +473,7 @@ function supplementCard(s) {
     <div class="section-title" style="margin-top:0">${ttl('spark', 'المحتوى العلمي المكمّل')}
       <span class="meta-row">${objBadge(s.reviewStatus)}${internalView() ? badge(s.confidence === 'high' ? 'ثقة مرتفعة' : 'يحتاج تحققًا من الصياغة', s.confidence === 'high' ? 'brand' : 'warn') : ''}</span></div>
     ${internalView()
-      ? '<p class="notice">هذا المحتوى أكمله الوكيل الكيميائي التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>'
+      ? '<p class="notice">هذا المحتوى أكمله الوكيل التربوي (ذكاء اصطناعي) لأن الكتاب المدرسي تركته فراغًا أو لم تتناوله؛ <strong>ليس من نص الكتاب المدرسي</strong> ولا يُعد معتمدًا حتى يعتمده مراجع.</p>'
       : '<p class="notice">محتوى مكمّل لما لم يتناوله الكتاب المدرسي بما يكفي؛ <strong>ليس من نص الكتاب المدرسي</strong>.</p>'}
     ${s.memoBasis ? `<p><strong>ما يقدمه الكتاب المدرسي:</strong> ${esc(cleanRef(s.memoBasis))}</p>` : ''}
     <p id="sup-text">${esc(cleanRef(s.supplement))}</p>
@@ -910,7 +910,8 @@ function buildSheet(kind, current) {
   if (!picked.length) return toast('لا توجد أسئلة لإنشاء الورقة', true);
   const teacher = kind === 'teacher';
   const mcq = picked.filter(q => q.type === 'mcq'), essay = picked.filter(q => q.type === 'essay');
-  const title = prompt('عنوان الورقة:', 'اختبار كيمياء 2-1') ?? 'اختبار كيمياء 2-1';
+  const defTitle = `اختبار ${state.course?.title || state.course?.code || ''}`.trim();
+  const title = prompt('عنوان الورقة:', defTitle) ?? defTitle;
   const w = `<div class="card"><h1>${esc(title)}</h1><p>${teacher ? 'نسخة المعلم — مع الإجابات ومفتاح التصحيح' : 'الاسم: ........................ الصف: ........'}</p></div>
     ${mcq.length ? `<h2 style="margin-top:1rem">أولًا: اختر الإجابة الصحيحة</h2>${mcq.map((q, n) => `<div class="q"><div class="q-stem">${n + 1}. ${esc(q.stem)}</div>${stimulusTable(q.stimulus)}${qImages(q.images)}
       <ol class="opts">${q.options.map((o, i) => `<li class="opt ${teacher && i === q.correctIndex ? 'correct' : ''}"><span class="letter">${LETTERS[i]})</span><span>${esc(o)}</span></li>`).join('')}</ol>
@@ -958,7 +959,7 @@ async function pageReports() {
 }
 
 // ---------- تسجيل الدخول ----------
-const LOGO = '<img class="login-logo logo-light" src="assets/itqan-logo.svg" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517"><img class="login-logo logo-dark" src="assets/itqan-logo-dark.svg" alt="إتقان — منصة بنك الأسئلة والتدريب في الكيمياء" width="520" height="517">';
+const LOGO = '<img class="login-logo logo-light" src="assets/itqan-logo.svg" alt="إتقان — منصة بنك الأسئلة والتدريب" width="520" height="517"><img class="login-logo logo-dark" src="assets/itqan-logo-dark.svg" alt="إتقان — منصة بنك الأسئلة والتدريب" width="520" height="517">';
 
 function pageLogin() {
   $app.innerHTML = `<div class="login-wrap"><div class="login-card">
