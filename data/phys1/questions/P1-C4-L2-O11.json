@@ -120,7 +120,7 @@
    ],
    "thinking_level": "تحليل",
    "question_kind": "قراءة مخطط",
-   "difficulty": "متوسط",
+   "difficulty": "صعب",
    "source_ref": "الكتاب ص 110 — الشكل 4-12 — اتجاه القوة المعيقة",
    "images": [
     {
@@ -168,7 +168,7 @@
    ],
    "thinking_level": "تذكر",
    "question_kind": "تذكر حقيقة",
-   "difficulty": "سهل",
+   "difficulty": "متوسط",
    "source_ref": "الكتاب ص 109 — اتجاه القوة المعيقة"
   }
  ],
@@ -332,7 +332,7 @@
    ],
    "thinking_level": "فهم",
    "question_kind": "تحديد اتجاه",
-   "difficulty": "سهل",
+   "difficulty": "متوسط",
    "source_ref": "الكتاب ص 109 — اتجاه القوة المعيقة ورمزها"
   }
  ]

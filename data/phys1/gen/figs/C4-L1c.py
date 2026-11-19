@@ -65,7 +65,7 @@ def panels(name, items, pw=180, ph=280, cy=None, axis='y', extras=None):
     save(name, svg(pw * len(items), ph, b))
 
 
-NET = ('F', 'المحصلة'); AIR = ('F', 'الهواء')
+NET = ('F', 'المحصلة'); AIR = 'F_d'  # القوة المعيقة كما يرمز لها الكتاب (ص 110)
 
 
 def ground(x1, x2, y):
@@ -271,12 +271,17 @@ def o32():
     b += plus(410, 270)
     save('c4l1-o32-book-fbd.svg', svg(w, h, b))
 
-    w, h = 420, 340; b = L(100, 20, 100, 134, INK, 2) + bucket(100, 150)
-    b += ARROW(170, 200, 170, 140, C_VEL, 3) + V(186, 172, 'v', C_VEL, 17)
-    b += T(100, 240, 'دلو يُرفع بحبل', 13, color=MUTED)
-    b += forces_at(300, 170, [(90, 80, '1'), (-90, 80, '2')])
-    b += plus(370, 300)
-    save('c4l1-o32-bucket.svg', svg(w, h, b))
+    # طائرة مسيّرة (درون) ترتفع بسرعة منتظمة: الدفع إلى أعلى والوزن إلى أسفل متساويان
+    w, h = 420, 340; cx, cy = 100, 160
+    b = RECT(cx - 34, cy - 12, 68, 24, INK, '#c9d3e0') + L(cx - 34, cy - 4, cx - 70, cy - 4, INK, 3) + L(cx + 34, cy - 4, cx + 70, cy - 4, INK, 3)
+    for px in (cx - 70, cx + 70):
+        b += L(px, cy - 4, px, cy - 18, INK, 2.5) + f'<ellipse cx="{px}" cy="{cy - 20}" rx="28" ry="4" fill="#e9eef5" stroke="{INK}" stroke-width="1.6"/>'
+    b += L(cx - 20, cy + 12, cx - 26, cy + 26, INK, 2) + L(cx + 20, cy + 12, cx + 26, cy + 26, INK, 2)
+    b += ARROW(215, 200, 215, 140, C_VEL, 3) + V(231, 172, 'v', C_VEL, 17)
+    b += T(110, 250, 'طائرة مسيّرة ترتفع بسرعة منتظمة', 13, color=MUTED)
+    b += forces_at(310, 170, [(90, 80, '1'), (-90, 80, '2')])
+    b += plus(375, 300)
+    save('c4l1-o32-drone.svg', svg(w, h, b))
 
 
 # ============ O33 ============
