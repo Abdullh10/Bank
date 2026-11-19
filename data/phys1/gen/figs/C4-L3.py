@@ -176,12 +176,12 @@ def bricks():
 
 def bucket_up():
     w, h = 340, 340; b = ''
-    b += L(150, 10, 150, 175, '#8a6d3b', 3.5)
+    b += L(150, 10, 150, 194, '#8a6d3b', 3.5)
     b += bucket(150, 210, 70, 64, '#bfe3c6')
     b += T(150, 250, '50.0 kg', 14)
     b += ARROW(240, 220, 240, 130, C_VEL, 3) + V(256, 175, 'v', C_VEL, 18, 'start')
     b += ARROW(290, 210, 290, 150, C_ACC, 3) + V(304, 185, 'a', C_ACC, 18, 'start')
-    b += T(265, 255, 'a = 1.5 m/s^2', 14, italic=False)
+    b += f'<text x="265" y="255" text-anchor="middle" font-size="15" fill="{INK}" {MATHFONT}><tspan font-style="italic">a</tspan> = 1.5 m/s<tspan dy="-0.45em" font-size="10">2</tspan></text>'
     b += plus_arrow(45, 300, 80)
     save('c4l3-o09-bucket-up.svg', svg(w, h, b))
 
