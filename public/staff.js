@@ -399,7 +399,7 @@ export async function pageTeacherPrep(ctx, editId = null) {
         document.querySelector('.pr-report')?.remove();
         const art = document.createElement('article');
         art.className = 'pr-report'; art.dir = 'rtl';
-        art.innerHTML = `<header class="rp-cover"><div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="48" height="48"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب في الكيمياء</span></div></div>
+        art.innerHTML = `<header class="rp-cover"><div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="48" height="48"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب</span></div></div>
           <div class="rp-title"><span class="rp-kicker">تقرير مشاركة الطلاب · الاستعداد للاختبار</span><h1>${esc(set.title)}</h1><p>${esc(set.lessonTitles.join('، '))}</p></div>
           <dl class="rp-meta"><div><dt>عدد الأسئلة</dt><dd>${num(set.n)}</dd></div><div><dt>الطلاب في التقرير</dt><dd>${num(list.length)}${list.length !== rows.length ? ` من ${num(rows.length)}` : ''}</dd></div>
             <div><dt>تاريخ التقرير</dt><dd>${esc(hijri(new Date().toISOString(), true))}</dd></div><div><dt>بدؤوا التدريب</dt><dd>${num(begun)}</dd></div>
