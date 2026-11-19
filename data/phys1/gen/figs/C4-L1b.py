@@ -101,7 +101,7 @@ def incline_base(W, H, ang, x0=40, base_y=None):
     b = f'<polygon points="{x0},{base_y} {x1:.1f},{base_y} {x1:.1f},{y1:.1f}" fill="#f3efe6" stroke="{INK}" stroke-width="2"/>'
     a = math.radians(ang)
     b += f'<path d="M {x0 + 55} {base_y} A 55 55 0 0 0 {x0 + 55 * math.cos(a):.1f} {base_y - 55 * math.sin(a):.1f}" fill="none" stroke="{INK}" stroke-width="1.5"/>'
-    b += T(x0 + 75, base_y - 9, f'{ang}', 15) + T(x0 + 88, base_y - 15, '°', 13)
+    b += T(x0 + 75, base_y - 9, f'{ang}', 15) + T(x0 + 85, base_y - 15, '°', 13)
     return b, x0, base_y, x1, y1
 
 def box_on_incline(x0, y0, ang, frac_x, size=52):
@@ -112,15 +112,17 @@ def box_on_incline(x0, y0, ang, frac_x, size=52):
 def o16_incline():
     W, H = 520, 340; ang = 30; b, x0, y0, x1, y1 = incline_base(W, H, ang)
     r, cx, cy = box_on_incline(x0, y0, ang, 240); b += r
-    vx1, vy1 = pol(cx, cy, 90 + ang, 72); b += ARROW(vx1 - 35 * math.cos(math.radians(ang)), vy1 + 35 * math.sin(math.radians(ang)), vx1 + 40 * math.cos(math.radians(ang)), vy1 - 40 * math.sin(math.radians(ang)), C_VEL, 3)
-    b += V(vx1 + 54 * math.cos(math.radians(ang)), vy1 - 54 * math.sin(math.radians(ang)) + 4, 'v', C_VEL)
+    # سهم السرعة المتجهة فوق الصندوق ومزاح نحو أسفل المنحدر كي لا يتقاطع مع السهم 3
+    vx1, vy1 = pol(cx, cy, 90 + ang, 95); ca, sa = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+    b += ARROW(vx1 - 120 * ca, vy1 + 120 * sa, vx1 - 40 * ca, vy1 + 40 * sa, C_VEL, 3)
+    b += V(vx1 - 26 * ca, vy1 + 26 * sa - 6, 'v', C_VEL)
     b += cand(cx, cy, ang, 55, '1', 32) + cand(cx, cy, 180 + ang, 55, '2', 32) + cand(cx, cy, 90 + ang, 48, '3', 30) + cand(cx, cy, 270, 70, '4', 0)
     save('c4l1-o16-incline.svg', svg(W, H, b))
 
 # ================= O17: مخطط جسم حر لصندوق يُسحب أفقيًا =================
 def o17_fbd():
     W, H = 400, 320; cx, cy = 200, 160; b = DOT(cx, cy, 7)
-    b += force(cx, cy, 90, 85, 'F_{N‍}') + force(cx, cy, 270, 85, 'F_g') + force(cx, cy, 0, 95, 'F_{T‍}') + force(cx, cy, 180, 60, '?')
+    b += force(cx, cy, 90, 85, 'F_N') + force(cx, cy, 270, 85, 'F_g') + force(cx, cy, 0, 95, 'F_T') + force(cx, cy, 180, 60, '?')
     b += plusx(30, 290) + plusy(30, 290)
     save('c4l1-o17-fbd.svg', svg(W, H, b))
 
@@ -172,7 +174,7 @@ def o20_map():
     for m in mids: b += L(top[0], top[1] + 28, m[0], m[1] - 28, INK, 1.5)
     for m, n in zip(mids, bots): b += L(m[0], m[1] + 28, n[0], n[1] - 28, INK, 1.5)
     b += node(*top, 'القوة') + node(*mids[0], 'الشد') + node(*mids[1], '؟') + node(*mids[2], 'الجاذبية')
-    b += node(*bots[0], '') + node(*bots[1], 'F_{N‍}', True) + node(*bots[2], '')
+    b += node(*bots[0], '') + node(*bots[1], 'F_N', True) + node(*bots[2], '')
     save('c4l1-o20-map.svg', svg(W, H, b))
 
 # ================= O22 =================

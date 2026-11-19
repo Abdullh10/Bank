@@ -36,7 +36,7 @@
     "$4.00 \\times 10^{-3}\\ \\text{kg}$"
    ],
    "correct_index": 2,
-   "explanation": "$m = \\frac{F_g}{g} = \\frac{2450\\ \\text{N}}{9.80\\ \\text{m/s}^2} = 250\\ \\text{kg}$.",
+   "explanation": "$m = \\frac{F_g}{g} = \\frac{2450\\ \\text{N}}{9.80\\ \\text{m/s}^2} = 250\\ \\text{kg} = 2.50 \\times 10^2\\ \\text{kg}$.",
    "distractor_notes": [
     "ضُرب الوزن في $g$ بدل القسمة عليه.",
     "اعتُبر الوزن بالنيوتن كتلة بالكيلوجرام.",
