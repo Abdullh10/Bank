@@ -95,8 +95,8 @@ def o02_candidates():
     b += FA(cx, cy, 0, 120, 'A', lab_r=140) + FA(cx, cy, 90, 90, 'B', lab_r=110, dx=-16) + DOT(cx, cy, 6)
     b += L(265, 20, 265, 300, GRID, 1.5)
     R = 150; ang = math.degrees(math.atan2(90, 120))
-    spots = [(350, 110, 180 + ang), (470, 230, ang), (560, 90, 180 + 90 - ang), (480, 300, 180)]
-    lens = [R, R, R, 120]
+    spots = [(360, 95, ang), (515, 95, 180), (360, 235, 180 + ang), (515, 235, 180 + 90 - ang)]
+    lens = [R, 120, R, R]
     for k, ((x, y, a), ln) in enumerate(zip(spots, lens)):
         x0, y0 = pol(x, y, a, -ln / 2); x1, y1 = pol(x, y, a, ln / 2)
         b += ARROW(x0, y0, x1, y1, C_FORCE, 3) + NUM(*pol(x, y, a + 90, 26), k + 1)
@@ -122,7 +122,7 @@ def o02_two_forces():
 def o02_rope():
     w, h = 560, 260; b = ''
     b += RECT(20, 70, 110, 60, INK, '#b9cbe0', 2) + f'<circle cx="45" cy="135" r="14" fill="#555"/><circle cx="105" cy="135" r="14" fill="#555"/>' + T(75, 60, 'السيارة', 14, color=MUTED)
-    b += RECT(470, 30, 26, 150, INK, '#a07a52', 2) + f'<circle cx="483" cy="40" r="42" fill="#7fb77e" stroke="{INK}" stroke-width="1.5"/>' + T(483, 210, 'الشجرة', 14, color=MUTED)
+    b += RECT(470, 60, 26, 130, INK, '#a07a52', 2) + f'<circle cx="483" cy="56" r="40" fill="#7fb77e" stroke="{INK}" stroke-width="1.5"/>' + T(483, 215, 'الشجرة', 14, color=MUTED)
     mx, my = 300, 140
     b += L(130, 100, mx, my, INK, 3) + L(mx, my, 470, 100, INK, 3)
     b += L(130, 100, 470, 100, MUTED, 1.2, '5 4')
@@ -137,7 +137,6 @@ def o02_frames():
         b += RECT(x0, 80, 230, 130, INK, '#e9dcc0', 3) + RECT(x0 + 14, 94, 202, 102, INK, '#cdb48a', 1)
         b += L(x0 + 4, 100, x0 + 115, apex, INK, 2) + L(x0 + 115, apex, x0 + 226, 100, INK, 2) + DOT(x0 + 115, apex, 4)
         b += NUM(x0 + 115, 225 - 10, k + 1)
-    b += RECT(30, 10, 500, 0.1, '#fff', '#fff', 0)
     save('c5l3-o02-frames.svg', svg(w, h + 10, b))
 
 
@@ -185,7 +184,7 @@ def o03_check():
 # ================= O04 =================
 def o04_perp():
     w, h = 380, 300; cx, cy = 150, 180; b = axes_straight(cx, cy, 120)
-    b += FA(cx, cy, 0, 105, '12.0 N', vec=False, dy=-16, lab_r=90) + FA(cx, cy, 90, 140, '16.0 N', vec=False, dx=40, lab_r=120) + DOT(cx, cy, 7)
+    b += FA(cx, cy, 0, 105, '12.0 N', vec=False, dy=-18, lab_r=55) + FA(cx, cy, 90, 140, '16.0 N', vec=False, dx=-36, lab_r=75) + DOT(cx, cy, 7)
     save('c5l3-o04-perp.svg', svg(w, h, b))
 
 
@@ -193,7 +192,7 @@ def o04_ring():
     w, h = 480, 320; cx, cy = 250, 190; b = axes_straight(cx, cy, 170)
     b += FA(cx, cy, 180, 160, '128 N', vec=False, dy=-18, lab_r=120)
     b += FA(cx, cy, 0, 80, '64.0 N', vec=False, dy=24, lab_r=50)
-    b += FA(cx, cy, 30, 152, '122 N', vec=False, dy=-14, lab_r=130)
+    b += FA(cx, cy, 30, 152, '122 N', vec=False, dy=-22, dx=-14, lab_r=150)
     b += ARC(cx, cy, 60, 0, 30) + T(cx + 92, cy - 12, '30.0°', 14)
     b += f'<circle cx="{cx}" cy="{cy}" r="9" fill="#fff" stroke="{INK}" stroke-width="3"/>'
     save('c5l3-o04-ring.svg', svg(w, h, b))
@@ -209,13 +208,13 @@ def o04_scale():
     b += FA(cx, cy, 270 + 27, 190, '75.0 N', vec=False, lab_r=215, dx=10)
     b += FA(cx, cy, 270, 200, '150.0 N', vec=False, lab_r=222)
     b += L(cx, cy, cx, cy + 205, MUTED, 1, '4 4')
-    b += ARC(cx, cy, 70, 243, 270) + T(cx - 30, cy + 98, '27.0°', 13) + ARC(cx, cy, 70, 270, 297) + T(cx + 30, cy + 98, '27.0°', 13)
+    b += ARC(cx, cy, 70, 243, 270) + T(cx - 62, cy + 62, '27.0°', 13) + ARC(cx, cy, 70, 270, 297) + T(cx + 62, cy + 62, '27.0°', 13)
     save('c5l3-o04-scale.svg', svg(w, h, b))
 
 
 def o04_q65():
     w, h = 420, 320; cx, cy = 170, 210; b = axes_straight(cx, cy, 150)
-    b += FA(cx, cy, 90, 120, '33.0 N', vec=False, dx=40, lab_r=110)
+    b += FA(cx, cy, 90, 120, '33.0 N', vec=False, dx=-38, lab_r=80)
     b += FA(cx, cy, 60, 160, '44.0 N', vec=False, dx=30, lab_r=150)
     b += ARC(cx, cy, 55, 0, 60) + T(cx + 76, cy - 30, '60.0°', 14)
     b += DOT(cx, cy, 7)
@@ -226,21 +225,34 @@ def o04_q65():
 def note(x, y, s, size=15): return T(x, y, s, size, 'start')
 
 
+def MU(x, y, val, sub='k'):
+    return T(x, y, f'μ_{sub}', 17, 'start', italic=True) + T(x + 24, y, f'= {val}', 16, 'start')
+
+
+def ALAB(angle, h, s):
+    x0, y0 = 40, h - 40
+    return T(x0 + 64 + (34 if angle < 20 else 0), y0 - 7, s, 14, 'start')
+
+
+def inc(name, angle, w, h, s, extra=''):
+    incline(name, angle, w=w, h=h, angle_label='', extra=ALAB(angle, h, s) + extra)
+
+
 def o05_smooth():
-    incline('c5l3-o05-smooth.svg', 30, w=480, h=290, angle_label='30.0°', extra=note(60, 40, 'سطح أملس'))
+    inc('c5l3-o05-smooth.svg', 30, 480, 290, '30.0°', note(60, 40, 'سطح أملس'))
 
 
 def o05_skier():
     (cx, cy), _ = inc_geom(30, 480, 290)
-    ex = T(cx, cy + 5, '55 kg', 13) + T(110, 50, 'μ_k = 0.12', 16, italic=True) + axes_tilted(cx, cy, 30, 95, 0)
-    incline('c5l3-o05-skier.svg', 30, w=480, h=290, angle_label='30.0°', extra=ex)
+    ex = T(cx, cy + 5, '55 kg', 13) + MU(110, 50, '0.12') + axes_tilted(cx, cy, 30, 95, 0)
+    inc('c5l3-o05-skier.svg', 30, 480, 290, '30.0°', ex)
 
 
 def o05_pull():
     (cx, cy), _ = inc_geom(14, 520, 230)
-    ex = T(cx, cy + 5, '63 kg', 13) + T(80, 50, 'μ_k = 0.27', 16, italic=True)
+    ex = T(cx, cy + 5, '63 kg', 13) + MU(80, 50, '0.27')
     x2, y2 = pol(cx, cy, 14, 170); ex += ARROW(*pol(cx, cy, 14, 30), x2, y2, C_FORCE, 3) + V(x2 - 30, y2 - 18, 'F_T', C_FORCE) + T(x2 + 8, y2 - 34, '512 N', 14, color=C_FORCE)
-    incline('c5l3-o05-pull.svg', 14, w=520, h=230, angle_label='14.0°', extra=ex)
+    inc('c5l3-o05-pull.svg', 14, 520, 230, '14.0°', ex)
 
 
 # ================= O06 =================
@@ -258,13 +270,12 @@ def o06_components():
 def o06_box650():
     (cx, cy), _ = inc_geom(40, 460, 330)
     ex = FA(cx, cy, 270, 110, '', ) + V(cx + 26, cy + 112, 'F_g', C_FORCE) + T(cx + 70, cy + 112, '= 650 N', 14, 'start')
-    incline('c5l3-o06-box650.svg', 40, w=460, h=330, angle_label='40.0°', extra=ex)
+    inc('c5l3-o06-box650.svg', 40, 460, 330, '40.0°', ex)
 
 
 def o06_proof():
     w, h = 480, 380; cx, cy = 230, 170; ang = 25; b = ''
     # خط السطح المائل تحت النقطة
-    b += L(*pol(cx, cy - 0, 180 + ang, 200), *pol(cx, cy, ang, 200), INK, 1.4)
     b += axes_tilted(cx, cy, ang, 150, 150)
     b += FA(cx, cy, 270, 170, 'F_g', dx=18, lab_r=170)
     b += ARC(cx, cy, 60, 270, 270 + ang, INK, 1.6) + T(*[v + d for v, d in zip(pol(cx, cy, 270 + ang / 2, 78), (0, 5))], 'α', 17, italic=True)
@@ -317,7 +328,7 @@ def o07_scene():
 # ================= O08 =================
 def o08_slide():
     (cx, cy), _ = inc_geom(35, 460, 320)
-    incline('c5l3-o08-slide.svg', 35, w=460, h=320, angle_label='35°', extra=T(cx, cy + 5, '43 kg', 13))
+    inc('c5l3-o08-slide.svg', 35, 460, 320, '35°', T(cx, cy + 5, '43 kg', 13))
 
 
 def o08_graph():
