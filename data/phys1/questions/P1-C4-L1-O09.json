@@ -120,7 +120,7 @@
     "$\\boldsymbol{F}_{\\text{المحصلة}} = m\\boldsymbol{a}$"
    ],
    "correct_index": 3,
-   "explanation": "من $\\boldsymbol{a} = \\frac{\\boldsymbol{F}_{\\text{المحصلة}}}{m}$ نضرب الطرفين في m فنحصل على $\\boldsymbol{F}_{\\text{المحصلة}} = m\\boldsymbol{a}$.",
+   "explanation": "من $\\boldsymbol{a} = \\frac{\\boldsymbol{F}_{\\text{المحصلة}}}{m}$ نضرب الطرفين في $m$ فنحصل على $\\boldsymbol{F}_{\\text{المحصلة}} = m\\boldsymbol{a}$.",
    "distractor_notes": [
     "القوة تساوي حاصل ضرب الكتلة في التسارع لا قسمة التسارع عليها.",
     "القوة تساوي حاصل ضرب الكتلة في التسارع لا قسمة الكتلة عليه.",

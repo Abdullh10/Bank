@@ -1,6 +1,6 @@
 import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..')); from figures import *
 # رسوم الدرس 4-2 (استخدام قوانين نيوتن) — الأهداف O01–O15
-import math
+import math, re
 
 XL = 'الزمن (s)'; VL = 'السرعة المتجهة (m/s)'
 
@@ -47,6 +47,17 @@ def elevator(name, v=None, a=None, a_zero=False, w=360, h=330):
     save(name, svg(w + 20, h, b))
 
 
+def Vd(x, y, s, color=C_FORCE, size=17, anchor='middle'):
+    """رمز متجه بحرف سفلي قائم (F_d كما في الكتاب: الحرف d قائم)."""
+    return re.sub(r'(<tspan dy="0.3em" font-size="\d+" font-weight="normal")>', r'\1 font-style="normal">', V(x, y, s, color, size, anchor))
+
+
+def F_scale(x, y, color=C_FORCE, size=18):
+    """رمز الكتاب لقوة الميزان: F عريض مائل وتحته الكلمة العربية «الميزان» حرفًا سفليًا قائمًا."""
+    return (f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" fill="{color}" font-weight="bold" font-style="italic" {MATHFONT}>F</text>'
+            f'<text x="{x + size * 0.62:.1f}" y="{y + size * 0.3:.1f}" font-size="{int(size * 0.72)}" fill="{color}" text-anchor="start" {FONT}>الميزان</text>')
+
+
 def fbd_y(name, forces, acc=None, w=330, h=320, body='dot'):
     """مخطط جسم حر رأسي: forces = [(dir 'up'/'down', length, label)]؛ acc = 'up'/'down' سهم تسارع بنفسجي منفصل."""
     cx, cy = 165, 160; b = ''
@@ -56,7 +67,8 @@ def fbd_y(name, forces, acc=None, w=330, h=320, body='dot'):
     for d, ln, lab in forces:
         s = -1 if d == 'up' else 1
         b += ARROW(cx, cy + s * r0, cx, cy + s * (r0 + ln), C_FORCE, 3)
-        b += V(cx + 14, cy + s * (r0 + ln * 0.6) + 6, lab, C_FORCE, 18, 'start')
+        ly = cy + s * (r0 + ln * 0.6) + 6
+        b += F_scale(cx + 14, ly) if lab == 'F_scale' else (Vd if lab == 'F_d' else V)(cx + 14, ly, lab, C_FORCE, 18, 'start')
     if acc:
         s = -1 if acc == 'up' else 1
         b += ARROW(270, cy - 30 * s, 270, cy + 30 * s, C_ACC, 3) + V(284, cy + 6, 'a', C_ACC, 18, 'start')
@@ -80,7 +92,7 @@ def falling_seq(name):
         x = 80 + i * 140; y = 70 + i * 45
         b += f'<circle cx="{x}" cy="{y}" r="14" fill="#f3d36b" stroke="{INK}" stroke-width="1.5"/>'
         b += ARROW(x, y + 14, x, y + 14 + fg, C_FORCE, 3) + V(x - 12, y + 14 + fg - 4, 'F_g', C_FORCE, 16, 'end')
-        b += ARROW(x, y - 14, x, y - 14 - fd, C_FORCE, 3) + V(x - 12, y - 14 - fd + 4, 'F_d', C_FORCE, 16, 'end')
+        b += ARROW(x, y - 14, x, y - 14 - fd, C_FORCE, 3) + Vd(x - 12, y - 14 - fd + 4, 'F_d', C_FORCE, 16, 'end')
         b += ARROW(x + 34, y - vv / 2, x + 34, y + vv / 2, C_VEL, 2.6) + V(x + 44, y + 6, 'v', C_VEL, 16, 'start')
         b += T(x, h - 14, str(i + 1), 15, weight='bold')
     save(name, svg(w, h, b))
@@ -114,9 +126,9 @@ def build():
     b += f'<circle cx="150" cy="282" r="34" fill="#c4d3e6" stroke="{INK}" stroke-width="2"/>' + T(150, 287, '3.0 kg', 13)
     save('c4l2-o03-two-scales.svg', svg(w, 340, b))
     # O04: مخطط جسم حر لشخص على ميزان في مصعد متسارع
-    fbd_y('c4l2-o04-fbd-elev.svg', [('up', 100, 'F_{sp}'), ('down', 80, 'F_g')], acc='up')
+    fbd_y('c4l2-o04-fbd-elev.svg', [('up', 100, 'F_scale'), ('down', 80, 'F_g')], acc='up')
     # O05: قوة الميزان أصغر من الوزن
-    fbd_y('c4l2-o05-fbd-compare.svg', [('up', 60, 'F_{sp}'), ('down', 95, 'F_g')])
+    fbd_y('c4l2-o05-fbd-compare.svg', [('up', 60, 'F_scale'), ('down', 95, 'F_g')])
     # O06: حالات المصعد
     elevator('c4l2-o06-elev-vup-aup.svg', v='up', a='up')
     elevator('c4l2-o06-elev-vup-adown.svg', v='up', a='down')
@@ -162,7 +174,7 @@ def build():
           marks=[(1, v(1), 'A'), (3, v(3), 'B'), (9, v(9), 'C')])
     graph('c4l2-o15-vt-accel.svg', [{'pts': pts, 'color': C_VEL}], (0, 10), (0, 25), XL, VL, 1, 5,
           marks=[(0.5, v(0.5), 'K'), (4, v(4), 'M'), (8, v(8), 'N')])
-    fbd_y('c4l2-o15-fbd-terminal.svg', [('up', 85, 'F_d'), ('down', 85, 'F_g')])
+    fbd_y('c4l2-o15-fbd-falling.svg', [('up', 40, 'F_d'), ('down', 95, 'F_g')])
 
 
 if __name__ == '__main__':
