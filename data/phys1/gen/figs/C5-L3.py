@@ -269,7 +269,7 @@ def o06_components():
 
 def o06_box650():
     (cx, cy), _ = inc_geom(40, 460, 330)
-    ex = FA(cx, cy, 270, 110, '', ) + V(cx + 26, cy + 112, 'F_g', C_FORCE) + T(cx + 70, cy + 112, '= 650 N', 14, 'start')
+    ex = FA(cx, cy, 270, 110, '', ) + V(cx + 26, cy + 112, 'F_g', C_FORCE) + T(cx + 40, cy + 117, '= 650 N', 14, 'start')
     inc('c5l3-o06-box650.svg', 40, 460, 330, '40.0°', ex)
 
 

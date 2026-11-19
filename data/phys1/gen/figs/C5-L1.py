@@ -37,7 +37,7 @@ class Scene:
             vx, vy = vpos if vpos else (lpos[0], lpos[1] + 20)
             self.b += T(mx + vx, my + vy, val, 14, 'middle', color)
 
-    def arc(self, c, r, a1, a2, label=None, lr=None, color=INK, size=14, dash=False):
+    def arc(self, c, r, a1, a2, label=None, lr=None, color=INK, size=14, dash=False, la=None):
         """قوس زاوية من a1 إلى a2 (درجات، عكس عقارب الساعة) نصف قطره r بالبكسل."""
         cx, cy = self.P(c)
         p1 = (cx + r * math.cos(math.radians(a1)), cy - r * math.sin(math.radians(a1)))
@@ -46,7 +46,7 @@ class Scene:
         da = ' stroke-dasharray="4 3"' if dash else ''
         self.b += f'<path d="M {p1[0]:.1f} {p1[1]:.1f} A {r} {r} 0 {large} 0 {p2[0]:.1f} {p2[1]:.1f}" fill="none" stroke="{color}" stroke-width="1.5"{da}/>'
         if label:
-            am = math.radians((a1 + a2) / 2); rr = lr or r + 16
+            am = math.radians(la if la is not None else (a1 + a2) / 2); rr = lr or r + 16
             self.b += T(cx + rr * math.cos(am), cy - rr * math.sin(am) + 5, label, size, 'middle', color)
 
     def text(self, p, s, size=14, anchor='middle', color=INK, italic=False, weight='normal', dx=0, dy=0):
@@ -84,7 +84,8 @@ def triangle(name, A, B, theta, la, lb, color, angle_label, w=520, h=300, unit=N
     s = Scene(w, h, u, origin, grid=False)
     pA = polar(A, dirA); dB = dirA + 180 - theta; pB = add(pA, polar(B, dB))
     s.vec((0, 0), pA, color, 'A', lpos=(0, 26), val=la, vpos=(0, 46))
-    s.vec(pA, pB, color, 'B', lpos=(18, -4), val=lb, vpos=(48, 16))
+    nx, ny = math.sin(math.radians(dB)), math.cos(math.radians(dB))  # يمين المتجه B على الشاشة
+    s.vec(pA, pB, color, 'B', lpos=(22 * nx, 22 * ny + 6), val=lb, vpos=(22 * nx + 34 * abs(nx) + 4, 22 * ny + 24))
     s.arc(pA, 34, dB, dirA + 180, angle_label, lr=58)
     s.save(name)
 
@@ -92,7 +93,7 @@ def triangle(name, A, B, theta, la, lb, color, angle_label, w=520, h=300, unit=N
 # ================= O01 =================
 def o01():
     # إزاحتان متعامدتان 9.0 km شرقًا ثم 12.0 km شمالًا (كل مربع 3.0 km)
-    s = Scene(420, 340, 22, (70, 300))
+    s = Scene(420, 350, 22, (70, 290))
     s.vec((0, 0), (9, 0), C_DISP, 'A', lpos=(0, 24), val='9.0 km', vpos=(0, 44))
     s.vec((9, 0), (9, 12), C_DISP, 'B', lpos=(20, 0), val='12.0 km', vpos=(52, 20))
     s.dot((0, 0), 4)
@@ -106,16 +107,16 @@ def o01():
     s.dot((0, 0), 8, INK, '#fff'); s.save('c5l1-o01-forces.svg')
 
     # قانون الجيب: إزاحتان 30.0 m و20.0 m والزاوية الداخلية 110.0°
-    triangle('c5l1-o01-sine.svg', 300, 200, 110, '30.0 m', '20.0 m', C_DISP, '110.0°', w=440, h=270, origin=(50, 235))
+    triangle('c5l1-o01-sine.svg', 300, 200, 110, '30.0 m', '20.0 m', C_DISP, '110.0°', w=470, h=280, origin=(50, 215))
 
     # طائرة 200 km/h شمالًا وريح 50 km/h شرقًا
-    s = Scene(420, 330, 1, (150, 290), grid=False)
+    s = Scene(420, 330, 1, (150, 270), grid=False)
     s.vec((0, 0), (0, 230), C_VEL, 'v_1', lpos=(-26, 0), val='200 km/h', vpos=(-60, 22))
     s.vec((0, 0), (58, 0), C_VEL, 'v_2', lpos=(0, 24), val='50 km/h', vpos=(0, 44))
     s.dot((0, 0), 6); s.raw(compass(330, 120)); s.save('c5l1-o01-plane.svg')
 
-    # السؤال المقالي: 40.0 m و25.0 m بزاوية داخلية 100.0°
-    triangle('c5l1-o01-e2.svg', 300, 187.5, 100, '40.0 m', '25.0 m', C_DISP, '100.0°', w=440, h=280, origin=(50, 250))
+    # السؤال المقالي: 40.0 m و30.0 m بزاوية داخلية 100.0°
+    triangle('c5l1-o01-e2.svg', 300, 225, 100, '40.0 m', '30.0 m', C_DISP, '100.0°', w=470, h=320, origin=(50, 255))
 
 
 # ================= O02 =================
@@ -172,7 +173,7 @@ def o03():
 
 # ================= O04 =================
 def o04():
-    triangle('c5l1-o04-tri135.svg', 225, 150, 135, '15.0 m', '10.0 m', C_DISP, '135.0°', w=480, h=260, origin=(50, 225))
+    triangle('c5l1-o04-tri135.svg', 225, 150, 135, '15.0 m', '10.0 m', C_DISP, '135.0°', w=440, h=240, origin=(50, 180))
 
     # قوتان من حلقة بينهما 60.0° (الذيلان معًا)
     s = Scene(420, 300, 1, (110, 240), grid=False)
@@ -184,7 +185,7 @@ def o04():
     # جذع يسحبه حبلان بقوة 600 N لكل منهما والزاوية بينهما 20.0°
     s = Scene(560, 240, 1, (200, 120), grid=False)
     s.raw(f'<rect x="20" y="104" width="180" height="32" rx="14" fill="#c9a77c" stroke="{INK}" stroke-width="2"/>')
-    s.line((0, 0), (320, 0), MUTED, 1.4, '6 5')
+    s.line((0, 0), (105, 0), MUTED, 1.4, '6 5')
     s.vec((0, 0), polar(300, 10), C_FORCE, 'F_1', lpos=(0, -18), val='600 N', vpos=(150, -40))
     s.vec((0, 0), polar(300, -10), C_FORCE, 'F_2', lpos=(0, 30), val='600 N', vpos=(150, 52))
     s.arc((0, 0), 120, -10, 10, '20.0°', lr=150)
@@ -206,7 +207,7 @@ def o05():
     s.vec((0, 0), p1, C_GEN, 'A', lpos=(-4, -16))
     s.vec(p1, p2, C_GEN, 'B', lpos=(-6, -16))
     s.vec(p2, p3, C_GEN, 'C', lpos=(18, 4))
-    s.text((5.4, -0.5), 'ضلع المربع = 1.0 m', 13, 'end', MUTED)
+    s.text((5.4, -0.5), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o05-grid3.svg')
 
     s = Scene(360, 300, 50, (60, 260))
@@ -214,7 +215,7 @@ def o05():
     A = (4, 1); B = (-1, 3)
     s.vec((0, 0), A, C_GEN, 'A', lpos=(0, 22))
     s.vec(A, add(A, B), C_GEN, 'B', lpos=(18, 0))
-    s.text((5.4, -0.6), 'ضلع المربع = 1.0 m', 13, 'end', MUTED)
+    s.text((5.4, -0.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o05-e2.svg')
 
 
@@ -244,8 +245,8 @@ def o06():
     p1 = A; p2 = add(p1, B); p3 = add(p2, C)
     s.vec((0, 0), p1, C_DISP, 'A', lpos=(-10, -14))
     s.vec(p1, p2, C_DISP, 'B', lpos=(20, 0))
-    s.vec(p2, p3, C_DISP, 'C', lpos=(-6, 22))
-    s.text((7.5, -4.6), 'ضلع المربع = 1.0 m', 13, 'end', MUTED)
+    s.vec(p2, p3, C_DISP, 'C', lpos=(16, 12))
+    s.text((7.5, -4.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o06-grid.svg')
 
     s = Scene(460, 340, 1, (230, 200), grid=False)
@@ -254,7 +255,7 @@ def o06():
     s.vec((0, 0), polar(150, 55), C_FORCE, 'F_2', lpos=(26, -6), val='21.0 N', vpos=(60, 14))
     s.vec((0, 0), (0, -120), C_FORCE, 'F_g', lpos=(24, 0), val='35.0 N', vpos=(52, 22))
     s.arc((0, 0), 36, 0, 55, '55.0°', lr=58, size=13)
-    s.arc((0, 0), 30, 0, 125, '125.0°', lr=90, size=13)
+    s.arc((0, 0), 26, 0, 125, '125.0°', lr=64, size=13, la=112)
     s.dot((0, 0), 5); s.save('c5l1-o06-e2.svg')
 
 
@@ -262,12 +263,12 @@ def o06():
 def o07():
     # الرسوم الأربعة لمحاولة جمع A وB (A = (4,0)، B = (1,3))
     w, h = 660, 260; b = ''
-    u = 26
+    u = 20
     A = (4, 0); Bv = (1, 3)
     cases = [
         ('tip', False), ('tip', True), ('tail', False), ('rot', False)]
     for k, (mode, rev) in enumerate(cases):
-        s = Scene(150, 200, u, (18, 170))
+        s = Scene(150, 200, u, (8, 170))
         if mode == 'tip':
             s.vec((0, 0), A, C_GEN, 'A', lpos=(0, 22)); s.vec(A, add(A, Bv), C_GEN, 'B', lpos=(16, 0))
             if rev: s.vec(add(A, Bv), (0, 0), C_GEN, 'R', lpos=(-14, -10), dash=True)
@@ -291,14 +292,14 @@ def o07():
     s.vec((0, 0), (5, 0), C_DISP, 'A', lpos=(0, 22))
     s.vec((5, 0), (3, 4), C_DISP, 'B', lpos=(20, 4))
     s.dot((0, 0), 4)
-    s.text((7.4, 1.6), 'ضلع المربع = 10 m', 13, 'end', MUTED)
+    s.text((7.0, 4.8), 'ضلع المربع = \u206610 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o07-measure.svg')
 
     # المنقلة: A = (2,0)، B من (2,0) إلى (−3,4)
     s = Scene(380, 300, 44, (220, 250))
     s.axes('+x', '+y')
     s.vec((0, 0), (2, 0), C_GEN, 'A', lpos=(0, 22))
-    s.vec((2, 0), (-3, 4), C_GEN, 'B', lpos=(14, 12))
+    s.vec((2, 0), (-3, 4), C_GEN, 'B', lpos=(-34, 14))
     s.save('c5l1-o07-protractor.svg')
 
     # ثلاثة متجهات متفرقة، ضلع المربع 2.0 m
@@ -306,7 +307,7 @@ def o07():
     s.vec((0.5, 1), (3.5, 2), C_DISP, 'A', lpos=(0, 22))
     s.vec((6, 1), (5, 4), C_DISP, 'B', lpos=(-18, 0))
     s.vec((8.5, 4), (10.5, 3), C_DISP, 'C', lpos=(4, -14))
-    s.text((11.8, 6.6), 'ضلع المربع = 2.0 m', 13, 'end', MUTED)
+    s.text((11.8, 6.6), 'ضلع المربع = \u20662.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o07-e3.svg')
 
 
@@ -351,7 +352,7 @@ def o09():
     s = Scene(340, 280, 50, (50, 230))
     s.axes('+x', '+y')
     s.vec((0, 0), (4, 3), C_GEN, 'A', lpos=(-12, -14))
-    s.text((5.6, -0.6), 'ضلع المربع = 1.0 m', 13, 'end', MUTED)
+    s.text((5.6, -0.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o09-e2.svg')
 
 
