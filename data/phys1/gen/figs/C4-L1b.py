@@ -153,7 +153,7 @@ def o19_bowl():
     bx, by = ox + (R - r - 2) * math.cos(math.radians(th)), oy - (R - r - 2) * math.sin(math.radians(th))
     b += DOT(bx, by, r, INK, '#d6dbe4')
     toO = math.degrees(math.atan2(-(oy - by), ox - bx))
-    b += cand(bx, by, 90, 60, '1', r) + cand(bx, by, toO, 60, '2', r) + cand(bx, by, toO - 90, 60, '3', r) + cand(bx, by, 270, 55, '4', r)
+    b += cand(bx, by, 90, 60, '1', r) + cand(bx, by, toO, 60, '2', r) + cand(bx, by, toO - 90, 42, '3', r) + cand(bx, by, 270, 55, '4', r)
     save('c4l1-o19-bowl.svg', svg(W, H, b))
 
 # ================= O20 =================
