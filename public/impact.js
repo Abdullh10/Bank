@@ -63,7 +63,7 @@ async function pageForm(ctx, id) {
     <div class="hero"><div class="hero-ic">${icon('trophy', 52)}<div><h1>${id ? 'تعديل دراسة الأثر' : 'دراسة أثر جديدة'}</h1>
       <p class="muted">البيانات الأساسية للاختبارين. يمكنك تعديلها لاحقًا.</p></div></div></div>
     <form id="imp-form" class="card">
-      <div class="field"><label for="imp-title">عنوان الدراسة</label><input id="imp-title" required value="${esc(s.title)}" placeholder="مثل: أثر المنصة في الفصل الأول · كيمياء 2-1"></div>
+      <div class="field"><label for="imp-title">عنوان الدراسة</label><input id="imp-title" required value="${esc(s.title)}" placeholder="مثل: أثر المنصة في الفصل الدراسي الأول"></div>
       <div class="form-grid imp-grid">
         <div class="field"><label for="imp-pre">تاريخ القبلي</label><input id="imp-pre" type="date" required value="${esc(s.preDate || '')}"></div>
         <div class="field"><label for="imp-post">تاريخ البعدي</label><input id="imp-post" type="date" value="${esc(s.postDate || '')}"><span class="small muted imp-hint">يمكن تحديده لاحقًا</span></div>
@@ -448,7 +448,7 @@ function reportHtml(ctx, data, a) {
   const weak = a.objectives ? [...a.objectives].filter(x => Number.isFinite(x.mPost)).sort((x, y) => x.mPost - y.mPost).slice(0, 3) : [];
   return `<article class="imp-report" dir="rtl">
   <header class="rp-cover">
-    <div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="54" height="54"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب في الكيمياء</span></div></div>
+    <div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="54" height="54"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب</span></div></div>
     <div class="rp-title"><span class="rp-kicker">تقرير قياس الأثر</span><h1>${esc(s.title)}</h1>
       <p>دراسة قبلية-بعدية لأثر التدريب على المنصة في تحصيل الطلاب</p></div>
     <dl class="rp-meta">${meta.map(([l, v]) => `<div><dt>${esc(l)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
