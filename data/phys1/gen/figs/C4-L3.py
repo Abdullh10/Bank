@@ -79,7 +79,7 @@ def pair_unknown():
     b += ground(20, 500, 150)
     b += BOX(160, 115, 90, 70, 'A') + BOX(360, 115, 90, 70, 'B')
     b += ARROW(405, 115, 485, 115, C_FORCE, 3.5) + FS(445, 62, 'A في B', tail=' = 24 N')
-    b += T(85, 120, '?', 26, color=C_FORCE, weight='bold')
+    b += FS(160, 62, 'B في A', tail=' = ?')
     b += plus_x(30, 190, 60)
     save('c4l3-o03-pair.svg', svg(w, h, b))
 
