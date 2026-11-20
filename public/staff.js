@@ -152,7 +152,7 @@ export async function pageTeacherComms(ctx) {
   // الاستبانة لمقرر واحد: المقرر الحالي، وعباراتها باسم مادته
   const cur = ctx.state?.course, curSubj = subjectOf(cur, subjects);
   const svItems = itemsFor(curSubj?.name), svOpen = openFor(curSubj?.name);
-  const subjBadge = c => { const sj = subjects.find(x => x.id === c.subjectId); return c.course ? `<span class="badge cm-course ${sj ? 's-' + esc(sj.color) : ''}">${sj ? sIcon(sj, 'xs') : ''}${esc(c.course)}</span>` : ''; };
+  const subjBadge = c => { const sj = subjects.find(x => x.id === c.subjectId); return c.course ? `<span class="badge cm-course ${sj ? 's-' + esc(sj.color) : ''}">${sj ? sIcon(sj, 'sm') : ''}${esc(c.course)}</span>` : ''; };
   const kinds = [['', 'الكل'], ['message', 'الرسائل'], ['task', 'المهام'], ['survey', 'الاستبانات']];
   const grades = [...new Set(students.map(s => s.grade).filter(Boolean))].sort();
   const owner = ctx.state?.user?.role === 'admin';
@@ -820,6 +820,11 @@ const accountTabs = (cur, ctx) => (ctx.state?.supabase ? `<div class="seg no-pri
 export async function pageAdminTeam(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const all = await api('/admin/team');
+  const subjects = ctx.state?.subjects || [];
+  // المراجع والمشرف: نطاق بالمواد (فارغ = كل المواد)
+  const scoped = r => r === 'reviewer' || r === 'supervisor';
+  const scopeText = ids => (ids?.length ? `<span class="muted">يرى فقط:</span> ${ids.map(id => { const x = subjects.find(y => y.id === id); return x ? `<span class="badge s-${esc(x.color)} subj-badge">${sIcon(x, 'sm')}${esc(x.name)}</span>` : esc(id); }).join(' ')}`
+    : '<span class="muted">يرى كل المواد</span>');
   const roleOpts = (cur, withPending = true) => [...STAFF_ROLES.map(([v, t]) => [v, t]), ...(withPending ? [['pending', 'موقوف']] : [])]
     .map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('');
   const fmt = d => hijri(d);
@@ -845,11 +850,11 @@ export async function pageAdminTeam(ctx) {
       <div class="table-wrap"><table class="list"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>آخر دخول</th><th></th></tr></thead><tbody>
       ${all.map(u => (u.role === 'admin' || u.self) ? `<tr><td>${esc(u.name)}</td><td class="ltr">${esc(u.username)}</td><td>${esc(ROLE_NAMES[u.role])}</td><td class="small">${fmt(u.lastSignIn)}</td><td class="small muted">${u.self ? 'حسابك' : ''}</td></tr>`
         : `<tr data-id="${u.id}" data-user="${esc(u.username)}">
-          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم">${u.role === 'viewer' ? `<div class="small muted tm-sum">${u.assignedCourses || 0} مقرر · ${u.assignedStudents || 0} طالب مسند</div>` : ''}</td>
+          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم">${u.role === 'viewer' ? `<div class="small muted tm-sum">${u.assignedCourses || 0} مقرر · ${u.assignedStudents || 0} طالب مسند</div>` : ''}${scoped(u.role) ? `<div class="small tm-scope">${scopeText(u.subjects)}</div>` : ''}</td>
           <td><input class="tm-u ltr" value="${esc(u.username)}" aria-label="اسم المستخدم" style="max-width:10rem"></td>
           <td><select class="tm-r" aria-label="الدور">${roleOpts(u.role)}</select></td>
           <td class="small">${fmt(u.lastSignIn)}</td>
-          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button>${u.role === 'viewer' ? '<button type="button" class="tm-assign-btn" aria-expanded="false">الإسناد</button>' : ''}<button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
+          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button>${u.role === 'viewer' ? '<button type="button" class="tm-assign-btn" aria-expanded="false">الإسناد</button>' : ''}${scoped(u.role) && subjects.length ? '<button type="button" class="tm-scope-btn" aria-expanded="false">نطاق المواد</button>' : ''}<button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
       </tbody></table></div>
       <p class="small muted">«موقوف» يمنع الحساب من رؤية أي محتوى دون حذفه. لا يمكن منح دور «مالك المشروع» من هنا.</p></section>`;
   const reload = () => pageAdminTeam(ctx).catch(fail);
@@ -873,6 +878,35 @@ export async function pageAdminTeam(ctx) {
         <div class="small">احفظ كلمة المرور الآن؛ لا تظهر مرة أخرى.</div></div>`;
     } catch (err) { fail(err); btn.disabled = false; }
   };
+  // نطاق المراجع أو المشرف بالمواد: لا شيء محدد = كل المواد (كما كان)
+  function openScope(tr, u, btn) {
+    const next = tr.nextElementSibling;
+    if (next?.classList.contains('tm-assign')) { next.remove(); btn.setAttribute('aria-expanded', 'false'); return; }
+    const sel = new Set(u.subjects || []);
+    const row = document.createElement('tr'); row.className = 'tm-assign';
+    row.innerHTML = `<td colspan="5"><div class="tm-assign-box">
+      <h3>نطاق «${esc(tr.querySelector('.tm-n').value)}» بالمواد</h3>
+      <p class="small muted">حدّد المواد التي يراجعها أو يطّلع عليها؛ لا يرى أسئلة غيرها ولا ملاحظاتها ولا سجل تعديلاتها (تفرضه قاعدة البيانات). دون تحديد يرى كل المواد. البرامج المشتركة (التحصيلي) لغير المقيَّد فقط.</p>
+      <div class="chips" role="group" aria-label="المواد">${subjects.map(x => `<button type="button" class="chip subj-chip ${sel.has(x.id) ? 'on' : ''}" data-sc="${esc(x.id)}" aria-pressed="${sel.has(x.id)}">${sIcon(x, 'sm')}${esc(x.name)}</button>`).join('')}</div>
+      <p class="small tm-scope-now"></p>
+      <div class="actions"><button type="button" class="primary tm-ssave">حفظ النطاق</button><button type="button" class="tm-scancel">إغلاق</button></div></div></td>`;
+    tr.after(row); btn.setAttribute('aria-expanded', 'true');
+    const now = () => { row.querySelector('.tm-scope-now').innerHTML = scopeText([...sel]); };
+    row.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => {
+      const on = !sel.has(b.dataset.sc); on ? sel.add(b.dataset.sc) : sel.delete(b.dataset.sc);
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); now();
+    });
+    row.querySelector('.tm-scancel').onclick = () => { row.remove(); btn.setAttribute('aria-expanded', 'false'); };
+    row.querySelector('.tm-ssave').onclick = async e => {
+      const b = e.currentTarget; if (b.disabled) return; b.disabled = true;
+      try {
+        const r = await api('/admin/team/scope', { method: 'POST', body: { id: u.id, subjects: [...sel] } });
+        u.subjects = r.subjects; tr.querySelector('.tm-scope').innerHTML = scopeText(r.subjects);
+        toast('حُفظ النطاق'); row.remove(); btn.setAttribute('aria-expanded', 'false');
+      } catch (err) { fail(err); b.disabled = false; }
+    };
+    now();
+  }
   // إسناد المعلم: المقررات التي يراها وطلابه الذين يتابع تقدمهم (يستبدل الإسناد السابق كاملًا)
   async function openAssign(tr, id, btn) {
     const next = tr.nextElementSibling;
@@ -949,6 +983,7 @@ export async function pageAdminTeam(ctx) {
       } catch (err) { fail(err); } finally { btn.disabled = false; }
     };
     tr.querySelector('.tm-assign-btn')?.addEventListener('click', e => openAssign(tr, id, e.currentTarget).catch(fail));
+    tr.querySelector('.tm-scope-btn')?.addEventListener('click', e => openScope(tr, all.find(u => u.id === id), e.currentTarget));
     tr.querySelector('.tm-reset').onclick = async () => {
       const pw = prompt('اكتب كلمة المرور الجديدة (8 أحرف على الأقل)، أو اتركها فارغة لتوليدها تلقائيًا:', '');
       if (pw === null) return;

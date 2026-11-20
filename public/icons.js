@@ -128,6 +128,7 @@ const LINES = {
   eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.6A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.6 6.7C4 8.4 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   logout: '<path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14"/><path d="M10 8 6 12l4 4M6 12h9.5"/>',
   print: '<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7.5" rx="2"/><path d="M7 14h10v6H7z"/>',
+  chart: '<path d="M4 20h16"/><path d="M7.5 16.5v-4M12 16.5V7M16.5 16.5v-6.5"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.6-4.6"/>',
   clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>',
