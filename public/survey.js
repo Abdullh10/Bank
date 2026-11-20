@@ -31,6 +31,16 @@ export const ITEMS = [
   { dim: 'G', text: 'أنصح زملائي باستخدام منصة إتقان.' },
 ];
 export const ATT = ITEMS.findIndex(i => i.att);
+// العبارات تُحفظ بكلمة «المادة» (ثابتة للمقارنة)، وتُعرض باسم مادة الاستبانة: «فهم دروس الفيزياء»، «مذاكرتي للفيزياء».
+// الترتيب والترميز لا يتغيران، فالتحليل واحد لكل المواد.
+export function subjectize(text, name) {
+  const n = String(name || '').trim();
+  if (!n || n === 'المادة') return text;
+  const al = /^ال/.test(n);
+  return String(text).replace(/للمادة/g, al ? 'لل' + n.slice(2) : 'ل' + n).replace(/المادة/g, n);
+}
+export const itemsFor = name => ITEMS.map(it => ({ ...it, text: subjectize(it.text, name) }));
+export const openFor = name => OPEN.map(t => subjectize(t, name));
 export const SCALE = [[5, 'أوافق بشدة'], [4, 'أوافق'], [3, 'محايد'], [2, 'لا أوافق'], [1, 'لا أوافق بشدة']];
 export const OPEN = ['ما أكثر شيء في المنصة ساعدك على تعلّم المادة؟ اذكر مثالًا.', 'ما الذي تقترح تغييره أو إضافته لتصبح المنصة أكثر فائدة لك؟'];
 export const MIN_SHOW = 5;      // أقل عدد إجابات لعرض أي نتيجة
@@ -113,7 +123,7 @@ export const rhoLabel = r => (!Number.isFinite(r) ? '—' : Math.abs(r) < 0.1 ? 
 const PER_PAGE = 4;
 export function surveyForm(ctx, it, done) {
   const { esc, $app, api, fail, toast } = ctx;
-  const answers = Array(ITEMS.length).fill(null), open = ['', ''], startedAt = Date.now();
+  const answers = Array(ITEMS.length).fill(null), open = ['', ''], startedAt = Date.now(), subj = it.survey?.subject;
   const pages = []; for (let i = 0; i < ITEMS.length; i += PER_PAGE) pages.push(ITEMS.slice(i, i + PER_PAGE).map((x, j) => i + j));
   pages.push('open');
   let page = -1;
@@ -132,8 +142,8 @@ export function surveyForm(ctx, it, done) {
     $app.innerHTML = `<section class="card sv-wrap">
       <div class="sv-top"><span class="small muted">${page + 1} من ${pages.length}</span><div class="bar"><span style="width:${Math.round((100 * page) / pages.length)}%"></span></div></div>
       ${cur === 'open' ? `<p class="small muted">سؤالان اختياريان (300 حرف لكل منهما). لا تكتب اسمك أو أسماء غيرك.</p>
-        ${OPEN.map((q, k) => `<div class="field"><label for="sv-o${k}">${esc(q)}</label><textarea id="sv-o${k}" dir="auto" maxlength="300" rows="3">${esc(open[k])}</textarea></div>`).join('')}`
-      : cur.map(i => `<fieldset class="sv-item"><legend>${esc(ITEMS[i].text)}</legend><div class="sv-scale">
+        ${openFor(subj).map((q, k) => `<div class="field"><label for="sv-o${k}">${esc(q)}</label><textarea id="sv-o${k}" dir="auto" maxlength="300" rows="3">${esc(open[k])}</textarea></div>`).join('')}`
+      : cur.map(i => `<fieldset class="sv-item"><legend>${esc(subjectize(ITEMS[i].text, subj))}</legend><div class="sv-scale">
           ${SCALE.map(([v, t]) => `<label class="sv-opt"><input type="radio" name="sv${i}" value="${v}" ${answers[i] === v ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></fieldset>`).join('')}
       <p class="notice bad small" id="sv-err" hidden></p>
       <div class="actions st-nav">${page > 0 ? `<button type="button" id="sv-prev">السابق</button>` : ''}
@@ -171,6 +181,7 @@ export function surveyResultsHtml(esc, d) {
   const removed = c.attention + c.straight + c.speed;
   const secs = Object.entries(d.sectionsSent || {}).map(([sec, n]) => [sec, n, c.kept.filter(r => (r.s ?? '—') === sec).length]);
   return `<div class="sv-res">
+    ${d.subject || d.course ? `<p class="small sv-scope">${esc([d.subject, d.course].filter(Boolean).join(' · '))}</p>` : ''}
     <p class="small">استجاب <b>${d.responses}</b> من ${d.sent} طالبًا (${pc(rate)})${rate < 50 ? ' <span class="badge warn">نسبة استجابة منخفضة: قد لا تمثل النتائج كل الطلاب</span>' : ''}.
       ${removed ? `استُبعدت ${removed} إجابة غير موثوقة (عبارة الانتباه ${c.attention}، الإجابة نفسها لكل العبارات ${c.straight}، أسرع من دقيقة ${c.speed})، فالتحليل على <b>${a.n}</b> إجابة.` : `التحليل على ${a.n} إجابة.`}</p>
     ${a.n < MIN_SHOW ? '<p class="notice warn small">الإجابات الموثوقة أقل من 5؛ لا تُعرض النتائج.</p>' : `
@@ -181,13 +192,13 @@ export function surveyResultsHtml(esc, d) {
     ${a.n < MIN_ALPHA ? `<p class="small muted">الثبات يُحسب من ${MIN_ALPHA} إجابة فأكثر.</p>` : a.n < ALPHA_STABLE ? `<p class="small muted">الثبات محسوب من ${a.n} إجابة؛ يُقرأ تقديرًا أوليًا لأن العينة أقل من ${ALPHA_STABLE}.</p>` : ''}
     <div class="table-wrap"><table class="list sv-items"><thead><tr><th>العبارة</th><th>المتوسط</th><th>الموافقة</th><th>توزيع الإجابات</th></tr></thead><tbody>
       ${a.items.map(x => { const it = a.dims.flatMap(dd => dd.itemTotal).find(t => t.i === x.i);
-        return `<tr><td>${esc(x.text)}${x.rev ? ' <span class="badge">عكسية</span>' : ''}${it && Number.isFinite(it.r) && it.r < 0.3 ? ' <span class="badge warn" title="ارتباطها ضعيف بباقي عبارات بعدها">تراجع صياغتها</span>' : ''}</td>
+        return `<tr><td>${esc(subjectize(x.text, d.subject))}${x.rev ? ' <span class="badge">عكسية</span>' : ''}${it && Number.isFinite(it.r) && it.r < 0.3 ? ' <span class="badge warn" title="ارتباطها ضعيف بباقي عبارات بعدها">تراجع صياغتها</span>' : ''}</td>
           <td>${fmt(x.mean, 2)}</td><td>${pc(x.agree)}</td>
           <td><span class="sv-dist" role="img" aria-label="${SCALE.map(([, t], k) => `${t} ${Math.round(x.dist[k])}%`).join('، ')}">${x.dist.map((p, k) => `<i class="sv-d${k}" style="width:${p}%"></i>`).join('')}</span></td></tr>`; }).join('')}
     </tbody></table></div>
     <p class="sv-legend small muted">${SCALE.map(([, t], k) => `<i class="sv-d${k}"></i>${t}`).join(' ')}</p>
     ${secs.length > 1 ? `<p class="small"><b>الاستجابة حسب الشعبة:</b> ${secs.map(([s, n, k]) => `${esc(s)}: ${k >= MIN_SHOW ? `${k} من ${n}` : 'أقل من 5'}`).join(' · ')}</p>` : ''}
-    ${[d.open1, d.open2].map((list, k) => list.length ? `<details class="sv-open"><summary>${esc(OPEN[k])} <span class="small muted">(${list.length})</span></summary>
+    ${[d.open1, d.open2].map((list, k) => list.length ? `<details class="sv-open"><summary>${esc(subjectize(OPEN[k], d.subject))} <span class="small muted">(${list.length})</span></summary>
       <ul>${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul></details>` : '').join('')}
     <div class="actions no-print"><button type="button" class="sv-print">طباعة / حفظ PDF</button></div>
     <p class="small muted">الأداة: مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009)، ليكرت خماسي. المستوى: 1–1.80 منخفض جدًا، 1.81–2.60 منخفض، 2.61–3.40 متوسط، 3.41–4.20 مرتفع، 4.21–5 مرتفع جدًا. العبارات العكسية أُعيد ترميزها. هذه نتائج إدراك الطلاب وتدعم نتائج الاختبار القبلي والبعدي ولا تحل محلها.</p>`}
@@ -209,7 +220,7 @@ export function printSurveyReport(esc, d, meta = {}) {
   art.className = 'pr-report sv-report'; art.dir = 'rtl';
   art.innerHTML = `<header class="rp-cover">
     <div class="rp-brand"><img src="assets/itqan-mark.svg" alt="" width="54" height="54"><div><b>منصة إتقان</b><span>بنك الأسئلة والتدريب</span></div></div>
-    <div class="rp-title"><span class="rp-kicker">تقرير نتائج استبانة الطلاب</span><h1>${esc(d.title)}</h1><p>استبانة إدراك الطلاب لأثر التدريب على المنصة في تعلّمهم</p></div>
+    <div class="rp-title"><span class="rp-kicker">تقرير نتائج استبانة الطلاب${d.subject ? ` · ${esc(d.subject)}` : ''}${d.course ? ` · ${esc(d.course)}` : ''}</span><h1>${esc(d.title)}</h1><p>استبانة إدراك الطلاب لأثر التدريب على المنصة في تعلّمهم</p></div>
     <dl class="rp-meta">
       <div><dt>تاريخ الإرسال</dt><dd>${esc(hdate(d.createdAt))}</dd></div><div><dt>تاريخ الإغلاق</dt><dd>${esc(hdate(d.closesAt))}</dd></div><div><dt>تاريخ التقرير</dt><dd>${esc(today)}</dd></div>
       <div><dt>أُرسلت إلى</dt><dd>${d.sent} طالبًا</dd></div><div><dt>الاستجابات</dt><dd>${d.responses} (${pc(rate)})</dd></div><div><dt>الإجابات الموثوقة</dt><dd>${a.n}</dd></div>
@@ -217,19 +228,19 @@ export function printSurveyReport(esc, d, meta = {}) {
   ${sec('الخلاصة')}
   <div class="rp-figs">${a.dims.map(x => `<div><b>${fmt(x.mean, 2)}</b><span>${esc(x.label)} · ${esc(x.level)}</span></div>`).join('')}</div>
   <div class="rp-box">استجاب ${d.responses} من ${d.sent} طالبًا (${pc(rate)})${removed ? `، واستُبعدت ${removed} إجابة غير موثوقة (أخطأ في عبارة الانتباه ${c.attention}، والإجابة نفسها لكل العبارات ${c.straight}، وأسرع من دقيقة ${c.speed})` : ''}، فبُني التحليل على ${a.n} إجابة.
-    أعلى الأبعاد «${esc(best.label)}» بمتوسط ${fmt(best.mean, 2)} من 5 (${esc(best.level)})، وأدنى العبارات: «${esc(low.text)}» (${fmt(low.mean, 2)}).
+    أعلى الأبعاد «${esc(best.label)}» بمتوسط ${fmt(best.mean, 2)} من 5 (${esc(best.level)})، وأدنى العبارات: «${esc(subjectize(low.text, d.subject))}» (${fmt(low.mean, 2)}).
     ${rate < 50 ? '<b>تنبيه:</b> نسبة الاستجابة أقل من 50%، فقد لا تمثل النتائج كل الطلاب.' : ''}</div>
   ${sec('نتائج الأبعاد')}
   ${table(['البعد', 'العبارات', 'المتوسط (من 5)', 'الانحراف المعياري', 'المستوى', 'نسبة المرتفع (≥ 3.5)', 'الثبات (ألفا كرونباخ)'],
     a.dims.map(x => row([esc(x.label), x.items.length, fmt(x.mean, 2), fmt(x.sd, 2), esc(x.level), pc(x.high), Number.isFinite(x.alpha) ? `${fmt(x.alpha, 2)} · ${esc(alphaLabel(x.alpha))}` : esc(alphaLabel(x.alpha))])), 'rp-num rp-keep')}
   ${a.n < MIN_ALPHA ? `<p class="rp-small">يُحسب الثبات من ${MIN_ALPHA} إجابة فأكثر.</p>` : a.n < ALPHA_STABLE ? `<p class="rp-small">الثبات محسوب من ${a.n} إجابة موثوقة؛ يُقرأ تقديرًا أوليًا لأن العينة أقل من ${ALPHA_STABLE}.</p>` : ''}
   ${sec('نتائج العبارات')}
-  ${table(['م', 'العبارة', 'المتوسط', 'الموافقة', 'توزيع الإجابات'], a.items.map((x, k) => row([k + 1, esc(x.text) + (x.rev ? ' <span class="rp-muted">(عكسية)</span>' : ''), fmt(x.mean, 2), pc(x.agree),
+  ${table(['م', 'العبارة', 'المتوسط', 'الموافقة', 'توزيع الإجابات'], a.items.map((x, k) => row([k + 1, esc(subjectize(x.text, d.subject)) + (x.rev ? ' <span class="rp-muted">(عكسية)</span>' : ''), fmt(x.mean, 2), pc(x.agree),
     `<span class="sv-dist">${x.dist.map((p, j) => `<i class="sv-d${j}" style="width:${p}%"></i>`).join('')}</span>`])), 'rp-num')}
   <p class="rp-small">المتوسط بعد إعادة ترميز العبارات العكسية (كلما ارتفع كان أفضل)؛ أما «الموافقة» فهي نسبة من اختار «أوافق» أو «أوافق بشدة» على نص العبارة كما هو، فانخفاضها في العبارة العكسية نتيجة إيجابية.</p>
   <p class="rp-legend">${SCALE.map(([, t], k) => `<i class="sv-d${k} sv-key"></i>${t}`).join(' ')}</p>
   ${secs.length > 1 ? `<p class="rp-small"><b>الاستجابة حسب الشعبة:</b> ${secs.map(([s, nn, k]) => `${esc(s)}: ${k >= MIN_SHOW ? `${k} من ${nn}` : 'أقل من 5'}`).join(' · ')}</p>` : ''}
-  ${(d.open1.length || d.open2.length) ? `${sec('الإجابات المفتوحة')}${[d.open1, d.open2].map((list, k) => list.length ? `<p class="rp-small"><b>${esc(OPEN[k])}</b> (${list.length})</p><ul class="rp-list">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '').join('')}` : ''}
+  ${(d.open1.length || d.open2.length) ? `${sec('الإجابات المفتوحة')}${[d.open1, d.open2].map((list, k) => list.length ? `<p class="rp-small"><b>${esc(subjectize(OPEN[k], d.subject))}</b> (${list.length})</p><ul class="rp-list">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '').join('')}` : ''}
   ${sec('الأداة والمنهجية')}
   <ul class="rp-list">
     <li><b>الأداة:</b> ${ITEMS.length - 1} عبارة بمقياس ليكرت الخماسي في أربعة أبعاد، وعبارة انتباه، وسؤالان مفتوحان؛ مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).</li>
@@ -238,7 +249,7 @@ export function printSurveyReport(esc, d, meta = {}) {
     <li><b>التفسير:</b> العبارات العكسية أُعيد ترميزها؛ المستوى: 1–1.80 منخفض جدًا، 1.81–2.60 منخفض، 2.61–3.40 متوسط، 3.41–4.20 مرتفع، 4.21–5 مرتفع جدًا.</li>
     <li><b>الحدود:</b> نتائج إدراك الطلاب تدعم نتائج الاختبار القبلي والبعدي ولا تحل محلها.</li>
   </ul>
-  <footer class="rp-sign">${['معلم المادة', 'المشرف التربوي', 'قائد المدرسة'].map(t => `<div><span>${t}</span><p>الاسم: ............................</p><p>التوقيع: ..........................</p></div>`).join('')}</footer>
+  <footer class="rp-sign">${[subjectize('معلم المادة', d.subject), 'المشرف التربوي', 'قائد المدرسة'].map(t => `<div><span>${t}</span><p>الاسم: ............................</p><p>التوقيع: ..........................</p></div>`).join('')}</footer>
   <p class="rp-foot">صدر هذا التقرير من منصة إتقان في ${esc(today)}${meta.sender ? ` · المرسل: ${esc(meta.sender)}` : ''} · رمز الاستبانة ${d.id}</p>`;
   document.body.append(art);
   document.body.classList.add('pr-printing');

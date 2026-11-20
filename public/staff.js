@@ -3,8 +3,8 @@ import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
-import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml, printSurveyReport } from './survey.js';
-import { courseOptions, groupCourses, enrollDialog } from './subjects.js';
+import { ITEMS as SURVEY_ITEMS, itemsFor, openFor, surveyResultsHtml, printSurveyReport } from './survey.js';
+import { courseOptions, groupCourses, enrollDialog, sIcon, subjectOf } from './subjects.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -141,9 +141,19 @@ const COMM_TEMPLATES = [
   ['اختبار قريب', 'اختبار قريب', 'استعدوا للاختبار القادم بالتدريب على الدروس المقررة.'],
   ['ابدأ هذا الدرس', 'ابدأ بهذا الدرس', 'ابدأ بالتدريب على الدرس الذي شرحناه اليوم.'],
 ];
+// تصفية «المُرسَل» بالمادة والنوع (تبقى أثناء الجلسة)
+const commsFilter = { subject: '', kind: '' };
 export async function pageTeacherComms(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
-  const [list, students, chapters] = await Promise.all([api('/staff/comms'), api('/staff/students'), api('/staff/lessons')]);
+  const subjects = ctx.state?.subjects || [];
+  if (commsFilter.subject && !subjects.some(x => x.id === commsFilter.subject)) commsFilter.subject = '';
+  const qs = new URLSearchParams(Object.entries(commsFilter).filter(([, v]) => v)).toString();
+  const [list, students, chapters] = await Promise.all([api('/staff/comms' + (qs ? '?' + qs : '')), api('/staff/students'), api('/staff/lessons')]);
+  // الاستبانة لمقرر واحد: المقرر الحالي، وعباراتها باسم مادته
+  const cur = ctx.state?.course, curSubj = subjectOf(cur, subjects);
+  const svItems = itemsFor(curSubj?.name), svOpen = openFor(curSubj?.name);
+  const subjBadge = c => { const sj = subjects.find(x => x.id === c.subjectId); return c.course ? `<span class="badge cm-course ${sj ? 's-' + esc(sj.color) : ''}">${sj ? sIcon(sj, 'xs') : ''}${esc(c.course)}</span>` : ''; };
+  const kinds = [['', 'الكل'], ['message', 'الرسائل'], ['task', 'المهام'], ['survey', 'الاستبانات']];
   const grades = [...new Set(students.map(s => s.grade).filter(Boolean))].sort();
   const owner = ctx.state?.user?.role === 'admin';
   const defDue = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
@@ -167,11 +177,12 @@ export async function pageTeacherComms(ctx) {
           <label>مكافأة الإنجاز (نقاط لكل طالب) <input type="number" id="cm-reward" min="0" max="500" value="0" style="max-width:6rem"></label>
           <span class="small muted" style="flex-basis:100%">المكافأة اختيارية: تُضاف لرصيد من يُنجز المهمة قبل الموعد (لا تدخل نقاط الترتيب)، وتُخصم من حصتك الأسبوعية (النقاط × عدد الطلاب) وتعود حصة من لم ينجز. تتطلب 10 أسئلة على الأقل وصحة 50% فأكثر.</span></div>
         <div id="cm-survey" hidden>
+          <p class="notice info small sv-for">${curSubj ? sIcon(curSubj, 'sm') : ''}<span>تُرسل لطلاب مقرر <b>${esc(cur?.code || '')}</b> المسجلين فيه${curSubj ? `، وتظهر عباراتها باسم مادته: «${esc(svItems[0].text)}»` : ''}. لاستبانة مقرر آخر بدّل المقرر من أعلى الصفحة.</span></p>
           <p class="small muted">استبانة علمية ثابتة (${SURVEY_ITEMS.length - 1} عبارة ليكرت خماسية في 4 أبعاد + عبارة انتباه + سؤالان مفتوحان، نحو 3 دقائق)، مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).
             الإجابات <b>سرية</b>: ترى النتائج مجمّعة دون أسماء ومن 5 إجابات فأكثر، ولا نقاط ولا مكافأة عليها. أرسلها بعد الاختبار البعدي وقبل إعلان درجاته.</p>
           <label>مدة الاستبانة <select id="cm-days"><option value="7">7 أيام</option><option value="10" selected>10 أيام</option><option value="14">14 يومًا</option></select></label>
-          <details class="sv-preview"><summary>عرض العبارات</summary><ol>${SURVEY_ITEMS.map(i => `<li>${esc(i.text)}${i.rev ? ' <span class="badge">عكسية</span>' : ''}${i.att ? ' <span class="badge">انتباه</span>' : ''}</li>`).join('')}</ol>
-            <p class="small">ثم سؤالان اختياريان: ${SURVEY_OPEN.map(esc).join(' / ')}</p></details>
+          <details class="sv-preview"><summary>عرض العبارات</summary><ol>${svItems.map(i => `<li>${esc(i.text)}${i.rev ? ' <span class="badge">عكسية</span>' : ''}${i.att ? ' <span class="badge">انتباه</span>' : ''}</li>`).join('')}</ol>
+            <p class="small">ثم سؤالان اختياريان: ${svOpen.map(esc).join(' / ')}</p></details>
         </div>
         <div class="cm-row"><label>المرحلة (الصف) <select id="cm-grade"><option value="">كل المراحل</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select></label>
           <label>الشعبة <select id="cm-sec"><option value="">كل الشعب</option></select></label>
@@ -181,27 +192,34 @@ export async function pageTeacherComms(ctx) {
         <div class="actions"><button type="button" class="primary" id="cm-send">إرسال</button></div>
       </div></section>
     <section class="card">${ttl('mail', 'المُرسَل')}
+      <div class="cm-filter no-print">${subjects.length > 1 ? `<div class="chips" role="radiogroup" aria-label="المادة"><button type="button" class="chip ${commsFilter.subject ? '' : 'on'}" data-cmf-subj="" role="radio" aria-checked="${!commsFilter.subject}">كل المواد</button>
+          ${subjects.map(x => `<button type="button" class="chip subj-chip ${commsFilter.subject === x.id ? 'on' : ''}" data-cmf-subj="${esc(x.id)}" role="radio" aria-checked="${commsFilter.subject === x.id}">${sIcon(x, 'sm')}${esc(x.name)}</button>`).join('')}</div>` : ''}
+        <label class="small">النوع <select id="cmf-kind">${kinds.map(([v, t]) => `<option value="${v}" ${commsFilter.kind === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label></div>
       ${list.length ? `<ul class="cm-list">${list.map(c => {
         const t = c.task, off = c.status === 'cancelled', svOpen = !!(c.survey && c.survey.open && !off); // الإغلاق اليدوي يُبقي موعد الإغلاق مستقبلًا
         return `<li class="cm-item ${off ? 'off' : ''}" data-comm="${c.id}"><div class="in-head"><b>${esc(c.title)}</b>
           <span class="badge ${c.kind === 'message' ? '' : 'brand'}">${{ task: 'مهمة', survey: 'استبانة' }[c.kind] || 'رسالة'}</span>${off ? `<span class="badge">${c.survey ? 'مغلقة' : 'ملغاة'}</span>` : ''}
-          <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
+          ${c.kind === 'message' ? '' : subjBadge(c)}<span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
           ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
           <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''}${t.reward ? ` · مكافأة ${t.reward} نقطة` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
           ${c.survey ? `<div class="small muted">استجاب ${c.survey.responses} من ${c.n} · ${svOpen ? `تُغلق ${esc(hijri(c.survey.closesAt))}` : 'أُغلقت'}</div>` : ''}
           <div class="actions">${c.survey ? `<button type="button" class="primary" data-svres="${c.id}">النتائج</button>` : ''}<button type="button" data-detail="${c.id}">التفاصيل</button>${off || (c.survey && !svOpen) ? '' : `<button type="button" class="danger" data-cancel="${c.id}" data-kind="${c.kind}">${c.survey ? 'إغلاق الاستبانة' : 'إلغاء'}</button>`}
             ${c.survey && !svOpen && c.survey.responses < c.n ? `<span class="cm-reopen"><select data-reopen-days="${c.id}" aria-label="مدة إعادة الفتح"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يومًا</option></select>
               <button type="button" data-reopen="${c.id}">إعادة فتح الاستبانة</button></span>` : ''}</div>
-          <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
+          <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : `<div class="empty">${commsFilter.subject || commsFilter.kind ? 'لا شيء مطابق لهذه التصفية.' : 'لم ترسل شيئًا بعد.'}</div>`}</section>`;
+  $app.querySelectorAll('[data-cmf-subj]').forEach(b => b.onclick = () => { commsFilter.subject = b.dataset.cmfSubj; pageTeacherComms(ctx).catch(fail); });
+  $app.querySelector('#cmf-kind').onchange = e => { commsFilter.kind = e.target.value; pageTeacherComms(ctx).catch(fail); };
   const q = s => $app.querySelector(s);
   const kind = () => $app.querySelector('[name=cm-kind]:checked').value;
   $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => {
     q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; q('#cm-survey').hidden = kind() !== 'survey';
     if (kind() === 'survey' && !q('#cm-title').value.trim()) q('#cm-title').value = 'استبانة رأيك في منصة إتقان';
+    refreshFilter();
   });
   $app.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = COMM_TEMPLATES[Number(b.dataset.tpl)]; q('#cm-title').value = t[1]; q('#cm-body').value = t[2]; });
   // التصفية: المرحلة ثم الشعبة (الشعب المعروضة تتبع المرحلة)، وتنطبق على «الكل» وعلى قائمة الطلاب المحددين
-  const matching = () => students.filter(s => (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
+  // المهمة والاستبانة لطلاب المقرر الحالي المسجلين فيه فقط
+  const matching = () => students.filter(s => (kind() === 'message' || s.enrolled) && (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
   const refreshFilter = () => {
     const g = q('#cm-grade').value, cur = q('#cm-sec').value;
     const secs = [...new Set(students.filter(s => !g || s.grade === g).map(s => s.section).filter(Boolean))].sort();
@@ -544,7 +562,7 @@ export function parseStudentLines(text) {
 }
 
 const adminFilter = { grade: '', section: '', q: '' };
-export const resetStaffState = () => Object.assign(adminFilter, { grade: '', section: '', q: '' });
+export const resetStaffState = () => { Object.assign(adminFilter, { grade: '', section: '', q: '' }); Object.assign(commsFilter, { subject: '', kind: '' }); };
 
 export async function pageAdminStudents(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
