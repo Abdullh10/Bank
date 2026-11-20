@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" width="500" height="300">
-<rect width="500" height="300" fill="#fff"/>
-<polygon points="40,260 460.0,260 460.0,64.2" fill="#f3efe6" stroke="#1f2a44" stroke-width="2"/><path d="M 100 260 A 60 60 0 0 0 94.4 234.6" fill="none" stroke="#1f2a44" stroke-width="1.5"/><text x="138.0" y="250.0" text-anchor="middle" font-size="16" fill="#1f2a44" direction="ltr" font-family="'Times New Roman',Times,serif">θ</text><rect x="228.0" y="102.7" width="64" height="52" fill="#eef2f8" stroke="#1f2a44" stroke-width="2" transform="rotate(-25 260.0119251947418 128.7189285032424)"/><line x1="210.8" y1="94.3" x2="277.4" y2="63.2" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/><polygon points="283.4,60.5 275.8,68.5 272.4,61.1" fill="#c0392b"/><text x="287.4" y="50.5" text-anchor="start" font-size="18" fill="#c0392b" font-weight="bold" font-style="italic" font-family="'Times New Roman',Times,serif">v</text>
-</svg>

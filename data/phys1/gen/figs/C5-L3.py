@@ -204,8 +204,8 @@ def o04_scale():
     b += f'<circle cx="210" cy="80" r="38" fill="#f6f1e3" stroke="{INK}" stroke-width="3"/>' + L(210, 80, 222, 58, INK, 2)
     for k in range(12): b += L(*pol(210, 80, k * 30, 30), *pol(210, 80, k * 30, 35), INK, 1.2)
     b += L(210, 118, cx, cy, INK, 2.5) + DOT(cx, cy, 6)
-    b += FA(cx, cy, 270 - 27, 190, '75.0 N', vec=False, lab_r=215, dx=-10)
-    b += FA(cx, cy, 270 + 27, 190, '75.0 N', vec=False, lab_r=215, dx=10)
+    b += FA(cx, cy, 270 - 27, 100, '75.0 N', vec=False, lab_r=128, dx=-14)
+    b += FA(cx, cy, 270 + 27, 100, '75.0 N', vec=False, lab_r=128, dx=14)
     b += FA(cx, cy, 270, 200, '150.0 N', vec=False, lab_r=222)
     b += L(cx, cy, cx, cy + 205, MUTED, 1, '4 4')
     b += ARC(cx, cy, 70, 243, 270) + T(cx - 62, cy + 62, '27.0°', 13) + ARC(cx, cy, 70, 270, 297) + T(cx + 62, cy + 62, '27.0°', 13)
@@ -225,8 +225,15 @@ def o04_q65():
 def note(x, y, s, size=15): return T(x, y, s, size, 'start')
 
 
+def UPSUB(svgtxt):
+    # الكتاب يطبع الحرف السفلي k وs في μ_k وf_k قائمًا (غير مائل)
+    for c in 'ks':
+        svgtxt = svgtxt.replace(f'font-weight="normal">{c}</tspan>', f'font-weight="normal" font-style="normal">{c}</tspan>')
+    return svgtxt
+
+
 def MU(x, y, val, sub='k'):
-    return T(x, y, f'μ_{sub}', 17, 'start', italic=True) + T(x + 24, y, f'= {val}', 16, 'start')
+    return UPSUB(T(x, y, f'μ_{sub}', 17, 'start', italic=True)) + T(x + 22, y, f'= {val}', 16, 'start')
 
 
 def ALAB(angle, h, s):
@@ -302,7 +309,7 @@ def o07_choices():
     b += mini(150, 390, ang, [(270, 100, 'F_g'), (90, 100, 'F_N'), (up, 55, 'f_k')], 3)
     b += mini(450, 390, ang, [(270, 100, 'F_g'), (nrm, 90, 'F_N'), (up, 55, 'f_k'), (down, 75, 'F')], 4)
     b += L(300, 15, 300, 505, GRID, 1.5) + L(15, 260, 585, 260, GRID, 1.5)
-    save('c5l3-o07-choices.svg', svg(w, h, b))
+    save('c5l3-o07-choices.svg', svg(w, h, UPSUB(b)))
 
 
 def o07_pull_up():

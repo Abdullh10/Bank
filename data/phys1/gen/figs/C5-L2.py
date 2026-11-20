@@ -74,18 +74,6 @@ def incline_box(name, ang, angle_text, w=500, h=300, vel=None):
     save(name, svg(w, h, b))
 
 
-# ---------------- O01 ----------------
-def o01_book_slide():
-    w, h = 460, 200; b = ''
-    b += ground(30, 430, 140)
-    b += BOX(200, 112, 120, 56, '', '#d9c7a6')
-    b += T(200, 118, 'كتاب', 15)
-    b += ARROW(170, 60, 270, 60, C_VEL, 3) + T(278, 66, 'v', 18, 'start', C_VEL, 'bold', True)
-    b += T(230, 185, 'سطح الطاولة', 14, color=MUTED)
-    b += plus_x(330, 40)
-    save('c5l2-o01-book-slide.svg', svg(w, h, b))
-
-
 # ---------------- O03: مخطط حركة قرص ينزلق ويتباطأ (دون سهم تسارع) ----------------
 def o03_puck_motion():
     w, h = 560, 150; b = ''
@@ -132,24 +120,24 @@ def o04_essay_two():
 
 
 # ---------------- O07 / O10: قوة الاحتكاك – القوة المؤثرة ----------------
-XL_A = 'القوة الأفقية المؤثرة (N)'; YL_F = 'قوة الاحتكاك (N)'
+XL_A = 'القوة الأفقية المؤثرة (N)'; YL_S = 'قوة الاحتكاك السكوني (N)'
+
+
+def static_graph(name, xmax, ymax, xs, ys, start):
+    """منحنى الاحتكاك السكوني مقابل القوة المؤثرة كما تعلّمه صور الأريكة: يساويها حتى قيمته القصوى ثم تبدأ الحركة (لا يُرسم ما بعدها)."""
+    s = [{'pts': [(0, 0), (start, start)], 'color': LINE, 'w': 2.8}]
+    X, Y = graph(name, s, (0, xmax), (0, ymax), XL_A, YL_S, xs, ys, w=540)
+    ex = L(X(start), Y(0), X(start), Y(ymax) + 4, MUTED, 1.8, '6 5') + DOT(X(start), Y(start), 5, LINE)
+    ex += T(X(start) + 8, Y(ymax) + 16, 'تبدأ الحركة', 14, 'start', MUTED)
+    graph(name, s, (0, xmax), (0, ymax), XL_A, YL_S, xs, ys, w=540, extra=ex)
 
 
 def o07_graph_mcq():
-    s = [{'pts': [(0, 0), (40, 40), (40, 32), (70, 32)], 'color': LINE, 'w': 2.8}]
-    graph('c5l2-o07-graph-mcq.svg', s, (0, 70), (0, 50), XL_A, YL_F, 10, 10, w=540)
+    static_graph('c5l2-o07-graph-mcq.svg', 60, 50, 10, 10, 40)
 
 
 def o07_graph_essay():
-    s = [{'pts': [(0, 0), (60, 60), (60, 45), (100, 45)], 'color': LINE, 'w': 2.8}]
-    graph('c5l2-o07-graph-essay.svg', s, (0, 100), (0, 70), XL_A, YL_F, 20, 10, w=540)
-
-
-def o10_graph_parts():
-    s = [{'pts': [(0, 0), (50, 50), (50, 35), (90, 35)], 'color': LINE, 'w': 2.8}]
-    X, Y = graph('c5l2-o10-graph-parts.svg', s, (0, 90), (0, 60), XL_A, YL_F, 10, 10, w=540)
-    ex = NUM(X(22) - 14, Y(22) - 18, 1) + NUM(X(50) + 18, Y(42.5), 2) + NUM(X(72), Y(35) - 22, 3)
-    graph('c5l2-o10-graph-parts.svg', s, (0, 90), (0, 60), XL_A, YL_F, 10, 10, w=540, extra=ex)
+    static_graph('c5l2-o07-graph-essay.svg', 100, 70, 20, 10, 60)
 
 
 def o07_fbd_rest():
@@ -192,14 +180,14 @@ def o09_brick_faces():
 
 
 def o09_press_down():
-    w, h = 460, 380; cx, cy = 230, 190; b = ''
+    w, h = 460, 400; cx, cy = 230, 200; b = ''
     b += DOT(cx, cy, 7)
-    b += force(cx, cy, cx, cy - 130, 'F', 'N', lx=cx + 12, ly=cy - 118, anchor='start')
+    b += force(cx, cy, cx, cy - 156, 'F', 'N', lx=cx + 12, ly=cy - 140, anchor='start')
     b += force(cx, cy, cx, cy + 130, 'F', 'g', '100 N', lx=cx - 12, ly=cy + 125, anchor='end')
-    b += L(cx, cy, cx + 18, cy, C_FORCE, 2) + force(cx + 18, cy, cx + 18, cy + 34, 'F', 'اليد', '20 N', lx=cx + 28, ly=cy + 30, anchor='start')
+    b += L(cx, cy, cx + 18, cy, C_FORCE, 2) + force(cx + 18, cy, cx + 18, cy + 26, 'F', '', '20 N', lx=cx + 28, ly=cy + 28, anchor='start')
     b += force(cx, cy, cx + 100, cy, 'F', 'الدفع', lx=cx + 104, ly=cy - 14, anchor='start')
     b += force(cx, cy, cx - 90, cy, 'f', 'k', lx=cx - 95, ly=cy - 14, anchor='end')
-    b += plus_x(40, 350) + plus_y(40, 350)
+    b += plus_x(40, 370) + plus_y(40, 370)
     save('c5l2-o09-press-down.svg', svg(w, h, b))
 
 
@@ -219,13 +207,10 @@ def o11_setup():
 
 
 if __name__ == '__main__':
-    o01_book_slide()
-    incline_box('c5l2-o01-incline-up.svg', 25, 'θ', vel='up')
     incline_box('c5l2-o02-incline-rest.svg', 25, 'θ')
     o03_puck_motion()
     o04_slope_points(); o04_three_lines(); o04_line_b(); o04_essay_two()
     o07_graph_mcq(); o07_graph_essay(); o07_fbd_rest()
-    o10_graph_parts()
     o08_fbd_numbers()
     o09_brick_faces(); o09_press_down()
     o11_setup()
