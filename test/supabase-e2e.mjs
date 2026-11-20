@@ -11,6 +11,7 @@ import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { subjectsSteps } from './subjects-e2e-steps.mjs';
+import { subjectsP4Steps } from './subjects-p4-e2e-steps.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
@@ -656,6 +657,10 @@ ok('coupon is single-use', (await asRole(sid, 'select to_jsonb(public.student_re
     await pool.query(`update public.profiles set role = 'student', managed = true, section = 'س', display_name = $2 where user_id = $1`, [u.id, 'طالب استبانة ' + i]);
     tmpIds.push(u.id);
   }
+  // الاستبانة لمقرر (2026-11-19): تصل لطلاب المقرر المسجلين فيه فقط
+  const notEnrolled = await asRole(OWN, 'select public.staff_send_comm($1::jsonb) r', [JSON.stringify({ kind: 'survey', course: 1, title: 'استبانة لغير المسجلين', days: 7, target: { mode: 'students', students: [tmpIds[0]] } })]);
+  ok('survey: refused for students not enrolled in the survey course', /غير مسجلين في هذا المقرر|لا يوجد طلاب مطابقون مسجلون/.test(notEnrolled.error?.message || ''), notEnrolled.error?.message);
+  for (const id of tmpIds) await pool.query('insert into public.course_enrollments (user_id, course_id) values ($1, 1) on conflict do nothing', [id]);
   const sent = await asRole(OWN, 'select public.staff_send_comm($1::jsonb) r', [JSON.stringify({ kind: 'survey', title: 'استبانة رأيك في منصة إتقان', days: 7, target: { mode: 'students', students: [sid, ...tmpIds] } })]);
   const commId = Number(sent.data?.id);
   ok('survey: owner sends a survey to 7 students', sent.data?.n === 7, JSON.stringify(sent.error));
@@ -947,6 +952,8 @@ ok('supervisor: answers visible, no edit/review tools', (await p.locator('#mcq-l
 
 // ---------- تعدد المواد (test/subjects-e2e-steps.mjs) ----------
 await subjectsSteps({ p, ok, pool, asRole, BASE, OUT });
+// ---------- تعدد المواد — المرحلة 4 (test/subjects-p4-e2e-steps.mjs) ----------
+await subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT });
 
 } catch (e) { results.push('FAIL exception: ' + e.message.split('\n')[0]); await p.screenshot({ path: `${OUT}/supa-fail.png` }); }
 console.log(results.join('\n'));
