@@ -145,12 +145,12 @@ def o02():
 
 # ================= O03 =================
 def o03():
-    w, h = 640, 230; b = ''
+    w, h = 660, 230; b = ''
     u = 18
     panels = [((30, 150), (4, 0), polar(4, 60)),
               ((190, 150), (4, 0), (0, 4)),
               ((350, 150), (4, 0), polar(4, 125)),
-              ((500, 150), polar(4, 30), polar(3.5, 150))]
+              ((510, 150), polar(4, 30), polar(3.5, 150))]
     for k, ((ox, oy), a, bb) in enumerate(panels):
         s = Scene(150, 200, u, (20, 160))
         pa = a; pb = add(a, bb)
@@ -166,7 +166,7 @@ def o03():
     cx, cy = 170, 220
     b += f'<ellipse cx="{cx}" cy="{cy}" rx="14" ry="26" fill="#d9c8a8" stroke="{INK}" stroke-width="2"/>'
     b += ARROW(cx, cy - 28, cx, cy - 150, C_VEL, 3) + V(cx - 14, cy - 100, 'v_b', C_VEL, 18, 'end') + T(cx - 14, cy - 78, '4.0 m/s', 14, 'end', C_VEL)
-    b += ARROW(cx + 16, cy, cx + 128, cy, C_VEL, 3) + V(cx + 74, cy - 12, 'v_w', C_VEL, 18) + T(cx + 74, cy + 22, '3.0 m/s', 14, 'middle', C_VEL)
+    b += ARROW(cx + 16, cy, cx + 108, cy, C_VEL, 3) + V(cx + 62, cy - 12, 'v_w', C_VEL, 18) + T(cx + 62, cy + 22, '3.0 m/s', 14, 'middle', C_VEL)  # 122 px لـ 4.0 و92 px لـ 3.0
     b += ARROW(330, 90, 420, 90, MUTED, 1.6) + T(375, 80, 'اتجاه التيار', 13, 'middle', MUTED)
     save('c5l1-o03-boat.svg', svg(w, h, b))
 
@@ -177,8 +177,8 @@ def o04():
 
     # قوتان من حلقة بينهما 60.0° (الذيلان معًا)
     s = Scene(420, 300, 1, (110, 240), grid=False)
-    s.vec((0, 0), (160, 0), C_FORCE, 'F_1', lpos=(0, 26), val='20.0 N', vpos=(0, 46))
-    s.vec((0, 0), polar(200, 60), C_FORCE, 'F_2', lpos=(-24, -6), val='30.0 N', vpos=(-50, 16))
+    s.vec((0, 0), (140, 0), C_FORCE, 'F_1', lpos=(0, 26), val='20.0 N', vpos=(0, 46))
+    s.vec((0, 0), polar(210, 60), C_FORCE, 'F_2', lpos=(-24, -6), val='30.0 N', vpos=(-50, 16))
     s.arc((0, 0), 46, 0, 60, '60.0°', lr=70)
     s.dot((0, 0), 8, INK, '#fff'); s.save('c5l1-o04-ring60.svg')
 
@@ -193,7 +193,7 @@ def o04():
 
     s = Scene(420, 300, 1, (110, 250), grid=False)
     s.vec((0, 0), (180, 0), C_FORCE, 'F_1', lpos=(0, 26), val='45.0 N', vpos=(0, 46))
-    s.vec((0, 0), polar(210, 50), C_FORCE, 'F_2', lpos=(-24, -6), val='60.0 N', vpos=(-52, 16))
+    s.vec((0, 0), polar(240, 50), C_FORCE, 'F_2', lpos=(-24, -6), val='60.0 N', vpos=(-52, 16))
     s.arc((0, 0), 46, 0, 50, '50.0°', lr=72)
     s.dot((0, 0), 8, INK, '#fff'); s.save('c5l1-o04-e2.svg')
 
@@ -215,7 +215,7 @@ def o05():
     A = (4, 1); B = (-1, 3)
     s.vec((0, 0), A, C_GEN, 'A', lpos=(0, 22))
     s.vec(A, add(A, B), C_GEN, 'B', lpos=(18, 0))
-    s.text((5.4, -0.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
+    s.text((5.4, 4.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o05-e2.svg')
 
 
@@ -223,9 +223,9 @@ def o05():
 def o06():
     s = Scene(460, 330, 1, (230, 250), grid=False)
     s.axes('+x', '+y', -210, 210, -60, 230)
-    s.vec((0, 0), (90, 0), C_FORCE, 'F_1', lpos=(0, 26), val='50.0 N', vpos=(0, 46))
-    s.vec((0, 0), polar(200, 60), C_FORCE, 'F_2', lpos=(26, 6), val='120.0 N', vpos=(62, 26))
-    s.vec((0, 0), (-160, 0), C_FORCE, 'F_3', lpos=(0, 26), val='90.0 N', vpos=(0, 46))
+    s.vec((0, 0), (80, 0), C_FORCE, 'F_1', lpos=(0, 26), val='50.0 N', vpos=(0, 46))
+    s.vec((0, 0), polar(192, 60), C_FORCE, 'F_2', lpos=(26, 6), val='120.0 N', vpos=(62, 26))
+    s.vec((0, 0), (-144, 0), C_FORCE, 'F_3', lpos=(0, 26), val='90.0 N', vpos=(0, 46))
     s.arc((0, 0), 40, 0, 60, '60.0°', lr=62)
     s.dot((0, 0), 8, INK, '#fff'); s.save('c5l1-o06-forces3.svg')
 
@@ -251,9 +251,9 @@ def o06():
 
     s = Scene(460, 340, 1, (230, 200), grid=False)
     s.axes('+x', '+y', -210, 210, -130, 190)
-    s.vec((0, 0), polar(170, 125), C_FORCE, 'F_1', lpos=(-24, -8), val='24.0 N', vpos=(-60, 14))
-    s.vec((0, 0), polar(150, 55), C_FORCE, 'F_2', lpos=(26, -6), val='21.0 N', vpos=(60, 14))
-    s.vec((0, 0), (0, -100), C_FORCE, 'F_g', lpos=(24, 0), val='20.0 N', vpos=(52, 22))
+    s.vec((0, 0), polar(144, 125), C_FORCE, 'F_1', lpos=(-24, -8), val='24.0 N', vpos=(-60, 14))
+    s.vec((0, 0), polar(126, 55), C_FORCE, 'F_2', lpos=(26, -6), val='21.0 N', vpos=(60, 14))
+    s.vec((0, 0), (0, -120), C_FORCE, 'F_g', lpos=(24, 0), val='20.0 N', vpos=(52, 22))
     s.arc((0, 0), 36, 0, 55, '55.0°', lr=58, size=13)
     s.arc((0, 0), 26, 0, 125, '125.0°', lr=86, size=12, la=107)
     s.dot((0, 0), 5); s.save('c5l1-o06-e2.svg')
@@ -352,7 +352,7 @@ def o09():
     s = Scene(340, 280, 50, (50, 230))
     s.axes('+x', '+y')
     s.vec((0, 0), (4, 3), C_GEN, 'A', lpos=(-12, -14))
-    s.text((5.6, -0.6), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
+    s.text((5.6, 4.2), 'ضلع المربع = \u20661.0 m\u2069', 13, 'end', MUTED)
     s.save('c5l1-o09-e2.svg')
 
 
