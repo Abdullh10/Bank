@@ -177,7 +177,7 @@ export async function pageTeacherComms(ctx) {
           <label>مكافأة الإنجاز (نقاط لكل طالب) <input type="number" id="cm-reward" min="0" max="500" value="0" style="max-width:6rem"></label>
           <span class="small muted" style="flex-basis:100%">المكافأة اختيارية: تُضاف لرصيد من يُنجز المهمة قبل الموعد (لا تدخل نقاط الترتيب)، وتُخصم من حصتك الأسبوعية (النقاط × عدد الطلاب) وتعود حصة من لم ينجز. تتطلب 10 أسئلة على الأقل وصحة 50% فأكثر.</span></div>
         <div id="cm-survey" hidden>
-          <p class="notice info small sv-for">${curSubj ? sIcon(curSubj, 'sm') : ''}<span>تُرسل لطلاب مقرر <b>${esc(cur?.code || '')}</b> المسجلين فيه${curSubj ? `، وتظهر عباراتها باسم مادته: «${esc(svItems[0].text)}»` : ''}. لاستبانة مقرر آخر بدّل المقرر من أعلى الصفحة.</span></p>
+          <p class="notice info small sv-for">${curSubj ? sIcon(curSubj, 'sm') : ''}<span>تُرسل لطلاب مقرر <b>${esc(cur?.code || '')}</b> المسجلين فيه${curSubj ? `، وتظهر عباراتها باسم مادته: «${esc(svItems[0].text.replace(/\.$/, ''))}»` : ''}. لاستبانة مقرر آخر بدّل المقرر من أعلى الصفحة.</span></p>
           <p class="small muted">استبانة علمية ثابتة (${SURVEY_ITEMS.length - 1} عبارة ليكرت خماسية في 4 أبعاد + عبارة انتباه + سؤالان مفتوحان، نحو 3 دقائق)، مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).
             الإجابات <b>سرية</b>: ترى النتائج مجمّعة دون أسماء ومن 5 إجابات فأكثر، ولا نقاط ولا مكافأة عليها. أرسلها بعد الاختبار البعدي وقبل إعلان درجاته.</p>
           <label>مدة الاستبانة <select id="cm-days"><option value="7">7 أيام</option><option value="10" selected>10 أيام</option><option value="14">14 يومًا</option></select></label>

@@ -1696,7 +1696,7 @@ dl.review dd { margin: 0; display: flex; align-items: center; gap: .4rem; flex-w
   border: 1.5px solid var(--line-2); border-radius: 16px; background: var(--surface); color: var(--ink-2); font-weight: 700; font-size: 1.02rem;
   box-shadow: var(--shadow-sm); min-height: 60px; position: relative; overflow: hidden; }
 .st-subj .sicon { width: 40px; height: 40px; border-radius: 12px; box-shadow: none; opacity: .75; }
-.st-subj:hover { background: var(--surface); border-color: var(--s); color: var(--s); }
+@media (hover: hover) { .st-subj:not(.on):hover { background: var(--surface); border-color: color-mix(in srgb, var(--s) 45%, var(--line-2)); color: var(--ink); } }
 .st-subj.on { border-color: var(--s); background: var(--s-soft); color: var(--s); box-shadow: 0 0 0 3px color-mix(in srgb, var(--s) 16%, transparent); }
 .st-subj.on .sicon { opacity: 1; box-shadow: 0 6px 14px color-mix(in srgb, var(--s-tile) 30%, transparent); }
 .st-subj.on::after { content: ""; position: absolute; inset: auto 0 0 0; height: 4px; background: var(--s); }
@@ -1749,3 +1749,9 @@ table.cmp td small { font-weight: 500; color: var(--ink-2); font-size: .8rem; }
   .cm-filter .chips { width: 100%; }
 }
 @media print { .cmp-card { box-shadow: none; } table.cmp thead th { position: static; } }
+.cm-item .in-head { justify-content: flex-start; gap: .3rem .5rem; }
+.cm-item .in-head > .small.muted { margin-inline-start: auto; }
+/* صندوق الإسناد والنطاق داخل جدول الحسابات العريض: يبقى ظاهرًا في عرض الهاتف مهما مُرِّر الجدول */
+@media (max-width: 760px) { .tm-assign-box { position: sticky; inset-inline-start: 0; max-width: calc(100vw - 4.6rem); } }
+.sc-act { text-align: end; }
+@media (max-width: 760px) { .page-head .actions { flex-wrap: wrap; } .page-head .actions > .cmp-link { order: 3; flex-basis: 100%; } }

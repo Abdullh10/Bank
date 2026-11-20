@@ -19,9 +19,11 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
     }
     await p.emulateMedia({ colorScheme: 'light' }); await p.setViewportSize({ width: 1280, height: 900 });
   };
+  // الانتقال إلى صفحة: إن كانت هي الحالية تُعاد تحميلها (الانتقال إلى الرابط نفسه لا يعيد رسم الصفحة)
+  const go = async h => { if (await p.evaluate(() => location.hash) === h) { await p.reload(); } else await p.goto(BASE + h); };
   const noHScroll = () => p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1);
   const login = async user => {
-    await p.goto(BASE + '#/'); await p.waitForSelector('#l-user, #logout');
+    await go('#/'); await p.waitForSelector('#l-user, #logout');
     if (await p.locator('#logout').count()) { await p.click('#logout'); await p.waitForSelector('#l-user'); }
     await p.fill('#l-user', user); await p.fill('#l-pass', 'x'); await p.click('button[type=submit]'); await p.waitForSelector('#logout');
   };
@@ -100,15 +102,15 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   // الواجهة: المراجعة المقيَّدة لا ترى إلا مقرر الفيزياء
   await p.evaluate(() => { try { localStorage.removeItem('itqan-course'); } catch { /* */ } });
   await login('p4rev');
-  await p.goto(BASE + '#/'); await p.waitForSelector('.course-card');
+  await go('#/'); await p.waitForSelector('.course-card');
   ok('scoped reviewer UI: courses page shows only فيزياء 1', JSON.stringify(await p.$$eval('.course-card h2', hs => hs.map(h => h.textContent.trim()))) === '["فيزياء 1"]');
-  await p.goto(BASE + '#/bank'); await p.waitForSelector('#bank-count');
+  await go('#/bank'); await p.waitForSelector('#bank-count');
   ok('scoped reviewer UI: bank opens on the physics course', /^3/.test((await p.locator('#bank-count').first().innerText()).trim()));
   // المالك: صفحة حسابات الفريق — نطاق المواد
   await setScope(OWNER, []);
   ok('scope: empty scope = all subjects again', (await call('get_courses')).data?.some(c => c.id === 1));
   await login('owner');
-  await p.goto(BASE + '#/team'); await p.waitForSelector(`tr[data-id="${RP}"] .tm-scope-btn`);
+  await go('#/team'); await p.waitForSelector(`tr[data-id="${RP}"] .tm-scope-btn`);
   ok('team page: reviewer row shows «يرى كل المواد»', (await p.locator(`tr[data-id="${RP}"] .tm-scope`).innerText()).includes('يرى كل المواد'));
   await p.click(`tr[data-id="${RP}"] .tm-scope-btn`); await p.click('.tm-assign [data-sc="phys"]');
   await shot('team-scope-1280', false);
@@ -116,21 +118,21 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   ok('team page: scope saved from the accounts page', (await pool.query('select array_agg(subject_id)::text a from public.staff_subjects where user_id = $1', [RP])).rows[0].a === '{phys}'
     && (await p.locator(`tr[data-id="${RP}"] .tm-scope`).innerText()).includes('الفيزياء'));
   await shots4('team-scope', async () => {
-    await p.goto(BASE + '#/team'); await p.waitForSelector(`tr[data-id="${RP}"] .tm-scope-btn`);
+    await go('#/team'); await p.waitForSelector(`tr[data-id="${RP}"] .tm-scope-btn`);
     await p.click(`tr[data-id="${RP}"] .tm-scope-btn`); await p.waitForSelector('.tm-ssave');
     await p.locator('.tm-assign').scrollIntoViewIfNeeded();
+    await p.evaluate(() => document.querySelectorAll('.table-wrap').forEach(t => { t.scrollLeft = 0; }));
   }, false);
   // صفحة المادة ← المعلمون: قسم المراجعين والمشرفين
-  await p.goto(BASE + '#/subject/phys'); await p.waitForSelector('.stabs');
+  await go('#/subject/phys'); await p.waitForSelector('.stabs');
   await p.click('.stabs [data-tab="teachers"]');
   ok('subject page: reviewers section lists the scoped reviewer and the unscoped one', (await p.locator(`[data-pane="teachers"] tr[data-staff="${RP}"] [data-sremove]`).count()) === 1
     && (await p.locator(`[data-pane="teachers"] tr[data-staff="${REV}"] [data-sadd]`).innerText()).includes('قصر على الفيزياء'));
   await p.click(`tr[data-staff="${REV}"] [data-sadd]`); await p.waitForFunction(id => document.querySelector(`tr[data-staff="${id}"] [data-sremove]`), REV);
   ok('subject page: «قصر على الفيزياء» scopes the reviewer', (await pool.query('select count(*)::int n from public.staff_subjects where user_id = $1 and subject_id = $2', [REV, 'phys'])).rows[0].n === 1);
   await shots4('subject-reviewers', async () => {
-    await p.goto(BASE + '#/subject/phys'); await p.waitForSelector('.stabs'); await p.click('.stabs [data-tab="teachers"]');
-    await p.locator('.tab-sub').scrollIntoViewIfNeeded();
-  }, false);
+    await go('#/subject/phys'); await p.waitForSelector('.stabs'); await p.click('.stabs [data-tab="teachers"]');
+  });
   p.once('dialog', d => d.accept());
   await p.click(`tr[data-staff="${REV}"] [data-sremove]`); await p.waitForFunction(id => document.querySelector(`tr[data-staff="${id}"] [data-sadd]`), REV);
   ok('subject page: removing the only subject returns the reviewer to all subjects', (await pool.query('select count(*)::int n from public.staff_subjects where user_id = $1', [REV])).rows[0].n === 0);
@@ -140,7 +142,7 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   // ================= (2) الاستبانة لكل مقرر ومادته =================
   await p.evaluate(() => { try { localStorage.setItem('itqan-course', '101'); } catch { /* */ } });
   await login('owner');
-  await p.goto(BASE + '#/comms'); await p.waitForSelector('#cm-send');
+  await go('#/comms'); await p.waitForSelector('#cm-send');
   await p.check('[name=cm-kind][value=survey]');
   ok('survey UI: physics course — notice and items use the subject name', (await p.locator('.sv-for').innerText()).includes('فيزياء 1') && (await p.locator('.sv-preview').textContent()).includes('فهم دروس الفيزياء'));
   ok('survey UI: recipients counted from the course enrolment only', /\(1\)/.test(await p.locator('#cm-mode option').first().innerText()));
@@ -148,7 +150,15 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   await shot('comms-survey-physics-1280');
   await p.click('#cm-send'); await p.waitForSelector('.toast');
   const phSv = (await pool.query(`select id, course_id, n_recipients from public.comms where kind = 'survey' and course_id = 101 order by id desc limit 1`)).rows[0];
-  ok('survey: sent for the physics course to its enrolled students only', phSv?.n_recipients === 1, JSON.stringify(phSv));
+  ok('survey: sent for the physics course to its enrolled students only', phSv?.n_recipients === 1 && Number(phSv.course_id) === 101, JSON.stringify(phSv));
+  // الترحيل: استبانة قديمة بلا مقرر تُنقل إلى مقرر الكيمياء الذي ينتمي إليه طلابها، ويُعاد تنفيذ الملف دون خطأ
+  const { rows: [old] } = await pool.query(`insert into public.comms (kind, sender_id, course_id, title, n_recipients) values ('survey', $1, 0, 'استبانة قديمة', 1) returning id`, [OWNER]);
+  await pool.query('insert into public.comm_recipients (comm_id, student_id) values ($1, $2)', [old.id, ST2]);
+  await pool.query(`delete from public.schema_flags where key = 'survey_course_2026_11_19'`);
+  let migErr = null;
+  try { await pool.query(fs.readFileSync(MIGRATION, 'utf8')); await pool.query(fs.readFileSync(MIGRATION, 'utf8')); } catch (e) { migErr = e.message; }
+  ok('migration file applies and is re-runnable; old survey moved to its chemistry course', !migErr && Number((await pool.query('select course_id from public.comms where id = $1', [old.id])).rows[0].course_id) === 1, migErr);
+  ok('migration keeps the physics survey on its course', Number((await pool.query('select course_id from public.comms where id = $1', [phSv.id])).rows[0].course_id) === 101);
   const listAll = (await asRole(OWNER, `select public.staff_list_comms(null, '{}'::jsonb) r`)).data;
   const listPh = (await asRole(OWNER, `select public.staff_list_comms(null, '{"subject":"phys"}'::jsonb) r`)).data;
   const listCh = (await asRole(OWNER, `select public.staff_list_comms(null, '{"subject":"chem","kind":"survey"}'::jsonb) r`)).data;
@@ -159,18 +169,11 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   await p.click('[data-cmf-subj="phys"]'); await p.waitForSelector('[data-cmf-subj="phys"].on');
   ok('survey UI: sent list filtered by subject chip', (await p.locator('.cm-item').count()) >= 1 && (await p.locator('.cm-item .cm-course').allInnerTexts()).every(t => t.includes('فيزياء')));
   await shots4('comms-filter-physics', async () => {
-    await p.goto(BASE + '#/comms'); await p.waitForSelector('#cm-send'); await p.check('[name=cm-kind][value=survey]');
+    await go('#/comms'); await p.waitForSelector('#cm-send');
+    await p.click('[data-cmf-subj="phys"]'); await p.waitForSelector('[data-cmf-subj="phys"].on');
     await p.locator('.cm-filter').scrollIntoViewIfNeeded();
   }, false);
   await p.click('[data-cmf-subj=""]'); await p.waitForSelector('[data-cmf-subj=""].on');
-  // الترحيل: استبانة قديمة بلا مقرر تُنقل إلى مقرر الكيمياء الذي ينتمي إليه طلابها، ويُعاد تنفيذ الملف دون خطأ
-  const { rows: [old] } = await pool.query(`insert into public.comms (kind, sender_id, course_id, title, n_recipients) values ('survey', $1, 0, 'استبانة قديمة', 1) returning id`, [OWNER]);
-  await pool.query('insert into public.comm_recipients (comm_id, student_id) values ($1, $2)', [old.id, ST2]);
-  await pool.query(`delete from public.schema_flags where key = 'survey_course_2026_11_19'`);
-  let migErr = null;
-  try { await pool.query(fs.readFileSync(MIGRATION, 'utf8')); await pool.query(fs.readFileSync(MIGRATION, 'utf8')); } catch (e) { migErr = e.message; }
-  ok('migration file applies and is re-runnable; old survey moved to its chemistry course', !migErr && (await pool.query('select course_id from public.comms where id = $1', [old.id])).rows[0].course_id === 1, migErr);
-  ok('migration keeps the physics survey on its course', (await pool.query('select course_id from public.comms where id = $1', [phSv.id])).rows[0].course_id === 101);
   await pool.query('delete from public.comms where id = $1', [old.id]);
 
   // ================= (3) تبويبات المواد للطالب =================
@@ -183,21 +186,21 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   await p.click('.st-subj[data-st-subj="phys"]'); await p.waitForSelector('.st-subj.on[data-st-subj="phys"]');
   ok('student tabs: physics tab shows physics lessons and header course', (await p.locator('details.st-ch').count()) === 1 && (await p.locator('details.st-ch').innerText()).includes('الحركة')
     && (await p.locator('#brand-sub').innerText()).includes('فيزياء 1'));
-  await p.goto(BASE + '#/rank'); await p.waitForSelector('.st-subjects');
+  await go('#/rank'); await p.waitForSelector('.st-subjects');
   ok('student tabs: the choice is kept on the excellence page', (await p.locator('.st-subj.on').innerText()).includes('الفيزياء'));
-  await p.goto(BASE + '#/inbox'); await p.waitForSelector('[data-survey]');
+  await go('#/inbox'); await p.waitForSelector('[data-survey]');
   await p.click('[data-survey]'); await p.click('#sv-go'); await p.waitForSelector('.sv-item legend');
   ok('student survey: items read «فهم دروس الفيزياء»', (await p.locator('.sv-item legend').first().innerText()).includes('فهم دروس الفيزياء'));
-  await shots4('student-survey-physics', async () => { await p.goto(BASE + '#/inbox'); await p.waitForSelector('[data-survey]'); await p.click('[data-survey]'); await p.click('#sv-go'); await p.waitForSelector('.sv-item'); });
+  await shots4('student-survey-physics', async () => { await go('#/inbox'); await p.waitForSelector('[data-survey]'); await p.click('[data-survey]'); await p.click('#sv-go'); await p.waitForSelector('.sv-item'); });
   // جلسة تدريب في الفيزياء (تغذي لوحة المقارنة)
-  await p.goto(BASE + '#/'); await p.waitForSelector('.st-subj.on[data-st-subj="phys"]');
+  await go('#/'); await p.waitForSelector('.st-subj.on[data-st-subj="phys"]');
   await p.locator('details.st-ch summary').first().click(); await p.locator('[data-lesson]').first().check();
   await p.selectOption('#s-count', '5'); await p.click('#s-start'); await p.waitForSelector('.st-opt');
   await p.waitForTimeout(3200); await p.locator('.st-opt').first().click(); await p.waitForSelector('.st-fb');
   ok('student tabs: a practice session in physics uses physics questions', (await pool.query(`select count(*)::int n from public.practice_answers a join public.practice_sessions s on s.id = a.session_id where s.user_id = $1 and a.question_id between 990001 and 990003`, [ST])).rows[0].n === 1);
   p.once('dialog', d => d.accept()); await p.click('#st-end'); await p.waitForTimeout(800);
-  await shots4('student-tabs', async () => { await p.goto(BASE + '#/rank'); await p.goto(BASE + '#/'); await p.waitForSelector('.st-subjects'); await p.waitForTimeout(500); });
-  await p.setViewportSize({ width: 390, height: 844 }); await p.goto(BASE + '#/'); await p.waitForSelector('.st-subjects');
+  await shots4('student-tabs', async () => { await go('#/rank'); await go('#/'); await p.waitForSelector('.st-subjects'); await p.waitForTimeout(500); });
+  await p.setViewportSize({ width: 390, height: 844 }); await go('#/'); await p.waitForSelector('.st-subjects');
   ok('phone: student home without horizontal scroll', await noHScroll());
   await p.setViewportSize({ width: 1280, height: 900 });
   await login('p4st2');
@@ -214,14 +217,14 @@ export async function subjectsP4Steps({ p, ok, pool, asRole, BASE, OUT }) {
   for (const uid of [VIEW, REV, ST]) refusedCmp.push((await asRole(uid, 'select public.admin_compare_subjects() r')).error?.code === '42501');
   ok('compare RPC: owner only (teacher, reviewer and student refused)', refusedCmp.every(Boolean), JSON.stringify(refusedCmp));
   await login('owner');
-  await p.goto(BASE + '#/'); await p.waitForSelector('a[href="#/compare"]');
+  await go('#/'); await p.waitForSelector('a[href="#/compare"]');
   await p.click('a[href="#/compare"]'); await p.waitForSelector('table.cmp');
   ok('compare page: linked from «المواد», one column per subject plus shared programmes', JSON.stringify(await p.$$eval('table.cmp thead th.cmp-h', hs => hs.map(h => h.textContent.trim()))) === '["الكيمياء","الفيزياء","برامج مشتركة"]');
-  await shots4('compare', async () => { await p.goto(BASE + '#/compare'); await p.waitForSelector('table.cmp'); });
-  await p.setViewportSize({ width: 390, height: 844 }); await p.goto(BASE + '#/compare'); await p.waitForSelector('table.cmp');
+  await shots4('compare', async () => { await go('#/compare'); await p.waitForSelector('table.cmp'); });
+  await p.setViewportSize({ width: 390, height: 844 }); await go('#/compare'); await p.waitForSelector('table.cmp');
   ok('phone: compare page without horizontal page scroll', await noHScroll());
   await p.setViewportSize({ width: 1280, height: 900 });
-  await shots4('owner-home-compare-link', async () => { await p.goto(BASE + '#/'); await p.waitForSelector('.scard'); }, false);
+  await shots4('owner-home-compare-link', async () => { await go('#/'); await p.waitForSelector('.scard'); }, false);
 
   await p.evaluate(() => { try { localStorage.setItem('itqan-course', '1'); localStorage.removeItem('itqan.student.subject.v1'); } catch { /* */ } });
   await cleanup();

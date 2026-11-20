@@ -72,7 +72,7 @@ export async function pageSubjects(ctx) {
     <div class="page-head">
       <div><h1>المواد</h1><p class="muted">اختر المادة لإدارة مقرراتها، أو أكمل من حيث توقفت.</p></div>
       <div class="actions no-print">${cur ? `<button type="button" id="sj-resume" data-course="${cur.id}">${line('next', 16)}متابعة ${esc(cur.code)}</button>` : ''}
-        ${subjects.length ? `<a class="btn" href="#/compare">${line('chart', 16)}مقارنة المواد</a>` : ''}
+        ${subjects.length ? `<a class="btn cmp-link" href="#/compare">${line('chart', 16)}مقارنة المواد</a>` : ''}
         <button type="button" class="primary" id="sj-add">${line('plus', 16)}إضافة مادة</button></div>
     </div>
     <div class="totals">
@@ -102,7 +102,7 @@ export async function pageCompare(ctx) {
   const rows = await api('/admin/compare');
   const cols = rows.filter(r => !r.shared || r.courses);
   // كل مقياس: [العنوان، القيمة، النص المعروض، نسبة الشريط (من أكبر قيمة أو من 100)]
-  const bar = (v, max, s) => `<div class="bar sbar cmp-bar ${s.shared ? '' : 's-' + escA(s.color)}"><span style="width:${max ? Math.max(2, Math.round((100 * (v || 0)) / max)) : 0}%"></span></div>`;
+  const bar = (v, max, s) => `<div class="bar sbar cmp-bar ${s.shared ? '' : 's-' + escA(s.color)}"><span style="width:${max && v > 0 ? Math.max(2, Math.round((100 * v) / max)) : 0}%"></span></div>`;
   const maxOf = f => Math.max(0, ...cols.map(f).map(Number).filter(Number.isFinite));
   const metric = (label, f, txt = v => num(v), opts = {}) => {
     const m = opts.pct ? 100 : maxOf(f);
@@ -193,7 +193,7 @@ export async function pageSubject(ctx, id) {
         const names = sc.map(x => state.subjects.find(y => y.id === x)).filter(Boolean);
         return `<tr data-staff="${escA(u.id)}"><td><b>${esc(u.name)}</b><div class="small muted">${u.role === 'reviewer' ? 'مراجع علمي' : 'مشرف تربوي'} · <span class="ltr">${esc(u.username)}</span></div></td>
         <td>${!sc.length ? '<span class="badge">كل المواد</span>' : names.map(x => `<span class="badge subj-badge s-${escA(x.color)}">${sIcon(x, 'sm')}${esc(x.name)}</span>`).join(' ')}</td>
-        <td class="actions as-acts">${has ? `<button type="button" class="danger" data-sremove="${escA(u.id)}">إزالة ${esc(s.name)} من نطاقه</button>`
+        <td class="sc-act">${has ? `<button type="button" class="danger" data-sremove="${escA(u.id)}">إزالة ${esc(s.name)} من نطاقه</button>`
           : `<button type="button" data-sadd="${escA(u.id)}">${sc.length ? `إضافة ${esc(s.name)} لنطاقه` : `قصر على ${esc(s.name)}`}</button>`}</td></tr>`; }).join('')}
       </tbody></table></div>` : '<p class="muted small">لا حسابات مراجعين أو مشرفين بعد؛ تُنشأ من «الحسابات ← الفريق».</p>'}`;
   const secRows = enrolled => list.map(c => {
