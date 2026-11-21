@@ -72,13 +72,13 @@
   {
    "stem": "ما الصيغة التي تنتج عند حل المعادلة $\\frac{v}{r} = \\frac{a}{v}$ لإيجاد التسارع المركزي؟",
    "options": [
-    "$a_{\\text{c}} = \\frac{v^2}{r}$",
-    "$a_{\\text{c}} = \\frac{v}{r}$",
-    "$a_{\\text{c}} = \\frac{r}{v^2}$",
-    "$a_{\\text{c}} = \\frac{v^2}{r^2}$"
+    "$a_{\\text{C}} = \\frac{v^2}{r}$",
+    "$a_{\\text{C}} = \\frac{v}{r}$",
+    "$a_{\\text{C}} = \\frac{r}{v^2}$",
+    "$a_{\\text{C}} = \\frac{v^2}{r^2}$"
    ],
    "correct_index": 0,
-   "explanation": "بضرب طرفي $\\frac{v}{r} = \\frac{a}{v}$ في $v$ نحصل على $a = \\frac{v^2}{r}$، ويُرمز له $a_{\\text{c}}$ تعبيرًا عن التسارع المركزي.",
+   "explanation": "بضرب طرفي $\\frac{v}{r} = \\frac{a}{v}$ في $v$ نحصل على $a = \\frac{v^2}{r}$، ويُرمز له $a_{\\text{C}}$ تعبيرًا عن التسارع المركزي.",
    "distractor_notes": [
     "",
     "عند ضرب الطرفين في $v$ يصبح البسط $v^2$ لا $v$.",
@@ -162,21 +162,21 @@
  ],
  "essay": [
   {
-   "stem": "استنتج علاقة التسارع المركزي $a_{\\text{c}} = \\frac{v^2}{r}$ مستعينًا بالشكل الذي يبيّن متجهي الموقع ومتجهي السرعة لجسم في حركة دائرية منتظمة ومثلثيهما، موضحًا كل خطوة.",
-   "model_answer": "متجه السرعة عمودي على متجه الموقع، فالزاوية بين $\\boldsymbol{r}_1$ و$\\boldsymbol{r}_2$ تساوي الزاوية بين $\\boldsymbol{v}_1$ و$\\boldsymbol{v}_2$؛ وكل مثلث متساوي الساقين، لذا فالمثلثان متشابهان. من التشابه: $\\frac{\\Delta r}{r} = \\frac{\\Delta v}{v}$. نقسم الطرفين على $\\Delta t$: $\\frac{\\Delta r}{r\\Delta t} = \\frac{\\Delta v}{v\\Delta t}$، أي $\\frac{1}{r}\\left(\\frac{\\Delta r}{\\Delta t}\\right) = \\frac{1}{v}\\left(\\frac{\\Delta v}{\\Delta t}\\right)$. لكن $v = \\frac{\\Delta r}{\\Delta t}$ و$a = \\frac{\\Delta v}{\\Delta t}$، فنحصل على $\\frac{v}{r} = \\frac{a}{v}$، ومنه $a_{\\text{c}} = \\frac{v^2}{r}$.",
+   "stem": "استنتج علاقة التسارع المركزي $a_{\\text{C}} = \\frac{v^2}{r}$ مستعينًا بالشكل الذي يبيّن متجهي الموقع ومتجهي السرعة لجسم في حركة دائرية منتظمة ومثلثيهما، موضحًا كل خطوة.",
+   "model_answer": "متجه السرعة عمودي على متجه الموقع، فالزاوية بين $\\boldsymbol{r}_1$ و$\\boldsymbol{r}_2$ تساوي الزاوية بين $\\boldsymbol{v}_1$ و$\\boldsymbol{v}_2$؛ وكل مثلث متساوي الساقين، لذا فالمثلثان متشابهان. من التشابه: $\\frac{\\Delta r}{r} = \\frac{\\Delta v}{v}$. نقسم الطرفين على $\\Delta t$: $\\frac{\\Delta r}{r\\Delta t} = \\frac{\\Delta v}{v\\Delta t}$، أي $\\frac{1}{r}\\left(\\frac{\\Delta r}{\\Delta t}\\right) = \\frac{1}{v}\\left(\\frac{\\Delta v}{\\Delta t}\\right)$. لكن $v = \\frac{\\Delta r}{\\Delta t}$ و$a = \\frac{\\Delta v}{\\Delta t}$، فنحصل على $\\frac{v}{r} = \\frac{a}{v}$، ومنه $a_{\\text{C}} = \\frac{v^2}{r}$.",
    "answer_elements": [
     "تعليل تشابه المثلثين",
     "كتابة $\\frac{\\Delta r}{r} = \\frac{\\Delta v}{v}$",
     "القسمة على $\\Delta t$",
     "التعويض بـ $v$ و$a$",
-    "الوصول إلى $a_{\\text{c}} = \\frac{v^2}{r}$"
+    "الوصول إلى $a_{\\text{C}} = \\frac{v^2}{r}$"
    ],
    "solution_steps": [
     "المثلثان متشابهان: الزاوية $\\Delta\\theta$ مشتركة وكلاهما متساوي الساقين",
     "$\\frac{\\Delta r}{r} = \\frac{\\Delta v}{v}$",
     "$\\frac{\\Delta r}{r\\Delta t} = \\frac{\\Delta v}{v\\Delta t}$",
     "$\\frac{v}{r} = \\frac{a}{v}$",
-    "$a_{\\text{c}} = \\frac{v^2}{r}$"
+    "$a_{\\text{C}} = \\frac{v^2}{r}$"
    ],
    "marks": [
     {
@@ -285,7 +285,7 @@
   },
   {
    "stem": "جسم يتحرك حركة دائرية منتظمة على دائرة نصف قطرها 2.0 m بسرعة مقدارها 4.0 m/s. خلال فترة زمنية قصيرة مقدارها 0.050 s: (a) احسب مقدار الإزاحة $\\Delta r$ تقريبًا. (b) استعمل تشابه المثلثين لحساب $\\Delta v$. (c) احسب التسارع $\\frac{\\Delta v}{\\Delta t}$، وقارنه بـ $\\frac{v^2}{r}$.",
-   "model_answer": "(a) $\\Delta r \\approx v\\Delta t = (4.0\\ \\text{m/s})(0.050\\ \\text{s}) = 0.20\\ \\text{m}$. (b) من التشابه $\\Delta v = \\frac{v\\,\\Delta r}{r} = \\frac{(4.0)(0.20)}{2.0} = 0.40\\ \\text{m/s}$. (c) $a = \\frac{\\Delta v}{\\Delta t} = \\frac{0.40\\ \\text{m/s}}{0.050\\ \\text{s}} = 8.0\\ \\text{m/s}^2$، و$\\frac{v^2}{r} = \\frac{(4.0)^2}{2.0} = 8.0\\ \\text{m/s}^2$؛ فالنتيجتان متساويتان، وهذا يؤكد العلاقة $a_{\\text{c}} = \\frac{v^2}{r}$.",
+   "model_answer": "(a) $\\Delta r \\approx v\\Delta t = (4.0\\ \\text{m/s})(0.050\\ \\text{s}) = 0.20\\ \\text{m}$. (b) من التشابه $\\Delta v = \\frac{v\\,\\Delta r}{r} = \\frac{(4.0)(0.20)}{2.0} = 0.40\\ \\text{m/s}$. (c) $a = \\frac{\\Delta v}{\\Delta t} = \\frac{0.40\\ \\text{m/s}}{0.050\\ \\text{s}} = 8.0\\ \\text{m/s}^2$، و$\\frac{v^2}{r} = \\frac{(4.0)^2}{2.0} = 8.0\\ \\text{m/s}^2$؛ فالنتيجتان متساويتان، وهذا يؤكد العلاقة $a_{\\text{C}} = \\frac{v^2}{r}$.",
    "answer_elements": [
     "$\\Delta r = 0.20\\ \\text{m}$",
     "$\\Delta v = 0.40\\ \\text{m/s}$",

@@ -45,10 +45,10 @@ def LAB(x, y, ang, dist, s, color, vec=True, size=17, dx=0, dy=0):
     return V(lx, ly, s, color, size) if vec else T(lx, ly, s, size - 2, 'middle', color, italic=True)
 
 
-def AC(x, y, color=C_ACC, size=17):
-    """الرمز a_c كما في الكتاب: a مائل عريض والحرف السفلي c قائم."""
-    return (f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" font-size="{size}" fill="{color}" font-weight="bold" font-style="italic" {MATHFONT}>a'
-            f'<tspan dy="0.3em" font-size="{int(size * 0.72)}" font-weight="normal" font-style="normal">c</tspan><tspan dy="-0.3em"></tspan></text>')
+def AC(x, y, color=C_ACC, size=17, bold=True):
+    """الرمز a_C كما في الكتاب (ص 169، 179): a مائل عريض والحرف السفلي C كبير قائم."""
+    return (f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" font-size="{size}" fill="{color}" font-weight="{'bold' if bold else 'normal'}" font-style="italic" {MATHFONT}>a'
+            f'<tspan dy="0.3em" font-size="{int(size * 0.72)}" font-weight="normal" font-style="normal">C</tspan><tspan dy="-0.3em"></tspan></text>')
 
 
 def EQ(x, y, sym, val, color=INK, italic=True, size=14):
@@ -206,7 +206,7 @@ def o05_graphs():
     for i in range(4):
         x0, y0 = 30 + 172 * i, 170; W, H = 130, 130
         b += ARROW(x0, y0, x0 + W + 10, y0, INK, 1.8, 9) + ARROW(x0, y0, x0, y0 - H - 10, INK, 1.8, 9)
-        b += T(x0 + W + 12, y0 + 18, 'v', 15, italic=True) + AC(x0 + 18, y0 - H - 4, INK, 15)
+        b += T(x0 + W + 12, y0 + 18, 'v', 15, italic=True) + AC(x0 + 18, y0 - H - 4, INK, 15, bold=False)
         if i == 0: pts = [(t, t) for t in (0, 1)]
         elif i == 1: pts = [(t / 20, (t / 20) ** 2) for t in range(21)]
         elif i == 2: pts = [(t / 20, 0.12 / (t / 20)) for t in range(3, 21)]
@@ -411,7 +411,7 @@ def numbered_arrows(name, ang, ccw, order):
 def o13_panels():
     w, h = 690, 240; b = ''; R = 52; cyc = 110
     # (اتجاه v، اتجاه a) للجسم عند الزاوية 0 والدوران عكس عقارب الساعة
-    combos = [(90, 0), (90, 180), (180, 90), (90, 90)]
+    combos = [(90, 180), (90, 0), (180, 90), (90, 90)]  # 1 الصحيح (a_C نحو المركز)، 2 إلى الخارج
     for i, (dv, da) in enumerate(combos):
         cx = 70 + 172 * i; b += CIRC(cx, cyc, R) + CENTER(cx, cyc) + MOTION(cx, cyc, R, 200, 250)
         x, y = pol(cx, cyc, 0, R); b += DOT(x, y, 6)
@@ -449,7 +449,7 @@ def o14_axes():
 
 def o14_bottom():
     fbd('c6l2-o14-bottom.svg', [{'angle': 90, 'length': 131, 'label': 'F_T'}, {'angle': -90, 'length': 59, 'label': 'F_g'}], w=360, h=360,
-        extra=ARROW(300, 250, 300, 170, MUTED, 1.8, 9) + T(300, 160, '+c', 15, italic=True, color=MUTED))
+        extra=ARROW(300, 250, 300, 170, MUTED, 1.8, 9) + T(300, 160, '+c', 15, italic=False, color=MUTED))
 
 
 def o14_table():
@@ -475,7 +475,7 @@ if __name__ == '__main__':
     o04_ab(); o04_equarter()
     o05_graphs(); o05_ar(); o05_tracks()
     o06_inv(); o06_station()
-    o07_net(); car_rear('c6l2-o07-e-car.svg')
+    o07_net()
     o08_paths(); o08_compass(); o08_target(); o08_erelease()
     o09_hammer(); o09_force(); o09_stopper()
     car_rear('c6l2-o10-car.svg'); o10_rotor()
