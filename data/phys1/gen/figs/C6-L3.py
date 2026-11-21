@@ -51,7 +51,7 @@ wx, wy = 2.5 * math.cos(math.radians(45)), 2.5 * math.sin(math.radians(45))
 vectors('c6l3-o01-wind45.svg', [
     {'from': (0, 0), 'to': (11, 0), 'color': C_VEL},
     {'from': (11, 0), 'to': (11 + wx, wy), 'color': C_VEL}], w=440, h=250, unit=u, origin=o, grid=False, axes=False,
-    extra=VA(o[0] + 70, o[1] + 26, 'الطائرة بالنسبة إلى الهواء') + T(o[0] + 110, o[1] - 10, '220 km/h', 14, color=C_VEL) +
+    extra=VA(o[0] + 70, o[1] + 26, 'الطائرة بالنسبة إلى الهواء') + T(o[0] + 110, o[1] - 10, '2.20×10² km/h', 14, color=C_VEL) +
     VA(o[0] + 11 * u + 20, o[1] - wy * u - 22, 'الهواء بالنسبة إلى الأرض') + T(o[0] + 11 * u - 22, o[1] - wy * u / 2 - 6, '50.0 km/h', 14, color=C_VEL) +
     L(o[0] + 11 * u, o[1], o[0] + 11 * u + 50, o[1], MUTED, 1.2, '4 3') +
     f'<path d="M {o[0] + 11 * u + 34:.1f} {o[1]:.1f} A 34 34 0 0 0 {o[0] + 11 * u + 34 * math.cos(math.radians(45)):.1f} {o[1] - 34 * math.sin(math.radians(45)):.1f}" fill="none" stroke="{INK}" stroke-width="1.4"/>' +
@@ -72,7 +72,7 @@ wx, wy = -3 * math.cos(math.radians(45)), -3 * math.sin(math.radians(45))
 vectors('c6l3-o01-e3.svg', [
     {'from': (0, 0), 'to': (-9, 0), 'color': C_VEL},
     {'from': (-9, 0), 'to': (-9 + wx, wy), 'color': C_VEL}], w=440, h=200, unit=u, origin=o, grid=False, axes=False,
-    extra=VA(o[0] - 150, o[1] - 14, 'الطائرة بالنسبة إلى الهواء') + T(o[0] - 90, o[1] + 22, '180 km/h', 14, color=C_VEL) +
+    extra=VA(o[0] - 150, o[1] - 14, 'الطائرة بالنسبة إلى الهواء') + T(o[0] - 90, o[1] + 22, '1.80×10² km/h', 14, color=C_VEL) +
     VA(o[0] - 9 * u + 6, o[1] + 52, 'الهواء بالنسبة إلى الأرض') + T(o[0] - 9 * u - 52, o[1] + 72, '60.0 km/h', 14, color=C_VEL) +
     L(o[0] - 9 * u, o[1], o[0] - 9 * u - 50, o[1], MUTED, 1.2, '4 3') +
     f'<path d="M {o[0] - 9 * u - 34:.1f} {o[1]:.1f} A 34 34 0 0 0 {o[0] - 9 * u - 34 * math.cos(math.radians(45)):.1f} {o[1] + 34 * math.sin(math.radians(45)):.1f}" fill="none" stroke="{INK}" stroke-width="1.4"/>' +
@@ -179,7 +179,7 @@ vectors('c6l3-o05-grid.svg', [
     DOT(o[0], o[1], 4, INK) + ARROW(20, 278, 80, 278, MUTED, 1.4) + T(86, 283, 'اتجاه التيار', 12, 'start', MUTED))
 
 # mcq6: رياح نحو الشمال، والمسار المطلوب شرقًا (خط متقطع بلا سهم سرعة)
-b = L(60, 170, 420, 170, MUTED, 2, '8 6') + T(400, 192, 'المسار المطلوب', 13) + DOT(60, 170, 5, INK) + T(60, 196, 'المطار', 13) + DOT(420, 170, 5, INK) + T(420, 158, 'الوجهة', 13)
+b = L(60, 170, 420, 170, MUTED, 2, '8 6') + T(240, 192, 'المسار المطلوب', 13) + DOT(60, 170, 5, INK) + T(60, 196, 'المطار', 13) + DOT(420, 170, 5, INK) + T(420, 158, 'الوجهة', 13)
 b += ARROW(240, 140, 240, 70, C_VEL, 3) + VA(250, 108, 'الهواء بالنسبة إلى الأرض')
 b += compass(70, 90, 36)
 save('c6l3-o05-heading.svg', svg(480, 215, b))
