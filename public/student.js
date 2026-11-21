@@ -6,6 +6,7 @@ import { qImages } from './media.js';
 import { icon, line, CHAPTER_ICONS } from './icons.js';
 import { hijri } from './dates.js';
 import { surveyForm } from './survey.js';
+import { sIcon } from './subjects.js';
 
 const LETTERS = ['أ', 'ب', 'ج', 'د'];
 const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
@@ -32,6 +33,46 @@ function encouragement(score, total) {
   if (p >= 70) return 'أداء جيد. راجع تفسير الأخطاء ثم جرّب «أعد الأخطاء» لتثبيت الفهم.';
   if (p >= 40) return 'بداية جيدة. اقرأ سبب خطأ كل بديل اخترته؛ فهم الخطأ أهم من حفظ الإجابة.';
   return 'كل محاولة تعلّم. ابدأ بالمستوى «أساسي»، واقرأ التفسير بعد كل سؤال، ثم أعد المحاولة.';
+}
+
+// ---------- تبويبات المواد: الطالب المسجل في مقررات من أكثر من مادة يختار المادة أعلى الصفحة ----------
+// كل ما بعدها (الدروس، التميّز، الرصيد، الاستعداد للاختبار) لمقرر تلك المادة، كما كان لمقرره الأول من قبل.
+// مادة واحدة: لا تبويبات ولا تغيير. التحصيلي يبقى قسمًا مستقلًا («برنامج مشترك»).
+const SUBJ_KEY = 'itqan.student.subject.v1';
+let stSubjects = null;
+const myCourses = ctx => (ctx.state.user?.courses || []).filter(c => (c.kind || 'course') === 'course');
+const subjIds = ctx => [...new Set(myCourses(ctx).map(c => c.subjectId).filter(Boolean))];
+function curSubject(ctx) {
+  const ids = subjIds(ctx);
+  if (ids.length < 2) return ids[0] || null;
+  let v = null; try { v = localStorage.getItem(SUBJ_KEY); } catch { /* التخزين غير متاح */ }
+  return ids.includes(v) ? v : ids[0];
+}
+// مقرر المادة المختارة (أول مقرر مسند فيها بترتيب المقررات)؛ null = المقرر الافتراضي في قاعدة البيانات
+function subjCourse(ctx) {
+  if (subjIds(ctx).length < 2) return null;
+  return myCourses(ctx).find(c => c.subjectId === curSubject(ctx))?.id ?? null;
+}
+const courseQ = ctx => (subjCourse(ctx) ? '?course=' + subjCourse(ctx) : '');
+const inSubject = (ctx, courseId) => {
+  if (subjIds(ctx).length < 2) return true;
+  const c = myCourses(ctx).find(x => x.id === courseId);
+  return !c || c.subjectId === curSubject(ctx);
+};
+async function subjectTabs(ctx, onPick) {
+  const ids = subjIds(ctx);
+  if (ids.length < 2) return '';
+  if (!stSubjects) stSubjects = await ctx.api('/subjects').catch(() => []);
+  const cur = curSubject(ctx), { esc } = ctx;
+  const list = ids.map(id => stSubjects.find(x => x.id === id) || { id, name: id, icon: 'book', color: 'teal' });
+  setTimeout(() => document.querySelectorAll('[data-st-subj]').forEach(b => b.onclick = () => {
+    if (b.dataset.stSubj === curSubject(ctx)) return;
+    try { localStorage.setItem(SUBJ_KEY, b.dataset.stSubj); } catch { /* التخزين غير متاح */ }
+    window.dispatchEvent(new Event('itqan-subject')); // سطر المقرر في الترويسة
+    onPick();
+  }));
+  return `<nav class="st-subjects" role="tablist" aria-label="المادة">${list.map(x => `<button type="button" role="tab" class="st-subj s-${esc(x.color || 'teal')} ${x.id === cur ? 'on' : ''}"
+    aria-selected="${x.id === cur}" data-st-subj="${esc(x.id)}">${sIcon(x)}<span>${esc(x.name)}</span></button>`).join('')}</nav>`;
 }
 
 let session = null; // { id, questions, idx, answers: {qid: result}, order: {qid: [origIdx...]}, timeLimit, startedAt, timer, summary }
@@ -72,7 +113,8 @@ export async function pageStudentHome(ctx, kind = 'course') {
   const tahsili = kind === 'tahsili';
   if (session?.prep) session = null; // جولة الاستعداد محفوظة إجاباتها، ويُكملها الطالب من قسمها
   if (session && !session.summary) return renderQuestion(ctx); // جلسة جارية
-  const catalog = (await api('/student/catalog')).filter(c => (c.kind || 'course') === kind);
+  const catalog = (await api('/student/catalog')).filter(c => (c.kind || 'course') === kind && (kind !== 'course' || inSubject(ctx, c.courseId)));
+  const tabs = tahsili ? '' : await subjectTabs(ctx, () => pageStudentHome(ctx, kind).catch(fail));
   if (!catalog.length && tahsili) {
     $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('exam', 64)}<div>
       <h1>الاستعداد للتحصيلي</h1>
@@ -88,7 +130,7 @@ export async function pageStudentHome(ctx, kind = 'course') {
   const prefs = { count: 10, levels: 'graded', timed: false, lessons: [], ...loadPrefs() };
   const chosen = new Set(prefs.lessons);
   const multi = new Set(catalog.map(c => c.courseId)).size > 1;
-  $app.innerHTML = `
+  $app.innerHTML = `${tabs}
     ${tahsili ? `<section class="hero banner"><div class="hero-ic">${icon('exam', 64)}<div>
       <span class="eyebrow">${icon('spark', 18)} أسئلة تدريبية على نمط اختبار التحصيل الدراسي</span>
       <h1>الاستعداد للتحصيلي</h1>
@@ -150,7 +192,7 @@ export async function pageStudentHome(ctx, kind = 'course') {
 function courseCards(ctx) {
   const { esc, api } = ctx;
   // المتميزون الخمسة في شعبة الطالب (إن توفّرت قائمة التميّز): يعرفهم زملاؤهم ويقتدون بهم
-  cachedApi(api, '/student/rank').then(d => {
+  cachedApi(api, '/student/rank' + courseQ(ctx)).then(d => {
     const box = document.getElementById('st-top5');
     eliteCelebrate(ctx, d);
     if (!box || !d?.available || !d.top?.length) return;
@@ -168,7 +210,7 @@ function courseCards(ctx) {
     box.hidden = false;
   }).catch(() => {});
   // شريط الرصيد: نقاطك المتاحة وما بقي للدرجة القادمة
-  cachedApi(api, '/student/balance').then(d => {
+  cachedApi(api, '/student/balance' + courseQ(ctx)).then(d => {
     const box = document.getElementById('st-bal');
     if (!box || !d?.available) return;
     const rate = d.settings.rate;
@@ -399,9 +441,10 @@ export async function pageStudentPrep(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   if (session?.prep && !session.summary) return renderQuestion(ctx); // جولة جارية
   if (session?.prep && session.summary) return renderSummary(ctx);
-  const sets = await api('/student/prep');
+  const sets = (await api('/student/prep')).filter(x => inSubject(ctx, x.courseId));
+  const tabs = await subjectTabs(ctx, () => pageStudentPrep(ctx).catch(ctx.fail));
   const multi = new Set(sets.map(s => s.courseId)).size > 1;
-  $app.innerHTML = `<section class="hero banner"><div class="hero-ic">${icon('objectives', 64)}<div>
+  $app.innerHTML = `${tabs}<section class="hero banner"><div class="hero-ic">${icon('objectives', 64)}<div>
       <span class="eyebrow">${icon('spark', 18)} تدريب للمراجعة: لا يُحتسب في النقاط ولا الترتيب</span>
       <h1>الاستعداد للاختبار</h1>
       <p class="muted">أسئلة حددها معلمك لاختبارك القادم. تمرّ عليها كلها على جولات من 20 سؤالًا، والتصحيح والتفسير بعد كل سؤال، ثم تراجع ما أخطأت فيه.</p></div></div></section>
@@ -491,8 +534,8 @@ function eliteCard(m, r) {
 }
 export async function pageStudentRank(ctx) {
   const { esc, $app, api } = ctx;
-  const d = await api('/student/rank');
-  const hero = `<section class="hero"><div class="hero-ic">${icon('trophy', 52)}<div><h1>التميّز</h1>
+  const d = await api('/student/rank' + courseQ(ctx));
+  const hero = `${await subjectTabs(ctx, () => pageStudentRank(ctx).catch(ctx.fail))}<section class="hero"><div class="hero-ic">${icon('trophy', 52)}<div><h1>التميّز</h1>
     <p class="muted">ترتيب المتدربين في شعبتك خلال هذا الفصل الدراسي. النقاط تكافئ التدريب الجاد والمنتظم، لا التخمين ولا السرعة.</p></div></div></section>`;
   if (!d.available) {
     $app.innerHTML = `${hero}<section class="card"><div class="empty">${d.reason === 'section' ? 'لم تُحدَّد شعبتك بعد؛ راجع معلمك ليظهر لك الترتيب.' : 'لم يُسند لك مقرر جاهز بعد.'}</div></section>`;
@@ -584,13 +627,13 @@ function eliteCelebrate(ctx, d) {
   celebrate('مبروك! دخلت مستوى النخبة', `حللت ${num(r.elitePct)}% من أسئلة المقرر، وهذا إنجاز لا يبلغه إلا المثابرون. من الآن كل ${num(r.eliteBlock)} إجابة مراجعة متقنة تضيف لك ${num(r.eliteReward)} نقطة.`, {
     cls: 'elite-cele', icon: 'trophy', tone: 'gilt', btn: 'انطلق', dialog: true,
     extra: `<div class="elite-cele-badge">النخبة</div><p class="small">راجع الأسئلة التي حللتها قبل أسبوع فأكثر، بتأنٍّ وصحة ${num(r.eliteAcc)}% فأكثر.</p>`,
-    onClose: () => { homeCache.delete('/student/rank'); ctx.api('/student/elite-seen', { method: 'POST' }).catch(() => {}); } });
+    onClose: () => { homeCache.delete('/student/rank' + courseQ(ctx)); ctx.api('/student/elite-seen', { method: 'POST' }).catch(() => {}); } });
 }
 
 export async function pageStudentBalance(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
-  const d = await api('/student/balance');
-  const hero = `<section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>الرصيد</h1>
+  const d = await api('/student/balance' + courseQ(ctx));
+  const hero = `${await subjectTabs(ctx, () => pageStudentBalance(ctx).catch(fail))}<section class="hero"><div class="hero-ic">${icon('coin', 52)}<div><h1>الرصيد</h1>
     <p class="muted">حوّل نقاط تدريبك إلى درجات: كل ${num(d.settings?.rate || 50)} نقطة تكسبها بتدريب جاد تُستبدل بدرجة تضاف إلى رصيدك ويرصدها لك معلمك.</p></div></div></section>`;
   if (!d.available) { $app.innerHTML = `${hero}<section class="card"><div class="empty">لم يُسند لك مقرر جاهز بعد.</div></section>`; return; }
   const rate = d.settings.rate, inRing = d.points - d.ready * rate;
@@ -672,7 +715,7 @@ export async function pageStudentBalance(ctx) {
     if (cpIn.value.trim().length < 8) { cpErr.textContent = 'اكتب الكود كاملًا (8 خانات)'; cpErr.hidden = false; return; }
     cpGo.disabled = true; cpErr.hidden = true;
     try {
-      const r = await api('/student/coupon', { method: 'POST', body: { code: cpIn.value } });
+      const r = await api('/student/coupon', { method: 'POST', body: { code: cpIn.value, course: subjCourse(ctx) } });
       if (!r.ok) { cpErr.textContent = r.error; cpErr.hidden = false; cpGo.disabled = false; return; }
       homeCache.clear();
       celebrate(`حصلت على ${num(r.points)} نقطة مكافأة!`, `${r.note ? r.note + ' · ' : ''}أصبحت نقاطك المتاحة ${num(r.balance.points)}.`);
@@ -694,7 +737,7 @@ export async function pageStudentBalance(ctx) {
       const ok = dlg.returnValue === 'ok'; dlg.remove();
       if (!ok) return;
       try {
-        const r = await api('/student/redeem', { method: 'POST', body: { grades: k } });
+        const r = await api('/student/redeem', { method: 'POST', body: { grades: k, course: subjCourse(ctx) } });
         homeCache.clear();
         celebrate(`مبروك! أضفت ${k === 1 ? 'درجة' : num(k) + ' درجات'} إلى رصيدك`, `سيرصدها لك معلمك. بقي لك ${num(r.points)} نقطة، فواصل التدريب لتكسب الدرجة القادمة.`);
         pageStudentBalance(ctx).catch(fail);
@@ -750,4 +793,4 @@ export async function pageStudentInbox(ctx) {
   });
 }
 
-export const resetStudentSession = () => { stopTimer(); session = null; homeCache.clear(); };
+export const resetStudentSession = () => { stopTimer(); session = null; homeCache.clear(); stSubjects = null; };

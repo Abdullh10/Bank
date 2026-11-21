@@ -386,9 +386,13 @@ async function surveyLink(ctx, data) {
   const pick = document.getElementById('imp-sv-pick'), out = document.getElementById('imp-sv-out');
   let list;
   try { list = await api('/impact/surveys'); } catch { return; }
+  // استبانات مادة مقرر الدراسة فقط، واستبانات المقرر نفسه أولًا
+  const sc = ctx.state?.courses?.find(c => c.id === data.study.courseId);
+  list = list.filter(x => !sc?.subjectId || !x.subjectId || x.subjectId === sc.subjectId)
+    .sort((x, y) => (y.courseId === data.study.courseId) - (x.courseId === data.study.courseId));
   if (!pick?.isConnected) return;
   if (!list.length) { out.innerHTML = '<p class="small muted">لا توجد استبانات بعد. أرسلها من «رسائل ومهام» ← «استبانة رأي الطلاب في المنصة».</p>'; pick.hidden = true; return; }
-  pick.innerHTML += list.map(x => `<option value="${x.id}">${esc(x.title)} · ${esc(hijri(x.createdAt))} (${num(x.responses)} إجابة)</option>`).join('');
+  pick.innerHTML += list.map(x => `<option value="${x.id}">${esc(x.title)}${x.course ? ` · ${esc(x.course)}` : ''} · ${esc(hijri(x.createdAt))} (${num(x.responses)} إجابة)</option>`).join('');
   pick.onchange = async () => {
     if (!pick.value) { out.innerHTML = ''; return; }
     try {

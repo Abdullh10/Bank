@@ -1,7 +1,7 @@
 // استبانة الطلاب: التنظيف والثبات والمستويات والارتباط مقابل قيم مرجعية.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ITEMS, ATT, clean, cronbach, level, analyzeSurvey, spearman, dimScore, scored } from '../public/survey.js';
+import { ITEMS, ATT, clean, cronbach, level, analyzeSurvey, spearman, dimScore, scored, subjectize, itemsFor, openFor } from '../public/survey.js';
 
 const near = (a, b, eps = 1e-3) => assert.ok(Math.abs(a - b) < eps, `${a} ≉ ${b}`);
 const resp = (v, d = 200) => { const a = ITEMS.map(() => v); a[ATT] = 2; return { a, d }; };
@@ -67,4 +67,16 @@ test('الثبات يُحسب من 15 إجابة فأكثر', () => {
   const rows = Array.from({ length: 15 }, (_, i) => { const v = 1 + (i % 5); const a = ITEMS.map(it => (it.rev ? 6 - v : v)); a[ATT] = 2; a[0] = 1 + ((i + 2) % 5); return { a, d: 200 }; });
   const a = analyzeSurvey(rows);
   assert.ok(a.dims.every(d => Number.isFinite(d.alpha)));
+});
+
+test('العبارات باسم المادة: «فهم دروس الفيزياء» و«مذاكرتي للفيزياء»، والترتيب والترميز كما هما', () => {
+  const ph = itemsFor('الفيزياء');
+  assert.equal(ph.length, ITEMS.length);
+  assert.equal(ph[0].text, 'ساعدتني منصة إتقان على فهم دروس الفيزياء بشكل أفضل.');
+  assert.equal(ph[1].text, 'جعلت المنصة مذاكرتي للفيزياء أكثر فاعلية.');
+  assert.ok(ph.every((it, i) => it.rev === ITEMS[i].rev && it.dim === ITEMS[i].dim && it.att === ITEMS[i].att));
+  assert.ok(!ph.some(it => it.text.includes('المادة')));
+  assert.equal(subjectize('مذاكرتي للمادة', 'علم البيئة'), 'مذاكرتي لعلم البيئة');
+  assert.equal(itemsFor(null)[0].text, ITEMS[0].text); // البرامج المشتركة: النص العام
+  assert.ok(openFor('الكيمياء')[0].includes('تعلّم الكيمياء'));
 });

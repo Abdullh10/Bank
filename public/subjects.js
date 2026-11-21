@@ -72,6 +72,7 @@ export async function pageSubjects(ctx) {
     <div class="page-head">
       <div><h1>المواد</h1><p class="muted">اختر المادة لإدارة مقرراتها، أو أكمل من حيث توقفت.</p></div>
       <div class="actions no-print">${cur ? `<button type="button" id="sj-resume" data-course="${cur.id}">${line('next', 16)}متابعة ${esc(cur.code)}</button>` : ''}
+        ${subjects.length ? `<a class="btn cmp-link" href="#/compare">${line('chart', 16)}مقارنة المواد</a>` : ''}
         <button type="button" class="primary" id="sj-add">${line('plus', 16)}إضافة مادة</button></div>
     </div>
     <div class="totals">
@@ -93,6 +94,59 @@ export async function pageSubjects(ctx) {
 }
 
 // =====================================================================
+// مقارنة المواد (لمالك المشروع): أرقام مجمّعة جنبًا إلى جنب، دون بيانات أي طالب بعينه
+// =====================================================================
+const fmt1 = v => (v == null || !Number.isFinite(Number(v)) ? '—' : Number(v).toLocaleString('ar-SA-u-nu-latn', { maximumFractionDigits: 1 }));
+export async function pageCompare(ctx) {
+  const { esc, $app, api } = ctx;
+  const rows = await api('/admin/compare');
+  const cols = rows.filter(r => !r.shared || r.courses);
+  // كل مقياس: [العنوان، القيمة، النص المعروض، نسبة الشريط (من أكبر قيمة أو من 100)]
+  const bar = (v, max, s) => `<div class="bar sbar cmp-bar ${s.shared ? '' : 's-' + escA(s.color)}"><span style="width:${max && v > 0 ? Math.max(2, Math.round((100 * v) / max)) : 0}%"></span></div>`;
+  const maxOf = f => Math.max(0, ...cols.map(f).map(Number).filter(Number.isFinite));
+  const metric = (label, f, txt = v => num(v), opts = {}) => {
+    const m = opts.pct ? 100 : maxOf(f);
+    return `<tr><th scope="row">${label}${opts.hint ? `<span class="small muted">${opts.hint}</span>` : ''}</th>${cols.map(c => { const v = f(c);
+      return `<td><b class="num">${txt(v, c)}</b>${opts.bar && v != null ? bar(v, m, c) : ''}</td>`; }).join('')}</tr>`;
+  };
+  const group = t => `<tr class="cmp-group"><th colspan="${cols.length + 1}">${t}</th></tr>`;
+  const imp = c => c.impact;
+  $app.innerHTML = `
+    <div class="crumbs"><a href="#/">المواد</a> ‹ مقارنة المواد</div>
+    <div class="page-head"><div><h1>مقارنة المواد</h1><p class="muted">أرقام مجمّعة لكل مادة جنبًا إلى جنب: المحتوى والطلاب والتدريب وقياس الأثر. لا تظهر هنا بيانات أي طالب بعينه.</p></div>
+      <div class="actions no-print"><button type="button" id="cmp-print">${line('print', 16)}طباعة</button></div></div>
+    ${cols.length < 2 ? '<p class="notice info">تظهر المقارنة بوضوح حين تكون في المنصة مادتان أو أكثر.</p>' : ''}
+    <div class="card cmp-card"><div class="table-wrap"><table class="cmp">
+      <thead><tr><th></th>${cols.map(c => `<th scope="col" class="cmp-h ${c.shared ? '' : 's-' + escA(c.color)}">${c.shared
+        ? '<span class="dots" aria-hidden="true"><i class="s-green"></i><i class="s-teal"></i><i class="s-indigo"></i></span>' : sIcon(c)}<span>${esc(c.name)}</span></th>`).join('')}</tr></thead>
+      <tbody>
+        ${group('المحتوى')}
+        ${metric('المقررات', c => c.courses, (v, c) => `${num(v)}<small> (${num(c.ready)} متاح)</small>`)}
+        ${metric('الأسئلة', c => c.questions, undefined, { bar: true })}
+        ${metric('الأسئلة المعتمدة', c => (c.questions ? pct(c.approved, c.questions) : null), v => (v == null ? '—' : v + '%'), { bar: true, pct: true })}
+        ${group('الطلاب والمعلمون')}
+        ${metric('الطلاب المسجلون', c => c.students, undefined, { bar: true })}
+        ${metric('الشعب', c => c.sections)}
+        ${metric('المعلمون', c => c.teachers)}
+        ${group('نشاط التدريب')}
+        ${metric('الإجابات', c => c.answers7, undefined, { bar: true, hint: 'آخر 7 أيام' })}
+        ${metric('الإجابات', c => c.answers30, undefined, { bar: true, hint: 'آخر 30 يومًا' })}
+        ${metric('الطلاب النشطون', c => c.active7, (v, c) => `${num(v)}<small>${c.students ? ` من ${num(c.students)}` : ''}</small>`, { hint: 'آخر 7 أيام' })}
+        ${metric('الطلاب النشطون', c => c.active30, (v, c) => `${num(v)}<small>${c.students ? ` (${pct(v, c.students)}%)` : ''}</small>`, { hint: 'آخر 30 يومًا' })}
+        ${metric('متوسط الصحة', c => c.accuracy30, v => (v == null ? '—' : fmt1(v) + '%'), { bar: true, pct: true, hint: 'آخر 30 يومًا' })}
+        ${metric('متوسط الصحة', c => c.accuracyAll, v => (v == null ? '—' : fmt1(v) + '%'), { bar: true, pct: true, hint: 'منذ البداية' })}
+        ${group('قياس الأثر والاستبانة')}
+        ${metric('دراسات الأثر', c => imp(c)?.studies ?? null, (v, c) => (v == null ? '<span class="muted">لا دراسات</span>' : `${num(v)}<small> · ${num(imp(c).paired)} طالبًا لهم الاختباران</small>`))}
+        ${metric('القبلي ← البعدي', c => imp(c)?.paired ? imp(c).post : null, (v, c) => (v == null ? '—' : `${fmt1(imp(c).pre)}% ← ${fmt1(imp(c).post)}%`), { hint: 'متوسط الدرجة' })}
+        ${metric('متوسط التحسن', c => imp(c)?.paired ? imp(c).gain : null, v => (v == null ? '—' : `<span class="${v >= 0 ? 'cmp-up' : 'cmp-down'}">${v > 0 ? '+' : ''}${fmt1(v)}</span> نقطة`))}
+        ${metric('استبانات الطلاب', c => c.surveys?.n ?? null, (v, c) => (v == null ? '<span class="muted">لا استبانات</span>' : `${num(v)}<small> · استجاب ${num(c.surveys.responses)} من ${num(c.surveys.sent)}</small>`))}
+      </tbody></table></div></div>
+    <p class="small muted">الإجابات كل إجابات التدريب الذاتي على أسئلة مقررات المادة. «نشط» من أجاب سؤالًا واحدًا على الأقل في الفترة. متوسط الصحة نسبة الإجابات الصحيحة.
+      قياس الأثر: متوسط درجتي القبلي والبعدي (نسبة مئوية) للطلاب الذين لهم الاختباران في كل دراسات مقررات المادة. البرامج المشتركة (التحصيلي) عمود مستقل.</p>`;
+  document.getElementById('cmp-print').onclick = () => window.print();
+}
+
+// =====================================================================
 // صفحة المادة: مقرراتها حسب الصف والفصل، ومعلموها، وطلابها وشعبها
 // =====================================================================
 const subjTab = { tab: 'courses' };
@@ -102,7 +156,8 @@ export async function pageSubject(ctx, id) {
   if (!s) { $app.innerHTML = '<div class="empty">المادة غير موجودة.</div>'; return; }
   const list = (state.courses || []).filter(c => c.subjectId === id);
   const ids = new Set(list.map(c => c.id));
-  const teachers = await api('/admin/teachers').catch(soft([]));
+  const [teachers, team] = await Promise.all([api('/admin/teachers').catch(soft([])), api('/admin/team').catch(soft([]))]);
+  const staff = team.filter(u => u.role === 'reviewer' || u.role === 'supervisor');
   const subjTeachers = teachers.filter(t => t.courses.some(c => ids.has(c)));
   // قائمة الطلاب أثقل: تُقرأ عند فتح تبويب «الطلاب والشعب» أو خطوات الإسناد فقط
   let students = null;
@@ -130,7 +185,17 @@ export async function pageSubject(ctx, id) {
       ${subjTeachers.map(t => { const mine = t.courses.filter(c => ids.has(c)); return `<tr data-teacher="${escA(t.id)}"><td><b>${esc(t.name)}</b><div class="small muted ltr">${esc(t.username)}</div></td>
         <td>${mine.length === list.length ? '<span class="badge brand">كل مقررات المادة</span> ' : ''}${mine.map(c => `<span class="badge">${esc(courseName(c))}</span>`).join(' ')}</td>
         <td class="actions as-acts"><button type="button" data-tedit="${escA(t.id)}">تعديل</button><button type="button" class="danger" data-tremove="${escA(t.id)}">إلغاء الإسناد</button></td></tr>`; }).join('')}
-      </tbody></table></div>` : `<div class="empty"><h3>لا معلمين مسندين لهذه المادة بعد</h3><p>أسند معلمًا لكل مقررات المادة بضغطة واحدة، أو لمقررات محددة.</p></div>`}`;
+      </tbody></table></div>` : `<div class="empty"><h3>لا معلمين مسندين لهذه المادة بعد</h3><p>أسند معلمًا لكل مقررات المادة بضغطة واحدة، أو لمقررات محددة.</p></div>`}
+    <div class="tab-head tab-sub"><div><h3>المراجعون العلميون والمشرفون التربويون</h3>
+      <p class="muted small">دون نطاق يرى الحساب كل المواد. «قصر على ${esc(s.name)}» يجعله يرى أسئلة هذه المادة وملاحظاتها فقط، وتفرض ذلك قاعدة البيانات.</p></div></div>
+    ${staff.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>الحساب</th><th>النطاق</th><th></th></tr></thead><tbody>
+      ${staff.map(u => { const sc = u.subjects || [], has = sc.includes(id);
+        const names = sc.map(x => state.subjects.find(y => y.id === x)).filter(Boolean);
+        return `<tr data-staff="${escA(u.id)}"><td><b>${esc(u.name)}</b><div class="small muted">${u.role === 'reviewer' ? 'مراجع علمي' : 'مشرف تربوي'} · <span class="ltr">${esc(u.username)}</span></div></td>
+        <td>${!sc.length ? '<span class="badge">كل المواد</span>' : names.map(x => `<span class="badge subj-badge s-${escA(x.color)}">${sIcon(x, 'sm')}${esc(x.name)}</span>`).join(' ')}</td>
+        <td class="sc-act">${has ? `<button type="button" class="danger" data-sremove="${escA(u.id)}">إزالة ${esc(s.name)} من نطاقه</button>`
+          : `<button type="button" data-sadd="${escA(u.id)}">${sc.length ? `إضافة ${esc(s.name)} لنطاقه` : `قصر على ${esc(s.name)}`}</button>`}</td></tr>`; }).join('')}
+      </tbody></table></div>` : '<p class="muted small">لا حسابات مراجعين أو مشرفين بعد؛ تُنشأ من «الحسابات ← الفريق».</p>'}`;
   const secRows = enrolled => list.map(c => {
     const st = enrolled.filter(x => x.courses.includes(c.id));
     const bySec = {};
@@ -149,7 +214,7 @@ export async function pageSubject(ctx, id) {
       if (el) el.innerHTML = `<div class="table-wrap"><table class="list"><thead><tr><th>المقرر</th><th>الشعب (عدد الطلاب)</th><th>المجموع</th></tr></thead><tbody>${secRows(enrolled)}</tbody></table></div>`;
     } catch (e) { if (!e?.stale) fail(e); }
   };
-  const tabs = [['courses', 'المقررات', list.length], ['teachers', 'المعلمون', subjTeachers.length], ['students', 'الطلاب والشعب', s.students]];
+  const tabs = [['courses', 'المقررات', list.length], ['teachers', 'المعلمون', subjTeachers.length + staff.filter(u => (u.subjects || []).includes(id)).length], ['students', 'الطلاب والشعب', s.students]];
   $app.innerHTML = `
     <div class="crumbs"><a href="#/">المواد</a> ‹ ${esc(s.name)}</div>
     <div class="subj-hero s-${escA(s.color)}"><div class="l">${sIcon(s, 'lg')}<div><h1>${esc(s.name)}</h1>
@@ -177,6 +242,17 @@ export async function pageSubject(ctx, id) {
     try { enrollDialog(ctx, { subjectId: id, students: await loadStudents() }); } catch (err) { if (!err?.stale) fail(err); } finally { b.disabled = false; }
   };
   $app.querySelectorAll('[data-tedit]').forEach(b => b.onclick = () => teacherDialog(ctx, s, teachers, list, b.dataset.tedit));
+  const setScope = async (b, u, list2, msg) => {
+    b.disabled = true;
+    try { await api('/admin/team/scope', { method: 'POST', body: { id: u.id, subjects: list2 } }); ctx.toast(msg); await ctx.refresh(); }
+    catch (e) { fail(e); b.disabled = false; }
+  };
+  $app.querySelectorAll('[data-sadd]').forEach(b => b.onclick = () => { const u = staff.find(x => x.id === b.dataset.sadd); setScope(b, u, [...(u.subjects || []), id], 'حُدّث النطاق'); });
+  $app.querySelectorAll('[data-sremove]').forEach(b => b.onclick = () => {
+    const u = staff.find(x => x.id === b.dataset.sremove), rest = (u.subjects || []).filter(x => x !== id);
+    if (!rest.length && !confirm(`${s.name} هي المادة الوحيدة في نطاق «${u.name}». بإزالتها يعود يرى كل المواد. متابعة؟`)) return;
+    setScope(b, u, rest, 'حُدّث النطاق');
+  });
   $app.querySelectorAll('[data-tremove]').forEach(b => b.onclick = async () => {
     const t = teachers.find(x => x.id === b.dataset.tremove);
     if (!confirm(`إلغاء إسناد كل مقررات ${s.name} للمعلم «${t?.name}»؟`)) return;

@@ -9,7 +9,7 @@ import { pageImpact } from './impact.js';
 import { pageNotes, notesCard, noteDialog, resetNotesState } from './notes.js';
 import { PERMS, ROLE_NAMES } from './roles.js';
 import { pageCourses, pickCourse, rememberCourse, courseLine } from './courses.js';
-import { pageSubjects, pageSubject, renderContext, pushRecent } from './subjects.js';
+import { pageSubjects, pageSubject, pageCompare, renderContext, pushRecent } from './subjects.js';
 import { icon, line, hydrateIcons, CHAPTER_ICONS } from './icons.js';
 import { startBidi } from './bidi.js';
 import { startMath } from './math.js';
@@ -148,10 +148,17 @@ const protectedBank = () => state.supabase && !can('fullbank');
 const $brandSub = document.getElementById('brand-sub');
 const BRAND_DEFAULT = $brandSub?.textContent || '';
 function showCourseLine() {
-  const c = state.user?.role === 'student' ? state.user.courses?.[0] : state.course;
+  const c = state.user?.role === 'student' ? studentHeaderCourse() : state.course;
   if ($brandSub) $brandSub.textContent = c ? courseLine(c) : BRAND_DEFAULT;
   renderContext({ esc, state, isOwner: can('edit'), choose: switchCourse });
 }
+// الطالب: مقرر المادة المختارة في تبويبات المواد (student.js)، وإلا مقرره الأول
+function studentHeaderCourse() {
+  const cs = state.user.courses || [];
+  let sid = null; try { sid = localStorage.getItem('itqan.student.subject.v1'); } catch { /* التخزين غير متاح */ }
+  return (sid && cs.find(c => c.kind !== 'tahsili' && c.subjectId === sid)) || cs[0];
+}
+window.addEventListener('itqan-subject', () => showCourseLine());
 // قائمة المقررات (مرة بعد الدخول). الخادم المحلي القديم لا يعرف المقررات: مقرر واحد من /stats.
 async function ensureCourses() {
   if (!state.courses) {
@@ -1041,7 +1048,7 @@ async function route() {
   const [, page, arg] = hash.split('/');
   document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active',
     a.dataset.nav === (page || 'home') || (a.dataset.nav === 'chapters' && ['chapter', 'objective'].includes(page))
-    || (a.dataset.nav === 'students' && page === 'team') || (a.dataset.nav === 'home' && ['course', 'subject'].includes(page))));
+    || (a.dataset.nav === 'students' && page === 'team') || (a.dataset.nav === 'home' && ['course', 'subject', 'compare'].includes(page))));
   document.body.classList.remove('print-student', 'print-teacher', 'exam-printing', 'xprint-student', 'xprint-key', 'xprint-all');
   // المنصة مغلقة: بلا دخول تظهر صفحة الدخول فقط، والحساب غير المفعّل يرى رسالة الانتظار.
   const locked = !state.user || state.user.role === 'pending';
@@ -1089,6 +1096,7 @@ async function route() {
     if (!page && can('edit') && state.subjects?.length) await pageSubjects(sctx);
     else if (!page) pageCourses({ esc, $app, courses: state.courses, current: state.course, isOwner: can('edit'), select: setCourse });
     else if (page === 'subject' && can('edit') && state.subjects?.length) await pageSubject(sctx, decodeURIComponent(arg || ''));
+    else if (page === 'compare' && can('edit') && state.subjects?.length) await pageCompare(sctx);
     else if (page === 'course') await pageHome();
     else if (page === 'chapters') await pageChapters();
     else if (page === 'chapter') await pageChapter(arg);

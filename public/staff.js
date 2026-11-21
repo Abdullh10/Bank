@@ -3,8 +3,8 @@ import { icon, line } from './icons.js';
 import { SITE_URL } from './config.js';
 import { ROLE_NAMES, STAFF_ROLES } from './roles.js';
 import { hijri } from './dates.js';
-import { ITEMS as SURVEY_ITEMS, OPEN as SURVEY_OPEN, surveyResultsHtml, printSurveyReport } from './survey.js';
-import { courseOptions, groupCourses, enrollDialog } from './subjects.js';
+import { ITEMS as SURVEY_ITEMS, itemsFor, openFor, surveyResultsHtml, printSurveyReport } from './survey.js';
+import { courseOptions, groupCourses, enrollDialog, sIcon, subjectOf } from './subjects.js';
 
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const num = n => Number(n || 0).toLocaleString('ar-SA-u-nu-latn');
@@ -141,9 +141,19 @@ const COMM_TEMPLATES = [
   ['اختبار قريب', 'اختبار قريب', 'استعدوا للاختبار القادم بالتدريب على الدروس المقررة.'],
   ['ابدأ هذا الدرس', 'ابدأ بهذا الدرس', 'ابدأ بالتدريب على الدرس الذي شرحناه اليوم.'],
 ];
+// تصفية «المُرسَل» بالمادة والنوع (تبقى أثناء الجلسة)
+const commsFilter = { subject: '', kind: '' };
 export async function pageTeacherComms(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
-  const [list, students, chapters] = await Promise.all([api('/staff/comms'), api('/staff/students'), api('/staff/lessons')]);
+  const subjects = ctx.state?.subjects || [];
+  if (commsFilter.subject && !subjects.some(x => x.id === commsFilter.subject)) commsFilter.subject = '';
+  const qs = new URLSearchParams(Object.entries(commsFilter).filter(([, v]) => v)).toString();
+  const [list, students, chapters] = await Promise.all([api('/staff/comms' + (qs ? '?' + qs : '')), api('/staff/students'), api('/staff/lessons')]);
+  // الاستبانة لمقرر واحد: المقرر الحالي، وعباراتها باسم مادته
+  const cur = ctx.state?.course, curSubj = subjectOf(cur, subjects);
+  const svItems = itemsFor(curSubj?.name), svOpen = openFor(curSubj?.name);
+  const subjBadge = c => { const sj = subjects.find(x => x.id === c.subjectId); return c.course ? `<span class="badge cm-course ${sj ? 's-' + esc(sj.color) : ''}">${sj ? sIcon(sj, 'sm') : ''}${esc(c.course)}</span>` : ''; };
+  const kinds = [['', 'الكل'], ['message', 'الرسائل'], ['task', 'المهام'], ['survey', 'الاستبانات']];
   const grades = [...new Set(students.map(s => s.grade).filter(Boolean))].sort();
   const owner = ctx.state?.user?.role === 'admin';
   const defDue = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
@@ -167,11 +177,12 @@ export async function pageTeacherComms(ctx) {
           <label>مكافأة الإنجاز (نقاط لكل طالب) <input type="number" id="cm-reward" min="0" max="500" value="0" style="max-width:6rem"></label>
           <span class="small muted" style="flex-basis:100%">المكافأة اختيارية: تُضاف لرصيد من يُنجز المهمة قبل الموعد (لا تدخل نقاط الترتيب)، وتُخصم من حصتك الأسبوعية (النقاط × عدد الطلاب) وتعود حصة من لم ينجز. تتطلب 10 أسئلة على الأقل وصحة 50% فأكثر.</span></div>
         <div id="cm-survey" hidden>
+          <p class="notice info small sv-for">${curSubj ? sIcon(curSubj, 'sm') : ''}<span>تُرسل لطلاب مقرر <b>${esc(cur?.code || '')}</b> المسجلين فيه${curSubj ? `، وتظهر عباراتها باسم مادته: «${esc(svItems[0].text.replace(/\.$/, ''))}»` : ''}. لاستبانة مقرر آخر بدّل المقرر من أعلى الصفحة.</span></p>
           <p class="small muted">استبانة علمية ثابتة (${SURVEY_ITEMS.length - 1} عبارة ليكرت خماسية في 4 أبعاد + عبارة انتباه + سؤالان مفتوحان، نحو 3 دقائق)، مقتبسة ومعدّلة عن Davis (1989) وPintrich et al. (1991) وRovai et al. (2009).
             الإجابات <b>سرية</b>: ترى النتائج مجمّعة دون أسماء ومن 5 إجابات فأكثر، ولا نقاط ولا مكافأة عليها. أرسلها بعد الاختبار البعدي وقبل إعلان درجاته.</p>
           <label>مدة الاستبانة <select id="cm-days"><option value="7">7 أيام</option><option value="10" selected>10 أيام</option><option value="14">14 يومًا</option></select></label>
-          <details class="sv-preview"><summary>عرض العبارات</summary><ol>${SURVEY_ITEMS.map(i => `<li>${esc(i.text)}${i.rev ? ' <span class="badge">عكسية</span>' : ''}${i.att ? ' <span class="badge">انتباه</span>' : ''}</li>`).join('')}</ol>
-            <p class="small">ثم سؤالان اختياريان: ${SURVEY_OPEN.map(esc).join(' / ')}</p></details>
+          <details class="sv-preview"><summary>عرض العبارات</summary><ol>${svItems.map(i => `<li>${esc(i.text)}${i.rev ? ' <span class="badge">عكسية</span>' : ''}${i.att ? ' <span class="badge">انتباه</span>' : ''}</li>`).join('')}</ol>
+            <p class="small">ثم سؤالان اختياريان: ${svOpen.map(esc).join(' / ')}</p></details>
         </div>
         <div class="cm-row"><label>المرحلة (الصف) <select id="cm-grade"><option value="">كل المراحل</option>${grades.map(g => `<option>${esc(g)}</option>`).join('')}</select></label>
           <label>الشعبة <select id="cm-sec"><option value="">كل الشعب</option></select></label>
@@ -181,27 +192,34 @@ export async function pageTeacherComms(ctx) {
         <div class="actions"><button type="button" class="primary" id="cm-send">إرسال</button></div>
       </div></section>
     <section class="card">${ttl('mail', 'المُرسَل')}
+      <div class="cm-filter no-print">${subjects.length > 1 ? `<div class="chips" role="radiogroup" aria-label="المادة"><button type="button" class="chip ${commsFilter.subject ? '' : 'on'}" data-cmf-subj="" role="radio" aria-checked="${!commsFilter.subject}">كل المواد</button>
+          ${subjects.map(x => `<button type="button" class="chip subj-chip ${commsFilter.subject === x.id ? 'on' : ''}" data-cmf-subj="${esc(x.id)}" role="radio" aria-checked="${commsFilter.subject === x.id}">${sIcon(x, 'sm')}${esc(x.name)}</button>`).join('')}</div>` : ''}
+        <label class="small">النوع <select id="cmf-kind">${kinds.map(([v, t]) => `<option value="${v}" ${commsFilter.kind === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label></div>
       ${list.length ? `<ul class="cm-list">${list.map(c => {
         const t = c.task, off = c.status === 'cancelled', svOpen = !!(c.survey && c.survey.open && !off); // الإغلاق اليدوي يُبقي موعد الإغلاق مستقبلًا
         return `<li class="cm-item ${off ? 'off' : ''}" data-comm="${c.id}"><div class="in-head"><b>${esc(c.title)}</b>
           <span class="badge ${c.kind === 'message' ? '' : 'brand'}">${{ task: 'مهمة', survey: 'استبانة' }[c.kind] || 'رسالة'}</span>${off ? `<span class="badge">${c.survey ? 'مغلقة' : 'ملغاة'}</span>` : ''}
-          <span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
+          ${c.kind === 'message' ? '' : subjBadge(c)}<span class="small muted">${esc(c.sender || '')} · ${esc(hijri(c.createdAt))} · إلى ${c.n} طالبًا</span></div>
           ${c.body ? `<div class="small in-body">${esc(c.body)}</div>` : ''}
           <div class="small muted">قرأها ${c.read} من ${c.n}${c.help ? ` · يحتاج مساعدة: <b>${c.help}</b>` : ''}${c.ack ? ` · فهموا: ${c.ack}` : ''}${t ? ` · ${esc(t.lesson || '')}: ${t.n} سؤالًا${t.minAccuracy ? ` بصحة ${t.minAccuracy}%` : ''}${t.reward ? ` · مكافأة ${t.reward} نقطة` : ''} قبل ${esc(hijri(t.dueAt))} — أنجز ${t.done}، جارية ${t.open}، انتهى موعدها ${t.missed}` : ''}</div>
           ${c.survey ? `<div class="small muted">استجاب ${c.survey.responses} من ${c.n} · ${svOpen ? `تُغلق ${esc(hijri(c.survey.closesAt))}` : 'أُغلقت'}</div>` : ''}
           <div class="actions">${c.survey ? `<button type="button" class="primary" data-svres="${c.id}">النتائج</button>` : ''}<button type="button" data-detail="${c.id}">التفاصيل</button>${off || (c.survey && !svOpen) ? '' : `<button type="button" class="danger" data-cancel="${c.id}" data-kind="${c.kind}">${c.survey ? 'إغلاق الاستبانة' : 'إلغاء'}</button>`}
             ${c.survey && !svOpen && c.survey.responses < c.n ? `<span class="cm-reopen"><select data-reopen-days="${c.id}" aria-label="مدة إعادة الفتح"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يومًا</option></select>
               <button type="button" data-reopen="${c.id}">إعادة فتح الاستبانة</button></span>` : ''}</div>
-          <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : '<div class="empty">لم ترسل شيئًا بعد.</div>'}</section>`;
+          <div class="cm-detail" id="cmd-${c.id}"></div></li>`; }).join('')}</ul>` : `<div class="empty">${commsFilter.subject || commsFilter.kind ? 'لا شيء مطابق لهذه التصفية.' : 'لم ترسل شيئًا بعد.'}</div>`}</section>`;
+  $app.querySelectorAll('[data-cmf-subj]').forEach(b => b.onclick = () => { commsFilter.subject = b.dataset.cmfSubj; pageTeacherComms(ctx).catch(fail); });
+  $app.querySelector('#cmf-kind').onchange = e => { commsFilter.kind = e.target.value; pageTeacherComms(ctx).catch(fail); };
   const q = s => $app.querySelector(s);
   const kind = () => $app.querySelector('[name=cm-kind]:checked').value;
   $app.querySelectorAll('[name=cm-kind]').forEach(r => r.onchange = () => {
     q('#cm-task').hidden = kind() !== 'task'; q('#cm-tpl').hidden = kind() !== 'message'; q('#cm-survey').hidden = kind() !== 'survey';
     if (kind() === 'survey' && !q('#cm-title').value.trim()) q('#cm-title').value = 'استبانة رأيك في منصة إتقان';
+    refreshFilter();
   });
   $app.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = COMM_TEMPLATES[Number(b.dataset.tpl)]; q('#cm-title').value = t[1]; q('#cm-body').value = t[2]; });
   // التصفية: المرحلة ثم الشعبة (الشعب المعروضة تتبع المرحلة)، وتنطبق على «الكل» وعلى قائمة الطلاب المحددين
-  const matching = () => students.filter(s => (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
+  // المهمة والاستبانة لطلاب المقرر الحالي المسجلين فيه فقط
+  const matching = () => students.filter(s => (kind() === 'message' || s.enrolled) && (!q('#cm-grade').value || s.grade === q('#cm-grade').value) && (!q('#cm-sec').value || s.section === q('#cm-sec').value));
   const refreshFilter = () => {
     const g = q('#cm-grade').value, cur = q('#cm-sec').value;
     const secs = [...new Set(students.filter(s => !g || s.grade === g).map(s => s.section).filter(Boolean))].sort();
@@ -544,7 +562,7 @@ export function parseStudentLines(text) {
 }
 
 const adminFilter = { grade: '', section: '', q: '' };
-export const resetStaffState = () => Object.assign(adminFilter, { grade: '', section: '', q: '' });
+export const resetStaffState = () => { Object.assign(adminFilter, { grade: '', section: '', q: '' }); Object.assign(commsFilter, { subject: '', kind: '' }); };
 
 export async function pageAdminStudents(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
@@ -802,6 +820,11 @@ const accountTabs = (cur, ctx) => (ctx.state?.supabase ? `<div class="seg no-pri
 export async function pageAdminTeam(ctx) {
   const { esc, $app, api, fail, toast } = ctx;
   const all = await api('/admin/team');
+  const subjects = ctx.state?.subjects || [];
+  // المراجع والمشرف: نطاق بالمواد (فارغ = كل المواد)
+  const scoped = r => r === 'reviewer' || r === 'supervisor';
+  const scopeText = ids => (ids?.length ? `<span class="muted">يرى فقط:</span> ${ids.map(id => { const x = subjects.find(y => y.id === id); return x ? `<span class="badge s-${esc(x.color)} subj-badge">${sIcon(x, 'sm')}${esc(x.name)}</span>` : esc(id); }).join(' ')}`
+    : '<span class="muted">يرى كل المواد</span>');
   const roleOpts = (cur, withPending = true) => [...STAFF_ROLES.map(([v, t]) => [v, t]), ...(withPending ? [['pending', 'موقوف']] : [])]
     .map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('');
   const fmt = d => hijri(d);
@@ -827,11 +850,11 @@ export async function pageAdminTeam(ctx) {
       <div class="table-wrap"><table class="list"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>آخر دخول</th><th></th></tr></thead><tbody>
       ${all.map(u => (u.role === 'admin' || u.self) ? `<tr><td>${esc(u.name)}</td><td class="ltr">${esc(u.username)}</td><td>${esc(ROLE_NAMES[u.role])}</td><td class="small">${fmt(u.lastSignIn)}</td><td class="small muted">${u.self ? 'حسابك' : ''}</td></tr>`
         : `<tr data-id="${u.id}" data-user="${esc(u.username)}">
-          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم">${u.role === 'viewer' ? `<div class="small muted tm-sum">${u.assignedCourses || 0} مقرر · ${u.assignedStudents || 0} طالب مسند</div>` : ''}</td>
+          <td><input class="tm-n" value="${esc(u.name)}" aria-label="الاسم">${u.role === 'viewer' ? `<div class="small muted tm-sum">${u.assignedCourses || 0} مقرر · ${u.assignedStudents || 0} طالب مسند</div>` : ''}${scoped(u.role) ? `<div class="small tm-scope">${scopeText(u.subjects)}</div>` : ''}</td>
           <td><input class="tm-u ltr" value="${esc(u.username)}" aria-label="اسم المستخدم" style="max-width:10rem"></td>
           <td><select class="tm-r" aria-label="الدور">${roleOpts(u.role)}</select></td>
           <td class="small">${fmt(u.lastSignIn)}</td>
-          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button>${u.role === 'viewer' ? '<button type="button" class="tm-assign-btn" aria-expanded="false">الإسناد</button>' : ''}<button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
+          <td class="actions as-acts"><button type="button" class="tm-save">حفظ</button>${u.role === 'viewer' ? '<button type="button" class="tm-assign-btn" aria-expanded="false">الإسناد</button>' : ''}${scoped(u.role) && subjects.length ? '<button type="button" class="tm-scope-btn" aria-expanded="false">نطاق المواد</button>' : ''}<button type="button" class="tm-reset">كلمة المرور</button><button type="button" class="tm-del danger">حذف</button></td></tr>`).join('')}
       </tbody></table></div>
       <p class="small muted">«موقوف» يمنع الحساب من رؤية أي محتوى دون حذفه. لا يمكن منح دور «مالك المشروع» من هنا.</p></section>`;
   const reload = () => pageAdminTeam(ctx).catch(fail);
@@ -855,6 +878,35 @@ export async function pageAdminTeam(ctx) {
         <div class="small">احفظ كلمة المرور الآن؛ لا تظهر مرة أخرى.</div></div>`;
     } catch (err) { fail(err); btn.disabled = false; }
   };
+  // نطاق المراجع أو المشرف بالمواد: لا شيء محدد = كل المواد (كما كان)
+  function openScope(tr, u, btn) {
+    const next = tr.nextElementSibling;
+    if (next?.classList.contains('tm-assign')) { next.remove(); btn.setAttribute('aria-expanded', 'false'); return; }
+    const sel = new Set(u.subjects || []);
+    const row = document.createElement('tr'); row.className = 'tm-assign';
+    row.innerHTML = `<td colspan="5"><div class="tm-assign-box">
+      <h3>نطاق «${esc(tr.querySelector('.tm-n').value)}» بالمواد</h3>
+      <p class="small muted">حدّد المواد التي يراجعها أو يطّلع عليها؛ لا يرى أسئلة غيرها ولا ملاحظاتها ولا سجل تعديلاتها (تفرضه قاعدة البيانات). دون تحديد يرى كل المواد. البرامج المشتركة (التحصيلي) لغير المقيَّد فقط.</p>
+      <div class="chips" role="group" aria-label="المواد">${subjects.map(x => `<button type="button" class="chip subj-chip ${sel.has(x.id) ? 'on' : ''}" data-sc="${esc(x.id)}" aria-pressed="${sel.has(x.id)}">${sIcon(x, 'sm')}${esc(x.name)}</button>`).join('')}</div>
+      <p class="small tm-scope-now"></p>
+      <div class="actions"><button type="button" class="primary tm-ssave">حفظ النطاق</button><button type="button" class="tm-scancel">إغلاق</button></div></div></td>`;
+    tr.after(row); btn.setAttribute('aria-expanded', 'true');
+    const now = () => { row.querySelector('.tm-scope-now').innerHTML = scopeText([...sel]); };
+    row.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => {
+      const on = !sel.has(b.dataset.sc); on ? sel.add(b.dataset.sc) : sel.delete(b.dataset.sc);
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); now();
+    });
+    row.querySelector('.tm-scancel').onclick = () => { row.remove(); btn.setAttribute('aria-expanded', 'false'); };
+    row.querySelector('.tm-ssave').onclick = async e => {
+      const b = e.currentTarget; if (b.disabled) return; b.disabled = true;
+      try {
+        const r = await api('/admin/team/scope', { method: 'POST', body: { id: u.id, subjects: [...sel] } });
+        u.subjects = r.subjects; tr.querySelector('.tm-scope').innerHTML = scopeText(r.subjects);
+        toast('حُفظ النطاق'); row.remove(); btn.setAttribute('aria-expanded', 'false');
+      } catch (err) { fail(err); b.disabled = false; }
+    };
+    now();
+  }
   // إسناد المعلم: المقررات التي يراها وطلابه الذين يتابع تقدمهم (يستبدل الإسناد السابق كاملًا)
   async function openAssign(tr, id, btn) {
     const next = tr.nextElementSibling;
@@ -931,6 +983,7 @@ export async function pageAdminTeam(ctx) {
       } catch (err) { fail(err); } finally { btn.disabled = false; }
     };
     tr.querySelector('.tm-assign-btn')?.addEventListener('click', e => openAssign(tr, id, e.currentTarget).catch(fail));
+    tr.querySelector('.tm-scope-btn')?.addEventListener('click', e => openScope(tr, all.find(u => u.id === id), e.currentTarget));
     tr.querySelector('.tm-reset').onclick = async () => {
       const pw = prompt('اكتب كلمة المرور الجديدة (8 أحرف على الأقل)، أو اتركها فارغة لتوليدها تلقائيًا:', '');
       if (pw === null) return;

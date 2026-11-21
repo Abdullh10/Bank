@@ -256,7 +256,7 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
   if (p === '/student/prep/restart') return rpc('student_prep_restart', { p_set: Number(body.set) });
   if (p === '/student/redeem') return rpc('student_redeem', { p_grades: Number(body.grades) || 1, p_course: body.course ? Number(body.course) : null });
   // ---------- المعلم والمشرف ----------
-  if (p === '/staff/comms') return method === 'GET' ? rpc('staff_list_comms', { p_course: course }) : rpc('staff_send_comm', { p: { ...body, course } });
+  if (p === '/staff/comms') return method === 'GET' ? rpc('staff_list_comms', { p_course: course, p_filter: { subject: f.subject || null, course: f.course || null, kind: f.kind || null } }) : rpc('staff_send_comm', { p: { ...body, course } });
   if (p === '/staff/comms/survey') return rpc('survey_results', { p_id: Number(f.id) });
   if (p === '/staff/comms/detail') return rpc('staff_comm_detail', { p_id: Number(f.id) });
   if (p === '/staff/comms/reopen') return rpc('staff_reopen_survey', { p_id: Number(body.id), p_days: Number(body.days) || 7 });
@@ -299,6 +299,8 @@ export async function supaApi(path, { method = 'GET', body = {} } = {}) {
     if (method === 'GET') return rpc('admin_get_teacher', { p_id: f.id });
     return rpc('admin_set_teacher', { p_id: body.id, p_courses: body.courses || [], p_students: body.students || [] });
   }
+  if (p === '/admin/team/scope') return rpc('admin_set_staff_subjects', { p_user: body.id, p_subjects: body.subjects || [] });
+  if (p === '/admin/compare') return rpc('admin_compare_subjects');
   if (p === '/admin/team/update') { await rpc('admin_update_staff', { p_id: body.id, p_name: body.name, p_role: body.role }); return { ok: true }; }
   // ---------- الملاحظات ولوحة المؤشرات ----------
   if (p === '/dashboard') return rpc('get_dashboard', { p_course: course });

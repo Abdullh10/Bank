@@ -1686,3 +1686,72 @@ dl.review dd { margin: 0; display: flex; align-items: center; gap: .4rem; flex-w
 @media print { .ctx { display: none !important; } }
 .tm-subj { margin: .5rem 0 .1rem; font-size: .82rem; color: var(--ink-2); font-weight: 600; }
 .tm-subj:first-of-type { margin-top: 0; }
+
+/* =====================================================================
+   تعدد المواد — المرحلة 4 (2026-11-19): تبويبات المواد للطالب، ونطاق المراجع، وتصفية الرسائل، ومقارنة المواد
+   ===================================================================== */
+/* تبويبات المواد أعلى صفحات الطالب (تظهر فقط لمن له مقررات في أكثر من مادة) */
+.st-subjects { display: flex; gap: .55rem; margin-bottom: 1rem; overflow-x: auto; padding: .15rem .1rem .35rem; scrollbar-width: thin; }
+.st-subj { flex: 1 1 0; min-width: 9.5rem; display: inline-flex; align-items: center; justify-content: flex-start; gap: .6rem; padding: .5rem .75rem .5rem 1rem;
+  border: 1.5px solid var(--line-2); border-radius: 16px; background: var(--surface); color: var(--ink-2); font-weight: 700; font-size: 1.02rem;
+  box-shadow: var(--shadow-sm); min-height: 60px; position: relative; overflow: hidden; }
+.st-subj .sicon { width: 40px; height: 40px; border-radius: 12px; box-shadow: none; opacity: .75; }
+@media (hover: hover) { .st-subj:not(.on):hover { background: var(--surface); border-color: color-mix(in srgb, var(--s) 45%, var(--line-2)); color: var(--ink); } }
+.st-subj.on { border-color: var(--s); background: var(--s-soft); color: var(--s); box-shadow: 0 0 0 3px color-mix(in srgb, var(--s) 16%, transparent); }
+.st-subj.on .sicon { opacity: 1; box-shadow: 0 6px 14px color-mix(in srgb, var(--s-tile) 30%, transparent); }
+.st-subj.on::after { content: ""; position: absolute; inset: auto 0 0 0; height: 4px; background: var(--s); }
+
+/* شارة مادة صغيرة (النطاق، مقرر الرسالة) */
+.subj-badge, .cm-course { display: inline-flex; align-items: center; gap: .3rem; padding-inline-start: .2rem; }
+.subj-badge.s-teal, .subj-badge.s-indigo, .subj-badge.s-green, .subj-badge.s-amber, .subj-badge.s-rose, .subj-badge.s-violet,
+.cm-course[class*=" s-"] { background: var(--s-soft); color: var(--s); border-color: color-mix(in srgb, var(--s) 30%, transparent); }
+.subj-badge .sicon.sm, .cm-course .sicon.sm { width: 18px; height: 18px; border-radius: 6px; }
+.subj-badge .sicon.sm svg, .cm-course .sicon.sm svg { width: 12px; height: 12px; }
+.tm-scope { margin-top: .3rem; display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; }
+.tm-scope-now { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; margin: .6rem 0 0; }
+.tab-sub { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px dashed var(--line-2); }
+.tab-sub h3 { margin: 0 0 .15rem; font-size: 1.02rem; color: var(--brand-2); }
+
+/* رسائل ومهام: تصفية «المُرسَل» وتنبيه مقرر الاستبانة */
+.cm-filter { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; margin-bottom: .8rem; }
+.cm-filter label { display: inline-flex; gap: .4rem; align-items: center; }
+.cm-filter select { width: auto; min-width: 8rem; }
+.sv-for { display: flex; gap: .55rem; align-items: flex-start; }
+.sv-for .sicon { margin-top: .1rem; }
+.sv-scope { font-weight: 700; color: var(--brand-2); }
+
+/* مقارنة المواد */
+.cmp-card { padding: .4rem; }
+table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 34rem; }
+table.cmp th, table.cmp td { padding: .6rem .8rem; text-align: start; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.cmp thead th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
+table.cmp tbody th { font-weight: 600; color: var(--ink); width: 13rem; }
+table.cmp tbody th .small { display: block; font-weight: 500; }
+table.cmp tbody tr:last-child > * { border-bottom: 0; }
+.cmp-h { font-size: 1.02rem; color: var(--s, var(--brand-2)); border-bottom: 3px solid var(--s, var(--line-2)) !important; }
+.cmp-h > span:last-child { display: inline-block; vertical-align: middle; margin-inline-start: .5rem; }
+.cmp-h .sicon { width: 34px; height: 34px; border-radius: 10px; vertical-align: middle; box-shadow: none; }
+.cmp-h .dots { display: inline-flex; vertical-align: middle; }
+.cmp-h .dots i { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--surface); margin-inline-start: -4px; background: var(--s-tile); }
+.cmp-group th { background: var(--surface-2); color: var(--ink-2) !important; font-size: .82rem; font-weight: 700; letter-spacing: .01em; padding-block: .4rem !important; }
+table.cmp td b { font-size: 1.08rem; color: var(--brand-2); }
+table.cmp td small { font-weight: 500; color: var(--ink-2); font-size: .8rem; }
+.cmp-bar { margin-top: .35rem; max-width: 12rem; }
+.cmp-up { color: var(--ok); } .cmp-down { color: var(--bad, #b3261e); }
+@media (max-width: 760px) {
+  .st-subj { min-width: 8rem; font-size: .95rem; min-height: 54px; }
+  .st-subj .sicon { width: 34px; height: 34px; }
+  table.cmp { min-width: 0; }
+  table.cmp th, table.cmp td { padding: .5rem .45rem; }
+  table.cmp tbody th { width: auto; min-width: 6.5rem; font-size: .88rem; }
+  table.cmp td b { font-size: .98rem; }
+  .cmp-h > span:last-child { display: block; margin: .25rem 0 0; font-size: .9rem; }
+  .cm-filter .chips { width: 100%; }
+}
+@media print { .cmp-card { box-shadow: none; } table.cmp thead th { position: static; } }
+.cm-item .in-head { justify-content: flex-start; gap: .3rem .5rem; }
+.cm-item .in-head > .small.muted { margin-inline-start: auto; }
+/* صندوق الإسناد والنطاق داخل جدول الحسابات العريض: يبقى ظاهرًا في عرض الهاتف مهما مُرِّر الجدول */
+@media (max-width: 760px) { .tm-assign-box { position: sticky; inset-inline-start: 0; max-width: calc(100vw - 4.6rem); } }
+.sc-act { text-align: end; }
+@media (max-width: 760px) { .page-head .actions { flex-wrap: wrap; } .page-head .actions > .cmp-link { order: 3; flex-basis: 100%; } }
