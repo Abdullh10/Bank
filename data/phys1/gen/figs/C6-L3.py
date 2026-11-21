@@ -116,7 +116,8 @@ vectors('c6l3-o02-triangle.svg', [
     {'from': (0, 0), 'to': (4, 6), 'color': C_VEL, 'dash': True}], w=380, h=260, unit=u, origin=o, grid=False, axes=False,
     extra=VA(o[0] - 82, o[1] - 4 * u, 'الطائرة بالنسبة') + T(o[0] - 75, o[1] - 4 * u + 20, 'إلى الهواء', 11, 'start', C_VEL) +
     VA(o[0] + 2 * u + 18, o[1] - 7 * u - 14, 'الهواء بالنسبة إلى الأرض') +
-    T(o[0] + 2 * u + 22, o[1] - 3 * u + 14, '؟', 20, 'start', C_VEL, 'bold') + DOT(o[0], o[1], 4, INK) + compass(290, 240, 36))
+    T(o[0] + 2 * u + 22, o[1] - 3 * u + 14, '؟', 20, 'start', C_VEL, 'bold') + DOT(o[0], o[1], 4, INK) + compass(290, 240, 36) +
+    ARROW(o[0] + 3.7 * u, o[1] - 5.55 * u, o[0] + 4 * u, o[1] - 6 * u, C_VEL, 2, 10))
 
 # mcq6: قارب في نهر؛ v_b/w عمودية على الضفة، وv_w/E موازية لها (ذيل بذيل كالشكل 6-14)
 b = RECT(0, 0, 420, 18, INK, '#8fb47a', 0) + RECT(0, 222, 420, 18, INK, '#8fb47a', 0) + RECT(0, 18, 420, 204, INK, '#dcecf7', 0)

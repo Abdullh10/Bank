@@ -99,29 +99,29 @@ def o01_table_stages():
 # ================= O02 =================
 def o02_top():
     w, h = 480, 300; b = GROUND(20, 460, 260)
-    pts = parab(50, 252, 190, 260, 190, 2 * 260 / 190); b += PATH(pts)
+    pts = parab(50, 252, 150, 260, 190, 2 * 260 / 190); b += PATH(pts)
     top = pts[30]; b += BALL(*top) + ARROW(top[0] + 10, top[1], top[0] + 70, top[1], C_VEL, 2.8) + V(top[0] + 80, top[1] + 6, 'v', C_VEL, 17, 'start')
     b += T(top[0], top[1] - 22, 'أعلى نقطة', 14, color=MUTED)
-    b += AXES(380, 120)
+    b += AXES(60, 90)
     save('c6l1-o02-top.svg', svg(w, h, b))
 
 
 def o02_three():
-    w, h = 520, 320; b = GROUND(20, 500, 280)
-    vx, vy, g = 190, 270, 190; t1 = 2 * vy / g
+    w, h = 540, 320; b = GROUND(20, 520, 280)
+    vx, vy, g = 160, 270, 190; t1 = 2 * vy / g
     pts = parab(50, 272, vx, vy, g, t1); b += PATH(pts)
     for k, lab in ((12, 'A'), (30, 'B'), (50, 'C')):
         t = t1 * k / 60; x, y = pts[k]; vyt = vy - g * t; sc = 0.28
         b += BALL(x, y) + ARROW(x, y, x + vx * sc, y - vyt * sc, C_VEL, 2.6, 10)
         b += T(x - 16, y + 24 if lab != 'B' else y - 16, lab, 16, weight='bold', italic=True)
-    b += AXES(430, 110)
+    b += AXES(450, 80)
     save('c6l1-o02-three.svg', svg(w, h, b))
 
 
 # ================= O03 =================
-def fbd_panels(name, panels, w=600, h=240, extra=''):
+def fbd_panels(name, panels, w=720, h=240, extra=''):
     """لوحات مخطط الجسم الحر مرقمة. panels = [ [ (ang, len, label), ... ], ... ]."""
-    n = len(panels); pw = w / n; b = ''
+    n = len(panels); pw = (w - 90) / n; b = AXES(w - 70, 200, 36) + L(w - 90, 12, w - 90, h - 12, GRID, 1.5)
     for i, forces in enumerate(panels):
         cx = pw * i + pw / 2; cy = 130
         b += NUMLAB(cx, 26, i + 1)
@@ -136,7 +136,7 @@ def fbd_panels(name, panels, w=600, h=240, extra=''):
 
 def o03_figs():
     G = (-90, 80, 'F_g')
-    fbd_panels('c6l1-o03-flight-fbds.svg', [[G], [G, (40, 70, 'F')], [], [G, (0, 70, 'F')]])
+    fbd_panels('c6l1-o03-flight-fbds.svg', [[G], [G, (40, 70, 'F')], [], [G, (0, 60, 'F')]])
     fbd_panels('c6l1-o03-top-fbds.svg', [[G, (90, 80, 'F')], [(0, 70, 'F')], [G], []])
     fbd_panels('c6l1-o03-ice-fbds.svg', [[G, (90, 80, 'F_N')], [G, (0, 70, 'F')], [G, (90, 45, 'F_N')], [G]])
     fbd_panels('c6l1-o03-air-fbds.svg', [[G, (40, 50, 'F_d')], [G], [G, (180, 50, 'F_d')], [G, (220, 50, 'F_d')]])
@@ -156,7 +156,7 @@ def o04_paths_ground():
         b += GROUND(pw * i + 8, pw * (i + 1) - 8, gy)
         if i == 0: pts = [(x0, gy), (x0 + 125, gy - 130)]
         elif i == 1: pts = [(x0, gy), (x0 + 62, gy - 120), (x0 + 124, gy)]
-        elif i == 2: pts = parab(x0, gy, 70, 150, 120, 2.5)
+        elif i == 2: pts = parab(x0, gy, 50, 150, 120, 2.5)
         else: pts = [(x0, gy), (x0 + 50, gy - 120), (x0 + 110, gy - 120), (x0 + 110, gy)]
         b += PATH(pts, INK, 2.4, '') + BALL(x0, gy - 7, 7)
     save('c6l1-o04-paths-ground.svg', svg(w, h, b))
@@ -172,7 +172,7 @@ def o04_paths_cliff():
         if i == 0: pts = [(sx, sy), (sx + 105, gy)]
         elif i == 1: pts = [(sx, sy), (sx + 85, sy), (sx + 85, gy)]
         elif i == 2: pts = parab(sx, sy, 105, 0, 2 * (gy - sy), 1.0)
-        else: pts = parab(sx, sy, 60, 60, 2 * 60 * 60 / 50, 1.75)
+        else: pts = parab(sx, sy, 50, 60, 2 * 60 * 60 / 50, 2.2)
         pts = [(x, min(y, gy)) for x, y in pts]
         b += PATH(pts, INK, 2.4, '') + BALL(sx - 8, sy, 7)
     save('c6l1-o04-paths-cliff.svg', svg(w, h, b))
@@ -186,7 +186,7 @@ def o05_strobe():
     x0, y0 = 60, 40; dx = 80
     for k in range(6):
         t = k * 0.1; b += BALL(x0 + dx * k, y0 + 4.9 * t * t * 100 * 1.0, 9)
-    b += T(260, 322, 'الصور ملتقطة كل 0.1 s', 14, color=MUTED)
+    b += T(260, 322, 'الصور ملتقطة كل \u202a0.1 s\u202c', 14, color=MUTED)
     save('c6l1-o05-strobe.svg', svg(w, h, b))
 
 
@@ -209,29 +209,29 @@ def o05_vx_graphs():
 
 
 # ================= O06 =================
-def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=520, h=330, axes=True, ratio=0.55):
-    gy = h - 50; top = 70; b = ''
+def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=560, h=330, axes=True, xr=200):
+    """جرف/بناية/طاولة يُقذف من حافتها جسم أفقيًا. pool = (x1_px, x2_px, land_px, lab1, lab2) بالبكسل من الحافة."""
+    gy = h - 50; top = 70; b = ''; X0 = 110
     if kind == 'table':
-        b += RECT(40, top, 170, 14, INK, '#d8c3a5') + RECT(196, top + 14, 12, gy - top - 14, INK, '#d8c3a5') + RECT(54, top + 14, 12, gy - top - 14, INK, '#d8c3a5')
-        ex = 210; ob = RECT(165, top - 22, 40, 16, INK, '#e07b39', 1.5) + DOT(174, top - 5, 4.5, INK, '#333') + DOT(196, top - 5, 4.5, INK, '#333')
+        b += RECT(X0, top, 170, 14, INK, '#d8c3a5') + RECT(X0 + 14, top + 14, 12, gy - top - 14, INK, '#d8c3a5') + RECT(X0 + 156, top + 14, 12, gy - top - 14, INK, '#d8c3a5')
+        ex = X0 + 170; ob = RECT(ex - 45, top - 22, 40, 16, INK, '#e07b39', 1.5) + DOT(ex - 36, top - 5, 4.5, INK, '#333') + DOT(ex - 14, top - 5, 4.5, INK, '#333')
         sx, sy = ex, top - 8
     else:
-        b += RECT(60, top, 140, gy - top, INK, '#d9d2c3' if kind == 'cliff' else '#dfe5ee', 1.8)
+        b += RECT(X0, top, 140, gy - top, INK, '#d9d2c3' if kind == 'cliff' else '#dfe5ee', 1.8)
         if kind == 'building':
             for r in range(5):
-                for c in range(3): b += RECT(78 + c * 40, top + 18 + r * 40, 22, 22, MUTED, '#fff', 1)
-        ex = 200; ob = ''; sx, sy = ex + 2, top - 9
+                for c in range(3): b += RECT(X0 + 18 + c * 40, top + 18 + r * 40, 22, 22, MUTED, '#fff', 1)
+        ex = X0 + 140; ob = ''; sx, sy = ex + 2, top - 9
     b += GROUND(20, w - 20, gy)
-    xr = (w - 110 - sx) * ratio / 0.55 if pool is None else pool[2] - sx
+    if pool: xr = pool[2]
     pts = parab(sx, sy, xr, 0, 2 * (gy - sy - 8), 1.0, 50); b += PATH(pts)
     if kind != 'table': b += BALL(sx, sy)
     b += ob
-    if vlab: b += ARROW(sx + 10, sy - 18, sx + 70, sy - 18, C_VEL, 2.8) + T(sx + 76, sy - 13, vlab, 15, 'start', C_VEL)
-    dx = 36 if kind == 'table' else 40
-    b += DIM_V(dx, top, gy, '', 'start') + T(dx + 10 if kind == 'table' else dx - 8, (top + gy) / 2 - 12, hlab, 15, 'start' if kind == 'table' else 'end')
-    if xlab: b += DIM_H(ex, pts[-1][0], gy + 24, xlab)
+    if vlab: b += ARROW(sx + 10, sy - 18, sx + 70, sy - 18, C_VEL, 2.8) + (V(sx + 78, sy - 12, vlab, C_VEL, 16, 'start') if vlab == 'v' else T(sx + 76, sy - 13, vlab, 15, 'start', C_VEL))
+    b += DIM_V(X0 - 24, top, gy, '') + T(X0 - 32, (top + gy) / 2 + 5, hlab, 15, 'end')
+    if xlab: b += DIM_H(ex, pts[-1][0], gy + 24, xlab, italic=(xlab == 'x'))
     if pool:
-        x1, x2 = pool[0], pool[1]
+        x1, x2 = ex + pool[0], ex + pool[1]
         b += f'<ellipse cx="{(x1 + x2) / 2:.1f}" cy="{gy:.1f}" rx="{(x2 - x1) / 2:.1f}" ry="9" fill="#9cc9ea" stroke="{INK}" stroke-width="1.5"/>'
         b += DIM_H(ex, x1, gy + 24, pool[3]) + DIM_H(ex, x2, gy + 50, pool[4])
     if axes: b += AXES(w - 80, 120)
@@ -241,9 +241,10 @@ def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=520, h=330, a
 def o06_figs():
     cliff_fig('c6l1-o06-cliff.svg', 'cliff', '44.1 m', '7.0 m/s')
     cliff_fig('c6l1-o06-building.svg', 'building', '45.0 m', '8.00 m/s', 'x')
-    cliff_fig('c6l1-o06-table-fall.svg', 'table', '0.784 m', 'v', ratio=0.3)
-    cliff_fig('c6l1-o06-table-car.svg', 'table', '1.10 m', None, '0.500 m', ratio=0.3)
-    cliff_fig('c6l1-o06-pool.svg', 'building', '40.0 m', '18.0 m/s', None, pool=(300, 420, 425, '30.0 m', '50.0 m'))
+    cliff_fig('c6l1-o06-table-fall.svg', 'table', '0.784 m', 'v', xr=90)
+    cliff_fig('c6l1-o06-table-car.svg', 'table', '1.10 m', None, '0.500 m', xr=100)
+    # المقياس 4.4 px/m: 30.0 m → 132، 50.0 m → 220، نقطة الهبوط 51.4 m → 226
+    cliff_fig('c6l1-o06-pool.svg', 'building', '40.0 m', '18.0 m/s', None, pool=(132, 220, 226, '30.0 m', '50.0 m'))
 
 
 # ================= O07 =================
@@ -282,7 +283,7 @@ def col_diagram(x, top, ups, downs, gap=14):
 
 
 def o07_vert_cols():
-    w, h = 600, 380; b = ''; pw = w / 4
+    w, h = 600, 420; b = ''; pw = w / 4
     ys = [330, 250, 190, 150, 130]          # مواقع الصعود (المسافات تتناقص)
     good_up = [(ys[0], 75), (ys[1], 56), (ys[2], 38), (ys[3], 19), (ys[4], 0)]
     good_dn = [(ys[3], 19), (ys[2], 38), (ys[1], 56), (ys[0], 75)]
@@ -315,7 +316,7 @@ def o07_combined():
 
 
 def o07_separate():
-    w, h = 560, 380; b = ''
+    w, h = 560, 440; b = ''
     # الحركة الأفقية: صف أعلى
     y = 50; xs = [70 + 52 * k for k in range(9)]
     for x in xs: b += DOT(x, y, 4.5) + ARROW(x, y, x + 40, y, C_VEL, 2.3, 8)
@@ -346,7 +347,7 @@ def o08_paths4():
             b += RECT(x0, 60, 60, 10, INK, '#d8c3a5')
             b += PATH([(x0 + 80, 64), (x0 + 80, gy)], INK, 2.2, '') + BALL(x0 + 80, 58, 7)
         elif i == 2:   # يُقذف من الأرض بزاوية
-            pts = parab(x0, gy - 7, 70, 140, 140, 2.0); b += PATH(pts, INK, 2.2, '') + BALL(x0, gy - 7, 7)
+            pts = parab(x0, gy - 7, 60, 140, 140, 2.0); b += PATH(pts, INK, 2.2, '') + BALL(x0, gy - 7, 7)
             b += ARROW(x0 + 2, gy - 12, x0 + 30, gy - 68, C_VEL, 2.4, 9)
         else:   # يُقذف رأسيًا إلى أعلى
             b += PATH([(x0 + 60, gy - 7), (x0 + 60, 50)], INK, 2.2, '') + PATH([(x0 + 72, 50), (x0 + 72, gy - 7)], INK, 2.2, '4 4')
@@ -367,7 +368,7 @@ def o09_launch():
 
 def o09_points():
     w, h = 520, 310; b = GROUND(20, 500, 270)
-    vx, vy, g = 180, 260, 180; t1 = 2 * vy / g
+    vx, vy, g = 160, 260, 180; t1 = 2 * vy / g
     pts = parab(50, 262, vx, vy, g, t1); b += PATH(pts)
     for k, lab, dy in ((12, 'A', 26), (48, 'C', -16)):
         x, y = pts[k]; b += BALL(x, y) + T(x + (-18 if lab == 'A' else 20), y + (6 if lab == 'A' else -8), lab, 17, weight='bold', italic=True)
@@ -383,7 +384,7 @@ def o09_acc4():
     for i in range(4):
         x0 = pw * i + 20; b += NUMLAB(pw * i + pw / 2, 22, i + 1)
         if i: b += L(pw * i, 10, pw * i, h - 10, GRID, 1.5)
-        vx, vy, g = 58, 125, 100; t1 = 2 * vy / g; pts = parab(x0, gy, vx, vy, g, t1, 60); b += PATH(pts, MUTED, 1.6)
+        vx, vy, g = 48, 125, 100; t1 = 2 * vy / g; pts = parab(x0, gy, vx, vy, g, t1, 60); b += PATH(pts, MUTED, 1.6)
         for k in (10, 30, 50):
             t = t1 * k / 60; x, y = pts[k]; b += DOT(x, y, 4)
             vyt = vy - g * t

@@ -51,6 +51,11 @@ def AC(x, y, color=C_ACC, size=17):
             f'<tspan dy="0.3em" font-size="{int(size * 0.72)}" font-weight="normal" font-style="normal">c</tspan><tspan dy="-0.3em"></tspan></text>')
 
 
+def EQ(x, y, sym, val, color=INK, italic=True, size=14):
+    """رمز (مائل للكمية القياسية، أو قائم مثل T الزمن الدوري كما في الكتاب) ثم «= القيمة والوحدة» بخط قائم."""
+    return T(x - 2, y, sym, size + 1, 'end', color, italic=italic) + T(x + 2, y, '= ' + val, size, 'start', color)
+
+
 def CENTER(cx, cy):
     return DOT(cx, cy, 3.5, INK)
 
@@ -137,12 +142,12 @@ def tri_pair(name, with_circle):
     dth = 40
     if with_circle:
         cx, cy, R = 150, 170, 120; b += CIRC(cx, cy, R, INK, 1.6) + CENTER(cx, cy)
-        a1, a2 = 70, 30
+        a1, a2 = 85, 25
         p1, p2 = pol(cx, cy, a1, R), pol(cx, cy, a2, R)
         b += ARROW(cx, cy, *p1, C_DISP, 2.6) + ARROW(cx, cy, *p2, C_DISP, 2.6) + ARROW(*p1, *p2, C_DISP, 2.6)
         b += LAB(cx, cy, a1 + 8, R * 0.55, 'r_1', C_DISP) + LAB(cx, cy, a2 - 10, R * 0.55, 'r_2', C_DISP)
-        mx, my = (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2; b += V(mx + 26, my - 6, 'Δr', C_DISP)
-        b += ARC(cx, cy, 34, a2, a1) + T(*pol(cx, cy, 50, 50), 'Δθ', 14, italic=True)
+        mx, my = (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2; b += V(mx - 18, my + 22, 'Δr', C_DISP)
+        b += ARC(cx, cy, 34, a2, a1) + T(*pol(cx, cy, 55, 52), 'Δθ', 14, italic=True)
         for (px, py), ang, lab in ((p1, a1, 'v_1'), (p2, a2, 'v_2')):
             b += AR(px, py, ang - 90, 62, C_VEL, 2.6) + LAB(px, py, ang - 90, 80, lab, C_VEL)
         b += MOTION(cx, cy, R, 120, 95)
@@ -161,11 +166,11 @@ def tri_pair(name, with_circle):
     cx, cy = ox + 30, (h - 60) if with_circle else 200; L2 = 150
     q1, q2 = pol(cx, cy, 20 + dth, L2), pol(cx, cy, 20, L2)
     if with_circle:  # رسم v_1 وv_2 من نقطة واحدة باتجاهيهما في الدائرة (70−90 = −20، 30−90 = −60)
-        q1, q2 = pol(cx, cy + -150, -20, L2), pol(cx, cy - 150, -60, L2); cy = cy - 150
+        q1, q2 = pol(cx, cy + -170, -5, L2), pol(cx, cy - 170, -65, L2); cy = cy - 170
         b += ARROW(cx, cy, *q1, C_VEL, 2.6) + ARROW(cx, cy, *q2, C_VEL, 2.6) + ARROW(*q1, *q2, C_VEL, 2.6)
-        b += LAB(cx, cy, -14, L2 * 0.55, 'v_1', C_VEL, dy=-14) + LAB(cx, cy, -66, L2 * 0.5, 'v_2', C_VEL, dx=-16)
+        b += LAB(cx, cy, 0, L2 * 0.55, 'v_1', C_VEL, dy=-16) + LAB(cx, cy, -70, L2 * 0.5, 'v_2', C_VEL, dx=-18)
         b += V((q1[0] + q2[0]) / 2 + 26, (q1[1] + q2[1]) / 2 + 4, 'Δv', C_VEL)
-        b += ARC(cx, cy, 40, -60, -20) + T(*pol(cx, cy, -40, 58), 'Δθ', 14, italic=True)
+        b += ARC(cx, cy, 40, -65, -5) + T(*pol(cx, cy, -35, 58), 'Δθ', 14, italic=True)
     else:
         b += ARROW(cx, cy, *q1, C_VEL, 2.6) + ARROW(cx, cy, *q2, C_VEL, 2.6) + ARROW(*q1, *q2, C_VEL, 2.6)
         b += LAB(cx, cy, 20 + dth + 6, L2 * 0.5, 'v_1', C_VEL, dx=-8) + LAB(cx, cy, 20 - 8, L2 * 0.5, 'v_2', C_VEL, dy=6)
@@ -185,8 +190,8 @@ def o04_ab():
 
 
 def o04_equarter():
-    w, h = 440, 360; cx, cy, R = 200, 210, 120; b = CIRC(cx, cy, R) + CENTER(cx, cy) + COMPASS(375, 70, 28)
-    b += MOTION(cx, cy, R, 30, 60)
+    w, h = 440, 360; cx, cy, R = 200, 210, 120; b = CIRC(cx, cy, R) + CENTER(cx, cy) + COMPASS(360, 300, 28)
+    b += MOTION(cx, cy, R, 35, 55)
     for ang, lab, pl in ((0, 'v_1', 'P_1'), (90, 'v_2', 'P_2')):
         x, y = pol(cx, cy, ang, R); b += DOT(x, y, 6) + AR(x, y, ang + 90, 80, C_VEL)
         b += LAB(x, y, ang + 90, 98, lab, C_VEL, dx=(24 if ang == 0 else 0), dy=(0 if ang == 0 else -16))
@@ -256,17 +261,16 @@ def o07_net():
 
 
 def car_rear(name, labels=True, centre_note=True):
-    w, h = 460, 340; cx, cy = 230, 170; b = ''
-    b += L(40, 290, 420, 290, INK, 3)
-    b += f'<rect x="{cx - 70}" y="{cy - 50}" width="140" height="90" rx="14" fill="#eef2f8" stroke="{INK}" stroke-width="2"/>'
-    b += RECT(cx - 62, 260, 26, 30, INK, '#555', 1) + RECT(cx + 36, 260, 26, 30, INK, '#555', 1)
-    b += L(cx - 49, 235, cx - 49, 260, INK, 2) + L(cx + 49, 235, cx + 49, 260, INK, 2)
+    w, h = 460, 380; cx, cy = 230, 170; b = ''
+    b += L(40, 320, 420, 320, INK, 3)
+    b += f'<rect x="{cx - 80}" y="{cy - 45}" width="160" height="125" rx="14" fill="#eef2f8" stroke="{INK}" stroke-width="2"/>'
+    b += RECT(cx - 72, 290, 26, 30, INK, '#555', 1) + RECT(cx + 46, 290, 26, 30, INK, '#555', 1)
     b += DOT(cx, cy, 6)
     b += AR(cx, cy, 90, 110, C_FORCE) + AR(cx, cy, -90, 110, C_FORCE) + AR(cx, cy, 180, 120, C_FORCE)
     if labels:
         b += V(cx + 26, cy - 100, 'F_N', C_FORCE) + V(cx + 26, cy + 112, 'F_g', C_FORCE) + V(cx - 120, cy - 12, 'f_f', C_FORCE)
     if centre_note:
-        b += ARROW(150, 320, 50, 320, MUTED, 1.6, 9) + T(160, 325, 'نحو مركز المنعطف', 13, 'start', MUTED)
+        b += ARROW(150, 355, 50, 355, MUTED, 1.6, 9) + T(160, 360, 'نحو مركز المنعطف', 13, 'start', MUTED)
     save(name, svg(w, h, b))
 
 
@@ -297,7 +301,7 @@ def o08_target():
         x, y = pol(cx, cy, ang, R); b += DOT(x, y, 6) + T(x + dx, y + dy, lab, 16, weight='bold')
     tx, ty = cx + R, 50
     b += CIRC(tx, ty, 22, RED, 3, fill='#fff') + CIRC(tx, ty, 12, RED, 3) + DOT(tx, ty, 3, RED) + T(tx + 34, ty + 5, 'الهدف', 14, 'start')
-    b += COMPASS(390, 330, 28)
+    b += COMPASS(80, 110, 28)
     save('c6l2-o08-target.svg', svg(w, h, b))
 
 
@@ -323,10 +327,10 @@ def o09_force():
 
 
 def o09_stopper():
-    w, h = 420, 330; cx, cy, R = 180, 170, 120; b = CIRC(cx, cy, R) + DOT(cx, cy, 5)
-    x, y = pol(cx, cy, 0, R); b += L(cx, cy, x, y, C_DISP, 2.2) + T(cx + 60, cy - 10, 'r = 0.75 m', 14, color=C_DISP)
-    b += RECT(x - 7, y - 9, 14, 18, INK, '#777', 1.5) + T(x + 16, y + 5, 'm = 20 g', 14, 'start')
-    b += MOTION(cx, cy, R, 30, 65) + T(cx, cy + R + 36, 'T = 1.5 s', 14)
+    w, h = 420, 360; cx, cy, R = 180, 170, 120; b = CIRC(cx, cy, R) + DOT(cx, cy, 5)
+    x, y = pol(cx, cy, 0, R); b += L(cx, cy, x, y, C_DISP, 2.2) + EQ(cx + 50, cy - 10, 'r', '0.75 m', C_DISP)
+    b += RECT(x - 7, y - 9, 14, 18, INK, '#777', 1.5) + EQ(x + 34, y + 5, 'm', '20 g')
+    b += MOTION(cx, cy, R, 30, 65) + EQ(cx, cy + R + 36, 'T', '1.5 s', italic=False)
     save('c6l2-o09-stopper.svg', svg(w, h, b))
 
 
@@ -358,9 +362,9 @@ def car_top(name, paths=True):
         b += DASHL(x + 8, y - 4, x + 8, y - 175) + NUM(x + 8, y - 192, 1)
         b += DASHL(x + 8, y - 4, x + 130, y - 4) + NUM(x + 148, y - 4, 2)
         b += NUM(cx + 40, cy - Rr - 4, 3)
-        b += DASHL(x + 8, y - 4, x - 90, y - 4) + NUM(x - 108, y - 4, 4)
-    b += CENTER(cx, cy) + T(cx, cy + 22, 'مركز المنعطف', 13, color=MUTED)
-    save(name, svg(w, h, b))
+        b += DASHL(x + 8, y - 4, x - 70, y - 4) + NUM(x - 88, y - 4, 4)
+    b += CENTER(cx, cy) + T(cx - 10, cy + 26, 'مركز المنعطف', 13, color=MUTED)
+    save(name, svg(w, h + 50, f'<g transform="translate(0,50)">{b}</g>'))
 
 
 # ================= O12 =================
@@ -394,7 +398,7 @@ def o12_ewheel():
 # ================= O13 =================
 def numbered_arrows(name, ang, ccw, order):
     """order: قائمة الاتجاهات بالترتيب 1..4 من بين 'fwd' (مماسي مع الحركة)، 'in'، 'out'، 'back'."""
-    w, h = 440, 380; cx, cy, R = 200, 200, 105; b = CIRC(cx, cy, R) + CENTER(cx, cy)
+    w, h = 480, 400; cx, cy, R = 240, 200, 105; b = CIRC(cx, cy, R) + CENTER(cx, cy)
     b += MOTION(cx, cy, R, ang + (150 if ccw else -150), ang + (190 if ccw else -190))
     x, y = pol(cx, cy, ang, R); b += DOT(x, y, 7)
     tf = ang + (90 if ccw else -90)
@@ -413,7 +417,10 @@ def o13_panels():
         x, y = pol(cx, cyc, 0, R); b += DOT(x, y, 6)
         b += AR(x, y, dv, 54, C_VEL, 2.8, 10) + LAB(x, y, dv, 70, 'v', C_VEL, dx=(12 if dv == 90 else 0), dy=(0 if dv == 90 else -14))
         b += AR(x, y, da, 40, C_ACC, 2.8, 10)
-        lx, ly = pol(x, y, da, 54); b += AC(lx + (8 if da == 0 else (-6 if da == 180 else -14)), ly + (20 if da in (0, 180) else 6))
+        lx, ly = pol(x, y, da, 40)
+        if da == 0: b += AC(lx - 4, ly - 10)
+        elif da == 180: b += AC(lx + 4, ly + 22)
+        else: b += AC(lx - 16, ly + 14)
         b += NUM(cx + 20, 220, i + 1)
     save('c6l2-o13-panels.svg', svg(w, h, b))
 
@@ -456,7 +463,7 @@ def o14_evert():
     w, h = 380, 400; cx, cy, R = 190, 200, 130; b = CIRC(cx, cy, R, INK, 1.5, '6 5') + DOT(cx, cy, 6, INK, '#fff')
     for ang, lab in ((90, 'العليا'), (270, 'السفلى')):
         x, y = pol(cx, cy, ang, R); b += L(cx, cy, x, y, INK, 2) + DOT(x, y, 10, INK, '#aaa')
-        b += T(x + 22, y + 5, 'النقطة ' + lab, 13, 'start')
+        b += T(x, y + (-18 if ang == 90 else 30), 'النقطة ' + lab, 13)
     b += T(cx - 26, cy - 60, '0.60 m', 14) + MOTION(cx, cy, R, 170, 200)
     save('c6l2-o14-e-vert.svg', svg(w, h, b))
 
