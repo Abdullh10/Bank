@@ -2,7 +2,7 @@ import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..')
 # رسوم الدرس 6-1 (حركة المقذوف) — الأهداف O10–O17
 # كالكتاب (ص163–165): مركّبتا السرعة v_x وv_y حمراوان، والسرعة المحصلة حمراء متقطعة، والتسارع بنفسجي رأسي إلى أسفل فقط.
 # لا تُكتب الكمية المطلوبة على الرسم.
-import math
+import math, re
 
 G = 9.80
 
@@ -68,6 +68,15 @@ def axes_xy(x, y, n=44):
             T(x + n + 4, y + 5, '+x', 14, 'start', MUTED, italic=True) + T(x, y - n - 6, '+y', 14, 'middle', MUTED, italic=True))
 
 
+def EQ(x, y, sym, rest, color=INK, size=14, anchor='start', vec=True):
+    """رمز (متجه: عريض مائل، أو قياسي: مائل) يتبعه نص قائم (= قيمة ووحدة)."""
+    t = T(0, 0, sym, size, 'start', color, 'bold' if vec else 'normal', True)
+    inner = re.search(r'>(.*)</text>$', t, re.S).group(1)
+    w = 'bold' if vec else 'normal'
+    return (f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}" font-size="{size}" fill="{color}" {MATHFONT}>'
+            f'<tspan font-weight="{w}" font-style="italic">{inner}</tspan><tspan font-weight="normal" font-style="normal">{esc(rest)}</tspan></text>')
+
+
 def letter(px, py, s, dx=0, dy=-12): return T(px + dx, py + dy, s, 16, 'middle', INK, 'bold')
 
 
@@ -88,11 +97,11 @@ def o10():
 
     # مساران بالسرعة نفسها 20.0 m/s بزاويتين 30.0° و60.0°
     sc = Proj(560, 300, (50, 255), 6.6); sc.ground(-1, 76)
-    for th, c, d in [(30.0, BLUE, '7 5'), (60.0, ORANGE, '3 4')]:
+    for th, c, d in [(30.0, INK, '7 5'), (60.0, ORANGE, '3 4')]:
         vx, vy = 20 * math.cos(math.radians(th)), 20 * math.sin(math.radians(th)); sc.path(vx, vy, color=c, dash=d, w=2.4)
     x0, y0 = sc.P(0, 0)
-    sc.raw(arc(x0, y0, 40, 0, 30) + T(x0 + 56, y0 - 8, '30.0°', 13, 'start') + arc(x0, y0, 62, 30, 60) + T(x0 + 30, y0 - 70, '60.0°', 13, 'start'))
-    sc.raw(T(250, 90, 'المسار (2): الزاوية ‎60.0°', 14, 'start', ORANGE) + T(300, 205, 'المسار (1): الزاوية ‎30.0°', 14, 'start', BLUE))
+    sc.raw(arc(x0, y0, 60, 0, 30) + T(x0 + 66, y0 - 7, '30.0°', 13, 'start') + arc(x0, y0, 26, 0, 60) + L(x0 + 8, y0 - 24, x0 - 6, y0 - 38, INK, 1) + T(x0 - 8, y0 - 40, '60.0°', 13, 'end'))
+    sc.raw(T(250, 90, 'المسار (2): الزاوية ‎60.0°‎', 14, 'start', ORANGE) + T(300, 205, 'المسار (1): الزاوية ‎30.0°‎', 14, 'start', INK))
     sc.raw(T(280, 285, 'مقدار السرعة الابتدائية في المسارين ‎20.0 m/s', 14, 'middle', INK))
     sc.save('c6l1-o10-two-angles.svg')
 
@@ -190,7 +199,7 @@ def o12():
 # ---------- O13 ----------
 def o13():
     sc = Proj(560, 300, (50, 250), 13.0); sc.ground(-1, 37)
-    vx, vy = 12.0, 14.0; sc.path(vx, vy, color=BLUE, dash='7 5', w=2.4)
+    vx, vy = 12.0, 14.0; sc.path(vx, vy, color=MUTED, dash='7 5', w=2.4)
     # مسار مع مقاومة الهواء (نموذج نوعي: تخميد خطي)
     k = 0.35; pts = []
     for i in range(400):
@@ -198,7 +207,7 @@ def o13():
         if y < 0 and t > 0.1: break
         pts.append(sc.P(x, y))
     sc.raw(f'<polyline points="{" ".join(f"{a:.1f},{b:.1f}" for a, b in pts)}" fill="none" stroke="{ORANGE}" stroke-width="2.4"/>')
-    xa, ya = sc.at(vx, vy, 2.3); sc.raw(T(xa + 16, ya - 6, '(1)', 15, 'start', BLUE, 'bold'))
+    xa, ya = sc.at(vx, vy, 2.3); sc.raw(T(xa + 16, ya - 6, '(1)', 15, 'start', MUTED, 'bold'))
     xb, yb = pts[len(pts) * 3 // 4]; sc.raw(T(xb - 34, yb + 4, '(2)', 15, 'end', ORANGE, 'bold'))
     x0, y0 = sc.P(0, 0); sc.raw(DOT(x0, y0, 5, INK))
     sc.raw(T(280, 286, 'الكرة نفسها أُطلقت بالسرعة الابتدائية نفسها في الحالتين', 13, 'middle', INK))
@@ -208,9 +217,9 @@ def o13():
 # ---------- O14 ----------
 def o14():
     # صور متتالية بفترات زمنية متساوية: A تسقط من السكون، وB تُقذف أفقيًا
-    w, h = 460, 400; b = ''; x0, y0 = 90, 40; sy = 1000 / 9.8 * 0.6
+    w, h = 460, 480; b = ''; x0, y0 = 90, 50
     for i in range(6):
-        y = y0 + 13.0 * i * i
+        y = y0 + 16.0 * i * i
         b += L(30, y, w - 20, y, GRID, 1.2, '4 4') + DOT(x0, y, 6.5, INK, '#cfd8e3') + DOT(x0 + 55 + i * 55, y, 6.5, '#b9770e', '#f4d03f')
     b += T(x0, h - 10, 'A', 16, 'middle', INK, 'bold') + T(x0 + 55, y0 - 18, 'B', 16, 'middle', INK, 'bold')
     b += ARROW(x0 + 70, y0 - 18, x0 + 120, y0 - 18, C_VEL, 2.4) + V(x0 + 126, y0 - 13, 'v_x', C_VEL, 15, 'start')
@@ -225,18 +234,20 @@ def o14():
     vxx = 3.0
     for i in range(4):
         t = 0.1 * i; x = ox + vxx * t * sx; y = oy + 0.5 * G * t * t * sx
-        b += DOT(x, y, 7, '#b9770e', '#f4d03f') + T(x, oy - 10, f'{vxx * t:.2f}', 13)
+        b += DOT(x, y, 7, '#b9770e', '#f4d03f') + T(x, oy - 10, f'{vxx * t:.2f}', 13) + T(x + 11, y + 19, f'({i + 1})', 12, 'start', MUTED)
+    b += T(ox - 12, oy + 5, 'B', 15, 'end', INK, 'bold')
     b += T(ox - 8, oy - 26, 'x (m)', 13, 'start', MUTED, italic=True)
     b += T(w / 2, h - 30, 'الفترة الزمنية بين كل صورتين متتاليتين ‎0.10 s', 14, 'middle', INK) + T(w / 2, h - 10, 'طول ضلع المربع في الشبكة ‎0.10 m', 14, 'middle', INK)
     save('c6l1-o14-grid.svg', svg(w, h, b))
 
     # طاولة وكرتان تتدحرجان عن حافتها
-    w, h = 440, 280; b = RECT(40, 110, 200, 14, INK, '#c8a97e') + RECT(60, 124, 14, 120, INK, '#c8a97e') + RECT(206, 124, 14, 120, INK, '#c8a97e')
-    b += L(20, 244, w - 20, 244, INK, 2.5)
-    b += DOT(200, 98, 11, INK, '#cfd8e3') + ARROW(214, 98, 254, 98, C_VEL, 2.4) + T(258, 103, '1.0 m/s', 13, 'start', C_VEL) + T(186, 90, 'A', 15, 'end', INK, 'bold')
-    b += DOT(200, 58, 11, '#b9770e', '#f4d03f') + ARROW(214, 58, 294, 58, C_VEL, 2.4) + T(298, 63, '2.0 m/s', 13, 'start', C_VEL) + T(186, 50, 'B', 15, 'end', INK, 'bold')
-    b += T(220, 270, 'تغادر الكرتان حافة الطاولة في اللحظة نفسها', 13, 'middle', INK)
-    b += dimv(250, 124, 244, '1.22 m', INK, 'start', 8)
+    # طاولتان متماثلتان ارتفاع كل منهما 1.22 m
+    w, h = 560, 280; b = L(20, 244, w - 20, 244, INK, 2.5)
+    for dx, lab, fill, edge, v, n in [(0, 'A', '#cfd8e3', INK, '1.0 m/s', 40), (270, 'B', '#f4d03f', '#b9770e', '2.0 m/s', 80)]:
+        b += RECT(30 + dx, 110, 150, 14, INK, '#c8a97e') + RECT(46 + dx, 124, 12, 120, INK, '#c8a97e') + RECT(156 + dx, 124, 12, 120, INK, '#c8a97e')
+        b += DOT(166 + dx, 98, 11, edge, fill) + ARROW(180 + dx, 98, 180 + dx + n, 98, C_VEL, 2.4) + T(180 + dx + n / 2, 88, v, 13, 'middle', C_VEL) + T(150 + dx, 92, lab, 15, 'end', INK, 'bold')
+        b += dimv(196 + dx, 124, 244, '1.22 m', INK, 'start', 8)
+    b += T(w / 2, 270, 'تغادر الكرتان حافتي الطاولتين في اللحظة نفسها', 13, 'middle', INK)
     save('c6l1-o14-table.svg', svg(w, h, b))
 
 
@@ -252,7 +263,7 @@ def o15():
     x0, y0 = sc.P(0, 0); xr, _ = sc.P(R, 0)
     xa, ya = sc.at(vx, vy, 0.9); sc.raw(ARROW(xa - 50, ya - 30, xa - 6, ya - 4, INK, 1.6, 9) + T(xa - 56, ya - 32, '(1)', 15, 'end', INK, 'bold'))
     sc.raw(dimh(x0, xr, y0 + 26, '(2)'))
-    sc.raw(T(x0 - 8, y0 - 10, 't = 0 s', 13, 'end', MUTED, italic=True) + T(xr + 8, y0 - 10, 't = 2.9 s', 13, 'start', MUTED, italic=True))
+    sc.raw(EQ(x0 - 8, y0 - 10, 't', ' = 0 s', MUTED, 13, 'end', vec=False) + EQ(xr + 8, y0 - 10, 't', ' = 2.9 s', MUTED, 13, vec=False))
     sc.raw(DOT(x0, y0, 5, INK) + DOT(xr, y0, 5, INK)); sc.save('c6l1-o15-blanks.svg')
 
 
@@ -263,13 +274,13 @@ def o16():
     ta = (vy - 6.0) / G; xa, ya = sc.at(vx, vy, ta); xe, ye = sc.at(vx, vy, Tf - ta)
     sc.raw(L(xa - 30, ya, xe + 30, ye, MUTED, 1.2, '3 4'))
     sc.raw(comps(xa, ya, vx, 6.0, k, lab=False) + letter(xa, ya, 'A', -14, 18))
-    sc.raw(T(xa + vx * k + 6, ya + 20, 'v_x = 8.0 m/s', 14, 'start', C_VEL, italic=True) + T(xa - 8, ya - 3 * k - 4, 'v_y = 6.0 m/s', 14, 'end', C_VEL, italic=True))
+    sc.raw(EQ(xa + vx * k + 6, ya + 20, 'v_x', ' = 8.0 m/s', C_VEL) + EQ(xa - 8, ya - 3 * k - 4, 'v_y', ' = 6.0 m/s', C_VEL, anchor='end'))
     sc.raw(DOT(xe, ye, 6, INK) + letter(xe, ye, 'E', 14, -8)); sc.raw(axes_xy(520, 90)); sc.save('c6l1-o16-AE.svg')
 
     vx, vy = 10.0, 13.72
     sc = Proj(520, 260, (50, 220), 11.0); sc.ground(-1, 40); sc.path(vx, vy)
-    xt, yt = sc.at(vx, vy, vy / G); sc.raw(DOT(xt, yt, 5, INK) + T(xt, yt - 12, 't = 1.4 s', 14, 'middle', INK, italic=True))
-    x0, y0 = sc.P(0, 0); sc.raw(DOT(x0, y0, 5, INK) + T(x0 + 4, y0 + 20, 't = 0 s', 14, 'middle', INK, italic=True))
+    xt, yt = sc.at(vx, vy, vy / G); sc.raw(DOT(xt, yt, 5, INK) + EQ(xt, yt - 12, 't', ' = 1.4 s', INK, anchor='middle', vec=False))
+    x0, y0 = sc.P(0, 0); sc.raw(DOT(x0, y0, 5, INK) + EQ(x0 + 4, y0 + 20, 't', ' = 0 s', INK, anchor='middle', vec=False))
     sc.save('c6l1-o16-times.svg')
 
     vx, vy = 6.0, 14.7; k = 3.2
@@ -278,8 +289,8 @@ def o16():
     for t, s, lab in pts:
         x, y = sc.at(vx, vy, t); vyt = vy - G * t
         if s in 'AB': sc.raw(ARROW(x, y, x, y - vyt * k, C_VEL, 2.4, 9) + T(x - 8, y - vyt * k / 2, lab, 13, 'end', C_VEL))
-        elif s == 'C': sc.raw(T(x, y - 30, 'v_y = ' + lab, 13, 'middle', C_VEL, italic=False))
-        else: sc.raw(T(x + 12, y - (4 if s == 'D' else 24), 'v_y = ?', 13, 'start', C_VEL))
+        elif s == 'C': sc.raw(EQ(x, y - 30, 'v_y', ' = ' + lab, C_VEL, 13, 'middle'))
+        else: sc.raw(EQ(x + 12, y - (4 if s == 'D' else 24), 'v_y', ' = ?', C_VEL, 13))
         sc.raw(DOT(x, y, 5, INK) + letter(x, y, s, 12 if s in 'AB' else (0 if s == 'C' else -12), 18 if s != 'C' else -12))
     sc.raw(L(*sc.at(vx, vy, 0.5), *sc.at(vx, vy, 2.5), MUTED, 1.2, '3 4'))
     sc.raw(axes_xy(530, 90)); sc.save('c6l1-o16-heights.svg')
@@ -296,11 +307,11 @@ def o17():
     w, h = 560, 330; b = plane(120, 50) + ARROW(185, 54, 245, 54, C_VEL, 2.6) + V(250, 60, 'v', C_VEL, 16, 'start')
     b += L(20, 300, w - 20, 300, INK, 2.5); x0, y0 = 120, 66
     b += DOT(x0, y0, 5, '#8e5b2a', '#c39b6a')
-    b += L(x0, y0 + 6, x0, 298, BLUE, 2, '6 4') + T(x0 + 10, 250, '(1)', 15, 'start', BLUE, 'bold')
+    b += L(x0, y0 + 6, x0, 298, INK, 2, '6 4') + T(x0 + 10, 250, '(1)', 15, 'start', INK, 'bold')
     pts = [(x0 + 330 * (i / 40), y0 + 232 * (i / 40) ** 2) for i in range(41)]
     b += f'<polyline points="{" ".join(f"{a:.1f},{c:.1f}" for a, c in pts)}" fill="none" stroke="{ORANGE}" stroke-width="2" stroke-dasharray="7 5"/>' + T(x0 + 310, 250, '(2)', 15, 'end', ORANGE, 'bold')
     pts = [(x0 - 90 * (i / 40), y0 + 232 * (i / 40) ** 2) for i in range(41)]
-    b += f'<polyline points="{" ".join(f"{a:.1f},{c:.1f}" for a, c in pts)}" fill="none" stroke="{GREEN}" stroke-width="2" stroke-dasharray="2 4"/>' + T(x0 - 96, 250, '(3)', 15, 'end', GREEN, 'bold')
+    b += f'<polyline points="{" ".join(f"{a:.1f},{c:.1f}" for a, c in pts)}" fill="none" stroke="{MUTED}" stroke-width="2" stroke-dasharray="2 4"/>' + T(x0 - 96, 250, '(3)', 15, 'end', MUTED, 'bold')
     save('c6l1-o17-plane.svg', svg(w, h, b))
 
     # حافلة تتحرك بسرعة ثابتة وراكب يقذف كرة رأسيًا إلى أعلى

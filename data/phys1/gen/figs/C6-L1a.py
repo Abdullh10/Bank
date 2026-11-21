@@ -113,7 +113,7 @@ def o02_three():
     for k, lab in ((12, 'A'), (30, 'B'), (50, 'C')):
         t = t1 * k / 60; x, y = pts[k]; vyt = vy - g * t; sc = 0.28
         b += BALL(x, y) + ARROW(x, y, x + vx * sc, y - vyt * sc, C_VEL, 2.6, 10)
-        b += T(x - 16, y + 24 if lab != 'B' else y - 16, lab, 16, weight='bold', italic=True)
+        b += T(x - 16, y + 24 if lab != 'B' else y - 16, lab, 16, italic=True)
     b += AXES(450, 80)
     save('c6l1-o02-three.svg', svg(w, h, b))
 
@@ -197,7 +197,7 @@ def o05_vx_graphs():
         b += NUMLAB(pw * i + pw / 2, 24, i + 1)
         if i: b += L(pw * i, 10, pw * i, h - 10, GRID, 1.5)
         b += ARROW(L0, B0, R0, B0, INK, 1.8, 9) + ARROW(L0, B0, L0, T0 - 6, INK, 1.8, 9)
-        b += T(R0 - 2, B0 + 18, 't (s)', 13, 'end', MUTED, italic=True)
+        b += T(R0 - 24, B0 + 18, 't', 13, 'end', MUTED, italic=True) + T(R0 - 2, B0 + 18, '(s)', 13, 'end', MUTED)
         b += V(L0 - 6, T0 + 4, 'v_x', C_VEL, 14, 'end')
         if i == 0: pts = [(L0, T0 + 20), (R0 - 14, B0 - 20)]
         elif i == 1: pts = [(L0, B0 - 50), (R0 - 14, B0 - 50)]
@@ -209,7 +209,7 @@ def o05_vx_graphs():
 
 
 # ================= O06 =================
-def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=560, h=330, axes=True, xr=200):
+def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=560, h=330, axes=True, xr=200, tcut=1.0):
     """جرف/بناية/طاولة يُقذف من حافتها جسم أفقيًا. pool = (x1_px, x2_px, land_px, lab1, lab2) بالبكسل من الحافة."""
     gy = h - 50; top = 70; b = ''; X0 = 110
     if kind == 'table':
@@ -224,7 +224,7 @@ def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=560, h=330, a
         ex = X0 + 140; ob = ''; sx, sy = ex + 2, top - 9
     b += GROUND(20, w - 20, gy)
     if pool: xr = pool[2]
-    pts = parab(sx, sy, xr, 0, 2 * (gy - sy - 8), 1.0, 50); b += PATH(pts)
+    pts = parab(sx, sy, xr, 0, 2 * (gy - sy - 8), tcut, 50); b += PATH(pts)
     if kind != 'table': b += BALL(sx, sy)
     b += ob
     if vlab: b += ARROW(sx + 10, sy - 18, sx + 70, sy - 18, C_VEL, 2.8) + (V(sx + 78, sy - 12, vlab, C_VEL, 16, 'start') if vlab == 'v' else T(sx + 76, sy - 13, vlab, 15, 'start', C_VEL))
@@ -239,12 +239,13 @@ def cliff_fig(name, kind, hlab, vlab=None, xlab=None, pool=None, w=560, h=330, a
 
 
 def o06_figs():
-    cliff_fig('c6l1-o06-cliff.svg', 'cliff', '44.1 m', '7.0 m/s')
-    cliff_fig('c6l1-o06-building.svg', 'building', '45.0 m', '8.00 m/s', 'x')
+    # المقياس الرأسي 210 px لكامل الارتفاع؛ المدى الأفقي بالمقياس نفسه تقريبًا
+    cliff_fig('c6l1-o06-cliff.svg', 'cliff', '44.1 m', '7.0 m/s', xr=100)
+    cliff_fig('c6l1-o06-building.svg', 'building', '45.0 m', '8.00 m/s', 'x', xr=113)
     cliff_fig('c6l1-o06-table-fall.svg', 'table', '0.784 m', 'v', xr=90)
     cliff_fig('c6l1-o06-table-car.svg', 'table', '1.10 m', None, '0.500 m', xr=100)
     # المقياس 4.4 px/m: 30.0 m → 132، 50.0 m → 220، نقطة الهبوط 51.4 m → 226
-    cliff_fig('c6l1-o06-pool.svg', 'building', '40.0 m', '18.0 m/s', None, pool=(132, 220, 226, '30.0 m', '50.0 m'))
+    cliff_fig('c6l1-o06-pool.svg', 'building', '40.0 m', '18.0 m/s', None, pool=(132, 220, 226, '30.0 m', '50.0 m'), tcut=0.55)  # المسار مقطوع في الهواء كي لا يكشف مكان السقوط
 
 
 # ================= O07 =================
@@ -320,7 +321,7 @@ def o07_separate():
     # الحركة الأفقية: صف أعلى
     y = 50; xs = [70 + 52 * k for k in range(9)]
     for x in xs: b += DOT(x, y, 4.5) + ARROW(x, y, x + 40, y, C_VEL, 2.3, 8)
-    b += V(250, y + 26, 'v_x', C_VEL, 16) + T(250, y + 50, 'a_x = 0', 15, italic=True, color=C_ACC)
+    b += V(250, y + 26, 'v_x', C_VEL, 16) + V(246, y + 50, 'a_x', C_ACC, 15, 'end') + T(250, y + 50, '= 0', 15, 'start', C_ACC)
     # الحركة الرأسية: عمود يسار
     ys = [350, 250, 175, 125, 100]
     ups = [(ys[0], 70), (ys[1], 52), (ys[2], 35), (ys[3], 18), (ys[4], 0)]
@@ -367,11 +368,11 @@ def o09_launch():
 
 
 def o09_points():
-    w, h = 520, 310; b = GROUND(20, 500, 270)
+    w, h = 530, 310; b = GROUND(20, 515, 270)
     vx, vy, g = 160, 260, 180; t1 = 2 * vy / g
     pts = parab(50, 262, vx, vy, g, t1); b += PATH(pts)
     for k, lab, dy in ((12, 'A', 26), (48, 'C', -16)):
-        x, y = pts[k]; b += BALL(x, y) + T(x + (-18 if lab == 'A' else 20), y + (6 if lab == 'A' else -8), lab, 17, weight='bold', italic=True)
+        x, y = pts[k]; b += BALL(x, y) + T(x + (-18 if lab == 'A' else 20), y + (6 if lab == 'A' else -8), lab, 17, italic=True)
     # سهم اتجاه الحركة على المسار
     x1, y1 = pts[22]; x2, y2 = pts[25]; b += ARROW(x1, y1 - 18, x2 + 4, y2 - 20, MUTED, 1.6, 8)
     b += T((x1 + x2) / 2, y1 - 34, 'اتجاه الحركة', 13, color=MUTED)
@@ -399,24 +400,7 @@ def o09_acc4():
     save('c6l1-o09-acc4.svg', svg(w, h, b))
 
 
-def o09_student():
-    w, h = 560, 330; b = GROUND(20, 540, 300)
-    vx, vy, g = 170, 260, 170; t1 = 2 * vy / g
-    pts = parab(50, 292, vx, vy, g, t1); b += PATH(pts, MUTED, 1.6)
-    sc = 0.3
-    for k, lab, vxs in ((10, 'A', 1.0), (30, 'B', 0.6), (50, 'C', 0.3)):
-        t = t1 * k / 60; x, y = pts[k]; vyt = vy - g * t
-        b += DOT(x, y, 4.5) + ARROW(x, y, x + vx * sc * vxs, y, C_VEL, 2.6, 9)
-        if abs(vyt) > 1: b += ARROW(x, y, x, y - vyt * sc, C_VEL, 2.6, 9)
-        b += FA(x, y, -60, 46, '', C_ACC)
-        b += T(x - 16, y - 8, lab, 16, weight='bold', italic=True)
-    x, y = pts[10]
-    b += V(x + vx * sc / 2, y - 10, 'v_x', C_VEL, 15) + V(x - 14, y - 40, 'v_y', C_VEL, 15, 'end') + V(x + 32, y + 40, 'a', C_ACC, 15, 'start')
-    b += AXES(450, 110)
-    save('c6l1-o09-student.svg', svg(w, h, b))
-
-
 if __name__ == '__main__':
     o01_table_stages(); o02_top(); o02_three(); o03_figs(); o04_paths_ground(); o04_paths_cliff()
     o05_strobe(); o05_vx_graphs(); o06_figs(); o07_horiz_rows(); o07_vert_cols(); o07_combined(); o07_separate()
-    o08_paths4(); o09_launch(); o09_points(); o09_acc4(); o09_student()
+    o08_paths4(); o09_launch(); o09_points(); o09_acc4()
