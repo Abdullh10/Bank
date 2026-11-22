@@ -1,0 +1,1410 @@
+{
+ "course": {
+  "subject": "الفيزياء",
+  "code": "فيزياء 3-2",
+  "grade": "الثالث الثانوي",
+  "term": "الثاني",
+  "country": "السعودية"
+ },
+ "source": {
+  "file": "تحليل محتوى مادة فيزياء 3-2 مسارات — الهيئة الملكية بالجبيل وينبع (PDF، 9 وحدات)",
+  "structure_basis": "ملف الأهداف المرفق من المستخدم بتاريخ 2026-11-22",
+  "content_basis": "",
+  "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف. مستوى الهدف من عمود «مستوى الهدف» في thinking_level_source.",
+  "option_count": 4
+ },
+ "chapters": [
+  {
+   "number": 1,
+   "title": "الكهرباء التيارية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "التيار الكهربائي والدوائر الكهربائية",
+     "objectives": [
+      {
+       "id": "P32-C1-L1-O01",
+       "text": "ان يوضح الطالب المقصود بالمفاهيم التالية: الدائرة الكهربائية، البطارية، القدرة، شدة التيار الكهربائي، الامبير",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O02",
+       "text": "ان يذكر الطالب مكونات الدائرة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O03",
+       "text": "ان يحل الطالب مسائل حسابية على قانون حساب القدرة في الدائرة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O04",
+       "text": "ان يذكر الطالب نص قانون اوم",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O05",
+       "text": "ان يطبق الطالب قانون اوم في حل مسائل",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O06",
+       "text": "ان يذكر الطالب العوامل التي تعتمد عليها مقاومة موصل",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O07",
+       "text": "ان يوضح الطالب كيفية التحكم في شدة التيار في دائرة كهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O08",
+       "text": "ان يذكر الطالب امثلة على المقاومة المتغيرة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O09",
+       "text": "ان يوضح الطالب تأثير التيار الكهربائي على جسم الانسان",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O10",
+       "text": "ان يرسم الطالب رسوماً تخطيطية للدوائر الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O11",
+       "text": "ان يوضح الطالب المقصود بالتوصيل على التوازي، التوصيل على التوالي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O12",
+       "text": "ان يوضح الطالب المقصود بالمفاهيم التالية: حفظ الشحنة ، حفظ الطاقة في الدائرة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O13",
+       "text": "ان يوضح الطالب المقصود بالمقاومة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "استخدام الطاقة الكهربائية",
+     "objectives": [
+      {
+       "id": "P32-C1-L2-O01",
+       "text": "ان يحل الطالب مسائل حسابية على تحولات الطاقة الكهربائية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L2-O02",
+       "text": "ان يوضح الطالب المقصود بالنواقل فائقة التوصيل",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L2-O03",
+       "text": "ان يستكشف الطالب طرائق نقل الطاقة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L2-O04",
+       "text": "ان يعرف الطالب الكيلوواط. ساعة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C1-L2-O05",
+       "text": "ان يحل الطالب مسائل حسابية على حساب تكلفة عمل الاجهزة الكهربائية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "دوائر التوالي والتوازي الكهربائية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "الدوائر الكهربائية البسيطة",
+     "objectives": [
+      {
+       "id": "P32-C2-L1-O01",
+       "text": "أن يصف الطالب دوائر التوالي الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O02",
+       "text": "أن يصف الطالب دوائر التوازي الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O03",
+       "text": "أن يحسب الطالب كلاً من التيار والهبوط في الجهد والمقاومة المكافئة في دوائر التوالي الكهربائية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O04",
+       "text": "أن يحسب الطالب كلاً من التيارات والجهد والمقاومة المكافئة في دوائر التوازي الكهربائية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O05",
+       "text": "أن يقارن الطالب بين التوصيل على التوالي والتوصيل على التوازي في الدوائر الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O06",
+       "text": "أن يعرف الطالب مجزىء الجهد – المقاومة المكافئة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O07",
+       "text": "أن يذكر الطالب الهدف من توصيل المقاومات على التوالي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O08",
+       "text": "أن يذكر الطالب الهدف من توصيل المقاومات على التوازي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O09",
+       "text": "أن يوضح الطالب تأثير إضافة أجهزة جديدة على دوائر التوالي الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O10",
+       "text": "أن يوضح الطالب تأثير إضافة أجهزة جديدة على دوائر التوازي الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تطبيقات الدوائر الكهربائية",
+     "objectives": [
+      {
+       "id": "P32-C2-L2-O01",
+       "text": "أن يعرف الطالب دائرة القصر – المنصهر الكهربائي – قاطع الدائرة الكهربائية – قاطع التفريغ الأرضي الخاطئ – الدائرة الكهربائية المركبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O02",
+       "text": "أن يوضح الطالب كيف تعمل المنصهرات وقواطع الدوائر الكهربائية وقواطع التفريغ الأرضي على حماية أسلاك التوصيلات الكهربائية في المنازل",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O03",
+       "text": "أن يوضح الطالب كيف يوصل المنصهر الكهربائي بمصدر الجهد لحماية الأجهزة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O04",
+       "text": "أن يقارن الطالب بين الأميتر والفولتميتر في الدوائر الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O05",
+       "text": "أن يحل الطالب مسائل حسابية على الدوائر الكهربائية المركبة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O06",
+       "text": "أن يذكر الطالب سبب تصميم الأميتر بمقاومة داخلية صغيرة جداً",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O07",
+       "text": "أن يذكر الطالب سبب تصميم الفولتميتر بمقاومة داخلية كبيرة جداً",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "المجالات المغناطيسية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "المغانط: الدائمة والمؤقتة",
+     "objectives": [
+      {
+       "id": "P32-C3-L1-O01",
+       "text": "أن يصف الطالب خصائص المغانط",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O02",
+       "text": "أن يشرح الطالب كيفية الحصول على مغانط مؤقته",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O03",
+       "text": "أن يعرف الطالب المجال المغناطيسي – التدفق المغناطيسي - المغناطيس الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O04",
+       "text": "أن يحدد الطالب اتجاه خطوط المجال المغناطيسي الدائم",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O05",
+       "text": "أن يصف الطالب شكل المجال المغناطيسي الناشئ حول سلك مستقيم يمر به تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O06",
+       "text": "أن يذكر الطالب العوامل المؤثرة في شدة المجال المغناطيسي الناشئ حول سلك مستقيم يمر به تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O07",
+       "text": "أن يذكر الطالب القاعدة التي تحدد اتجاه المجال المغناطيسي الناشئ حول سلك مستقيم يمر به تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O08",
+       "text": "أن يذكر الطالب العوامل المؤثرة في شدة المجال المغناطيسي الناشئ حول ملف لولبي يمر به تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O09",
+       "text": "أن يذكر الطالب القاعدة التي تحدد اتجاه المجال المغناطيسي الناشئ حول ملف لولبي يمر به تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O10",
+       "text": "أن يوضح الطالب أقطاب المغناطيس الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O11",
+       "text": "أن يعرف الطالب المنطقة المغناطيسية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "القوى الناتجة عن المجالات المغناطيسية",
+     "objectives": [
+      {
+       "id": "P32-C3-L2-O01",
+       "text": "أن يذكر الطالب سبب حركة سلك مستقيم يسري فيه تيار وضع عمودياً في مجال مغناطيسي منتظم",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O02",
+       "text": "أن يذكر الطالب العوامل المؤثرة في القوة المغناطيسية عند مرور تيار كهربائي في سلك مستقيم موضوع داخل مجال مغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O03",
+       "text": "أن يوضح الطالب القاعدة التي تحدد اتجاه القوة المغناطيسية عند مرور تيار كهربائي في سلك مستقيم موضوع داخل مجال مغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O04",
+       "text": "أن يحل الطالب مسائل حسابية على القوة التي يؤثر بها مجال مغناطيسي في أسلاك يسري فيها تيارات كهربائية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O05",
+       "text": "أن يحل الطالب مسائل حسابية على القوة التي يؤثر بها مجال مغناطيسي في جسيمات مشحونة متحركة في مجال مغناطيسي",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O06",
+       "text": "أن يحدد الطالب اتجاه القوة المغناطيسية من خلال الرسم",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O07",
+       "text": "أن يذكر الطالب تطبيق عملي على القوة المؤثرة في سلك يسري فيه تيار كهربائي موضوع في مجال مغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O08",
+       "text": "أن يعرف الطالب الجلفانومتر – المحرك الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O09",
+       "text": "أن يوضح الطالب كيف يمكن تحويل الجلفانومتر إلى أميتر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O10",
+       "text": "أن يوضح الطالب كيف يمكن تحويل الجلفانومتر إلى فولتميتر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O11",
+       "text": "أن يصف الطالب تصميم المحرك الكهربائي ومبدأ عمله",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O12",
+       "text": "أن يذكر الطالب العوامل المؤثرة في القوة المغناطيسية عندما يتحرك جسيم مشحون داخل مجال مغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O13",
+       "text": "أن يوضح الطالب القاعدة التي تحدد اتجاه القوة المغناطيسية عندما يتحرك جسيم مشحون داخل مجال مغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "الحث الكهرومغناطيسي",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "التيار الكهربائي الناتج عن تغير المجالات المغناطيسية",
+     "objectives": [
+      {
+       "id": "P32-C4-L1-O01",
+       "text": "أن يوضح الطالب كيف يعمل النغير في المجال المغناطيسي على توليد تيار كهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O02",
+       "text": "أن يذكر الطالب القاعدة التي تحدد اتجاه التيار الكهربائي المتولد بسبب التغير في المجال المغناطيسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O03",
+       "text": "أن يعرف الطالب الحث الكهرومغناطيسي – القوة الدافعة الكهربائية – المولد الكهربائي – التيار المتناوب",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O04",
+       "text": "أن يذكر الطالب العوامل المؤثرة في القوة الدافعة الكهربائية الحثية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O05",
+       "text": "أن يذكر الطالب تطبيق عملي على القوة الدافعة الكهربائية الحثية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O06",
+       "text": "أن يحل الطالب مسائل حسابية على القوة الدافعة الكهربائية الحثية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O07",
+       "text": "أن يحدد الطالب اتجاه التيار الكهربائي المتولد في سلك يتحرك عمودياً على مجال مغناطيسي من خلال الرسم",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O08",
+       "text": "أن يصف الطالب تصميم المولد الكهربائي ومبدأ عمله",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O09",
+       "text": "أن يحل الطالب مسائل حسابية على التيار الفعال والجهد الفعال",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "تغيّر المجالات المغناطيسية يولد قوة دافعة كهربائية حثية",
+     "objectives": [
+      {
+       "id": "P32-C4-L2-O01",
+       "text": "أن يذكر الطالب نص قانون لنز",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O02",
+       "text": "أن يحدد الطالب اتجاه التيار الحثي المتولد في الملف من خلال الرسم",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O03",
+       "text": "أن يعرف الطالب القوة الدافعة الكهربائية الحثية العكسية – الحث الذاتي – المحول الكهربائي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O04",
+       "text": "أن يذكر الطالب تطبيقات على قانون لنز",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O05",
+       "text": "أن يصف الطالب تركيب المحول الكهربائي ومبدأ عمله",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O06",
+       "text": "أن يقارن الطالب بين أنواع المحول خافض الجهد والمحول رافع الجهد",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O07",
+       "text": "أن يعدد الطالب استخدامات المحولات الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O08",
+       "text": "أن يحل الطالب مسائل حسابية على قانون المحول الكهربائي",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "title": "الكهرومغناطيسية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "تفاعلات المجالات الكهربائية والمغناطيسية والمادة",
+     "objectives": [
+      {
+       "id": "P32-C5-L1-O01",
+       "text": "ان يوضح الطالب مفتاح فهم سلوك الموجات الكهرومغناطيسية من خلال فهم طبيعة الالكترون",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O02",
+       "text": "ان يعرف الطالب أنبوب أشعة المهبط",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O03",
+       "text": "أن يشرح الطالب تجربة تومسون مع الالكترونات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O04",
+       "text": "أن يشرح الطالب تجربة تومسون مع البروتونات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O05",
+       "text": "أن يحل الطالب مسائل تتضمن التفاعل بين الجسيمات والمجالات الكهربائية والمغناطيسية في انبوب أشعة المهبط",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O06",
+       "text": "أن يعرف الطالب النظائر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O07",
+       "text": "أن يشرح الطالب كيف يعمل مطياف الكتلة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O08",
+       "text": "أن يعدد الطالب استخدامات مطياف الكتلة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O09",
+       "text": "أن يحل الطالب مسائل تتضمن التفاعل بين الجسيمات والمجالات الكهربائية والمغناطيسية في مطياف الكتلة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "المجالات الكهربائية والمغناطيسية في الفضاء",
+     "objectives": [
+      {
+       "id": "P32-C5-L2-O01",
+       "text": "أن يوضح الطالب خصائص الموجات الكهرومغناطيسية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O02",
+       "text": "أن يحل الطالب مسائل حسابية تتضمن خصائص الموجات الكهرومغناطيسية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O03",
+       "text": "أن يصف الطالب كيف تنتشر الموجات الكهرومغناطيسية في الفضاء",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O04",
+       "text": "أن يعدد الطالب طرق توليد الموجات الكهرومغناطيسية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O05",
+       "text": "أن يشرح الطالب كيفية توليد موجات كهرومغناطيسية باستخدام ملف ومكثف كهربائي يتصلان معاً على التوالي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O06",
+       "text": "أن يعرف الطالب الطيف الكهرومغناطيسي والاشعاع الكهرومغناطيسي والكهرباء الإجهادية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O07",
+       "text": "أن يوضح الطالب سبب استخدام بلورات الكوارتز عادة في الساعات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O08",
+       "text": "أن يشرح الطالب استقبال الموجات الكهرومغناطيسية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O09",
+       "text": "أن يشرح الطالب طريقة انبعاث الأشعة السينية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "title": "نظرية الكم",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "النموذج الجسيمي للموجات",
+     "objectives": [
+      {
+       "id": "P32-C6-L1-O01",
+       "text": "أن يصف الطالب الطيف المنبعث من جسم ساخن.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O02",
+       "text": "أن يشرح الطالب نظرية بلانك.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O03",
+       "text": "أن يفسر الطالب التأثير الكهروضوئي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O04",
+       "text": "أن يوضح الطالب فشل نظرية الموجات الكهرومغناطيسية في تفسير التأثير الكهروضوئي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O05",
+       "text": "أن يفسر الطالب نظرية اينشتاين في تفسير التأثير الكهروضوئي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O06",
+       "text": "أن يذكر الطالب تطبيقات على ظاهرة التاثير الكهروضوئي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O07",
+       "text": "أن يحل الطالب مسائل تتضمن قوانين التأثير الكهروضوئي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O08",
+       "text": "أن يوضح الطالب كيف يمكن اختبار نظرية اينشتاين.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O09",
+       "text": "أن يشرح الطالب تأثير كومبتون.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "موجات المادة",
+     "objectives": [
+      {
+       "id": "P32-C6-L2-O01",
+       "text": "أن يعرف الطالب طول موجة دي برولي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L2-O02",
+       "text": "أن يشرح الطالب تجربتان أثبتت نتائجهما أن الالكترونات تحيد تماماً كالضوء.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L2-O03",
+       "text": "أن يحل الطالب مسائل حسابية تتضمن معادلة دي برولي.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C6-L2-O04",
+       "text": "أن يوضح الطالب مبدأ عدم التحديد لهيزنبرج.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 7,
+   "title": "الذرة",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "نموذج بور الذري",
+     "objectives": [
+      {
+       "id": "P32-C7-L1-O01",
+       "text": "أن يشرح الطالب تجربة راذرفورد مع صفيحة الذهب",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O02",
+       "text": "أن يذكر الطالب نتائج تجربة راذرفورد مع صفيحة الذهب",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O03",
+       "text": "أن يذكر الطالب سبب استخدام راذرفورد شاشة مطلية بطبقة من كبريتات الزنك في تجربته مع صفيحة الذهب",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O04",
+       "text": "أن يذكر الطالب وظيفة جهاز المطياف",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O05",
+       "text": "أن يقارن الطالب بين الطيف المنبعث من غاز والطيف المنبعث من جسم ساخن",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O06",
+       "text": "أن يذكر الطالب استخدامات طيف الانبعاث",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O07",
+       "text": "أن يوضح الطالب طيف الامتصاص",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O08",
+       "text": "أن يوضح الطالب سبب وجود بعض الخطوط المعتمة في طيف ضوء الشمس",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O09",
+       "text": "أن يوضح الطالب كيف يمكن تحديد مكونات الغلاف الشمسي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O10",
+       "text": "أن يشرح الطالب كيف ينتج طيف الامتصاص للغازات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O11",
+       "text": "أن يذكر الطالب الاستخدامات الصناعية للتحليل الطيفي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O12",
+       "text": "أن يوضح الطالب سبب دراسة الطيف الذري لذرة الهيدروجين بدقة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O13",
+       "text": "أن يذكر الطالب سلبيات نموذج راذرفورد",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O14",
+       "text": "أن يعرف الطالب مستوى الطاقة – حالة الاستقرار – حالة الاثارة – الطاقة الصفرية – طاقة التأين",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O15",
+       "text": "أن يوضح الطالب ما الذي يحدد طاقة الذرة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O16",
+       "text": "أن يوضح الطالب سبب أن طاقة الإلكترون في المستويات القريبة من النواة أقل من طاقة الإلكترون في المستويات البعيدة عن النواة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O17",
+       "text": "أن يصف الطالب نموذج بور للذرة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O18",
+       "text": "أن يذكر الطالب عيوب نموذج بور للذرة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O19",
+       "text": "أن يحل الطالب مسائل على نصف قطر المستوى ومعادلات مستويات الطاقة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O20",
+       "text": "أن يوضح الطالب سبب أن طاقة الذرة في نموذج بور ذات قيمة سالبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O21",
+       "text": "أن يذكر الطالب سلاسل طيف الانبعاث لذرة الهيدروجين",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O22",
+       "text": "أن يذكر الطالب مميزات نموذج بور",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "النموذج الكمي للذرة",
+     "objectives": [
+      {
+       "id": "P32-C7-L2-O01",
+       "text": "أن يذكر الطالب أوجه القصور في نموذج بور.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O02",
+       "text": "أن يعرف الطالب النموذج الكمي.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O03",
+       "text": "أن يصف الطالب النموذج الكمي للذرة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O04",
+       "text": "أن يعرف الطالب السحابة الالكترونية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O05",
+       "text": "أن يوضح الطالب المقصود بميكانيكا الكم",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O06",
+       "text": "أن يعدد الطالب النجاحات التي حققتها ميكانيكا الكم",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O07",
+       "text": "أن يقارن الطالب بين الضوء المترابط والضوء الغير مترابط",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O08",
+       "text": "أن يذكر الطالب طرق اثارت الذرات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O09",
+       "text": "أن يقارن الطالب بين الانبعاث التلقائي والانبعاث المحفز",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O10",
+       "text": "أن يذكر الطالب شروط الانبعاث المحفز",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O11",
+       "text": "أن يعرف الطالب الليزر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O12",
+       "text": "أن يوضح الطالب كيف تثار ذرات الليزر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O13",
+       "text": "أن يوضح الطالب سبب ان ضوء الليزر مترابط",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O14",
+       "text": "أن يوضح الطالب سبب ان ضوء الليزر له الطول الموجي نفسه",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O15",
+       "text": "أن يوضح الطالب تطبيقات الليزر",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 8,
+   "title": "إلكترونات الحالة الصلبة",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "التوصيل الكهربائي في المواد الصلبة",
+     "objectives": [
+      {
+       "id": "P32-C8-L1-O01",
+       "text": "ان يوضح الطالب طريقة عمل انابيب التفريغ",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O02",
+       "text": "ان يعرف الطالب أشباه الموصلات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O03",
+       "text": "ان يوضح الطالب مميزات الادوات الالكترونية المصنوعة من اشباه الموصلات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O04",
+       "text": "ان يوضح الطالب نظرية الاحزمة للمواد الصلبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O05",
+       "text": "ان يذكر الطالب الهدف من نظرية الاحزمة للمواد الصلبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O06",
+       "text": "ان يقارن الطالب بين فجوات الطاقة في عدة مواد ؟",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O07",
+       "text": "ان يصف الطالب الموصلات وفق نظرية الاحزمة للمواد الصلبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O08",
+       "text": "ان يحل الطالب مسائل حسابية على كثافة الالكترونات الحرة في موصل",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O09",
+       "text": "ان يصف الطالب العوازل وفق نظرية الاحزمة للمواد الصلبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O10",
+       "text": "ان يصف الطالب أشباه الموصلات وفق نظرية الاحزمة للمواد الصلبة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O11",
+       "text": "ان يعلل الطالب انخفاض موصلية أشباه الموصلات النقية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O12",
+       "text": "ان يحل الطالب مسائل حسابية على حساب عدد الالكترونات الحرة الموجودة في كل ذرة من شبه الموصل النقي",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O13",
+       "text": "ان يوضح الطالب المقصود بأشباه الموصلات المعالجة ، الشوائب",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O14",
+       "text": "ان يوضح الطالب تأثير إضافة شوائب خماسية التكافؤ او شوائب ثلاثية التكافؤ الى شبه الموصل النقي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O15",
+       "text": "ان يوضح الطالب طريقة عمل المجسات الحرارية ومقاييس الضوء",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O16",
+       "text": "ان يحل الطالب مسائل حسابية على اشباه الموصلات المعالجة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الأدوات الإلكترونية",
+     "objectives": [
+      {
+       "id": "P32-C8-L2-O01",
+       "text": "ان يوضح الطالب المقصود بالدايود",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O02",
+       "text": "ان يوضح الطالب خصائص الدايود",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O03",
+       "text": "ان يوضح الطالب طريقة عمل الدايودات المشعة للضوء",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O04",
+       "text": "ان يذكر الطالب استخدامات الدايودات المشعة للضوء",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O05",
+       "text": "ان يحل الطالب مسائل حسابية على الدايود",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O06",
+       "text": "ان يعرف الطالب الترانزستور",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O07",
+       "text": "ان يوضح الطالب طرق توصيل الدايود في الدائرة الكهربائية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O08",
+       "text": "ان يوضح الطالب انواع الترانزستور",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O09",
+       "text": "ان يحل الطالب مسائل حسابية على كسب التيار في الترانزستور",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O10",
+       "text": "ان يوضح الطالب المقصود بالرقائق الميكروية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O11",
+       "text": "ان يوضح الطالب دور كل من: الفيزيائيين ، و الكيميائيين ، والمهندسين في صناعة الكترونيات أشباه الموصلات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "number": 9,
+   "title": "الفيزياء النووية",
+   "lessons": [
+    {
+     "number": 1,
+     "title": "النواة",
+     "objectives": [
+      {
+       "id": "P32-C9-L1-O01",
+       "text": "ان يوضح الطالب المقصود بالعدد الذري ، العدد الكتلي ، النظائر ، النويدة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O02",
+       "text": "ان يحل الطالب مسائل حسابية على مكونات النواة.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O03",
+       "text": "ان يحدد الطالب شحنة النواة الكلية وكتلة النواة ووحدة الكتل الذرية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O04",
+       "text": "ان يفسر الطالب ما الذي يحافظ على نيوكلوينات النواة معاً",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O05",
+       "text": "ان يوضح الطالب المقصود بالقوة النووية القوية ، النيوكلوينات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O06",
+       "text": "ان يوضح الطالب المقصود : بطاقة الربط النووية ، فرق الكتلة.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O07",
+       "text": "ان يحسب الطالب الطاقة الناتجة من وحدة كتل ذرية (1 u)",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O08",
+       "text": "ان يحل الطالب مسائل حسابية على طاقة الربط النووية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 2,
+     "title": "الاضمحلال النووي والتفاعلات النووية",
+     "objectives": [
+      {
+       "id": "P32-C9-L2-O01",
+       "text": "ان يصف الطالب ثلاث انماط للانحلال الاشعاعي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O02",
+       "text": "ان يعرف الطالب التفاعل النووي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O03",
+       "text": "ان يحل الطالب معادلات نووية",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O04",
+       "text": "ان يوضح الطالب المقصود بعمر النصف ، والنشاطية الاشعاعية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O05",
+       "text": "ان يذكر الطالب استخدامات عمر النصف للنظائر المشعة",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O06",
+       "text": "ان يحسب الطالب كمية المادة المشعة المتبقة ونشاطها بعد فترة زمنية محددة",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O07",
+       "text": "ان يوضح الطالب المقصود بالنشاط الاشعاعي الاصطناعي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O08",
+       "text": "ان يعرف الطالب التفاعل الانشطاري ، الاندماج النووي ، التفاعل المتسلسل",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O09",
+       "text": "ان يصف الطالب عمل المفاعل النووي",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O10",
+       "text": "ان يحسب الطاقة الناتجة من التفاعل النووي .",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      }
+     ]
+    },
+    {
+     "number": 3,
+     "title": "وحدات بناء المادة",
+     "objectives": [
+      {
+       "id": "P32-C9-L3-O01",
+       "text": "ان يوضح الطالب تركيب المسارعات الخطية ، والسنكروترون",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O02",
+       "text": "ان يذكر الطالب استخدام المسارعات الخطية ، والسنكروترون",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O03",
+       "text": "ان يصف الطالب دور المجال الكهربائي والمجال المغناطيسي في السنكروترون",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O04",
+       "text": "ان يذكر الطالب الطرائق الثلاث للكشف عن الجسيمات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O05",
+       "text": "ان يقارن الطالب بين الجسيم وضديده",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O06",
+       "text": "ان يفسر الطالب تولد بعض الجسيمات في التفاعلات النووية.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O07",
+       "text": "ان يذكر الطالب بعض الأمثلة على جسيمات تتولد في التفاعلات النووية",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O08",
+       "text": "ان يوضح الطالب المقصود بالنموذج المعياري ، الكواركات ، اللبتونات .",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O09",
+       "text": "ان يوضح الطالب المقصود بحاملات القوة.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O10",
+       "text": "ان يوضح الطالب تركيب كل من البروتون والنيوترون وفق نموذج الكواركات",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O11",
+       "text": "ان يحسب الطالب الطاقة الناتجة من فناء جسيم.",
+       "thinking_level_source": "تطبيق",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O12",
+       "text": "ان يوضح الطالب المقصود بإنتاج الزوج .",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O13",
+       "text": "ان يفسر الطالب اضمحلال بيتا والتفاعل الضعيف",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O14",
+       "text": "ان يوضح الطالب المقصود باختبار النموذج المعياري.",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O15",
+       "text": "ان يوضح الطالب القوى الأربعة في الكون",
+       "thinking_level_source": "فهم",
+       "status": "pending"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
