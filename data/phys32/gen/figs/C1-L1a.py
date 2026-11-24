@@ -30,7 +30,7 @@ def _sym(kind, closed=False):
         b += L(-6, -10, -12, -17, INK, 1.8)
     elif kind == 'S':
         b += L(-26, 0, -13, 0, INK, W) + L(13, 0, 26, 0, INK, W) + DOT(-13, 0, 2.6) + DOT(13, 0, 2.6)
-        b += L(-13, 0, 14, 0 if closed else -12, INK, W)
+        b += L(-13, 0, 15, -4, INK, W) if closed else L(-13, 0, 14, -12, INK, W)  # المغلق: ذراع مائلة قليلًا تستقر على النقطة اليمنى (تمييزًا لها عن نقاط التوصيل)
     elif kind == 'F':
         b += L(-26, 0, -12, 0, INK, W) + L(12, 0, 26, 0, INK, W)
         b += f'<path d="M -12 0 C -12 -13 0 -13 0 0 C 0 13 12 13 12 0" fill="none" stroke="{INK}" stroke-width="{W}"/>'
@@ -81,6 +81,8 @@ def battery_left(x, y1, y2, kind='B', label=None, plus=True):
     return b, (cx, cy)
 
 def cur_arrow(x1, y, x2, label='I'):
+    # يُستدعى بـ y = Y1 + 18؛ يُرسم السهم داخل الدائرة فوق السلك السفلي (كالشكل 1-3) حتى لا يلامس الحرفُ السلك
+    y -= 36
     return ARROW(x1, y, x2, y, INK, 1.6, 9) + T((x1 + x2) / 2, y - 9, label, 15, italic=True)
 
 def num(x, y, n): return f'<circle cx="{x:.1f}" cy="{y:.1f}" r="11" fill="#fff" stroke="{MUTED}" stroke-width="1.3"/>' + T(x, y + 5, str(n), 14, color=INK, weight='bold')
