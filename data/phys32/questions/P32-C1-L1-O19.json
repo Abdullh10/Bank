@@ -233,8 +233,8 @@
       "solution_steps": [
         "$t = 20.0 \\times 60 = 1200\\ \\text{s}$",
         "$E = Pt = (75.0\\ \\text{W})(1200\\ \\text{s}) = 9.0 \\times 10^{4}\\ \\text{J}$",
-        "$E_{\\text{ضوء}} = 0.10 \\times 9.0 \\times 10^{4} = 9.0 \\times 10^{3}\\ \\text{J}$",
-        "$E_{\\text{حرارة}} = 9.0 \\times 10^{4} - 9.0 \\times 10^{3} = 8.1 \\times 10^{4}\\ \\text{J}$",
+        "الطاقة الضوئية: $0.10 \\times 9.0 \\times 10^{4}\\ \\text{J} = 9.0 \\times 10^{3}\\ \\text{J}$",
+        "الطاقة الحرارية: $9.0 \\times 10^{4}\\ \\text{J} - 9.0 \\times 10^{3}\\ \\text{J} = 8.1 \\times 10^{4}\\ \\text{J}$",
         "$\\frac{E_{75}}{E_{15}} = \\frac{75.0}{15.0} = 5$"
       ],
       "marks": [
