@@ -9,9 +9,10 @@
  "source": {
   "file": "تحليل محتوى مادة فيزياء 3-2 مسارات — الهيئة الملكية بالجبيل وينبع (PDF، 9 وحدات)",
   "structure_basis": "ملف الأهداف المرفق من المستخدم بتاريخ 2026-11-22",
-  "content_basis": "",
+  "content_basis": "كتاب الطالب فيزياء 3-2 — نظام المسارات (طبعة 1447)، ص10–288",
   "notes": "النص الأصلي محفوظ حرفيًا بما فيه أخطاؤه الإملائية؛ الصياغة المصححة في مراجعة الأهداف. مستوى الهدف من عمود «مستوى الهدف» في thinking_level_source.",
-  "option_count": 4
+  "option_count": 4,
+  "added_objectives": 76
  },
  "chapters": [
   {
@@ -99,6 +100,55 @@
        "text": "ان يوضح الطالب المقصود بالمقاومة الكهربائية",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C1-L1-O14",
+       "text": "أن يعرّف الطالب التيار الاصطلاحي، ويحدّد اتجاهه في الدائرة الكهربائية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O15",
+       "text": "أن يصف الطالب الشروط اللازمة لسريان تيار كهربائي في دائرة كهربائية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O16",
+       "text": "أن يميّز الطالب بين الموصل الذي يحقق قانون أوم والجهاز الذي لا يحققه (مثل الدايود والمصباح الكهربائي) من البيانات أو الرسم البياني",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O17",
+       "text": "أن يوضّح الطالب كيفية توصيل الأميتر والفولتميتر في الدائرة الكهربائية لقياس شدة التيار وفرق الجهد",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O18",
+       "text": "أن يحدّد الطالب تحولات الطاقة في أجزاء الدائرة الكهربائية (البطارية، والمولد، والمحرك، والمصباح، والمدفأة)",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O19",
+       "text": "أن يفرّق الطالب بين القدرة والطاقة في الدائرة الكهربائية، ويحسب الطاقة الكهربائية باستخدام العلاقة E = Pt",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L1-O20",
+       "text": "أن يستقصي الطالب عمليًا العلاقة بين الجهد والتيار والعلاقة بين المقاومة والتيار، ويمثّلها بيانيًا",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -135,6 +185,34 @@
        "text": "ان يحل الطالب مسائل حسابية على حساب تكلفة عمل الاجهزة الكهربائية",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C1-L2-O06",
+       "text": "أن يوضّح الطالب كيف تتحوّل الطاقة الكهربائية إلى طاقة حرارية في المقاومة، ويستنتج العلاقتين P = I²R و P = V²/R",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L2-O07",
+       "text": "أن يعرّف الطالب القدرة الضائعة I²R، ويحسب مقدارها في أسلاك نقل الطاقة الكهربائية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L2-O08",
+       "text": "أن يفسّر الطالب سبب توصيل بعض الأجهزة المنزلية (كالطباخ الكهربائي وسخان الماء) بدائرة جهدها 220 V بدلًا من 127 V",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C1-L2-O09",
+       "text": "أن يحسب الطالب الطاقة الكهربائية التي يحوّلها جهاز إلى ضوء أو حرارة بمعلومية كفاءته",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -207,6 +285,41 @@
        "text": "أن يوضح الطالب تأثير إضافة أجهزة جديدة على دوائر التوازي الكهربائية",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C2-L1-O11",
+       "text": "أن يفسّر الطالب سلوك التيار وفرق الجهد في دوائر التوالي والتوازي باستخدام نموذج النهر الجبلي",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C2-L1-O12",
+       "text": "أن يحسب الطالب الجهد الناتج عن مجزّئ الجهد باستخدام العلاقة V_B = V R_B/(R_A + R_B)، ويصف استخدامه مع المجسّات كالمقاومة الضوئية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C2-L1-O13",
+       "text": "أن يقارن الطالب بين سطوع مصابيح كهربائية مختلفة القدرة عند توصيلها على التوالي وعند توصيلها على التوازي، مستندًا إلى العلاقة P = I²R",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C2-L1-O14",
+       "text": "أن يحسب الطالب القدرة المستنفدة في كل مقاومة وفي دوائر التوالي والتوازي، والقيمة العظمى للقدرة والجهد الآمنين",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C2-L1-O15",
+       "text": "أن يستقصي الطالب عمليًا العلاقة بين التيار وفرق الجهد والمقاومة في دوائر التوالي ودوائر التوازي، ويقارن بينها",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -255,6 +368,20 @@
        "text": "أن يذكر الطالب سبب تصميم الفولتميتر بمقاومة داخلية كبيرة جداً",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C2-L2-O08",
+       "text": "أن يحسب الطالب التيار الكلي المار في منصهر دائرة منزلية موصولة أجهزتها على التوازي، ويحكم هل ينصهر المنصهر أم لا",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C2-L2-O09",
+       "text": "أن يفسّر الطالب ضعف إضاءة المصابيح المنزلية عند تشغيل جهاز يحتاج إلى تيار كبير، بوجود مقاومة أسلاك التمديدات موصولة على التوالي مع الأجهزة الموصولة على التوازي",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -333,6 +460,48 @@
        "text": "أن يعرف الطالب المنطقة المغناطيسية",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C3-L1-O12",
+       "text": "أن يقارن الطالب بين المغناطيس الدائم والمغناطيس المؤقت",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L1-O13",
+       "text": "أن يصف الطالب المجال المغناطيسي الناشئ عن حلقة سلكية يسري فيها تيار كهربائي",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L1-O14",
+       "text": "أن يشرح الطالب تجربة أورستد التي بيّنت العلاقة بين الكهرباء والمغناطيسية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L1-O15",
+       "text": "أن يفسّر الطالب اتجاه إبرة البوصلة باعتبار الأرض مغناطيسًا عملاقًا",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L1-O16",
+       "text": "أن يفسّر الطالب مغنطة المواد الفرومغناطيسية (الحديد والنيكل والكوبالت) بدلالة ترتيب المناطق المغناطيسية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L1-O17",
+       "text": "أن يوضّح الطالب أن خطوط المجال المغناطيسي تشكل حلقات مغلقة وأنه لا توجد أقطاب مغناطيسية مفردة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -417,6 +586,34 @@
        "text": "أن يوضح الطالب القاعدة التي تحدد اتجاه القوة المغناطيسية عندما يتحرك جسيم مشحون داخل مجال مغناطيسي",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C3-L2-O14",
+       "text": "أن يفسّر الطالب تجاذب سلكين متوازيين يسري فيهما تياران في الاتجاه نفسه وتنافرهما عندما يكون التياران متعاكسين",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L2-O15",
+       "text": "أن يشرح الطالب كيف تُستخدم المجالات المغناطيسية في حرف حزمة الإلكترونات في أنبوب الأشعة المهبطية لتشكيل الصورة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L2-O16",
+       "text": "أن يوضّح الطالب كيفية تخزين المعلومات واسترجاعها باستخدام الوسائط المغناطيسية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C3-L2-O17",
+       "text": "أن يحلّ الطالب مسائل على تحويل الجلفانومتر إلى أميتر أو فولتميتر بحساب مقاومة مجزئ التيار أو المضاعف",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -483,6 +680,34 @@
        "text": "أن يحل الطالب مسائل حسابية على التيار الفعال والجهد الفعال",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C4-L1-O10",
+       "text": "أن يحسب الطالب متوسط القدرة الناتجة عن مولد التيار المتناوب بدلالة القدرة العظمى",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L1-O11",
+       "text": "أن يقارن الطالب بين المولد الكهربائي والمحرك الكهربائي من حيث تحويل الطاقة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L1-O12",
+       "text": "أن يفسّر الطالب تغيّر مقدار التيار الحثي واتجاهه في أثناء دوران حلقة المولد في المجال المغناطيسي",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L1-O13",
+       "text": "أن يثبت الطالب باستخدام تحليل الوحدات أن وحدة القوة الدافعة الكهربائية الحثية هي الفولت",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -537,6 +762,41 @@
        "text": "أن يحل الطالب مسائل حسابية على قانون المحول الكهربائي",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C4-L2-O09",
+       "text": "أن يفسّر الطالب نشوء التيارات الدوامية وسبب صنع قلب المحرك أو المحول من شرائح حديدية رقيقة معزولة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L2-O10",
+       "text": "أن يوضّح الطالب أثر القوة الدافعة الكهربائية الحثية العكسية في عمل المحركات الكهربائية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L2-O11",
+       "text": "أن يفسّر الطالب صعوبة تدوير ملف المولد عند زيادة التيار المسحوب منه في ضوء قانون لنز وقانون حفظ الطاقة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L2-O12",
+       "text": "أن يوضّح الطالب تأثير الحث الذاتي في الدوائر الكهربائية وعلاقة القوة الدافعة الكهربائية الحثية العكسية بمعدل تغير التيار",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C4-L2-O13",
+       "text": "أن يحلّ الطالب مسائل على كفاءة المحول الكهربائي والقدرة الضائعة فيه",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -603,6 +863,27 @@
        "text": "أن يحل الطالب مسائل تتضمن التفاعل بين الجسيمات والمجالات الكهربائية والمغناطيسية في مطياف الكتلة",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C5-L1-O10",
+       "text": "أن يوضّح الطالب كيف حُسبت كتلة الإلكترون بالجمع بين نسبة q/m التي قاسها تومسون وشحنة الإلكترون التي قاسها مليكان",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L1-O11",
+       "text": "أن يحدّد الطالب اتجاه المجالين الكهربائي والمغناطيسي اللازمين لانحراف حزمة من الجسيمات المشحونة أو مرورها دون انحراف في أنبوب تومسون ومطياف الكتلة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L1-O12",
+       "text": "أن يحلّل الطالب نتائج مطياف الكتلة (مواقع العلامات على الفيلم وعرضها) لتحديد نظائر العنصر ونسب وفرتها",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -663,6 +944,41 @@
        "text": "أن يشرح الطالب طريقة انبعاث الأشعة السينية",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C5-L2-O10",
+       "text": "أن يعرّف الطالب العوازل الكهربائية، ويحسب سرعة الموجة الكهرومغناطيسية فيها باستخدام العلاقة v = c/√K",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L2-O11",
+       "text": "أن يصف الطالب العوامل المؤثرة في قدرة الهوائي على التقاط موجة كهرومغناطيسية لها طول موجي محدد، ويحسب طول الهوائي المناسب",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L2-O12",
+       "text": "أن يرتّب الطالب أنواع الإشعاع الكهرومغناطيسي في الطيف الكهرومغناطيسي حسب التردد والطول الموجي والطاقة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L2-O13",
+       "text": "أن يوضّح الطالب أن الموجات الكهرومغناطيسية تنقل الطاقة والمعلومات، مع أمثلة من الميكروويف والأشعة تحت الحمراء والأشعة فوق البنفسجية",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C5-L2-O14",
+       "text": "أن يستقصي الطالب عمليًا قدرة مواد مختلفة على حجب موجات الراديو، ويستنتج صفات المواد الحاجبة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -729,6 +1045,41 @@
        "text": "أن يشرح الطالب تأثير كومبتون.",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C6-L1-O10",
+       "text": "أن يعرّف الطالب الفوتون ويحسب طاقته باستخدام E = hf = (1240 eV.nm)/λ",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C6-L1-O11",
+       "text": "أن يعرّف الطالب الإلكترون فولت (eV) ويحوّل الطاقة بين وحدتي الجول والإلكترون فولت",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C6-L1-O12",
+       "text": "أن يعرّف الطالب دالة الشغل (اقتران الشغل) للفلز ويربطها بتردد العتبة (W = hf0)",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C6-L1-O13",
+       "text": "أن يحلّل الطالب الرسم البياني للطاقة الحركية العظمى للإلكترونات الضوئية مقابل التردد لاستنتاج تردد العتبة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C6-L1-O14",
+       "text": "أن يحسب الطالب زخم الفوتون باستخدام العلاقة p = h/λ",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -759,6 +1110,20 @@
        "text": "أن يوضح الطالب مبدأ عدم التحديد لهيزنبرج.",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C6-L2-O05",
+       "text": "أن يفسّر الطالب سبب عدم ملاحظة الطبيعة الموجية للأجسام الكبيرة بمقارنة طول موجة دي برولي المصاحبة لها بأبعادها",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C6-L2-O06",
+       "text": "أن يصف الطالب الطبيعة المزدوجة (الجسيمية والموجية) للضوء والمادة",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -903,6 +1268,48 @@
        "text": "أن يذكر الطالب مميزات نموذج بور",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C7-L1-O23",
+       "text": "أن يحسب الطالب طاقة الفوتون المنبعث أو الممتص عند انتقال الإلكترون بين مستويين للطاقة، وتردده وطوله الموجي، باستخدام العلاقتين E فوتون = hf = ΔE ذرة وλ = hc/ΔE.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L1-O24",
+       "text": "أن يصف الطالب النموذج النووي للذرة (تركّز الشحنة الموجبة وأكثر من 99.9% من كتلة الذرة في النواة، وأن قطر الذرة أكبر من قطر النواة بنحو 10000 مرة، فمعظم حجم الذرة فراغ).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L1-O25",
+       "text": "أن يعرّف الطالب طيف الانبعاث الذري، ويصف كيفية الحصول عليه باستخدام أنبوب تفريغ الغاز.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L1-O26",
+       "text": "أن يعرّف الطالب عدد الكم الرئيس n، ويوضّح أن نصف قطر المستوى يزداد بزيادة n² وأن الطاقة تعتمد على 1/n².",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L1-O27",
+       "text": "أن يوضّح الطالب كيف طوّر بور نموذجه بتطبيق قانون نيوتن الثاني وقانون كولوم على الإلكترون، وافتراض تكمية الزخم الزاوي (mvr = nh/2π).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L1-O28",
+       "text": "أن يقدّر الطالب حجم جسم لا يمكن رؤيته باستخدام الاحتمالات في نموذج محاكٍ لتجربة صفيحة الذهب، ويحسب نسبة الخطأ المئوية.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -999,6 +1406,34 @@
        "text": "أن يوضح الطالب تطبيقات الليزر",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C7-L2-O16",
+       "text": "أن يفسّر الطالب شرط استقرار مستويات الإلكترون في الذرة باستخدام موجات دي برولي (nλ = 2πr).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L2-O17",
+       "text": "أن يصف الطالب كيف يُنتَج شعاع الليزر في أنبوب تحصر طرفيه مرآتان متوازيتان إحداهما جزئية الانعكاس.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L2-O18",
+       "text": "أن يصف الطالب خصائص ضوء الليزر (أحادي اللون، ومترابط، وموجّه، وذو طاقة عالية).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C7-L2-O19",
+       "text": "أن يستخدم الطالب الجدول 7–1 لمصادر الليزر الشائعة لتحديد الطول الموجي ونوع الليزر (نبضي أو مستمر)، ويحسب فرق الطاقة بين مستويات الطاقة الليزرية من الطول الموجي.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1107,6 +1542,27 @@
        "text": "ان يحل الطالب مسائل حسابية على اشباه الموصلات المعالجة",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C8-L1-O17",
+       "text": "أن يفسّر الطالب أثر ارتفاع درجة الحرارة في موصلية الفلزات وموصلية أشباه الموصلات.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C8-L1-O18",
+       "text": "أن يوضّح الطالب كيف تتكون الفجوات في أشباه الموصلات، ولماذا تتحرك في اتجاه معاكس لحركة الإلكترونات الحرة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C8-L1-O19",
+       "text": "أن يحسب الطالب الطول الموجي للإشعاع المرتبط بانتقال الإلكترون عبر فجوة الطاقة الممنوعة باستخدام العلاقة E = 1240 eV·nm/λ.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1179,6 +1635,34 @@
        "text": "ان يوضح الطالب دور كل من: الفيزيائيين ، و الكيميائيين ، والمهندسين في صناعة الكترونيات أشباه الموصلات",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C8-L2-O12",
+       "text": "أن يوضّح الطالب المقصود بطبقة النضوب وسبب تكوّنها عند وصلة الدايود.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C8-L2-O13",
+       "text": "أن يشرح الطالب كيف يضخّم الترانزستور npn تغيّرات الجهد الصغيرة من خلال تحكّم تيار القاعدة I_B في تيار الجامع I_C.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C8-L2-O14",
+       "text": "أن يذكر الطالب استخدام الدايود في تقويم الجهد المتناوب AC إلى جهد مستمر DC (المقوّم).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C8-L2-O15",
+       "text": "أن يستقصي الطالب عمليًا خصائص التيار–الجهد للدايود والدايود المشع للضوء، ويقارنها بخصائص المقاوم.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
@@ -1239,6 +1723,20 @@
        "text": "ان يحل الطالب مسائل حسابية على طاقة الربط النووية",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C9-L1-O09",
+       "text": "أن يفسّر الطالب استقرار الأنوية باستخدام منحنى طاقة الربط النووية لكل نيوكليون مقابل العدد الكتلي (الشكل 9–2)، ويحدد متى يحدث التفاعل النووي طبيعيًّا.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C9-L1-O10",
+       "text": "أن يفسّر الطالب سبب أن الكتل الذرية لمعظم العناصر ليست أعدادًا صحيحة (وجود النظائر ومتوسط الكتلة).",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1305,6 +1803,20 @@
        "text": "ان يحسب الطاقة الناتجة من التفاعل النووي .",
        "thinking_level_source": "تطبيق",
        "status": "pending"
+      },
+      {
+       "id": "P32-C9-L2-O11",
+       "text": "أن يمثّل الطالب بيانيًّا عدد الأنوية غير المضمحلة مع الزمن، ويستنتج عمر النصف من الرسم البياني.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C9-L2-O12",
+       "text": "أن يصف الطالب الاندماج النووي في الشمس (سلسلة بروتون–بروتون)، ويفسّر حاجته إلى درجات حرارة عالية جدًّا، ويقارنه بالانشطار النووي من حيث طريقة تحرير الطاقة.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     },
@@ -1401,6 +1913,27 @@
        "text": "ان يوضح الطالب القوى الأربعة في الكون",
        "thinking_level_source": "فهم",
        "status": "pending"
+      },
+      {
+       "id": "P32-C9-L3-O16",
+       "text": "أن يصف الطالب طريقة عمل عداد جايجر–مولر وحجرة الغيمة وحجرة الفقاعة في الكشف عن الجسيمات المشحونة، ويفسّر عدم ترك الجسيمات المتعادلة مسارات فيها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C9-L3-O17",
+       "text": "أن يصنّف الطالب الهادرونات إلى باريونات وميزونات، ويحسب شحنة جسيم من تركيبه من الكواركات وضديداتها.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
+      },
+      {
+       "id": "P32-C9-L3-O18",
+       "text": "أن يصمم الطالب تجربة لاستكشاف العلاقة بين البعد عن مصدر إشعاع بيتا وجاما وشدة الإشعاع المقيس باستخدام عداد جايجر، ويمثّل النتائج بيانيًّا.",
+       "thinking_level_source": "",
+       "status": "pending",
+       "added_from_textbook": true
       }
      ]
     }
