@@ -69,3 +69,11 @@ Do NOT run git, do not touch any other file or any other part's files.
 
 ## Report back (short)
 Lesson/part, files written, number of questions with figures, checker result, key distribution, and anything you were unsure about (scientific doubt, thin coverage, judgement call) with the question number.
+
+## Y2. Book typography for symbols — chapter 2 onward (owner ruling 2026-11-25, overrides Q/Y where they differ)
+The owner ruled: «التزم بشكل الرموز كما في الكتاب». Chapter 1 stays as it is (italic); from chapter 2 on, every symbol must LOOK as the book prints it. Check each symbol on the page you cite.
+- Chapter 2 (pp.41–69) prints electrical quantities UPRIGHT (roman), not italic: I, V, R, P, E with upright Latin subscripts (R_A, R_B, V_A, I_1). Write them with `\mathrm{}`: `$\mathrm{I} = \frac{\mathrm{V}}{\mathrm{R}}$`, `$\mathrm{R} = \mathrm{R}_\mathrm{A} + \mathrm{R}_\mathrm{B} + \ldots$`, `$\frac{1}{\mathrm{R}} = \frac{1}{\mathrm{R}_\mathrm{A}} + \frac{1}{\mathrm{R}_\mathrm{B}}$`, `$\mathrm{V}_\mathrm{B} = \mathrm{I}\mathrm{R}_\mathrm{B}$`, `$\mathrm{P} = \mathrm{I}\mathrm{V}$`. Arabic subscripts exactly as printed: `$\mathrm{V}_{\text{مصدر}}$` (book p.43). Numbers with units stay as before (`$45.0\ \text{V}$` or plain `45.0 V`).
+- If the book prints a particular symbol italic (e.g. q, or a Greek letter), keep it italic — copy the page, do not generalise.
+- Later chapters: before writing, look at how that chapter's formulas print (upright vs italic, bold vectors such as B and F, subscripts) and follow it the same way; note your reading in the report.
+- Figures: labels of quantities in SVG circuits use upright text (`T(..., italic=False)`), with upright subscripts as the book's figures (R_A, V_B, «V مصدر»). Circuit symbols exactly as the book's chart (p.19) — reuse the helpers in `data/phys32/gen/figs/C1-L1b.py` / `C1-L1a.py` (copy them into your own figs file; do not edit chapter-1 files), switching their quantity labels to upright.
+- Be consistent inside a file: never mix `$I$` and `$\mathrm{I}$`.
