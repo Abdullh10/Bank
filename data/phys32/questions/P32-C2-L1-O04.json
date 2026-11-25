@@ -153,7 +153,7 @@
     "100 Ω على التوازي مع مقاومة الفرع"
    ],
    "correct_index": 2,
-   "explanation": "لخفض المقاومة توصل مقاومة على التوازي: $\\frac{1}{\\mathrm{R}_\\mathrm{x}} = \\frac{1}{40.0} - \\frac{1}{60.0} = \\frac{1}{120}$، إذن $\\mathrm{R}_\\mathrm{x} = 120\\ \\Omega$.",
+   "explanation": "لخفض المقاومة توصل مقاومة $\\mathrm{R}_\\mathrm{B}$ على التوازي مع مقاومة الفرع $\\mathrm{R}_\\mathrm{A} = 60.0\\ \\Omega$: $\\frac{1}{\\mathrm{R}} = \\frac{1}{\\mathrm{R}_\\mathrm{A}} + \\frac{1}{\\mathrm{R}_\\mathrm{B}}$، إذن $\\frac{1}{\\mathrm{R}_\\mathrm{B}} = \\frac{1}{40.0} - \\frac{1}{60.0} = \\frac{1}{120}$، و$\\mathrm{R}_\\mathrm{B} = 120\\ \\Omega$.",
    "distractor_notes": [
     "التوصيل على التوالي يزيد المقاومة دائمًا، فلا يمكن أن يخفضها.",
     "طرح المقاومتين لا يصلح في التوازي؛ فالعلاقة تُجمع فيها المقلوبات.",
@@ -233,12 +233,12 @@
    "model_answer": "(a) $\\mathrm{A}_3$ في فرع المقاومة 15.0 Ω: $\\mathrm{V} = (0.80)(15.0) = 12\\ \\text{V}$. (b) $\\mathrm{A}_2$: $12/30.0 = 0.40\\ \\text{A}$، $\\mathrm{A}_4$: $12/10.0 = 1.2\\ \\text{A}$. (c) $\\mathrm{A}_1 = 0.40 + 0.80 + 1.2 = 2.4\\ \\text{A}$. (d) $\\frac{1}{\\mathrm{R}} = \\frac{1}{30.0} + \\frac{1}{15.0} + \\frac{1}{10.0} = \\frac{1}{5.00}$، $\\mathrm{R} = 5.0\\ \\Omega$، والتحقق $12/2.4 = 5.0\\ \\Omega$.",
    "answer_elements": [
     "جهد البطارية 12 V",
-    "$\\mathrm{A}_2$ = 0.40 A وA4 = 1.2 A",
+    "$\\mathrm{A}_2$ = 0.40 A و$\\mathrm{A}_4$ = 1.2 A",
     "$\\mathrm{A}_1$ = 2.4 A",
     "المكافئة 5.0 Ω والتحقق"
    ],
    "solution_steps": [
-    "$\\mathrm{V} = \\mathrm{I}_3\\mathrm{R} = (0.80\\ \\text{A})(15.0\\ \\Omega) = 12\\ \\text{V}$",
+    "$\\mathrm{V} = \\mathrm{I}_3 \\times 15.0\\ \\Omega = (0.80\\ \\text{A})(15.0\\ \\Omega) = 12\\ \\text{V}$",
     "$\\mathrm{I}_2 = \\frac{12}{30.0} = 0.40\\ \\text{A}$، $\\mathrm{I}_4 = \\frac{12}{10.0} = 1.2\\ \\text{A}$",
     "$\\mathrm{I}_1 = 0.40 + 0.80 + 1.2 = 2.4\\ \\text{A}$",
     "$\\mathrm{R} = 5.0\\ \\Omega = \\frac{12\\ \\text{V}}{2.4\\ \\text{A}}$"
@@ -249,7 +249,7 @@
      "marks": 1
     },
     {
-     "element": "$\\mathrm{A}_2$ وA4",
+     "element": "$\\mathrm{A}_2$ و$\\mathrm{A}_4$",
      "marks": 2
     },
     {
