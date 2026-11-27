@@ -26,3 +26,6 @@ Edit the JSON files in place (keep structure). Keep the key spread (no position 
 
 ## Report (short)
 Counts: MCQs checked, essays checked, figures checked; defects fixed by type (key errors / numeric / scientific / typography / figure / wording). List the significant fixes (id, question number, before → after, why) and residual doubts for the owner.
+
+## Chapter 2 onward: book typography (owner ruling 2026-11-25)
+Apply BRIEF.md rule Y2: from chapter 2, every symbol must look as the book prints it on the cited page. Chapter 2 prints I, V, R, P (and their subscripts R_A, V_B) UPRIGHT — `$\mathrm{R}_\mathrm{A}$`; italic `$I$`, `$R_A$` in a chapter-2 file is a defect to fix (text, explanations, notes, tables, figure labels). Arabic subscripts as printed (`$\mathrm{V}_{\text{مصدر}}$`). Keep anything the book prints italic italic. Do not touch chapter-1 files.
