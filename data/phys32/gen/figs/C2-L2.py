@@ -43,9 +43,12 @@ def seg(x1, y1, x2, y2, comp=None, label=None, side=1, plus='start', lsize=14, l
         pp = P(offs[0] + 6 * sg, -22); mm = P(offs[-1] - 6 * sg, -22)
         b += T(pp[0], pp[1] + 5, '+', 15, color=PLUS, weight='bold') + T(mm[0], mm[1] + 5, '−', 15, weight='bold')
     elif comp == 'lamp':
-        b += f'<circle cx="{mx:.1f}" cy="{my:.1f}" r="14" fill="#fff" stroke="{INK}" stroke-width="2.2"/>'
-        a = P(-14, 0); c = P(14, 0); l1 = P(-4, -9); l2 = P(4, -9); q1 = P(-6, 6); q2 = P(6, 6)
-        b += f'<path d="M {a[0]:.1f} {a[1]:.1f} L {P(-6,0)[0]:.1f} {P(-6,0)[1]:.1f} C {l1[0]:.1f} {l1[1]:.1f} {l2[0]:.1f} {l2[1]:.1f} {P(0,0)[0]:.1f} {P(0,0)[1]:.1f} C {q1[0]:.1f} {q1[1]:.1f} {q2[0]:.1f} {q2[1]:.1f} {P(6,0)[0]:.1f} {P(6,0)[1]:.1f} L {c[0]:.1f} {c[1]:.1f}" fill="none" stroke="{INK}" stroke-width="1.8"/>'
+        # رمز المصباح كما في الكتاب (ص 19 والشكل 2-15): دائرة مظللة يدخلها السلكان من طرفين متقابلين،
+        # وفي داخلها فتيل على شكل قوسين متصلين بعروة صغيرة في الوسط (لا موجة جيبية كرمز المولد المتناوب)
+        b += f'<circle cx="{mx:.1f}" cy="{my:.1f}" r="14" fill="{METER_FILL}" stroke="{INK}" stroke-width="2.2"/>'
+        q = lambda s, t: '{:.1f} {:.1f}'.format(*P(s, t))
+        b += (f'<path d="M {q(-14, 0)} C {q(-14, -15)} {q(-2, -14)} {q(1.8, 4)} C {q(3.5, 9.5)} {q(-3.5, 9.5)} {q(-1.8, 4)} '
+              f'C {q(2, -14)} {q(14, -15)} {q(14, 0)}" fill="none" stroke="{INK}" stroke-width="1.8" stroke-linejoin="round"/>')
     elif comp in ('A', 'V', 'X'):
         b += f'<circle cx="{mx:.1f}" cy="{my:.1f}" r="15" fill="{METER_FILL}" stroke="{INK}" stroke-width="2"/>' + T(mx, my + 5.5, mlabel or comp, 16, color=INK)
     elif comp in ('Sopen', 'Sclosed'):
@@ -121,8 +124,8 @@ def o02():
     b += T(200, 230, 'المحوّل', 15, color=MUTED)
     b += T(590, 98, 'السلك الحي', 14, 'end', MUTED) + T(590, 194, 'السلك المتعادل', 14, 'end', MUTED)
     b += T(40, 140, 'المصدر', 14, 'start', MUTED) + RECT(610, 95, 70, 90, INK, '#f3efe6') + T(645, 145, 'الجهاز', 14)
-    b += ARROW(330, 96, 400, 96, C_FORCE if False else INK, 2.2) + T(365, 82, '2.500 A', 15)
-    b += ARROW(400, 184, 330, 184, INK, 2.2) + T(365, 206, '2.495 A', 15)
+    b += ARROW(330, 96, 400, 96, C_FORCE if False else INK, 2.2) + T(365, 82, '2.50 A', 15)
+    b += ARROW(400, 184, 330, 184, INK, 2.2) + T(365, 206, '2.45 A', 15)
     C('c2l2-o02-gfci.svg', 700, 250, b)
 
 # ───────────────────────── O03 موضع المنصهر
@@ -241,7 +244,7 @@ def appliances(name, lab_fuse, devs, w=590, h=300):
 
 def o08():
     appliances('c2l2-o08-house.svg', '15 A', [('تلفاز', '120 W'), ('مكواة', '960 W'), ('غلاية', '1200 W')])
-    appliances('c2l2-o08-e1.svg', '15 A', [('تلفاز', '180 W'), ('مكواة', '1080 W'), ('مجفف شعر', '600 W')])
+    appliances('c2l2-o08-e1.svg', '15 A', [('تلفاز', '180 W'), ('مكواة', '1080 W'), ('مجفف شعر', '840 W')])
 
 # ───────────────────────── O09 ضعف الإضاءة
 def o09():
@@ -254,7 +257,7 @@ def o09():
         b += seg(460, y1, 460, 150, 'Sopen') + T(476, 110, 'S', 15, 'start') + seg(460, 150, 460, y2, 'R') + T(478, 210, dry_lab, 13, 'start')
         return b
     C('c2l2-o09-house.svg', 600, 300, base('مقاومة أسلاك التمديدات', 'مصباح', 'مجفف شعر'))
-    b = mains(x0, y1, y2) + wires((x0, y1), (140, y1)) + seg(140, y1, 280, y1, 'R') + T(210, y1 - 22, '1.6 Ω', 14) + T(210, y1 + 36, 'مقاومة الأسلاك', 13)
+    b = mains(x0, y1, y2) + wires((x0, y1), (140, y1)) + seg(140, y1, 280, y1, 'R') + T(210, y1 - 22, '0.60 Ω', 14) + T(210, y1 + 36, 'مقاومة الأسلاك', 13)
     b += wires((280, y1), (460, y1)) + wires((x0, y2), (460, y2)) + node(340, y1) + node(340, y2)
     b += seg(340, y1, 340, y2, 'lamp') + T(318, 155, 'مصباح', 13, 'end') + T(318, 177, '144 Ω', 13, 'end')
     b += seg(460, y1, 460, 150, 'Sopen') + T(476, 110, 'S', 15, 'start') + seg(460, 150, 460, y2, 'R') + T(478, 200, 'مجفف شعر', 13, 'start') + T(478, 222, '16.0 Ω', 13, 'start')
