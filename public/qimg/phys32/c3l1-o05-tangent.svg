@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300">
+<rect width="360" height="300" fill="#fff"/>
+<circle cx="180" cy="150" r="45" fill="none" stroke="#1e8449" stroke-width="1.8"/><circle cx="180" cy="150" r="85" fill="none" stroke="#1e8449" stroke-width="1.8"/><circle cx="180" cy="150" r="125" fill="none" stroke="#1e8449" stroke-width="1.8"/><circle cx="180" cy="150" r="13" fill="#f3e3d3" stroke="#c07a45" stroke-width="2.2"/><circle cx="180" cy="150" r="3.6" fill="#1f2a44"/><line x1="180.0" y1="150.0" x2="249.6" y2="101.2" stroke="#5b6676" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="5 4"/><circle cx="249.6" cy="101.2" r="4.5" fill="#1f2a44" stroke="#1f2a44" stroke-width="1.5"/><text x="263.6" y="95.2" text-anchor="start" font-size="16" fill="#1f2a44" font-weight="bold" font-style="italic" font-family="'Times New Roman',Times,serif">P</text>
+</svg>
