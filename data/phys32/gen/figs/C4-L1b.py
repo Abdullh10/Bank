@@ -12,9 +12,15 @@ def magnet(x, y, w, h, letter):
     return RECT(x, y, w, h, MAG_D, MAG, 2) + T(x + w / 2, y + h / 2 + 9, letter, 26, color=INK, weight='bold')
 def num(x, y, n, lx, ly):
     return L(x, y, lx, ly, MUTED, 1.3) + f'<circle cx="{lx}" cy="{ly}" r="13" fill="#fff" stroke="{INK}" stroke-width="1.6"/>' + T(lx, ly + 5, str(n), 15, weight='bold')
-def lamp(x, y, r=17):
-    b = f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff7d6" stroke="{INK}" stroke-width="2"/>'
-    b += f'<path d="M {x - r * 0.7} {y + r * 0.2} q {r * 0.35} {-r * 0.9} {r * 0.7} 0 q {r * 0.35} {r * 0.9} {r * 0.7} 0" fill="none" stroke="{INK}" stroke-width="1.6"/>'
+def lamp(x, y, r=17, vertical=False):
+    """رمز المصباح كما في مخطط رموز الدوائر في الكتاب: دائرة يدخلها السلك من طرفيها وبداخلها فتيلة ملتفة (لا الرمز ~ لمصدر AC)."""
+    k = r / 14
+    P = (lambda s, t: (x + t * k, y + s * k)) if vertical else (lambda s, t: (x + s * k, y + t * k))
+    a, c = P(-14, 0), P(14, 0); m1, m2, m0 = P(-6, 0), P(6, 0), P(0, 0)
+    l1, l2, q1, q2 = P(-4, -9), P(4, -9), P(-6, 6), P(6, 6)
+    b = f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff" stroke="{INK}" stroke-width="2.2"/>'
+    b += (f'<path d="M {a[0]:.1f} {a[1]:.1f} L {m1[0]:.1f} {m1[1]:.1f} C {l1[0]:.1f} {l1[1]:.1f} {l2[0]:.1f} {l2[1]:.1f} {m0[0]:.1f} {m0[1]:.1f} '
+          f'C {q1[0]:.1f} {q1[1]:.1f} {q2[0]:.1f} {q2[1]:.1f} {m2[0]:.1f} {m2[1]:.1f} L {c[0]:.1f} {c[1]:.1f}" fill="none" stroke="{INK}" stroke-width="1.8"/>')
     return b
 
 def axes(x0, y0, w, hup, hdown, xlab, ylab, size=14):
@@ -78,7 +84,8 @@ def o08():
     b += L(226, 250, 160, 250, INK, 2.2) + L(160, 250, 160, 360, INK, 2.2) + L(160, 360, 262, 360, INK, 2.2)
     b += lamp(280, 360) + L(298, 360, 400, 360, INK, 2.2) + L(400, 360, 400, 290, INK, 2.2) + L(400, 290, 334, 290, INK, 2.2)
     b += num(85, 220, 1, 85, 262) + num(345, 140, 2, 380, 240) + num(250, 290, 3, 210, 318) + num(237, 243, 4, 200, 215)
-    C('c4l1-o08-generator.svg', 560, 400, b)
+    b += T(280, 404, 'مصباح', 14, color=MUTED)
+    C('c4l1-o08-generator.svg', 560, 420, b)
 
 # ───────── O09 منحنيا التيار والجهد المتناوبين
 def o09():
@@ -107,14 +114,14 @@ def o11():
     b += L(150, 95, 150, 50, INK, 2.2) + L(150, 50, 470, 50, INK, 2.2) + L(470, 50, 470, 250, INK, 2.2)
     b += L(150, 205, 150, 250, INK, 2.2) + L(150, 250, 300, 250, INK, 2.2)
     b += f'<circle cx="320" cy="250" r="18" fill="#fff" stroke="{INK}" stroke-width="2"/>' + T(320, 256, 'A', 17, italic=False)
-    b += L(338, 250, 470, 250, INK, 2.2) + lamp(470, 150, 20)
+    b += L(338, 250, 470, 250, INK, 2.2) + lamp(470, 150, 20, vertical=True)
     b = b.replace(L(470, 50, 470, 250, INK, 2.2), L(470, 50, 470, 130, INK, 2.2) + L(470, 170, 470, 250, INK, 2.2))
     b += T(510, 155, 'مصباح', 14, 'start')
     C('c4l1-o11-lab.svg', 580, 290, b)
 
 # ───────── O12 دوران الحلقة
 def o12():
-    # (a) و(b) منظر علوي: الحلقة بين القطبين، مستواها موازٍ للمجال ثم عمودي عليه
+    # (a) و(b) منظر جانبي (كالمنظر الجانبي في الشكل 4-6؛ النظر على امتداد المحور): الحلقة بين القطبين، مستواها موازٍ للمجال ثم عمودي عليه
     b = ''
     for k in range(2):
         ox = k * 330
@@ -127,7 +134,7 @@ def o12():
         else:
             b += f'<rect x="{cx - 7}" y="{cy - 55}" width="14" height="110" rx="6" fill="none" stroke="{WIRE}" stroke-width="5"/>'
         b += DOT(cx, cy, 3, MUTED)
-    b += T(330, 200, 'منظر علوي (المحور عمودي على الصفحة)', 14, color=MUTED)
+    b += T(330, 200, 'منظر جانبي (المحور عمودي على الصفحة)', 14, color=MUTED)
     b += L(330, 15, 330, 180, GRID, 1.5)
     C('c4l1-o12-views.svg', 660, 215, b)
     # منحنى التيار مع الزمن ونقاط معلّمة
@@ -146,7 +153,9 @@ def o12():
     P = lambda s, t: (cx + s * half * ux + t * thick * px, cy + s * half * uy + t * thick * py)
     a_, b_, c_, d_ = P(-1, -1), P(1, -1), P(1, 1), P(-1, 1)
     b += f'<polygon points="{a_[0]:.1f},{a_[1]:.1f} {b_[0]:.1f},{b_[1]:.1f} {c_[0]:.1f},{c_[1]:.1f} {d_[0]:.1f},{d_[1]:.1f}" fill="none" stroke="{WIRE}" stroke-width="5"/>'
-    b += DOT(cx, cy, 4, MUTED) + T(cx + 30, cy + 22, 'محور', 13, color=MUTED)
+    # محور الدوران قضيب رمادي في وسط الحلقة موازٍ للضلعين bc وad (كالشكل 4-7)
+    e1, e2 = P(0, -1.7), P(0, 1.7)
+    b += L(e1[0], e1[1], e2[0], e2[1], MUTED, 5) + L(e2[0] + 3, e2[1] + 3, cx + 66, cy + 40, MUTED, 1.2) + T(cx + 70, cy + 52, 'محور', 14, 'start', MUTED)
     for (x, y), s, dx, dy in ((b_, 'b', -14, -6), (c_, 'c', 12, -6), (a_, 'a', -14, 16), (d_, 'd', 14, 16)):
         b += T(x + dx, y + dy, s, 17, italic=False, weight='bold')
     C('c4l1-o12-loop.svg', 580, 300, b)
