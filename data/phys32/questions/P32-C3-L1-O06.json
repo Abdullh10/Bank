@@ -114,10 +114,10 @@
   {
    "stem": "يبين الشكل الآتي مقطعًا لسلك مستقيم طويل عمودي على الصفحة يسري فيه تيار، والنقاط P وQ وR على أبعاد r و2r و3r منه على الترتيب. ما الترتيب الصحيح لشدة المجال المغناطيسي عند هذه النقاط؟",
    "options": [
-    "$\\mathrm{B}_P > \\mathrm{B}_Q > \\mathrm{B}_R$",
-    "$\\mathrm{B}_R > \\mathrm{B}_Q > \\mathrm{B}_P$",
-    "$\\mathrm{B}_P = \\mathrm{B}_Q = \\mathrm{B}_R$",
-    "$\\mathrm{B}_Q > \\mathrm{B}_P > \\mathrm{B}_R$"
+    "$\\mathrm{B}_\\mathrm{P} > \\mathrm{B}_\\mathrm{Q} > \\mathrm{B}_\\mathrm{R}$",
+    "$\\mathrm{B}_\\mathrm{R} > \\mathrm{B}_\\mathrm{Q} > \\mathrm{B}_\\mathrm{P}$",
+    "$\\mathrm{B}_\\mathrm{P} = \\mathrm{B}_\\mathrm{Q} = \\mathrm{B}_\\mathrm{R}$",
+    "$\\mathrm{B}_\\mathrm{Q} > \\mathrm{B}_\\mathrm{P} > \\mathrm{B}_\\mathrm{R}$"
    ],
    "correct_index": 0,
    "explanation": "شدة المجال تتناسب عكسيًا مع البعد عن السلك؛ فأقرب نقطة (P) عندها أكبر مجال، ثم Q، ثم R الأبعد.",
@@ -228,10 +228,10 @@
     "مقارنة (b) بـ (a): النصف مع التعليل"
    ],
    "solution_steps": [
-    "$\\mathrm{B}_a = (2\\times10^{-7})(10)/(0.5) = 4\\times10^{-6}\\ \\text{T}$",
-    "$\\mathrm{B}_a / \\mathrm{B}_{\\text{أرض}} = 4\\times10^{-6} / 5.0\\times10^{-5} = 0.08$",
-    "$\\mathrm{B}_b = (2\\times10^{-7})(200)/(20) = 2\\times10^{-6}\\ \\text{T}$",
-    "$\\mathrm{B}_b / \\mathrm{B}_a = 0.5$"
+    "$\\mathrm{B}_\\mathrm{a} = (2\\times10^{-7})(10)/(0.5) = 4\\times10^{-6}\\ \\text{T}$",
+    "$\\mathrm{B}_\\mathrm{a} / \\mathrm{B}_{\\text{أرض}} = 4\\times10^{-6} / 5.0\\times10^{-5} = 0.08$",
+    "$\\mathrm{B}_\\mathrm{b} = (2\\times10^{-7})(200)/(20) = 2\\times10^{-6}\\ \\text{T}$",
+    "$\\mathrm{B}_\\mathrm{b} / \\mathrm{B}_\\mathrm{a} = 0.5$"
    ],
    "marks": [
     {
@@ -293,7 +293,7 @@
     "من المنحنى: $(1.0)(60) = (2.0)(30) = (3.0)(20) = 60\\ \\mu\\text{T}\\cdot\\text{cm}$",
     "$\\mathrm{B}(5.0\\ \\text{cm}) = 60/5.0 = 12\\ \\mu\\text{T}$",
     "$\\mathrm{I} = \\mathrm{B}d/(2\\times10^{-7}) = (60\\times10^{-6})(0.010)/(2\\times10^{-7}) = 3.0\\ \\text{A}$",
-    "$\\mathrm{B}_{\\text{جديد}} = 2 \\times 30 = 60\\ \\mu\\text{T}$"
+    "المجال الجديد $= 2 \\times 30 = 60\\ \\mu\\text{T}$"
    ],
    "marks": [
     {
