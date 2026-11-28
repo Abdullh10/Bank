@@ -75,6 +75,10 @@ def o10():
     # (2) مسمار ملفوف عليه سلك موصول ببطارية (الطرف المسطح يسارًا، والمدبب يمينًا) — لا أسهم على اللفات
     yc = 110; x0 = 150; ln = 240; n = 7; r = 30
     b = ''
+    p = ln / n
+    # الأجزاء الخلفية من اللفات (خلف المسمار): خط متقطع باهت يصل أسفل كل لفة أمامية بأعلى اللفة التي تليها — تبيّن اتجاه اللف من الرسم وحده
+    for k in range(n - 1):
+        b += L(x0 + k * p + p / 2, yc + r, x0 + (k + 1) * p, yc - r, '#c9a27e', 1.8, '4 4')
     b += RECT(x0 - 40, yc - 12, ln + 60, 24, '#6d7680', IRON, 1.5)
     b += RECT(x0 - 52, yc - 34, 12, 68, '#6d7680', IRON, 1.5)
     b += f'<polygon points="{x0 + ln + 20},{yc - 12} {x0 + ln + 75},{yc} {x0 + ln + 20},{yc + 12}" fill="{IRON}" stroke="#6d7680" stroke-width="1.5"/>'
@@ -262,7 +266,7 @@ def o14():
 
 
 # ---------------------------------------------------------------- O15 الأرض مغناطيس عملاق
-def earth(name, magnet_labels=('S', 'N'), points=False, w=480, h=320):
+def earth(name, magnet_labels=('S', 'N'), points=False, w=560, h=320):
     cx, cy, R = w / 2, h / 2 + 5, 82
     b = ''
     # خطوط المجال: خطوط ثنائي القطب r = k sin²θ (θ من محور القطبين) خارج الأرض فقط
@@ -277,13 +281,31 @@ def earth(name, magnet_labels=('S', 'N'), points=False, w=480, h=320):
             b += '<polyline points="' + ' '.join(f'{x:.1f},{y:.1f}' for x, y in pts) + f'" fill="none" stroke="{C_FIELD}" stroke-width="2.2"/>'
             xe = cx + side * k * R
             b += ARROW(xe, cy + 9, xe, cy - 9, C_FIELD, 2.2, 11)
+    # خطوط أبعد تخرج من قرب القطبين وتغادر حدود الشكل: تُظهر تقارب الخطوط وتركّز التدفق عند القطبين
+    for k in (4.5, 10.0):
+        for side in (1, -1):
+            runs, cur = [], []
+            for i in range(0, 1801):
+                th = math.radians(i / 10)
+                rr = k * R * math.sin(th) ** 2
+                x, y = cx + side * rr * math.sin(th), cy - rr * math.cos(th)
+                if rr >= R and 0 <= x <= w and 8 <= y <= h - 8:
+                    cur.append((x, y))
+                elif cur:
+                    runs.append(cur); cur = []
+            if cur: runs.append(cur)
+            for run in runs:
+                if len(run) > 1:
+                    b += '<polyline points="' + ' '.join(f'{x:.1f},{y:.1f}' for x, y in run) + f'" fill="none" stroke="{C_FIELD}" stroke-width="2.2"/>'
     b += f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="#cfe3f5" stroke="#2a6fb0" stroke-width="2"/>'
     # المغناطيس داخل الأرض: الطرف الأعلى (قرب الشمال الجغرافي) والأسفل
     neutral = magnet_labels[0] == '1'
     b += RECT(cx - 13, cy - 55, 26, 55, '#555', '#d5d8dc' if neutral else '#f2f2f2', 1.5) + RECT(cx - 13, cy, 26, 55, '#555', '#d5d8dc' if neutral else '#d9534f', 1.5)
     b += T(cx, cy - 22, magnet_labels[0], 16, weight='bold') + T(cx, cy + 34, magnet_labels[1], 16, weight='bold', color='#fff' if magnet_labels[1] in ('N',) else INK)
     b += L(cx, cy - R - 30, cx, cy - R, MUTED, 1.5, '4 3') + L(cx, cy + R, cx, cy + R + 30, MUTED, 1.5, '4 3')
-    b += T(cx, cy - R - 38, 'القطب الشمالي الجغرافي', 14) + T(cx, cy + R + 50, 'القطب الجنوبي الجغرافي', 14)
+    for yy, txt in ((cy - R - 18, 'القطب الشمالي الجغرافي'), (cy + R + 20, 'القطب الجنوبي الجغرافي')):
+        b += L(cx - 92, yy, cx - 6, yy, MUTED, 1.2)
+        b += RECT(cx - 252, yy - 13, 160, 24, '#ffffff', '#ffffff', 0) + T(cx - 172, yy + 5, txt, 14)
     if points:
         ax, ay = cx + R * math.sin(math.radians(18)), cy - R * math.cos(math.radians(18)); b += DOT(ax, ay, 5) + T(ax + 16, ay - 6, 'A', 18, weight='bold')
         b += DOT(cx + R, cy, 5) + T(cx + R + 26, cy + 18, 'B', 18, weight='bold')
