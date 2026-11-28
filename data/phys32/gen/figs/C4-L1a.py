@@ -53,6 +53,9 @@ def resistor(x, y1, y2, vertical=True):
     for k in range(n): pts.append((x + (9 if k % 2 == 0 else -9), y1 + (k + 0.5) * (y2 - y1) / n))
     pts.append((x, y2))
     return '<polyline points="' + ' '.join(f'{a:.1f},{c:.1f}' for a, c in pts) + f'" fill="none" stroke="{INK}" stroke-width="2.2" stroke-linejoin="round"/>'
+def isub(x, y, main, sub, size=15):
+    """رمز قائم بحرف سفلي عربي عن يمينه كالكتاب ص110 و113 (I عظمى)؛ x هو الطرف الأيمن للحرف السفلي."""
+    return T(x, y + 4, sub, int(size * 0.72), 'end') + T(x - 0.42 * size * len(sub) - 1, y, main, size, 'end')
 def galv(x, y, r=17):
     return f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff" stroke="{INK}" stroke-width="2.2"/>' + T(x, y + 6, 'G', 16)
 
@@ -72,7 +75,7 @@ def o01():
 
     # مقالي: سلك رأسي داخل مجال منتظم داخل في الورقة، موصول بجلفانومتر خارج المجال
     b = RECT(110, 30, 260, 220, C_FIELD, '#eef7f1', 1.5)
-    b += grid(134, 52, 350, 230, 'into', 43, 44, clear=[(222, 40, 258, 240)])
+    b += grid(134, 52, 350, 230, 'into', 43, 44, clear=[(232, 40, 248, 240)])
     b += wire(240, 20, 240, 260, 6)
     b += L(240, 20, 470, 20, INK, 2) + L(240, 260, 470, 260, INK, 2) + L(470, 20, 470, 123, INK, 2) + L(470, 157, 470, 260, INK, 2) + galv(470, 140)
     b += lab_B(388, 46) + T(240, 288, 'السلك المتحرك', 14, color=MUTED)
@@ -97,7 +100,7 @@ def o03():
     pts = ' '.join(f'{x0 + t:.1f},{y0 - A * math.sin(2 * math.pi * t / 200):.1f}' for t in range(0, 401, 4))
     b += f'<polyline points="{pts}" fill="none" stroke="{C_VEL}" stroke-width="3"/>'
     b += L(x0, y0 - A, x0 + 50, y0 - A, MUTED, 1.2, '5 4') + L(x0, y0 + A, x0 + 150, y0 + A, MUTED, 1.2, '5 4')
-    b += T(x0 - 8, y0 - A + 5, 'I_{عظمى}', 15, 'end') + T(x0 - 8, y0 + A + 5, '−I_{عظمى}', 15, 'end') + T(x0 - 10, y0 + 5, '0', 14, 'end', MUTED)
+    b += isub(x0 - 8, y0 - A + 5, 'I', 'عظمى') + isub(x0 - 8, y0 + A + 5, '−I', 'عظمى') + T(x0 - 10, y0 + 5, '0', 14, 'end', MUTED)
     b += T(x1 + 14, y0 - 12, 'الزمن', 14) + T(x0, 20, 'التيار', 14)
     C('c4l1-o03-ac.svg', 520, 260, b)
 
@@ -127,20 +130,20 @@ def mic(name, labels):
     b += f'<path d="M 110 60 Q 125 170 110 280" fill="none" stroke="#8a96a8" stroke-width="5"/>'
     # المغناطيس (مقطع): قطب مركزي N وقطبان خارجيان S
     b += RECT(240, 60, 150, 40, MAG_D, MAG, 2) + RECT(240, 240, 150, 40, MAG_D, MAG, 2) + RECT(350, 60, 40, 220, MAG_D, MAG, 2)
-    b += RECT(220, 140, 170, 60, MAG_D, MAG, 2)
-    b += T(262, 90, 'S', 18, weight='bold') + T(262, 270, 'S', 18, weight='bold') + T(250, 178, 'N', 18, weight='bold')
-    # الملف حول القطب المركزي ومتصل بالغشاء
-    b += RECT(150, 128, 58, 84, WIRE_D, '#f6dcc8', 2)
-    for y in range(132, 210, 8): b += L(153, y, 205, y + 4, WIRE_D, 2)
-    b += L(118, 140, 150, 140, INK, 2) + L(118, 200, 150, 200, INK, 2)
-    # أسلاك التوصيل
-    b += f'<path d="M 190 212 C 200 300 300 300 430 310" fill="none" stroke="{INK}" stroke-width="1.6"/>'
-    b += f'<path d="M 175 212 C 185 315 300 318 430 322" fill="none" stroke="{INK}" stroke-width="1.6"/>'
+    b += RECT(200, 140, 190, 60, MAG_D, MAG, 2)
+    b += T(300, 90, 'S', 18, weight='bold') + T(300, 270, 'S', 18, weight='bold') + T(320, 178, 'N', 18, weight='bold')
+    # الملف ملفوف حول الطرف الأيسر للقطب المركزي N، ويقع في الفجوة بينه وبين القطبين S (داخل المجال)، ومتصل بالغشاء
+    b += RECT(206, 114, 54, 112, WIRE_D, '#f6dcc8', 2)
+    for y in range(118, 222, 8): b += L(209, y, 257, y + 4, WIRE_D, 2)
+    b += L(118, 140, 206, 140, INK, 2) + L(118, 200, 206, 200, INK, 2)
+    # أسلاك التوصيل (تمر عن يسار القطب السفلي S)
+    b += f'<path d="M 222 226 L 222 292 Q 222 312 262 312 L 430 312" fill="none" stroke="{INK}" stroke-width="1.6"/>'
+    b += f'<path d="M 212 226 L 212 300 Q 212 324 252 324 L 430 324" fill="none" stroke="{INK}" stroke-width="1.6"/>'
     (l1, l2, l3, l4) = labels
     b += L(112, 70, 150, 30, INK, 1.1) + T(155, 28, l1, 14, 'start', weight='bold')
-    b += L(180, 128, 205, 40, INK, 1.1) + T(208, 36, l2, 14, 'start', weight='bold') if False else L(195, 128, 290, 30, INK, 1.1) + T(294, 28, l2, 14, 'start', weight='bold')
+    b += L(180, 128, 205, 40, INK, 1.1) + T(208, 36, l2, 14, 'start', weight='bold') if False else L(240, 114, 290, 30, INK, 1.1) + T(294, 28, l2, 14, 'start', weight='bold')
     b += L(390, 120, 430, 110, INK, 1.1) + T(434, 114, l3, 14, 'start', weight='bold')
-    b += L(400, 312, 430, 290, INK, 1.1) + T(434, 290, l4, 14, 'start', weight='bold')
+    b += L(405, 312, 430, 290, INK, 1.1) + T(434, 290, l4, 14, 'start', weight='bold')
     C(name, 560, 340, b)
 
 def o05():

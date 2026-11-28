@@ -170,7 +170,7 @@ def meters(name, vp, ip, vs, is_):
 
 
 def o13():
-    meters('c4l2-o13-meters.svg', 'V_p = 230 V', 'I_p = 0.50 A', 'V_s = 20.0 V', 'I_s = 5.0 A')
+    meters('c4l2-o13-meters.svg', 'V_p = 230 V', 'I_p = 0.500 A', 'V_s = 20.0 V', 'I_s = 5.00 A')
     meters('c4l2-o13-e3.svg', 'V_p = 240 V', 'I_p = 2.50 A', 'V_s = 48.0 V', 'I_s = 11.5 A')
     # سلسلة: مصدر 2.4 kV ← T1 (1:5) ← أسلاك ← T2 ← حمل
     b = ''
