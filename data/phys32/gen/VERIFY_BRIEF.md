@@ -29,3 +29,4 @@ Counts: MCQs checked, essays checked, figures checked; defects fixed by type (ke
 
 ## Chapter 2 onward: book typography (owner ruling 2026-11-25)
 Apply BRIEF.md rule Y2: from chapter 2, every symbol must look as the book prints it on the cited page. Chapter 2 prints I, V, R, P (and their subscripts R_A, V_B) UPRIGHT — `$\mathrm{R}_\mathrm{A}$`; italic `$I$`, `$R_A$` in a chapter-2 file is a defect to fix (text, explanations, notes, tables, figure labels). Arabic subscripts as printed (`$\mathrm{V}_{\text{مصدر}}$`). Keep anything the book prints italic italic. Do not touch chapter-1 files.
+Chapter 3 (see BRIEF Y2 chapter-3 reading): F, q, v, θ italic; I, L, B upright, not bold. `$\boldsymbol{B}$`, `$\boldsymbol{F}$` or italic `$B$`/`$I$`/`$L$` in a chapter-3 file is a defect. Field green, force blue, velocity red; × into page, • out of page.
