@@ -285,8 +285,8 @@ def earth(name, magnet_labels=('S', 'N'), points=False, w=480, h=320):
     b += L(cx, cy - R - 30, cx, cy - R, MUTED, 1.5, '4 3') + L(cx, cy + R, cx, cy + R + 30, MUTED, 1.5, '4 3')
     b += T(cx, cy - R - 38, 'القطب الشمالي الجغرافي', 14) + T(cx, cy + R + 50, 'القطب الجنوبي الجغرافي', 14)
     if points:
-        b += DOT(cx + 26, cy - R - 12, 5) + T(cx + 42, cy - R - 14, 'A', 18, weight='bold')
-        b += DOT(cx + R + 10, cy, 5) + T(cx + R + 26, cy + 18, 'B', 18, weight='bold')
+        ax, ay = cx + R * math.sin(math.radians(18)), cy - R * math.cos(math.radians(18)); b += DOT(ax, ay, 5) + T(ax + 16, ay - 6, 'A', 18, weight='bold')
+        b += DOT(cx + R, cy, 5) + T(cx + R + 26, cy + 18, 'B', 18, weight='bold')
     C(name, w, h, b)
 
 
