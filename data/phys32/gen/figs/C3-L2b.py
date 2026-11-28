@@ -138,9 +138,10 @@ def o11():
         b += f'<circle cx="{x1:.1f}" cy="{y1:.1f}" r="11" fill="#fff" stroke="{INK}" stroke-width="2"/>' + DOT(x1, y1, 3.2, INK)
         b += f'<circle cx="{x2:.1f}" cy="{y2:.1f}" r="11" fill="#fff" stroke="{INK}" stroke-width="2"/>' + L(x2 - 5, y2 - 5, x2 + 5, y2 + 5, INK, 2) + L(x2 - 5, y2 + 5, x2 + 5, y2 - 5, INK, 2)
         # القوة على تيار خارج الورقة في مجال نحو اليمين: لأعلى؛ وعلى تيار داخل الورقة: لأسفل
-        o = 0 if ang == 0 else 22
-        b += ARROW(x1 + o, y1 - 13, x1 + o, y1 - 58, C_FORCE, 2.6) + T(x1 + o + 13, y1 - 45, 'F', 17, color=C_FORCE, italic=True)
-        b += ARROW(x2 + o, y2 + 13, x2 + o, y2 + 58, C_FORCE, 2.6) + T(x2 + o + 13, y2 + 50, 'F', 17, color=C_FORCE, italic=True)
+        # تبدأ أسهم القوة من الضلع نفسه (في الوضع b تبدأ من حافة دائرة الضلع كي لا تغطي خط الملف)
+        o, s0 = (0, 13) if ang == 0 else (12, 4)
+        b += ARROW(x1 + o, y1 - s0, x1 + o, y1 - 58, C_FORCE, 2.6) + T(x1 + o + 13, y1 - 45, 'F', 17, color=C_FORCE, italic=True)
+        b += ARROW(x2 + o, y2 + s0, x2 + o, y2 + 58, C_FORCE, 2.6) + T(x2 + o + 13, y2 + 50, 'F', 17, color=C_FORCE, italic=True)
     b += L(300, 20, 300, 290, GRID, 1.5)
     C('c3l2-o11-sides.svg', 600, 300, b)
 

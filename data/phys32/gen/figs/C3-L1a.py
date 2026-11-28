@@ -131,7 +131,7 @@ def o01():
     for k, yy in enumerate(ys):
         b += f'<rect x="100" y="{yy}" width="100" height="20" rx="3" fill="#59606b" stroke="{INK}" stroke-width="1.5"/>' + RECT(146, yy, 8, 20, '#8a6d3b', '#d8b46a', 1)
         b += T(225, yy + 15, str(k + 1), 15, 'start', weight='bold')
-    b += T(150, 54, 'N', 15, color=NRED, weight='bold') + T(205, 54, '(الوجه العلوي للقرص 1)', 11, 'start', MUTED)
+    b += T(120, 54, 'N', 15, color=NRED, weight='bold') + T(205, 54, '(الوجه العلوي للقرص 1)', 11, 'start', MUTED)
     save('c3l1-o01-rings.svg', svg(400, 330, b))
     # مقالي: مغناطيسان أطرافهما مرقّمة
     b = magnet(30, 60, 170, 44, 'N', None, lab=False) + T(48, 89, 'N', 17, color='#fff', weight='bold') + T(185, 50, '2', 15, weight='bold')
