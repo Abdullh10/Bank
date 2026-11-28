@@ -1,0 +1,329 @@
+{
+ "objective": "P32-C4-L1-O13",
+ "meta": {
+  "origin": "مولدة بالذكاء الاصطناعي",
+  "basis": "كتاب الطالب فيزياء 3-2 — نظام المسارات (طبعة 1447)",
+  "status_note": "مسودة مولدة: الحسابات متحقق منها بـ Python، ولم يراجعها خبير بشري بعد"
+ },
+ "mcq": [
+  {
+   "stem": "عُرّفت الكمية B بالعلاقة $\\mathrm{B} = \\frac{F}{\\mathrm{IL}}$. ما وحدة المجال المغناطيسي (التسلا T) معبّرًا عنها بوحدات القوة والتيار والطول؟",
+   "options": [
+    "$\\text{N.A/m}$",
+    "$\\text{N/A.m}$",
+    "$\\text{N.m/A}$",
+    "$\\text{A.m/N}$"
+   ],
+   "correct_index": 1,
+   "explanation": "من $\\mathrm{B} = \\frac{F}{\\mathrm{IL}}$: وحدة القوة N، والتيار A، والطول m، فوحدة B هي $\\text{N/A.m}$.",
+   "distractor_notes": [
+    "ضرب وحدة القوة في وحدة التيار بدل القسمة عليها.",
+    "",
+    "ضرب وحدة القوة في وحدة الطول بدل القسمة عليها.",
+    "قلب العلاقة: $\\frac{\\mathrm{IL}}{F}$."
+   ],
+   "thinking_level": "تذكر",
+   "question_kind": "معرفة",
+   "difficulty": "سهل",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF"
+  },
+  {
+   "stem": "أيّ تحليل للوحدات يعدّ صحيحًا لحساب وحدة القوة الدافعة الكهربائية الحثية من العلاقة $\\mathrm{EMF} = \\mathrm{BL}v$؟",
+   "options": [
+    "$(\\text{N/A.m})(\\text{m})(\\text{m/s})$",
+    "$(\\text{N.A/m})(\\text{m})(\\text{m/s})$",
+    "$(\\text{N/A.m})(\\text{m})(\\text{s/m})$",
+    "$(\\text{N/A.m})(\\text{m²})(\\text{m/s})$"
+   ],
+   "correct_index": 0,
+   "explanation": "وحدة B هي $\\text{N/A.m}$، ووحدة L هي m، ووحدة $v$ هي m/s؛ فيُكتب: $(\\text{N/A.m})(\\text{m})(\\text{m/s})$.",
+   "distractor_notes": [
+    "",
+    "وحدة التسلا مكتوبة خطأ: الصحيح $\\text{N/A.m}$ لا $\\text{N.A/m}$.",
+    "وحدة السرعة m/s لا s/m.",
+    "طول السلك يقاس بالمتر m لا بالمتر المربع."
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "تحليل وحدات",
+   "difficulty": "سهل",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF؛ ص 135 اختبار مقنن س1"
+  },
+  {
+   "stem": "ما ناتج تبسيط الوحدات $(\\text{N/A.m})(\\text{m})(\\text{m/s})$؟",
+   "options": [
+    "$\\text{N/A.s}$",
+    "$\\text{N.m²/A.s}$",
+    "$\\text{N.s/A.m}$",
+    "$\\text{N.m/A.s}$"
+   ],
+   "correct_index": 3,
+   "explanation": "يُختصر أحد المترين في البسط مع المتر في المقام: $(\\text{N/A.m})(\\text{m})(\\text{m/s}) = \\frac{\\text{N.m.m}}{\\text{A.m.s}} = \\text{N.m/A.s}$.",
+   "distractor_notes": [
+    "اختصار المترين كليهما في البسط مع متر واحد في المقام.",
+    "عدم اختصار المتر في المقام مع أحد المترين في البسط.",
+    "قلب وحدة السرعة إلى s/m.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "تبسيط وحدات",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF"
+  },
+  {
+   "stem": "عند إثبات أن $\\text{N.m/A.s}$ تساوي $\\text{J/C}$، أيّ علاقتين بين الوحدات تُستعملان؟",
+   "options": [
+    "$\\text{J} = \\text{N/m}$ و$\\text{C} = \\text{A/s}$",
+    "$\\text{J} = \\text{N.m}$ و$\\text{C} = \\text{A/s}$",
+    "$\\text{J} = \\text{N.m}$ و$\\text{C} = \\text{A.s}$",
+    "$\\text{J} = \\text{N.s}$ و$\\text{C} = \\text{A.m}$"
+   ],
+   "correct_index": 2,
+   "explanation": "الجول شغل يساوي قوة × مسافة: $\\text{J} = \\text{N.m}$، والأمبير كولوم لكل ثانية $\\text{A} = \\text{C/s}$ أي $\\text{C} = \\text{A.s}$؛ إذن $\\frac{\\text{N.m}}{\\text{A.s}} = \\frac{\\text{J}}{\\text{C}}$.",
+   "distractor_notes": [
+    "الجول حاصل ضرب القوة في المسافة لا قسمتها عليها، والكولوم A.s لا A/s.",
+    "من $\\text{A} = \\text{C/s}$ يكون $\\text{C} = \\text{A.s}$ لا $\\text{A/s}$.",
+    "",
+    "N.s وحدة الدفع لا الشغل، وA.m ليست وحدة الشحنة."
+   ],
+   "thinking_level": "فهم",
+   "question_kind": "تحليل وحدات",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF"
+  },
+  {
+   "stem": "في حل مسألة على القوة الدافعة الكهربائية الحثية ظهر الناتج بالوحدة $\\text{T.m}^2\\text{/s}$. بأيّ وحدة يمكن أن يُكتب هذا الناتج؟",
+   "options": [
+    "الجول J",
+    "الأمبير A",
+    "النيوتن N",
+    "الفولت V"
+   ],
+   "correct_index": 3,
+   "explanation": "$\\text{T.m}^2\\text{/s} = (\\text{N/A.m})(\\text{m}^2)(\\text{1/s}) = \\text{N.m/A.s} = \\text{J/C} = \\text{V}$؛ ولهذا يُكتب $0.11\\ \\text{T.m}^2\\text{/s} = 0.11\\ \\text{V}$.",
+   "distractor_notes": [
+    "الجول وحدة طاقة، أما EMF فطاقة لكل وحدة شحنة.",
+    "الأمبير وحدة التيار، ويُحسب التيار بقسمة EMF على المقاومة.",
+    "النيوتن وحدة القوة، وEMF ليست قوة بل فرق جهد.",
+    ""
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "تحويل وحدات",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 109 — المثال 1؛ الكتاب ص 107 — تحليل وحدات EMF"
+  },
+  {
+   "stem": "أيّ الوحدات الآتية ليست مكافئة للفولت؟",
+   "options": [
+    "$\\text{J/C}$",
+    "$\\text{T.m/s}$",
+    "$\\text{T.m}^2\\text{/s}$",
+    "$\\text{N.m/A.s}$"
+   ],
+   "correct_index": 1,
+   "explanation": "$\\text{T.m/s} = (\\text{N/A.m})(\\text{m/s}) = \\text{N/A.s}$، وهذه ليست الفولت لأنها تنقص مترًا؛ أما $\\text{J/C}$ و$\\text{N.m/A.s}$ و$\\text{T.m}^2\\text{/s}$ فكلها تساوي الفولت.",
+   "distractor_notes": [
+    "الفولت يُعرّف بأنه جول لكل كولوم، فهي مكافئة له.",
+    "",
+    "$\\text{T.m}^2\\text{/s} = \\text{N.m/A.s} = \\text{V}$، فهي مكافئة له.",
+    "$\\text{N.m/A.s} = \\text{J/C} = \\text{V}$، فهي مكافئة له."
+   ],
+   "thinking_level": "تحليل",
+   "question_kind": "تحليل وحدات",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF"
+  },
+  {
+   "stem": "أراد طالب إثبات أن وحدة BLv هي الفولت، فكتب: «$(\\text{N.A/m})(\\text{m})(\\text{m/s}) = \\text{N.A.m/s}$»، ثم لم يستطع الوصول إلى الفولت. ما مصدر الخطأ؟",
+   "options": [
+    "كتب وحدة التسلا خطأ، وصوابها $\\text{N/A.m}$",
+    "كتب وحدة السرعة خطأ، وصوابها $\\text{s/m}$",
+    "كتب وحدة الطول خطأ، وصوابها $\\text{m}^2$",
+    "لا خطأ؛ فـ $\\text{N.A.m/s}$ تساوي الفولت"
+   ],
+   "correct_index": 0,
+   "explanation": "من $\\mathrm{B} = \\frac{F}{\\mathrm{IL}}$ تكون وحدة التسلا $\\text{N/A.m}$ (الأمبير في المقام)؛ وبها يصبح التحليل $(\\text{N/A.m})(\\text{m})(\\text{m/s}) = \\text{N.m/A.s} = \\text{J/C} = \\text{V}$.",
+   "distractor_notes": [
+    "",
+    "وحدة السرعة m/s صحيحة كما كتبها.",
+    "وحدة الطول m صحيحة كما كتبها.",
+    "$\\text{N.A.m/s}$ ليست الفولت؛ فالفولت $\\text{N.m/A.s}$ والأمبير فيه في المقام."
+   ],
+   "thinking_level": "تقويم",
+   "question_kind": "تقويم حل",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF؛ ص 129 السؤال 43"
+  }
+ ],
+ "essay": [
+  {
+   "stem": "استخدم الوحدات لإثبات أن الفولت هو وحدة قياس المقدار $\\mathrm{BL}v$، موضحًا وحدة كل كمية والعلاقات بين الوحدات التي تستعملها.",
+   "model_answer": "من $\\mathrm{B} = \\frac{F}{\\mathrm{IL}}$ وحدة B هي $\\text{N/A.m}$، ووحدة L هي m، ووحدة $v$ هي m/s. إذن وحدة $\\mathrm{BL}v$: $(\\text{N/A.m})(\\text{m})(\\text{m/s}) = \\text{N.m/A.s}$. وبما أن $\\text{J} = \\text{N.m}$ و$\\text{A} = \\text{C/s}$ (أي $\\text{A.s} = \\text{C}$)، فإن $\\text{N.m/A.s} = \\text{J/C}$، وبما أن $\\text{V} = \\text{J/C}$ فوحدة $\\mathrm{BL}v$ هي الفولت V.",
+   "answer_elements": [
+    "وحدة B هي $\\text{N/A.m}$ مع ذكر مصدرها",
+    "التعويض والتبسيط إلى $\\text{N.m/A.s}$",
+    "استعمال $\\text{J} = \\text{N.m}$ و$\\text{C} = \\text{A.s}$",
+    "الوصول إلى $\\text{J/C} = \\text{V}$"
+   ],
+   "solution_steps": [
+    "$[\\mathrm{B}] = \\text{N/A.m}$، $[\\mathrm{L}] = \\text{m}$، $[v] = \\text{m/s}$",
+    "$(\\text{N/A.m})(\\text{m})(\\text{m/s}) = \\text{N.m/A.s}$",
+    "$\\text{N.m} = \\text{J}$، $\\text{A.s} = \\text{C}$ ⇐ $\\text{N.m/A.s} = \\text{J/C}$",
+    "$\\text{J/C} = \\text{V}$"
+   ],
+   "marks": [
+    {
+     "element": "وحدات الكميات الثلاث",
+     "marks": 1
+    },
+    {
+     "element": "التبسيط إلى N.m/A.s",
+     "marks": 1
+    },
+    {
+     "element": "علاقتا الجول والكولوم",
+     "marks": 1
+    },
+    {
+     "element": "الوصول إلى الفولت",
+     "marks": 1
+    }
+   ],
+   "rubric": [
+    {
+     "level": "4 درجات",
+     "description": "إثبات كامل متسلسل"
+    },
+    {
+     "level": "2–3 درجات",
+     "description": "إثبات صحيح مع إغفال تبرير خطوة"
+    },
+    {
+     "level": "1 درجة",
+     "description": "كتابة وحدات الكميات فقط"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "كتابة وحدة التسلا $\\text{N.A/m}$",
+    "كتابة $\\text{C} = \\text{A/s}$",
+    "التوقف عند N.m/A.s دون ربطها بالفولت"
+   ],
+   "thinking_level": "تطبيق",
+   "question_kind": "إثبات بالوحدات",
+   "difficulty": "متوسط",
+   "source_ref": "الكتاب ص 107؛ ص 129 السؤال 43"
+  },
+  {
+   "stem": "في مسألة يُطلب فيها مقدار المجال المغناطيسي من العلاقة $\\mathrm{B} = \\frac{\\mathrm{EMF}}{\\mathrm{L}v}$. أثبت باستخدام تحليل الوحدات أن وحدة الناتج هي التسلا $\\text{N/A.m}$.",
+   "model_answer": "وحدة $\\frac{\\mathrm{EMF}}{\\mathrm{L}v}$ هي $\\frac{\\text{V}}{(\\text{m})(\\text{m/s})} = \\text{V.s/m}^2$. وبما أن $\\text{V} = \\text{J/C} = \\text{N.m/A.s}$، فإن $\\text{V.s/m}^2 = \\frac{\\text{N.m}}{\\text{A.s}}\\cdot\\frac{\\text{s}}{\\text{m}^2} = \\frac{\\text{N}}{\\text{A.m}}$، وهي وحدة التسلا.",
+   "answer_elements": [
+    "وحدة الكسر $\\text{V.s/m}^2$",
+    "التعبير عن الفولت بـ $\\text{N.m/A.s}$",
+    "الاختصار والوصول إلى $\\text{N/A.m}$"
+   ],
+   "solution_steps": [
+    "$\\frac{\\text{V}}{(\\text{m})(\\text{m/s})} = \\text{V.s/m}^2$",
+    "$\\text{V} = \\text{J/C} = \\text{N.m/A.s}$",
+    "$\\frac{\\text{N.m}}{\\text{A.s}}\\cdot\\frac{\\text{s}}{\\text{m}^2} = \\text{N/A.m} = \\text{T}$"
+   ],
+   "marks": [
+    {
+     "element": "وحدة الكسر",
+     "marks": 1
+    },
+    {
+     "element": "التعبير عن الفولت",
+     "marks": 1
+    },
+    {
+     "element": "الاختصار إلى التسلا",
+     "marks": 1
+    }
+   ],
+   "rubric": [
+    {
+     "level": "3 درجات",
+     "description": "إثبات كامل صحيح"
+    },
+    {
+     "level": "2 درجتان",
+     "description": "خطوتان صحيحتان"
+    },
+    {
+     "level": "1 درجة",
+     "description": "خطوة واحدة صحيحة"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "قسمة الفولت على m/s دون ضربها في m",
+    "خطأ في اختصار الثواني"
+   ],
+   "thinking_level": "تحليل",
+   "question_kind": "إثبات بالوحدات",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF؛ ص 135 اختبار مقنن س2"
+  },
+  {
+   "stem": "ادّعى طالب أن القوة الدافعة الكهربائية الحثية في سلك يتحرك عموديًّا على مجال مغناطيسي تُعطى بالعلاقة $\\mathrm{EMF} = \\frac{\\mathrm{B}v}{\\mathrm{L}}$. استخدم تحليل الوحدات للحكم على صحة ادّعائه.",
+   "model_answer": "وحدة $\\frac{\\mathrm{B}v}{\\mathrm{L}}$ هي $\\frac{(\\text{N/A.m})(\\text{m/s})}{\\text{m}} = \\text{N/A.m.s}$. أما الفولت فيساوي $\\text{N.m/A.s}$. الوحدتان مختلفتان (الأولى تنقص $\\text{m}^2$)، فالعلاقة لا يمكن أن تعطي EMF بالفولت، وادّعاء الطالب خاطئ. العلاقة الصحيحة $\\mathrm{EMF} = \\mathrm{BL}v$ التي وحدتها $(\\text{N/A.m})(\\text{m})(\\text{m/s}) = \\text{N.m/A.s} = \\text{J/C} = \\text{V}$.",
+   "answer_elements": [
+    "حساب وحدة $\\frac{\\mathrm{B}v}{\\mathrm{L}}$: $\\text{N/A.m.s}$",
+    "مقارنتها بالفولت $\\text{N.m/A.s}$",
+    "الحكم بخطأ الادّعاء",
+    "ذكر العلاقة الصحيحة مع تحقق وحدتها"
+   ],
+   "solution_steps": [],
+   "marks": [
+    {
+     "element": "وحدة العلاقة المدّعاة",
+     "marks": 1
+    },
+    {
+     "element": "المقارنة بالفولت",
+     "marks": 1
+    },
+    {
+     "element": "الحكم",
+     "marks": 1
+    },
+    {
+     "element": "العلاقة الصحيحة",
+     "marks": 1
+    }
+   ],
+   "rubric": [
+    {
+     "level": "4 درجات",
+     "description": "تحليل صحيح وحكم معلّل مع العلاقة الصحيحة"
+    },
+    {
+     "level": "2–3 درجات",
+     "description": "تحليل وحكم صحيحان دون ذكر العلاقة الصحيحة أو العكس"
+    },
+    {
+     "level": "1 درجة",
+     "description": "حكم صحيح دون تحليل"
+    },
+    {
+     "level": "صفر",
+     "description": "إجابة خاطئة أو لا إجابة"
+    }
+   ],
+   "common_errors": [
+    "الحكم على العلاقة بالمقادير العددية لا بالوحدات",
+    "خطأ في اختصار الأمتار"
+   ],
+   "thinking_level": "تقويم",
+   "question_kind": "تقويم علاقة",
+   "difficulty": "صعب",
+   "source_ref": "الكتاب ص 107 — تحليل وحدات EMF"
+  }
+ ]
+}

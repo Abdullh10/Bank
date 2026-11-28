@@ -81,13 +81,13 @@ def o01():
 # ───────────────────────── O02
 def o02():
     # ثلاثة اتجاهات متعامدة كما في القاعدة الرابعة لليد اليمنى
-    ox, oy = 170, 200
+    ox, oy = 250, 200
     b = ARROW(ox, oy, ox + 190, oy, C_VEL, 3, 13) + lab_v(ox + 205, oy + 6) + T(ox + 150, oy + 30, 'الإبهام', 14, color=MUTED)
     b += ARROW(ox, oy, ox + 110, oy - 95, C_FIELD, 3, 13) + lab_B(ox + 124, oy - 102) + T(ox + 160, oy - 70, 'الأصابع', 14, color=MUTED)
     b += ARROW(ox, oy, ox, oy - 160, INK, 3, 13) + qmark(ox - 20, oy - 150) + T(ox - 30, oy - 110, 'العمودي على باطن الكف', 14, 'end', MUTED)
     b += L(ox - 4, oy - 18, ox + 14, oy - 18, MUTED, 1.4) + L(ox + 14, oy - 18, ox + 14, oy, MUTED, 1.4)
     b += DOT(ox, oy, 4, INK)
-    C('c4l1-o02-rule.svg', 420, 240, b)
+    C('c4l1-o02-rule.svg', 500, 240, b)
 
 # ───────────────────────── O03
 def o03():
@@ -98,7 +98,7 @@ def o03():
     b += f'<polyline points="{pts}" fill="none" stroke="{C_VEL}" stroke-width="3"/>'
     b += L(x0, y0 - A, x0 + 50, y0 - A, MUTED, 1.2, '5 4') + L(x0, y0 + A, x0 + 150, y0 + A, MUTED, 1.2, '5 4')
     b += T(x0 - 8, y0 - A + 5, 'I_{عظمى}', 15, 'end') + T(x0 - 8, y0 + A + 5, '−I_{عظمى}', 15, 'end') + T(x0 - 10, y0 + 5, '0', 14, 'end', MUTED)
-    b += T(x1 + 4, y0 + 24, 'الزمن', 14) + T(x0, 20, 'التيار', 14)
+    b += T(x1 + 14, y0 - 12, 'الزمن', 14) + T(x0, 20, 'التيار', 14)
     C('c4l1-o03-ac.svg', 520, 260, b)
 
 # ───────────────────────── O04
@@ -116,13 +116,6 @@ def o04():
         b += tag(cx, cy + 50, lab)
     C('c4l1-o04-angles.svg', 650, 280, b)
 
-    # MCQ: سلك طويل جزء منه فقط داخل منطقة المجال
-    b = RECT(200, 30, 140, 170, C_FIELD, '#eef7f1', 1.5) + grid(222, 54, 318, 180, 'out', 32, 42, clear=[(212, 100, 330, 130)])
-    b += wire(40, 115, 520, 115, 6) + ARROW(470, 80, 470, 40, C_VEL, 3, 12) + lab_v(488, 52)
-    b += L(200, 220, 340, 220, INK, 1.4) + L(200, 213, 200, 227, INK, 1.4) + L(340, 213, 340, 227, INK, 1.4) + T(270, 243, '0.20 m', 15)
-    b += L(40, 268, 520, 268, INK, 1.4) + L(40, 261, 40, 275, INK, 1.4) + L(520, 261, 520, 275, INK, 1.4) + T(280, 291, '1.20 m', 15)
-    b += lab_B(355, 30) + T(270, 22, 'منطقة المجال', 13, color=C_FIELD)
-    C('c4l1-o04-part.svg', 560, 300, b)
 
 # ───────────────────────── O05
 def mic(name, labels):
@@ -145,7 +138,7 @@ def mic(name, labels):
     b += f'<path d="M 175 212 C 185 315 300 318 430 322" fill="none" stroke="{INK}" stroke-width="1.6"/>'
     (l1, l2, l3, l4) = labels
     b += L(112, 70, 150, 30, INK, 1.1) + T(155, 28, l1, 14, 'start', weight='bold')
-    b += L(180, 128, 205, 40, INK, 1.1) + T(208, 36, l2, 14, 'start', weight='bold') if False else L(185, 128, 230, 30, INK, 1.1) + T(234, 28, l2, 14, 'start', weight='bold')
+    b += L(180, 128, 205, 40, INK, 1.1) + T(208, 36, l2, 14, 'start', weight='bold') if False else L(195, 128, 290, 30, INK, 1.1) + T(294, 28, l2, 14, 'start', weight='bold')
     b += L(390, 120, 430, 110, INK, 1.1) + T(434, 114, l3, 14, 'start', weight='bold')
     b += L(400, 312, 430, 290, INK, 1.1) + T(434, 290, l4, 14, 'start', weight='bold')
     C(name, 560, 340, b)
@@ -158,11 +151,11 @@ def o05():
 def rails(name, kind, R_lab, rod_x, vdir, L_lab=None, vlab='v', ends=None, B_lab='B', extra=''):
     """دائرة مستطيلة: مقاومة في الضلع الأيسر وسكتان أفقيتان وقضيب رأسي متحرك عند rod_x، في مجال (into/out)."""
     xl, xr, yt, yb = 60, 460, 50, 230
-    b = grid(100, 80, 440, 200, kind, 48, 40, clear=[(rod_x - 18, 60, rod_x + 18, 220), (rod_x + (10 if vdir > 0 else -100), 112, rod_x + (100 if vdir > 0 else -10), 148)] if True else [])
+    b = grid(100, 80, 440, 200, kind, 48, 40, clear=[(rod_x - 18, 60, rod_x + 18, 220), (70, 125, 150, 155), (rod_x - 110, 170, rod_x - 10, 200) if L_lab else (0, 0, 0, 0), (rod_x + (10 if vdir > 0 else -100), 112, rod_x + (100 if vdir > 0 else -10), 148)] if True else [])
     b += L(xl, yt, xr, yt, INK, 2.4) + L(xl, yb, xr, yb, INK, 2.4) + L(xl, yt, xl, 110, INK, 2.4) + L(xl, 170, xl, yb, INK, 2.4) + resistor(xl, 110, 170)
     if R_lab: b += T(xl + 18, 146, R_lab, 15, 'start')
     b += wire(rod_x, yt - 14, rod_x, yb + 14, 7)
-    b += ARROW(rod_x + 14 * vdir, 130, rod_x + 80 * vdir, 130, C_VEL, 3, 12) + lab_v(rod_x + 90 * vdir + (6 if vdir > 0 else -6), 124, vlab, 16, 'start' if vdir > 0 else 'end')
+    b += ARROW(rod_x + 14 * vdir, 130, rod_x + 80 * vdir, 130, C_VEL, 3, 12) + (lab_v(rod_x + 90 * vdir + 6, 124, 'v', 16, 'start') + T(rod_x + 90 * vdir + 16, 124, vlab[1:], 15, 'start', C_VEL) if len(vlab) > 1 else lab_v(rod_x + 90 * vdir + (6 if vdir > 0 else -6), 124, vlab, 16, 'start' if vdir > 0 else 'end'))
     if L_lab:
         b += L(rod_x + 28 * (-vdir), yt, rod_x + 28 * (-vdir), yb, INK, 1.2) + L(rod_x + 28 * (-vdir) - 6, yt, rod_x + 28 * (-vdir) + 6, yt, INK, 1.2) + L(rod_x + 28 * (-vdir) - 6, yb, rod_x + 28 * (-vdir) + 6, yb, INK, 1.2)
         b += T(rod_x + 34 * (-vdir), 186, L_lab, 15, 'end' if vdir > 0 else 'start')
@@ -177,7 +170,7 @@ def o06():
     # سلك عمودي على الورقة سرعته تصنع زاوية 60° مع مجال أفقي
     b = hfield(20, 460, [40, 100, 220, 280], 1) + L(20, 160, 150, 160, C_FIELD, 2) + L(270, 160, 460, 160, C_FIELD, 2) + ARROW(340, 160, 364, 160, C_FIELD, 2, 12)
     cx, cy = 170, 160; a = math.radians(60)
-    b += wire_end(cx, cy) + ARROW(cx + 15 * math.cos(a), cy - 15 * math.sin(a), cx + 120 * math.cos(a), cy - 120 * math.sin(a), C_VEL, 3, 12) + lab_v(cx + 134 * math.cos(a) + 6, cy - 134 * math.sin(a) + 8)
+    b += wire_end(cx, cy) + ARROW(cx + 15 * math.cos(a), cy - 15 * math.sin(a), cx + 120 * math.cos(a), cy - 120 * math.sin(a), C_VEL, 3, 12) + lab_v(cx + 120 * math.cos(a) + 18, cy - 120 * math.sin(a) + 22)
     b += L(cx + 13, cy, cx + 85, cy, INK, 1.2, '4 3') + f'<path d="M {cx + 50:.1f} {cy:.1f} A 50 50 0 0 0 {cx + 50 * math.cos(a):.1f} {cy - 50 * math.sin(a):.1f}" fill="none" stroke="{INK}" stroke-width="1.5"/>' + T(cx + 64, cy - 26, '‎60°', 14)
     b += lab_B(470, 34)
     C('c4l1-o06-angle.svg', 490, 300, b)
